@@ -264,7 +264,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
 <nav>
   <a class="nav-brand" href="#"><div class="brand-icon">C</div>CyberScore</a>
-  <div style="display:flex;align-items:center;gap:8px;"><div class="nav-pill">11 Intel Sources · AI-Powered</div><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:100px;padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--muted2);letter-spacing:.06em;">v1.4.1</div></div>
+  <div style="display:flex;align-items:center;gap:8px;"><div class="nav-pill">11 Intel Sources · AI-Powered</div><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:100px;padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--muted2);letter-spacing:.06em;">v1.5.1</div></div>
 </nav>
 
 <section class="hero" id="heroSection">
@@ -272,19 +272,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <h1>Real threat intel.<br><span class="grad">Instant vendor score.</span></h1>
   <p class="hero-sub">10 public intelligence sources — live DNS, certificate transparency, WHOIS, malware feeds, VirusTotal & AlienVault OTX — synthesised by AI into a vendor security grade.</p>
 
-  <!-- Anthropic API Key — required -->
-  <div style="width:100%;max-width:680px;margin:0 auto 12px;animation:fadeUp .7s .28s ease both;">
-    <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border:1.5px solid rgba(59,130,246,0.35);border-radius:12px;padding:10px 16px;box-shadow:0 4px 20px rgba(59,130,246,0.1);">
-      <span style="font-size:.85rem;">🔑</span>
-      <div style="flex:1;">
-        <div style="font-size:.7rem;font-weight:700;color:var(--blue2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;">Anthropic API Key <span style="color:var(--red);margin-left:2px;">required</span></div>
-        <input type="password" id="anthropicKey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"
-          style="width:100%;background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text);" />
-      </div>
-      <a href="https://console.anthropic.com/settings/keys" target="_blank"
-        style="font-size:.72rem;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color .2s;flex-shrink:0;">Get key →</a>
-    </div>
-  </div>
+  <!-- API key handled securely via Cloudflare Worker -->
 
   <div class="search-wrap">
     <div class="search-box">
@@ -356,6 +344,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
       <div class="scan-check" id="chk-news"><div class="check-dot">●</div>Cyber News</div>
       <div class="scan-check" id="chk-vt"><div class="check-dot">●</div>VirusTotal</div>
       <div class="scan-check" id="chk-otx"><div class="check-dot">●</div>AlienVault OTX</div>
+      <div class="scan-check" id="chk-technews"><div class="check-dot">●</div>Company News</div>
       <div class="scan-check" id="chk-ai"><div class="check-dot">●</div>AI Risk Synthesis</div>
     </div>
   </div>
@@ -485,6 +474,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <div id="otxContent"></div>
   </div>
 
+  <!-- Company Tech & General News -->
+  <div class="results-full panel" id="techNewsPanel" style="display:none;animation-delay:.30s;border-color:rgba(99,102,241,0.18);background:linear-gradient(135deg,rgba(99,102,241,0.04),rgba(59,130,246,0.02));">
+    <div class="panel-hdr">
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(99,102,241,0.12);">🗞️</div>Company Intelligence — Tech &amp; General News</div>
+      <span class="live-badge" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.25);color:#818cf8;">LIVE</span>
+    </div>
+    <div id="techNewsContent"></div>
+  </div>
+
   <!-- Findings -->
   <div class="results-full panel" style="animation-delay:.22s;">
     <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(239,68,68,0.12);">⚠️</div>Security Findings</div></div>
@@ -500,7 +498,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 </section>
 
 <script>
-const VERSION='1.4.1';
+const VERSION='1.5.1';
 const BUILD_DATE='2026-03-06';
 console.info(`%cCyberScore ThreatIntel v${VERSION} (${BUILD_DATE})%c — 11 intel sources · AI-powered vendor risk assessment`,
   'color:#60a5fa;font-weight:800;font-size:13px;','color:#64748b;font-size:11px;');
@@ -523,8 +521,8 @@ function ratingLabel(s){
 function sevClass(s){return{critical:'sev-critical',high:'sev-high',medium:'sev-medium',low:'sev-low',info:'sev-info'}[s?.toLowerCase()]||'sev-info';}
 
 // ── Scan animation ─────────────────────────────────────────────────────────────
-const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','ai'];
-const STATUSES=['Querying RDAP WHOIS…','Fetching live DNS records…','Checking certificate transparency…','Scanning URLhaus malware feed…','Querying ThreatFox IOC database…','Checking breach history…','Checking governance & hygiene…','Scanning cyber news…','Contacting VirusTotal…','Pulling AlienVault OTX…','AI risk synthesis…'];
+const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','technews','ai'];
+const STATUSES=['Querying RDAP WHOIS…','Fetching live DNS records…','Checking certificate transparency…','Scanning URLhaus malware feed…','Querying ThreatFox IOC database…','Checking breach history…','Checking governance & hygiene…','Scanning cyber news…','Contacting VirusTotal…','Pulling AlienVault OTX…','Fetching company news…','AI risk synthesis…'];
 let scanTimer=null;
 function animateScan(domain){
   $('scanning').classList.add('active');
@@ -804,6 +802,52 @@ async function fetchCyberNews(domain){
   };
 }
 
+async function fetchCompanyNews(domain){
+  const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
+  const rss2json=url=>fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12`,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const clean=s=>(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#\d+;/g,'').trim();
+  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-3);
+
+  const enc=s=>encodeURIComponent(s);
+  const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
+
+  // Fire 4 parallel searches covering different angles
+  const [r1,r2,r3,r4]=await Promise.all([
+    rss2json(gNews(`"${company}" technology OR software OR cloud OR AI OR digital`)),
+    rss2json(gNews(`"${company}" partnership OR acquisition OR launch OR product OR funding`)),
+    rss2json(gNews(`"${company}" revenue OR growth OR strategy OR CEO OR leadership`)),
+    rss2json(gNews(`"${company}" Australia OR Melbourne OR Sydney OR government OR contract`)),
+  ]);
+
+  const seen=new Set();
+  const articles=[];
+  [r1,r2,r3,r4].forEach((d,si)=>{
+    if(d?.status!=='ok')return;
+    const cats=['Technology & Digital','Business & Strategy','Company & Leadership','Industry & Contracts'];
+    (d.items||[]).forEach(a=>{
+      const title=clean(a.title||'');
+      const key=title.toLowerCase().substring(0,45);
+      if(!title||seen.has(key))return;
+      seen.add(key);
+      const pub=new Date(a.pubDate||0);
+      if(pub<cutoff)return;
+      articles.push({
+        title,
+        source:clean(a.author)||new URL(a.link||'https://x.com').hostname.replace('www.','').replace('news.google.com','Google News'),
+        date:a.pubDate?.split(' ').slice(0,4).join(' ')||'',
+        pubDate:pub,
+        link:a.link||'#',
+        snippet:clean(a.description||'').substring(0,220),
+        category:cats[si],
+        isRecent:pub>new Date(Date.now()-365*24*3600*1000),
+      });
+    });
+  });
+
+  articles.sort((a,b)=>b.pubDate-a.pubDate);
+  return{company,articles:articles.slice(0,20),found:articles.length>0};
+}
+
 async function fetchVirusTotal(domain,apiKey){
   if(!apiKey)return null;
   try{
@@ -845,29 +889,28 @@ async function startScan(){
   const raw=$('domainInput').value.trim();
   if(!raw){alert('Please enter a domain.');return;}
   const domain=raw.replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase().trim();
-  const anthropicKey=$('anthropicKey').value.trim();
   const vtKey=$('vtKey').value.trim();
   const otxKey=$('otxKey').value.trim();
-  if(!anthropicKey){showError(domain,'Anthropic API key is required. Enter your key above the search box.');btn.disabled=false;btn.textContent='Assess Vendor';return;}
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='Assessing…';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','newsPanel','vtPanel','otxPanel'].forEach(id=>$(id).style.display='none');
+  ['dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','newsPanel','vtPanel','otxPanel','techNewsPanel'].forEach(id=>$(id).style.display='none');
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   try{
-    const [rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx]=await Promise.all([
+    const [rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews]=await Promise.all([
       fetchRDAP(domain),fetchDNS(domain),fetchCRT(domain),
       fetchURLhaus(domain),fetchThreatFox(domain),
       fetchBreachHistory(domain),fetchGovernance(domain),fetchCyberNews(domain),
       fetchVirusTotal(domain,vtKey),fetchOTX(domain,otxKey),
+      fetchCompanyNews(domain),
     ]);
-    const aiData=await callClaudeAPI(domain,anthropicKey,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx});
+    const aiData=await callClaudeAPI(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
     finishScanAnim();
     await new Promise(r=>setTimeout(r,500));
     $('scanning').classList.remove('active');
     $('heroSection').style.display='none';
-    renderResults(domain,aiData,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx});
+    renderResults(domain,aiData,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(e){
     finishScanAnim();$('scanning').classList.remove('active');console.error(e);showError(domain,e.message);
@@ -875,8 +918,8 @@ async function startScan(){
 }
 
 // ── CLAUDE API ─────────────────────────────────────────────────────────────────
-async function callClaudeAPI(domain,anthropicKey,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx}=intel;
+async function callClaudeAPI(domain,intel){
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews}=intel;
   const ctx=[];
   if(rdap)ctx.push(`WHOIS: Registrar=${rdap.registrar}, Registered=${rdap.registered?.split('T')[0]||'?'}, Expires=${rdap.expiry?.split('T')[0]||'?'}, NS=[${rdap.nameservers?.join(',')}]`);
   if(dns)ctx.push(`DNS: IPs=[${dns.aRecords?.join(',')}], MX=[${dns.mx?.slice(0,3).join(',')}], SPF=${dns.spf?'PRESENT:'+dns.spf.substring(0,70):'MISSING'}, DMARC=${dns.dmarc?'PRESENT:'+dns.dmarc.substring(0,70):'MISSING'}, IPv6=${dns.ipv6}`);
@@ -980,7 +1023,8 @@ CYBER NEWS INFLUENCE:
 - Recent incident articles found: mention in summary, add finding if relevant
 - Only penalise score if news clearly indicates a confirmed recent security incident`;
 
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-dangerous-direct-browser-access':'true'},
+  const WORKER_URL='https://threatintel-proxy.gpang77.workers.dev';
+  const resp=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
 
   if(!resp.ok){
@@ -1344,8 +1388,8 @@ function renderResults(domain,d,intel){
   $('resultSummary').textContent=d.summary||'';
   $('statFindings').textContent=d.total_findings||d.findings?.length||0;
   $('statCritical').textContent=d.critical_count||0;
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx}=intel;
-  const srcCount=[rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt&&!vt.error,otx&&!otx.error].filter(Boolean).length;
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews}=intel;
+  const srcCount=[rdap,dns,crt,urlhaus,threatfox,breach,gov,news,techNews,vt&&!vt.error,otx&&!otx.error].filter(Boolean).length;
   $('statSources').textContent=srcCount+'/7';
   $('scoreGrade').textContent='Grade '+rl.grade;$('scoreGrade').style.color=rl.color;
 
@@ -1394,7 +1438,7 @@ function renderResults(domain,d,intel){
       <div style="font-family:'Sora',sans-serif;font-size:.8rem;font-weight:700;color:${c};width:38px;text-align:right;">${v}<span style="font-size:.6rem;color:var(--muted);font-weight:400;">/100</span></div></div>`).join('');
 
   // Intel panels
-  renderDNSPanel(rdap,dns);renderCRTPanel(crt);renderThreatPanel(urlhaus,threatfox);renderBreachPanel(breach);renderGovPanel(gov);renderNewsPanel(news);renderVTPanel(vt);renderOTXPanel(otx);
+  renderDNSPanel(rdap,dns);renderCRTPanel(crt);renderThreatPanel(urlhaus,threatfox);renderBreachPanel(breach);renderGovPanel(gov);renderNewsPanel(news);renderVTPanel(vt);renderOTXPanel(otx);renderTechNewsPanel(techNews);
 
   // Verdict
   const crit=d.critical_count||0;
@@ -1442,6 +1486,74 @@ function renderResults(domain,d,intel){
 }
 
 // ── UTILS ──────────────────────────────────────────────────────────────────────
+function renderTechNewsPanel(techNews){
+  if(!techNews)return;
+  $('techNewsPanel').style.display='block';
+  const co=safeText(techNews.company||'this company');
+  let h='';
+
+  if(!techNews.found||!techNews.articles?.length){
+    h=`<div class="clean-msg" style="color:var(--muted2);">No recent news found for <strong>${co}</strong> in the past 3 years.</div>`;
+    $('techNewsContent').innerHTML=h;return;
+  }
+
+  // Group by category
+  const cats={};
+  techNews.articles.forEach(a=>{
+    const c=a.category||'General';
+    if(!cats[c])cats[c]=[];
+    cats[c].push(a);
+  });
+
+  const catIcons={'Technology & Digital':'💻','Business & Strategy':'📈','Company & Leadership':'👔','Industry & Contracts':'🏛️','General':'📰'};
+  const catColors={'Technology & Digital':'rgba(99,102,241,0.08)','Business & Strategy':'rgba(20,184,166,0.08)','Company & Leadership':'rgba(167,139,250,0.08)','Industry & Contracts':'rgba(59,130,246,0.08)','General':'rgba(255,255,255,0.03)'};
+  const catBorders={'Technology & Digital':'rgba(99,102,241,0.2)','Business & Strategy':'rgba(20,184,166,0.2)','Company & Leadership':'rgba(167,139,250,0.2)','Industry & Contracts':'rgba(59,130,246,0.2)','General':'var(--border)'};
+
+  // Summary bar
+  const recent=techNews.articles.filter(a=>a.isRecent).length;
+  h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+    <div style="padding:8px 14px;border-radius:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);font-size:.8rem;">
+      <span style="font-weight:700;color:#818cf8;font-size:1.1rem;">${techNews.articles.length}</span> <span style="color:var(--muted2);">articles found</span>
+    </div>
+    <div style="padding:8px 14px;border-radius:8px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);font-size:.8rem;">
+      <span style="font-weight:700;color:var(--green);font-size:1.1rem;">${recent}</span> <span style="color:var(--muted2);">from past 12 months</span>
+    </div>
+    <div style="padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:.8rem;">
+      <span style="font-weight:700;color:var(--text);font-size:1.1rem;">${Object.keys(cats).length}</span> <span style="color:var(--muted2);">topic categories</span>
+    </div>
+  </div>`;
+
+  // Render each category
+  Object.entries(cats).forEach(([cat,arts])=>{
+    const icon=catIcons[cat]||'📰';
+    h+=`<div style="margin-bottom:20px;">
+      <div class="sec-title">${icon} ${safeText(cat)} <span style="font-size:.68rem;font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0;">(${arts.length} article${arts.length>1?'s':''})</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">`;
+    arts.slice(0,6).forEach(a=>{
+      const bg=catColors[cat]||'rgba(255,255,255,0.03)';
+      const br=catBorders[cat]||'var(--border)';
+      h+=`<div style="padding:11px 13px;border-radius:9px;background:${bg};border:1px solid ${br};display:flex;flex-direction:column;gap:5px;">
+        <a href="${a.link||'#'}" target="_blank" rel="noopener"
+          style="font-size:.82rem;font-weight:600;color:var(--blue2);text-decoration:none;line-height:1.4;">${safeText(a.title)}</a>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+          <span style="font-size:.68rem;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 6px;">${safeText(a.source)}</span>
+          <span style="font-size:.68rem;color:var(--muted);">${a.date||''}</span>
+          ${a.isRecent?'<span style="font-size:.64rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,0.15);color:var(--green);">NEW</span>':''}
+        </div>
+        ${a.snippet?`<div style="font-size:.74rem;color:var(--muted2);line-height:1.5;">${safeText(a.snippet.substring(0,150))}…</div>`:''}
+      </div>`;
+    });
+    h+=`</div></div>`;
+  });
+
+  h+=`<div class="src-footer">
+    <span>Source: Google News RSS · Past 3 years · ${techNews.articles.length} articles across ${Object.keys(cats).length} categories</span>
+    <a href="https://news.google.com/search?q=${encodeURIComponent(techNews.company||'')}" target="_blank">Search all news →</a>
+  </div>`;
+
+  $('techNewsContent').innerHTML=h;
+}
+
 function showError(domain,msg){
   $('heroSection').style.display='flex';
   const ex=$('scanError');if(ex)ex.remove();
