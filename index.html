@@ -1,3 +1,7 @@
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<!-- API KEY — update this line when key changes          -->
+<!-- const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';      -->
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!DOCTYPE html>
 <!-- Colaboree Intel v2.0.0 - 2026-03-10 -->
 <html lang="en">
@@ -84,7 +88,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 @keyframes spin{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(360deg);}}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
 
-.hero h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:900;line-height:1.08;letter-spacing:-.03em;
+.hero h1{font-size:clamp(1.3rem,2.2vw,1.9rem);font-weight:700;line-height:1.08;letter-spacing:-.03em;
   color:var(--ink);margin-bottom:18px;animation:fadeUp .7s .1s ease both;}
 .hero h1 .grad{color:var(--coral);}
 .hero-sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:580px;margin:0 auto 34px;animation:fadeUp .7s .2s ease both;}
@@ -350,7 +354,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 
 <nav>
   <a class="nav-brand" href="#">
-    <div class="brand-icon">C</div>
     <span class="nav-brand-name">Colabo<span>ree</span> Intel</span>
   </a>
   <div style="display:flex;align-items:center;gap:8px;">
@@ -361,7 +364,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 
 <section class="hero" id="heroSection">
   <div class="hero-eyebrow"><span class="pulse"></span>Vendor Security Assessment Platform</div>
-  <h1>Real threat intel.<br/><span class="grad">Instant vendor score.</span></h1>
+  <h1>Know your vendors.<br/><span class="grad">Before they become a risk.</span></h1>
   <p class="hero-sub">11 public intelligence sources — live DNS, certificate transparency, WHOIS, malware feeds, VirusTotal &amp; AlienVault OTX — synthesised by AI into a vendor security grade.</p>
 
   <div class="search-wrap">
@@ -576,6 +579,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 </section>
 
 <script>
+const ANTHROPIC_API_KEY='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'; // ← UPDATE KEY HERE
 const VERSION='2.0.0';
 const BUILD_DATE='2026-03-10';
 console.log(`Colaboree Intel v${VERSION} (${BUILD_DATE}) — 11 intel sources · AI-powered vendor risk assessment`);
@@ -974,14 +978,17 @@ async function startScan(){
   ['dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','newsPanel','vtPanel','otxPanel','techNewsPanel'].forEach(id=>$(id).style.display='none');
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews;
   try{
-    const [rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews]=await Promise.all([
+    [rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews]=await Promise.all([
       fetchRDAP(domain),fetchDNS(domain),fetchCRT(domain),
       fetchURLhaus(domain),fetchThreatFox(domain),
       fetchBreachHistory(domain),fetchGovernance(domain),fetchCyberNews(domain),
       fetchVirusTotal(domain,vtKey),fetchOTX(domain,otxKey),
       fetchCompanyNews(domain),
     ]);
+  }catch(e){console.warn('Free intel partial failure:',e);}
+  try{
     const aiData=await callClaudeAPI(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
     finishScanAnim();
     await new Promise(r=>setTimeout(r,500));
@@ -990,7 +997,9 @@ async function startScan(){
     renderResults(domain,aiData,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(e){
-    finishScanAnim();$('scanning').classList.remove('active');console.error(e);showError(domain,e.message);
+    // AI failed — show free intel fallback (news + tech news)
+    finishScanAnim();$('scanning').classList.remove('active');console.error(e);
+    showFallback(domain,e.message,{news,techNews,dns,rdap,crt});
   }finally{btn.disabled=false;btn.textContent='Assess Vendor';}
 }
 
@@ -1100,18 +1109,16 @@ CYBER NEWS INFLUENCE:
 - Recent incident articles found: mention in summary, add finding if relevant
 - Only penalise score if news clearly indicates a confirmed recent security incident`;
 
-  const WORKER_URLS=['https://api.colaboree.com','https://threatintel-proxy.gpang77.workers.dev'];
-  let resp=null,lastErr='';
-  for(const url of WORKER_URLS){
-    try{
-      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
-        signal:AbortSignal.timeout(25000)});
-      resp=r;
-      if(resp.ok||resp.status<500)break;
-    }catch(e){lastErr=e.message;}
-  }
-  if(!resp)throw new Error(lastErr||'All endpoints failed — check network/proxy settings');
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':ANTHROPIC_API_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
+  });
   if(!resp.ok){
     const eb=await resp.json().catch(()=>({}));const b=eb.error||eb;
     if(resp.status===429||b?.type==='exceeded_limit'||b?.type==='rate_limit_error'){
@@ -1637,6 +1644,112 @@ function renderTechNewsPanel(techNews){
   </div>`;
 
   $('techNewsContent').innerHTML=h;
+}
+
+function showFallback(domain,msg,intel){
+  // Hide hero, show a simple fallback panel
+  $('heroSection').style.display='none';
+  $('results').classList.remove('active');
+
+  // Remove old fallback if exists
+  const old=$('fallbackPanel');if(old)old.remove();
+
+  const company=domain.replace(/\..+$/,'').replace(/-/g,' ');
+  const googleNewsURL=`https://news.google.com/search?q=${encodeURIComponent(company+' cybersecurity OR technology OR breach OR hack')}&hl=en`;
+  const googleNewsGenURL=`https://news.google.com/search?q=${encodeURIComponent(company)}&hl=en`;
+
+  // Build news links from fetched data
+  let cyberHTML='';
+  if(intel.news&&intel.news.articles&&intel.news.articles.length){
+    cyberHTML=intel.news.articles.slice(0,8).map(a=>`
+      <a href="${a.link||'#'}" target="_blank" rel="noopener" style="display:block;padding:12px 14px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--coral);margin-bottom:4px;">${safeText(a.title||'')}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${safeText(a.source||'')} · ${a.date||''}</div>
+        ${a.snippet?`<div style="font-size:.78rem;color:var(--ink);margin-top:5px;line-height:1.5;">${safeText(a.snippet.substring(0,180))}…</div>`:''}
+      </a>`).join('');
+  } else {
+    cyberHTML=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:.85rem;">No cybersecurity news found in public feeds.</div>`;
+  }
+
+  const co=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
+  let techHTML='';
+  if(intel.techNews&&intel.techNews.articles&&intel.techNews.articles.length){
+    techHTML=intel.techNews.articles.slice(0,8).map(a=>`
+      <a href="${a.link||'#'}" target="_blank" rel="noopener" style="display:block;padding:12px 14px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:4px;">${safeText(a.title||'')}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${safeText(a.source||'')} · ${a.date||''}</div>
+        ${a.snippet?`<div style="font-size:.78rem;color:var(--muted);margin-top:5px;line-height:1.5;">${safeText(a.snippet.substring(0,180))}…</div>`:''}
+      </a>`).join('');
+  } else {
+    // Fallback: show quick search links to Google News
+    const searches=[
+      {label:'General News',q:co},
+      {label:'Technology & Digital',q:co+' technology OR software OR AI OR digital'},
+      {label:'Business & Strategy',q:co+' business OR acquisition OR partnership OR growth'},
+      {label:'Cybersecurity',q:co+' security OR breach OR hack OR cyber'},
+    ];
+    techHTML=`
+      <div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+        Real-time news couldn't be fetched (RSS rate limit). Click below to search Google News directly:
+      </div>
+      ${searches.map(s=>`
+        <a href="https://news.google.com/search?q=${encodeURIComponent(s.q)}&hl=en" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);">${s.label}</div>
+            <div style="font-size:.73rem;color:var(--muted);margin-top:2px;">${s.q}</div>
+          </div>
+          <span style="color:var(--coral);font-size:.85rem;font-weight:700;">→</span>
+        </a>`).join('')}`;
+  }
+
+  const panel=document.createElement('div');
+  panel.id='fallbackPanel';
+  panel.style.cssText='position:relative;z-index:1;max-width:900px;margin:30px auto 80px;padding:0 5%;';
+  panel.innerHTML=`
+    <!-- Header -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px 28px;margin-bottom:20px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--coral);margin-bottom:6px;">${safeText(domain)}</div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,92,58,0.08);border:1px solid rgba(255,92,58,0.2);border-radius:100px;padding:5px 14px;font-size:.78rem;font-weight:700;color:var(--coral);">
+            ⚠️ AI scoring unavailable — showing public intel
+          </div>
+          <div style="font-size:.82rem;color:var(--muted);margin-top:10px;max-width:500px;line-height:1.6;">
+            The AI engine could not be reached (network or proxy restriction). Cybersecurity and company news from public sources are shown below.
+          </div>
+        </div>
+        <button onclick="resetScan()" style="background:var(--ink);color:var(--cream);border:none;border-radius:8px;padding:10px 20px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;">← New Search</button>
+      </div>
+    </div>
+
+    <!-- Cyber News -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(220,38,38,0.1);display:flex;align-items:center;justify-content:center;">📰</div>
+          Cybersecurity News
+        </div>
+        <a href="${googleNewsURL}" target="_blank" style="font-size:.78rem;color:var(--coral);text-decoration:none;font-weight:600;">View all →</a>
+      </div>
+      ${cyberHTML}
+    </div>
+
+    <!-- Company / Tech News -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(200,241,53,0.15);display:flex;align-items:center;justify-content:center;">🗞️</div>
+          Company & Technology News
+        </div>
+        <a href="${googleNewsGenURL}" target="_blank" style="font-size:.78rem;color:var(--coral);text-decoration:none;font-weight:600;">View all →</a>
+      </div>
+      ${techHTML}
+    </div>
+  `;
+
+  document.querySelector('.hero').after(panel);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function showError(domain,msg){
