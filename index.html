@@ -1,255 +1,341 @@
 <!DOCTYPE html>
+<!-- Colaboree Intel v2.0.0 - 2026-03-10 -->
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CyberScore — Domain Security Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Colaboree Intel — Domain Security Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Cabinet+Grotesk:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#080e1a;--bg2:#0d1628;--bg3:#111e35;
-  --panel:rgba(255,255,255,0.04);--panel2:rgba(255,255,255,0.07);
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-  --blue:#3b82f6;--blue2:#60a5fa;--teal:#14b8a6;--green:#22c55e;
-  --yellow:#eab308;--orange:#f97316;--red:#ef4444;--purple:#a78bfa;
-  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
-  --glow-blue:rgba(59,130,246,0.18);
+  --ink:#0d0d0d;
+  --cream:#f5f0e8;
+  --warm:#f0e6d3;
+  --acid:#c8f135;
+  --coral:#ff5c3a;
+  --coral2:#ff7a5c;
+  --sky:#b8e0ff;
+  --muted:#6b6560;
+  --muted2:#9a948f;
+  --card:#ffffff;
+  --border:rgba(13,13,13,0.1);
+  --border2:rgba(13,13,13,0.16);
+  --panel:rgba(13,13,13,0.04);
+  --panel2:rgba(13,13,13,0.07);
+  /* Status colours */
+  --green:#16a34a;
+  --yellow:#ca8a04;
+  --orange:#ea580c;
+  --red:#dc2626;
+  --blue:#2563eb;
+  --teal:#0d9488;
+  --purple:#7c3aed;
+  --blue2:#3b82f6;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-h1,h2,h3,h4{font-family:'Sora',sans-serif;}
+body{font-family:'Cabinet Grotesk',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+h1,h2,h3,h4,.mono-head{font-family:'Syne',sans-serif;}
 .mono{font-family:'JetBrains Mono',monospace;}
 
+/* BG TEXTURE */
 .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(59,130,246,0.07),transparent 60%),
-             radial-gradient(ellipse 50% 40% at 80% 90%,rgba(20,184,166,0.05),transparent 60%);}
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 0%,rgba(200,241,53,0.12),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%,rgba(255,92,58,0.08),transparent 60%);}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(13,13,13,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(13,13,13,0.04) 1px,transparent 1px);
   background-size:48px 48px;mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 30%,transparent 80%);}
 
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-  padding:0 5%;height:62px;background:rgba(8,14,26,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
-.nav-brand{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:800;font-size:1.15rem;color:#fff;text-decoration:none;}
-.brand-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--teal));
-  display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(59,130,246,0.4);}
-.nav-pill{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);border-radius:100px;
-  padding:5px 14px;font-size:.78rem;font-weight:600;color:var(--blue2);letter-spacing:.05em;}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5%;height:62px;
+  background:rgba(245,240,232,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.brand-icon{width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--coral),var(--acid));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--ink);
+  box-shadow:0 0 14px rgba(255,92,58,0.3);}
+.nav-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.nav-brand-name span{color:var(--coral);}
+.nav-pill{background:rgba(200,241,53,0.2);border:1px solid rgba(200,241,53,0.4);border-radius:100px;
+  padding:5px 14px;font-size:.78rem;font-weight:700;color:var(--ink);letter-spacing:.04em;}
+.nav-ver{background:var(--panel);border:1px solid var(--border);border-radius:100px;
+  padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;}
 
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:100px 5% 60px;text-align:center;}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);
-  border:1px solid rgba(59,130,246,0.25);border-radius:100px;padding:5px 16px;
-  font-size:.77rem;font-weight:700;color:var(--blue2);letter-spacing:.1em;text-transform:uppercase;
+/* HERO */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:100px 5% 60px;text-align:center;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,92,58,0.08);border:1px solid rgba(255,92,58,0.2);
+  border-radius:100px;padding:5px 16px;
+  font-size:.77rem;font-weight:700;color:var(--coral);letter-spacing:.08em;text-transform:uppercase;
   margin-bottom:28px;animation:fadeDown .6s ease both;}
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulseAnim 2s infinite;}
-@keyframes pulseAnim{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:pulseAnim 2s infinite;}
+@keyframes pulseAnim{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.6)}}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes spin{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(360deg);}}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
 
-.hero h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:900;line-height:1.08;letter-spacing:-0.03em;color:#fff;
-  margin-bottom:18px;animation:fadeUp .7s .1s ease both;}
-.hero h1 .grad{background:linear-gradient(90deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero-sub{font-size:1rem;color:var(--muted2);line-height:1.7;max-width:580px;margin:0 auto 34px;animation:fadeUp .7s .2s ease both;}
+.hero h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:900;line-height:1.08;letter-spacing:-.03em;
+  color:var(--ink);margin-bottom:18px;animation:fadeUp .7s .1s ease both;}
+.hero h1 .grad{color:var(--coral);}
+.hero-sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:580px;margin:0 auto 34px;animation:fadeUp .7s .2s ease both;}
 
+/* SEARCH */
 .search-wrap{width:100%;max-width:680px;margin:0 auto;animation:fadeUp .7s .3s ease both;}
-.search-box{display:flex;align-items:center;background:var(--bg3);border:1.5px solid var(--border2);
-  border-radius:14px;padding:6px 6px 6px 20px;transition:border-color .25s,box-shadow .25s;
-  box-shadow:0 8px 32px rgba(0,0,0,0.4);}
-.search-box:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.15),0 8px 32px rgba(0,0,0,0.4);}
-.search-icon{font-size:1rem;margin-right:12px;opacity:.5;flex-shrink:0;}
-.search-input{flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:1.05rem;color:var(--text);}
-.search-input::placeholder{color:var(--muted);}
-.search-btn{background:linear-gradient(135deg,var(--blue),#2563eb);color:#fff;border:none;padding:12px 26px;
-  border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;
-  transition:transform .15s,box-shadow .2s;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 14px rgba(59,130,246,0.4);}
-.search-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,0.55);}
+.search-box{display:flex;align-items:center;background:var(--card);border:1.5px solid var(--border2);
+  border-radius:14px;padding:6px 6px 6px 20px;
+  transition:border-color .25s,box-shadow .25s;
+  box-shadow:0 8px 32px rgba(13,13,13,0.1);}
+.search-box:focus-within{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,92,58,0.12),0 8px 32px rgba(13,13,13,0.1);}
+.search-icon{font-size:1rem;margin-right:12px;opacity:.4;flex-shrink:0;}
+.search-input{flex:1;background:transparent;border:none;outline:none;
+  font-family:'Cabinet Grotesk',sans-serif;font-size:1.05rem;color:var(--ink);}
+.search-input::placeholder{color:var(--muted2);}
+.search-btn{background:var(--coral);color:#fff;border:none;padding:12px 26px;
+  border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;
+  cursor:pointer;transition:transform .15s,box-shadow .2s;white-space:nowrap;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(255,92,58,0.3);}
+.search-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,92,58,0.45);}
 .search-btn:disabled{opacity:.6;cursor:not-allowed;}
 .search-examples{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
-.ex-chip{background:var(--panel);border:1px solid var(--border);border-radius:100px;padding:4px 14px;
-  font-size:.78rem;color:var(--muted2);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;}
-.ex-chip:hover{border-color:var(--blue);color:var(--blue2);background:var(--glow-blue);}
+.ex-chip{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:4px 14px;
+  font-size:.78rem;color:var(--muted);cursor:pointer;transition:all .2s;
+  font-family:'JetBrains Mono',monospace;}
+.ex-chip:hover{border-color:var(--coral);color:var(--coral);background:rgba(255,92,58,0.05);}
 
+/* API KEYS */
 .api-keys-section{width:100%;max-width:680px;margin:14px auto 0;animation:fadeUp .7s .4s ease both;}
 .api-keys-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;justify-content:center;
-  font-size:.82rem;color:var(--muted2);padding:8px;transition:color .2s;user-select:none;}
-.api-keys-toggle:hover{color:var(--text);}
+  font-size:.82rem;color:var(--muted);padding:8px;transition:color .2s;user-select:none;}
+.api-keys-toggle:hover{color:var(--ink);}
 .toggle-arrow{transition:transform .25s;display:inline-block;}
 .api-keys-toggle.open .toggle-arrow{transform:rotate(180deg);}
-.api-keys-body{display:none;margin-top:10px;background:var(--bg3);border:1px solid var(--border2);
+.api-keys-body{display:none;margin-top:10px;background:var(--card);border:1px solid var(--border2);
   border-radius:14px;padding:20px;flex-direction:column;gap:10px;}
 .api-keys-body.open{display:flex;}
 .api-key-row{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:9px 14px;}
 .api-key-source{display:flex;align-items:center;gap:8px;min-width:140px;flex-shrink:0;}
 .api-key-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.api-key-name{font-size:.8rem;font-weight:600;color:var(--text);}
-.api-key-input{flex:1;background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text);}
-.api-key-input::placeholder{color:var(--muted);font-family:'DM Sans',sans-serif;}
+.api-key-name{font-size:.8rem;font-weight:600;color:var(--ink);}
+.api-key-input{flex:1;background:transparent;border:none;outline:none;
+  font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--ink);}
+.api-key-input::placeholder{color:var(--muted2);font-family:'Cabinet Grotesk',sans-serif;}
 .api-key-link{font-size:.72rem;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color .2s;}
-.api-key-link:hover{color:var(--blue2);}
-.badge-free{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;background:rgba(34,197,94,0.12);color:var(--green);}
-.badge-soon{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;background:rgba(100,116,139,0.15);color:var(--muted);}
+.api-key-link:hover{color:var(--coral);}
+.badge-free{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
+  background:rgba(22,163,74,0.1);color:var(--green);}
+.badge-soon{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
+  background:var(--panel);color:var(--muted);}
 
-.intel-bar{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:18px;font-size:.72rem;color:var(--muted);animation:fadeUp .7s .5s ease both;}
-.intel-src{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:3px 10px;}
+/* INTEL BAR */
+.intel-bar{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:18px;
+  font-size:.72rem;color:var(--muted);animation:fadeUp .7s .5s ease both;}
+.intel-src{display:flex;align-items:center;gap:5px;background:var(--card);
+  border:1px solid var(--border);border-radius:6px;padding:3px 10px;}
 .intel-src-dot{width:6px;height:6px;border-radius:50%;}
 
+/* SCANNING */
 #scanning{display:none;position:relative;z-index:1;max-width:680px;margin:28px auto 0;
-  background:var(--bg3);border:1px solid var(--border2);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+  background:var(--card);border:1px solid var(--border2);border-radius:20px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(13,13,13,0.12);}
 #scanning.active{display:block;}
 .scan-header{padding:20px 24px 12px;display:flex;align-items:center;gap:14px;}
-.scan-radar{width:38px;height:38px;border-radius:50%;border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 14px rgba(59,130,246,0.3);}
-.scan-radar::before{content:'';position:absolute;width:6px;height:6px;border-radius:50%;background:var(--blue);top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;}
-.scan-radar::after{content:'';position:absolute;bottom:50%;left:50%;width:2px;height:calc(50% - 4px);background:linear-gradient(to top,var(--blue),rgba(59,130,246,0.2));transform-origin:bottom center;animation:spin 1.2s linear infinite;border-radius:1px;}
-.scan-domain{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--blue2);}
-.scan-status{font-size:.78rem;color:var(--muted2);}
-.scan-bar-outer{height:3px;background:rgba(255,255,255,0.06);}
-.scan-bar-inner{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));width:0%;transition:width .4s ease;}
+.scan-radar{width:38px;height:38px;border-radius:50%;border:2px solid var(--coral);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  box-shadow:0 0 14px rgba(255,92,58,0.3);}
+.scan-radar::before{content:'';position:absolute;width:6px;height:6px;border-radius:50%;
+  background:var(--coral);top:50%;left:50%;transform:translate(-50%,-50%);z-index:1;}
+.scan-radar::after{content:'';position:absolute;bottom:50%;left:50%;width:2px;
+  height:calc(50% - 4px);background:linear-gradient(to top,var(--coral),rgba(255,92,58,0.2));
+  transform-origin:bottom center;animation:spin 1.2s linear infinite;border-radius:1px;}
+.scan-domain{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--coral);}
+.scan-status{font-size:.78rem;color:var(--muted);}
+.scan-bar-outer{height:3px;background:rgba(13,13,13,0.08);}
+.scan-bar-inner{height:100%;background:linear-gradient(90deg,var(--coral),var(--acid));width:0%;transition:width .4s ease;}
 .scan-checks{padding:12px 24px 20px;display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.scan-check{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);transition:color .3s;}
-.scan-check.done{color:var(--text);}
-.scan-check.active-check{color:var(--blue2);}
-.check-dot{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0;transition:all .3s;}
-.scan-check.done .check-dot{background:rgba(34,197,94,0.2);border-color:var(--green);color:var(--green);}
-.scan-check.active-check .check-dot{border-color:var(--blue);animation:pulseAnim 1s infinite;}
+.scan-check{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted2);transition:color .3s;}
+.scan-check.done{color:var(--ink);}
+.scan-check.active-check{color:var(--coral);}
+.check-dot{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:.58rem;flex-shrink:0;transition:all .3s;}
+.scan-check.done .check-dot{background:rgba(22,163,74,0.15);border-color:var(--green);color:var(--green);}
+.scan-check.active-check .check-dot{border-color:var(--coral);animation:pulseAnim 1s infinite;}
 .loading-dots span{animation:blink 1.4s infinite both;}
 .loading-dots span:nth-child(2){animation-delay:.2s;}
 .loading-dots span:nth-child(3){animation-delay:.4s;}
 
+/* RESULTS */
 #results{display:none;position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 5% 80px;}
 #results.active{display:block;animation:fadeIn .5s ease;}
 .action-bar{display:flex;gap:10px;justify-content:flex-end;margin-bottom:16px;flex-wrap:wrap;}
-.action-btn{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:var(--panel);color:var(--muted2);font-family:'DM Sans',sans-serif;}
-.action-btn:hover{border-color:var(--blue);color:var(--blue2);background:var(--glow-blue);}
+.action-btn{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;
+  font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;
+  border:1px solid var(--border);background:var(--card);color:var(--muted);
+  font-family:'Cabinet Grotesk',sans-serif;}
+.action-btn:hover{border-color:var(--coral);color:var(--coral);background:rgba(255,92,58,0.05);}
 
+/* RESULT HEADER */
 .result-header{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;
-  background:var(--bg3);border:1px solid var(--border2);border-radius:22px;padding:30px 34px;margin-bottom:20px;position:relative;overflow:hidden;}
-.result-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(59,130,246,0.06),transparent 70%);pointer-events:none;}
+  background:var(--card);border:1px solid var(--border2);border-radius:22px;
+  padding:30px 34px;margin-bottom:20px;position:relative;overflow:hidden;
+  box-shadow:0 8px 32px rgba(13,13,13,0.08);}
+.result-header::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,92,58,0.04),transparent 70%);
+  pointer-events:none;}
 .score-ring-wrap{position:relative;}
 .score-ring-svg{transform:rotate(-90deg);}
 .score-ring-svg circle{transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1);}
 .score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.score-big{font-family:'Sora',sans-serif;font-size:2.1rem;font-weight:900;color:#fff;}
+.score-big{font-family:'Syne',sans-serif;font-size:2.1rem;font-weight:900;color:var(--ink);}
 .score-max{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-.result-domain-label{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--blue2);margin-bottom:6px;}
-.result-rating-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:100px;font-family:'Sora',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:12px;}
-.result-summary{font-size:.86rem;color:var(--muted2);line-height:1.65;max-width:460px;}
+.result-domain-label{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--coral);margin-bottom:6px;}
+.result-rating-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;
+  border-radius:100px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:12px;}
+.result-summary{font-size:.86rem;color:var(--muted);line-height:1.65;max-width:460px;}
 .result-stats{display:flex;flex-direction:column;gap:9px;min-width:135px;}
-.rstat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:9px 13px;text-align:center;}
-.rstat-val{font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;}
+.rstat{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:9px 13px;text-align:center;}
+.rstat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--ink);}
 .rstat-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
 
+/* INTEL STRIP */
 .intel-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px;}
 .intel-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;font-size:.74rem;font-weight:600;border:1px solid;}
-.intel-chip.ok{background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.2);color:var(--green);}
-.intel-chip.warn{background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.2);color:var(--orange);}
-.intel-chip.err{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:var(--red);}
+.intel-chip.ok{background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.2);color:var(--green);}
+.intel-chip.warn{background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.2);color:var(--orange);}
+.intel-chip.err{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);}
 .intel-chip.skip{background:var(--panel);border-color:var(--border);color:var(--muted);}
 
+/* GRID */
 .results-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
 .results-full{margin-bottom:18px;}
 @media(max-width:900px){.results-grid{grid-template-columns:1fr;}}
 
-.panel{background:var(--bg3);border:1px solid var(--border);border-radius:18px;padding:22px;animation:fadeUp .5s ease both;}
+/* PANEL */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;
+  animation:fadeUp .5s ease both;box-shadow:0 4px 16px rgba(13,13,13,0.06);}
 .panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.panel-title{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-size:.93rem;font-weight:700;color:#fff;}
+.panel-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);}
 .panel-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;}
 .live-badge{font-size:.7rem;font-weight:700;letter-spacing:.05em;border-radius:6px;padding:2px 9px;border:1px solid;}
 
-.grade-badge{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:.92rem;}
-.grade-A{background:rgba(34,197,94,0.15);color:var(--green);border:1.5px solid rgba(34,197,94,0.35);}
-.grade-B{background:rgba(20,184,166,0.15);color:var(--teal);border:1.5px solid rgba(20,184,166,0.35);}
-.grade-C{background:rgba(234,179,8,0.15);color:var(--yellow);border:1.5px solid rgba(234,179,8,0.35);}
-.grade-D{background:rgba(249,115,22,0.15);color:var(--orange);border:1.5px solid rgba(249,115,22,0.35);}
-.grade-F{background:rgba(239,68,68,0.15);color:var(--red);border:1.5px solid rgba(239,68,68,0.35);}
+/* GRADES */
+.grade-badge{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.92rem;}
+.grade-A{background:rgba(22,163,74,0.12);color:var(--green);border:1.5px solid rgba(22,163,74,0.3);}
+.grade-B{background:rgba(13,148,136,0.12);color:var(--teal);border:1.5px solid rgba(13,148,136,0.3);}
+.grade-C{background:rgba(202,138,4,0.12);color:var(--yellow);border:1.5px solid rgba(202,138,4,0.3);}
+.grade-D{background:rgba(234,88,12,0.12);color:var(--orange);border:1.5px solid rgba(234,88,12,0.3);}
+.grade-F{background:rgba(220,38,38,0.12);color:var(--red);border:1.5px solid rgba(220,38,38,0.3);}
 .grade-N{background:var(--panel);color:var(--muted);border:1.5px solid var(--border);}
 
+/* RV LIST */
 .rv-list{display:flex;flex-direction:column;gap:8px;}
-.rv-row{display:flex;align-items:center;gap:11px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;transition:all .2s;}
-.rv-row:hover{border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);}
+.rv-row{display:flex;align-items:center;gap:11px;padding:10px 12px;
+  background:var(--warm);border:1px solid var(--border);border-radius:10px;transition:all .2s;}
+.rv-row:hover{border-color:var(--border2);background:var(--cream);}
 .rv-emoji{font-size:.95rem;width:20px;text-align:center;}
 .rv-info{flex:1;}
 .rv-name-row{display:flex;align-items:center;gap:7px;margin-bottom:2px;}
-.rv-name{font-size:.82rem;font-weight:600;color:var(--text);}
-.rv-src{font-size:.63rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(59,130,246,0.1);color:var(--blue2);letter-spacing:.04em;}
-.rv-finding{font-size:.74rem;color:var(--muted2);line-height:1.4;}
-.rv-bar{height:4px;border-radius:2px;background:rgba(255,255,255,0.07);margin-top:5px;overflow:hidden;}
+.rv-name{font-size:.82rem;font-weight:600;color:var(--ink);}
+.rv-src{font-size:.63rem;font-weight:700;padding:1px 6px;border-radius:3px;
+  background:rgba(255,92,58,0.1);color:var(--coral);letter-spacing:.04em;}
+.rv-finding{font-size:.74rem;color:var(--muted);line-height:1.4;}
+.rv-bar{height:4px;border-radius:2px;background:rgba(13,13,13,0.08);margin-top:5px;overflow:hidden;}
 .rv-bar-fill{height:100%;border-radius:2px;transition:width 1s ease;}
 
+/* FINDINGS */
 .findings-list{display:flex;flex-direction:column;gap:10px;}
-.finding-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;padding:13px 15px;border-left:3px solid transparent;}
+.finding-card{background:var(--warm);border:1px solid var(--border);border-radius:11px;padding:13px 15px;border-left:3px solid transparent;}
 .finding-card.critical{border-left-color:var(--red);}
 .finding-card.high{border-left-color:var(--orange);}
 .finding-card.medium{border-left-color:var(--yellow);}
 .finding-card.low{border-left-color:var(--green);}
-.finding-card.info{border-left-color:var(--blue);}
+.finding-card.info{border-left-color:var(--coral);}
 .finding-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
 .sev-pill{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
-.sev-critical{background:rgba(239,68,68,0.15);color:var(--red);}
-.sev-high{background:rgba(249,115,22,0.15);color:var(--orange);}
-.sev-medium{background:rgba(234,179,8,0.15);color:var(--yellow);}
-.sev-low{background:rgba(34,197,94,0.15);color:var(--green);}
-.sev-info{background:rgba(59,130,246,0.15);color:var(--blue2);}
-.finding-title{font-size:.85rem;font-weight:600;color:var(--text);}
-.finding-src{font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:4px;background:rgba(167,139,250,0.12);color:var(--purple);}
-.finding-desc{font-size:.79rem;color:var(--muted2);line-height:1.55;}
-.finding-fix{margin-top:7px;padding:7px 11px;background:rgba(59,130,246,0.06);border-radius:7px;font-size:.76rem;color:var(--blue2);line-height:1.5;}
-.finding-fix strong{color:#fff;}
+.sev-critical{background:rgba(220,38,38,0.12);color:var(--red);}
+.sev-high{background:rgba(234,88,12,0.12);color:var(--orange);}
+.sev-medium{background:rgba(202,138,4,0.12);color:var(--yellow);}
+.sev-low{background:rgba(22,163,74,0.12);color:var(--green);}
+.sev-info{background:rgba(255,92,58,0.1);color:var(--coral);}
+.finding-title{font-size:.85rem;font-weight:600;color:var(--ink);}
+.finding-src{font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:4px;background:rgba(200,241,53,0.2);color:var(--ink);letter-spacing:.04em;}
+.finding-desc{font-size:.79rem;color:var(--muted);line-height:1.55;}
+.finding-fix{margin-top:7px;padding:7px 11px;background:rgba(200,241,53,0.15);border-radius:7px;font-size:.76rem;color:var(--ink);line-height:1.5;border:1px solid rgba(200,241,53,0.3);}
+.finding-fix strong{color:var(--ink);font-weight:700;}
 
+/* INFRA TABLE */
 .infra-table{width:100%;border-collapse:collapse;}
 .infra-table td{padding:7px 11px;border-bottom:1px solid var(--border);font-size:.8rem;vertical-align:top;}
 .infra-table td:first-child{color:var(--muted);width:38%;font-weight:500;}
-.infra-table td:last-child{color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;word-break:break-all;}
+.infra-table td:last-child{color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.75rem;word-break:break-all;}
 .infra-table tr:last-child td{border-bottom:none;}
 
+/* COMPARE */
 .compare-row{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
-.compare-label{font-size:.77rem;color:var(--muted2);width:115px;flex-shrink:0;}
-.compare-track{flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.compare-label{font-size:.77rem;color:var(--muted);width:115px;flex-shrink:0;}
+.compare-track{flex:1;height:6px;background:rgba(13,13,13,0.08);border-radius:3px;overflow:hidden;}
 .compare-fill{height:100%;border-radius:3px;transition:width 1.2s ease;}
 
+/* REC */
 .rec-list{display:flex;flex-direction:column;gap:9px;}
-.rec-item{display:flex;gap:11px;padding:11px 13px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;}
-.rec-num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;}
-.rec-text{font-size:.82rem;color:var(--text);line-height:1.6;}
+.rec-item{display:flex;gap:11px;padding:11px 13px;background:var(--warm);border:1px solid var(--border);border-radius:11px;}
+.rec-num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--acid));
+  display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;
+  font-size:.7rem;font-weight:800;color:var(--ink);flex-shrink:0;margin-top:1px;}
+.rec-text{font-size:.82rem;color:var(--ink);line-height:1.6;}
 
+/* VERDICT */
 .verdict-banner{padding:16px 20px;border-radius:12px;display:flex;align-items:center;gap:13px;border:1px solid;margin-bottom:14px;}
 .verdict-icon{font-size:1.45rem;}
-.verdict-title{font-family:'Sora',sans-serif;font-weight:700;font-size:.95rem;color:#fff;margin-bottom:3px;}
+.verdict-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:3px;}
 .verdict-text{font-size:.81rem;line-height:1.55;}
 
-.sec-title{font-family:'Sora',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.09em;margin:16px 0 9px;display:flex;align-items:center;gap:7px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.09em;margin:16px 0 9px;display:flex;align-items:center;gap:7px;}
 .sec-title:first-child{margin-top:0;}
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px;}
 .stat-cell{border-radius:10px;padding:12px 13px;text-align:center;}
-.stat-val{font-family:'Sora',sans-serif;font-size:1.45rem;font-weight:800;margin-bottom:2px;}
-.stat-lbl{font-size:.69rem;color:var(--muted2);}
-.threat-row{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:9px;margin-bottom:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
-.threat-label{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:1px;}
-.threat-val{font-size:.73rem;color:var(--muted2);font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.4;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;margin-bottom:2px;}
+.stat-lbl{font-size:.69rem;color:var(--muted);}
+.threat-row{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:9px;margin-bottom:6px;background:var(--warm);border:1px solid var(--border);}
+.threat-label{font-size:.78rem;font-weight:600;color:var(--ink);margin-bottom:1px;}
+.threat-val{font-size:.73rem;color:var(--muted);font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.4;}
 .tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
-.tag{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:4px;padding:1px 7px;font-size:.66rem;color:var(--blue2);}
+.tag{background:rgba(200,241,53,0.2);border:1px solid rgba(200,241,53,0.4);border-radius:4px;padding:1px 7px;font-size:.66rem;color:var(--ink);}
 .clean-msg{text-align:center;padding:18px;color:var(--green);font-size:.86rem;}
 .dns-two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .vt-engine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:6px;}
-.vt-engine{padding:7px 9px;border-radius:7px;font-size:.74rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
-.vt-engine-name{font-weight:600;color:var(--text);margin-bottom:1px;}
+.vt-engine{padding:7px 9px;border-radius:7px;font-size:.74rem;background:var(--warm);border:1px solid var(--border);}
+.vt-engine-name{font-weight:600;color:var(--ink);margin-bottom:1px;}
 .vt-engine-result{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--red);}
-.crt-row{padding:7px 11px;border-radius:7px;background:rgba(255,255,255,0.03);border:1px solid var(--border);margin-bottom:5px;}
-.crt-cn{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--blue2);}
-.crt-meta{font-size:.7rem;color:var(--muted2);margin-top:2px;}
+.crt-row{padding:7px 11px;border-radius:7px;background:var(--warm);border:1px solid var(--border);margin-bottom:5px;}
+.crt-cn{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--coral);}
+.crt-meta{font-size:.7rem;color:var(--muted);margin-top:2px;}
 .dns-table{width:100%;border-collapse:collapse;font-size:.76rem;}
-.dns-table th{padding:4px 7px;color:var(--muted);text-transform:uppercase;font-size:.66rem;letter-spacing:.07em;text-align:left;border-bottom:1px solid var(--border);}
-.dns-table td{padding:5px 7px;border-bottom:1px solid rgba(255,255,255,0.04);font-family:'JetBrains Mono',monospace;font-size:.73rem;vertical-align:top;}
+.dns-table th{padding:4px 7px;color:var(--muted);text-transform:uppercase;font-size:.66rem;
+  letter-spacing:.07em;text-align:left;border-bottom:1px solid var(--border);}
+.dns-table td{padding:5px 7px;border-bottom:1px solid rgba(13,13,13,0.04);
+  font-family:'JetBrains Mono',monospace;font-size:.73rem;vertical-align:top;}
 .dns-table tr:last-child td{border-bottom:none;}
-.src-footer{margin-top:12px;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border);padding-top:9px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;}
-.src-footer a{color:var(--blue2);text-decoration:none;}
+.src-footer{margin-top:12px;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border);
+  padding-top:9px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;}
+.src-footer a{color:var(--coral);text-decoration:none;}
 .error-box{border-radius:13px;padding:22px;text-align:center;}
 ::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px;}
+::-webkit-scrollbar-track{background:var(--cream);}
+::-webkit-scrollbar-thumb{background:var(--warm);border-radius:3px;}
+
 @media(max-width:768px){
   .result-header{grid-template-columns:1fr;text-align:center;}
   .stat-grid{grid-template-columns:repeat(2,1fr);}
@@ -263,16 +349,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 <div class="grid-bg"></div>
 
 <nav>
-  <a class="nav-brand" href="#"><div class="brand-icon">C</div>CyberScore</a>
-  <div style="display:flex;align-items:center;gap:8px;"><div class="nav-pill">11 Intel Sources · AI-Powered</div><div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:100px;padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--muted2);letter-spacing:.06em;">v1.5.1</div></div>
+  <a class="nav-brand" href="#">
+    <div class="brand-icon">C</div>
+    <span class="nav-brand-name">Colabo<span>ree</span> Intel</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="nav-pill">11 Intel Sources · AI-Powered</div>
+    <div class="nav-ver">v2.0.0</div>
+  </div>
 </nav>
 
 <section class="hero" id="heroSection">
   <div class="hero-eyebrow"><span class="pulse"></span>Vendor Security Assessment Platform</div>
-  <h1>Real threat intel.<br><span class="grad">Instant vendor score.</span></h1>
-  <p class="hero-sub">10 public intelligence sources — live DNS, certificate transparency, WHOIS, malware feeds, VirusTotal & AlienVault OTX — synthesised by AI into a vendor security grade.</p>
-
-  <!-- API key handled securely via Cloudflare Worker -->
+  <h1>Real threat intel.<br/><span class="grad">Instant vendor score.</span></h1>
+  <p class="hero-sub">11 public intelligence sources — live DNS, certificate transparency, WHOIS, malware feeds, VirusTotal &amp; AlienVault OTX — synthesised by AI into a vendor security grade.</p>
 
   <div class="search-wrap">
     <div class="search-box">
@@ -295,15 +385,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
       Optional API keys — VirusTotal &amp; AlienVault OTX (free)
     </div>
     <div class="api-keys-body" id="keysBody">
-      <div style="font-size:.74rem;color:var(--muted);padding:2px 0 6px;">Keys are stored only in your browser session and sent only to their respective APIs.</div>
+      <div style="font-size:.74rem;color:var(--muted);padding:2px 0 6px;">Keys stored in browser session only — sent directly to their respective APIs.</div>
       <div class="api-key-row">
-        <div class="api-key-source"><div class="api-key-dot" style="background:#3b82f6;"></div><div class="api-key-name">VirusTotal</div></div>
-        <input type="password" class="api-key-input" id="vtKey" placeholder="VT API key — 70+ AV engines, URL & domain reputation"/>
+        <div class="api-key-source"><div class="api-key-dot" style="background:var(--blue);"></div><div class="api-key-name">VirusTotal</div></div>
+        <input type="password" class="api-key-input" id="vtKey" placeholder="VT API key — 70+ AV engines, URL &amp; domain reputation"/>
         <span class="badge-free">FREE</span>
         <a class="api-key-link" href="https://www.virustotal.com/gui/join-us" target="_blank">Get key →</a>
       </div>
       <div class="api-key-row">
-        <div class="api-key-source"><div class="api-key-dot" style="background:#f97316;"></div><div class="api-key-name">AlienVault OTX</div></div>
+        <div class="api-key-source"><div class="api-key-dot" style="background:var(--orange);"></div><div class="api-key-name">AlienVault OTX</div></div>
         <input type="password" class="api-key-input" id="otxKey" placeholder="OTX API key — threat pulses, malware samples, passive DNS"/>
         <span class="badge-free">FREE</span>
         <a class="api-key-link" href="https://otx.alienvault.com/api/" target="_blank">Get key →</a>
@@ -320,7 +410,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>XposedOrNot</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Governance</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Google News</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--blue2);"></div>VirusTotal (key)</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--coral);"></div>VirusTotal (key)</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);"></div>AlienVault OTX (key)</div>
   </div>
 
@@ -340,11 +430,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
       <div class="scan-check" id="chk-urlhaus"><div class="check-dot">●</div>URLhaus Malware Feed</div>
       <div class="scan-check" id="chk-threatfox"><div class="check-dot">●</div>ThreatFox IOC Feed</div>
       <div class="scan-check" id="chk-breach"><div class="check-dot">●</div>Breach History</div>
-      <div class="scan-check" id="chk-gov"><div class="check-dot">●</div>Governance &amp; Hygiene</div>
-      <div class="scan-check" id="chk-news"><div class="check-dot">●</div>Cyber News</div>
+      <div class="scan-check" id="chk-gov"><div class="check-dot">●</div>Security Governance</div>
+      <div class="scan-check" id="chk-news"><div class="check-dot">●</div>Cyber News Intel</div>
       <div class="scan-check" id="chk-vt"><div class="check-dot">●</div>VirusTotal</div>
       <div class="scan-check" id="chk-otx"><div class="check-dot">●</div>AlienVault OTX</div>
-      <div class="scan-check" id="chk-technews"><div class="check-dot">●</div>Company News</div>
+      <div class="scan-check" id="chk-technews"><div class="check-dot">●</div>Company Intelligence</div>
       <div class="scan-check" id="chk-ai"><div class="check-dot">●</div>AI Risk Synthesis</div>
     </div>
   </div>
@@ -352,26 +442,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
 <section id="results">
   <div class="action-bar">
-    <button class="action-btn" onclick="window.print()">🖨️ Print</button>
-    <button class="action-btn" onclick="copyReport()">📋 Copy Summary</button>
-    <button class="action-btn" onclick="resetScan()">🔄 New Scan</button>
+    <button class="action-btn" onclick="copyReport()">📋 Copy Report</button>
+    <button class="action-btn" onclick="resetScan()">← New Assessment</button>
   </div>
 
   <div class="result-header">
     <div class="score-ring-wrap">
-      <svg class="score-ring-svg" width="116" height="116" viewBox="0 0 116 116">
-        <circle cx="58" cy="58" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
-        <circle id="scoreArc" cx="58" cy="58" r="50" fill="none" stroke="url(#sGrad)" stroke-width="8"
-          stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"/>
-        <defs><linearGradient id="sGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#14b8a6"/>
+      <svg class="score-ring-svg" width="110" height="110" viewBox="0 0 110 110">
+        <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ff5c3a"/><stop offset="100%" stop-color="#c8f135"/>
         </linearGradient></defs>
+        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(13,13,13,0.08)" stroke-width="8"/>
+        <circle id="scoreArc" cx="55" cy="55" r="46" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
+          stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289"/>
       </svg>
       <div class="score-center">
         <div class="score-big" id="scoreNum">—</div>
         <div class="score-max">/ 100</div>
       </div>
-      <div id="scoreGrade" style="text-align:center;margin-top:3px;font-family:'Sora',sans-serif;font-size:.7rem;font-weight:800;letter-spacing:.1em;"></div>
+      <div id="scoreGrade" style="text-align:center;margin-top:3px;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted);"></div>
     </div>
     <div>
       <div class="result-domain-label" id="resultDomain">—</div>
@@ -389,119 +478,107 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
   <div class="results-grid">
     <div class="panel" style="animation-delay:.06s">
-      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(59,130,246,0.12);">🎯</div>Risk Vectors</div></div>
+      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(255,92,58,0.1);">🎯</div>Risk Vectors</div></div>
       <div class="rv-list" id="rvList"></div>
     </div>
     <div class="panel" style="animation-delay:.1s">
-      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(20,184,166,0.12);">🏗️</div>Infrastructure</div></div>
+      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🏗️</div>Infrastructure</div></div>
       <table class="infra-table" id="infraTable"></table>
       <div style="margin-top:16px;">
-        <div style="font-family:'Sora',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;">vs. Industry Benchmark</div>
+        <div style="font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;">vs. Industry Benchmark</div>
         <div id="compareRows"></div>
       </div>
     </div>
   </div>
 
-  <!-- DNS & WHOIS -->
   <div class="results-full panel" id="dnsPanel" style="display:none;animation-delay:.12s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(34,197,94,0.12);">🌐</div>DNS Records &amp; WHOIS — Live Data</div>
-      <span class="live-badge" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.25);color:var(--green);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(22,163,74,0.1);">🌐</div>DNS Records &amp; WHOIS — Live Data</div>
+      <span class="live-badge" style="background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.2);color:var(--green);">LIVE</span>
     </div>
     <div id="dnsContent"></div>
   </div>
 
-  <!-- Certificate Transparency -->
   <div class="results-full panel" id="crtPanel" style="display:none;animation-delay:.14s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(167,139,250,0.12);">📜</div>Certificate Transparency — crt.sh</div>
-      <span class="live-badge" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:var(--purple);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">📜</div>Certificate Transparency — crt.sh</div>
+      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
     </div>
     <div id="crtContent"></div>
   </div>
 
-  <!-- Threat Feeds -->
   <div class="results-full panel" id="threatPanel" style="display:none;animation-delay:.16s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(239,68,68,0.12);">🦠</div>Malware &amp; IOC Feeds — abuse.ch</div>
-      <span class="live-badge" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:var(--red);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🦠</div>Malware &amp; IOC Feeds — abuse.ch</div>
+      <span class="live-badge" style="background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);">LIVE</span>
     </div>
     <div id="threatContent"></div>
   </div>
 
-  <!-- Breach History -->
-  <div class="results-full panel" id="breachPanel" style="display:none;animation-delay:.17s;background:linear-gradient(135deg,rgba(239,68,68,0.04),rgba(249,115,22,0.03));border-color:rgba(239,68,68,0.16);">
+  <div class="results-full panel" id="breachPanel" style="display:none;animation-delay:.17s;background:linear-gradient(135deg,rgba(220,38,38,0.03),rgba(234,88,12,0.02));border-color:rgba(220,38,38,0.12);">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(239,68,68,0.12);">🔓</div>Breach History — XposedOrNot</div>
-      <span class="live-badge" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.25);color:var(--red);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🔓</div>Breach History — XposedOrNot</div>
+      <span class="live-badge" style="background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);">LIVE</span>
     </div>
     <div id="breachContent"></div>
   </div>
 
-  <!-- Governance & Web Hygiene -->
-  <div class="results-full panel" id="govPanel" style="display:none;animation-delay:.19s;background:linear-gradient(135deg,rgba(167,139,250,0.04),rgba(59,130,246,0.03));border-color:rgba(167,139,250,0.16);">
+  <div class="results-full panel" id="govPanel" style="display:none;animation-delay:.19s;background:linear-gradient(135deg,rgba(200,241,53,0.06),rgba(255,92,58,0.02));border-color:rgba(200,241,53,0.2);">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(167,139,250,0.12);">🏛️</div>Security Governance &amp; Web Hygiene</div>
-      <span class="live-badge" style="background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.25);color:var(--purple);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🏛️</div>Security Governance &amp; Web Hygiene</div>
+      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
     </div>
     <div id="govContent"></div>
   </div>
 
-  <!-- Cyber News -->
   <div class="results-full panel" id="newsPanel" style="display:none;animation-delay:.20s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(234,179,8,0.12);">📰</div>Cyber News, Dark Web &amp; Incident Intelligence</div>
-      <span class="live-badge" style="background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.25);color:var(--yellow);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(202,138,4,0.1);">📰</div>Cyber News, Dark Web &amp; Incident Intelligence</div>
+      <span class="live-badge" style="background:rgba(202,138,4,0.08);border-color:rgba(202,138,4,0.2);color:var(--yellow);">LIVE</span>
     </div>
     <div id="newsContent"></div>
   </div>
 
-  <!-- VirusTotal -->
   <div class="results-full panel" id="vtPanel" style="display:none;animation-delay:.18s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(59,130,246,0.12);">🔬</div>VirusTotal — Multi-Engine Analysis</div>
-      <span class="live-badge" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.25);color:var(--blue2);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(37,99,235,0.1);">🔬</div>VirusTotal — Multi-Engine Analysis</div>
+      <span class="live-badge" style="background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.2);color:var(--blue);">LIVE</span>
     </div>
     <div id="vtContent"></div>
   </div>
 
-  <!-- OTX -->
-  <div class="results-full panel" id="otxPanel" style="display:none;animation-delay:.2s;background:linear-gradient(135deg,rgba(249,115,22,0.04),rgba(239,68,68,0.03));border-color:rgba(249,115,22,0.16);">
+  <div class="results-full panel" id="otxPanel" style="display:none;animation-delay:.2s;background:linear-gradient(135deg,rgba(234,88,12,0.03),rgba(220,38,38,0.02));border-color:rgba(234,88,12,0.12);">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(249,115,22,0.12);">🛡️</div>AlienVault OTX — Threat Intelligence</div>
-      <span class="live-badge" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.25);color:var(--orange);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(234,88,12,0.1);">🛡️</div>AlienVault OTX — Threat Intelligence</div>
+      <span class="live-badge" style="background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.2);color:var(--orange);">LIVE</span>
     </div>
     <div id="otxContent"></div>
   </div>
 
-  <!-- Company Tech & General News -->
-  <div class="results-full panel" id="techNewsPanel" style="display:none;animation-delay:.30s;border-color:rgba(99,102,241,0.18);background:linear-gradient(135deg,rgba(99,102,241,0.04),rgba(59,130,246,0.02));">
+  <div class="results-full panel" id="techNewsPanel" style="display:none;animation-delay:.30s;background:linear-gradient(135deg,rgba(200,241,53,0.06),rgba(255,92,58,0.02));border-color:rgba(200,241,53,0.2);">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(99,102,241,0.12);">🗞️</div>Company Intelligence — Tech &amp; General News</div>
-      <span class="live-badge" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.25);color:#818cf8;">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🗞️</div>Company Intelligence — Tech &amp; General News</div>
+      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
     </div>
     <div id="techNewsContent"></div>
   </div>
 
-  <!-- Findings -->
   <div class="results-full panel" style="animation-delay:.22s;">
-    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(239,68,68,0.12);">⚠️</div>Security Findings</div></div>
+    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">⚠️</div>Security Findings</div></div>
     <div id="verdictBanner"></div>
     <div class="findings-list" id="findingsList"></div>
   </div>
 
-  <!-- Remediation -->
   <div class="results-full panel" style="animation-delay:.26s;">
-    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(34,197,94,0.12);">✅</div>Remediation Roadmap</div></div>
+    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">✅</div>Remediation Roadmap</div></div>
     <div class="rec-list" id="recList"></div>
   </div>
 </section>
 
 <script>
-const VERSION='1.5.1';
-const BUILD_DATE='2026-03-06';
-console.info(`%cCyberScore ThreatIntel v${VERSION} (${BUILD_DATE})%c — 11 intel sources · AI-powered vendor risk assessment`,
-  'color:#60a5fa;font-weight:800;font-size:13px;','color:#64748b;font-size:11px;');
+const VERSION='2.0.0';
+const BUILD_DATE='2026-03-10';
+console.log(`Colaboree Intel v${VERSION} (${BUILD_DATE}) — 11 intel sources · AI-powered vendor risk assessment`);
 
 const $=id=>document.getElementById(id);
 function fillDomain(d){$('domainInput').value=d;$('domainInput').focus();}
@@ -1023,10 +1100,18 @@ CYBER NEWS INFLUENCE:
 - Recent incident articles found: mention in summary, add finding if relevant
 - Only penalise score if news clearly indicates a confirmed recent security incident`;
 
-  const WORKER_URL='https://threatintel-proxy.gpang77.workers.dev';
-  const resp=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
-
+  const WORKER_URLS=['https://api.colaboree.com','https://threatintel-proxy.gpang77.workers.dev'];
+  let resp=null,lastErr='';
+  for(const url of WORKER_URLS){
+    try{
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
+        signal:AbortSignal.timeout(25000)});
+      resp=r;
+      if(resp.ok||resp.status<500)break;
+    }catch(e){lastErr=e.message;}
+  }
+  if(!resp)throw new Error(lastErr||'All endpoints failed — check network/proxy settings');
   if(!resp.ok){
     const eb=await resp.json().catch(()=>({}));const b=eb.error||eb;
     if(resp.status===429||b?.type==='exceeded_limit'||b?.type==='rate_limit_error'){
@@ -1576,5 +1661,6 @@ function copyReport(){
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
 </script>
+
 </body>
 </html>
