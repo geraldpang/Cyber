@@ -1,6 +1,6 @@
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!-- API KEY — update this line when key changes          -->
-<!-- const ANTHROPIC_API_KEY = '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';      -->
+<!-- const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';      -->
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!DOCTYPE html>
 <!-- Colaboree Intel v2.0.0 - 2026-03-10 -->
@@ -592,7 +592,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 </section>
 
 <script>
-const ANTHROPIC_API_KEY='YOUR_API_KE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'; // ← UPDATE KEY HERE
+const ANTHROPIC_API_KEY='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'; // ← UPDATE KEY HERE
 const VERSION='2.0.0';
 const BUILD_DATE='2026-03-10';
 console.log(`Colaboree Intel v${VERSION} (${BUILD_DATE}) — 11 intel sources · AI-powered vendor risk assessment`);
@@ -1122,35 +1122,56 @@ CYBER NEWS INFLUENCE:
 - Recent incident articles found: mention in summary, add finding if relevant
 - Only penalise score if news clearly indicates a confirmed recent security incident
 
-IMPORTANT — USE YOUR OWN KNOWLEDGE:
-You have training knowledge of major real-world cyber incidents. If the domain belongs to a company with a well-known breach or cyber incident (e.g. Medibank 2022 ransomware, Optus 2022 breach, Latitude Financial 2023, Canva 2019, etc.), you MUST:
-- Add a High or Critical finding for the known incident
-- Reference it in the summary
+IMPORTANT — SEARCH THE WEB + USE YOUR OWN KNOWLEDGE:
+You have access to a web_search tool. You MUST use it to search for recent breach and security incident information about this vendor. Search for:
+1. "[company name] data breach OR ransomware OR cyber attack OR hack"
+2. "[company name] security incident OR data leak 2023 OR 2024 OR 2025"
+
+Also use your own training knowledge of major real-world cyber incidents (e.g. Medibank 2022 ransomware, Optus 2022 breach, Latitude Financial 2023, Canva 2019, etc.).
+
+For ANY known or discovered incident you MUST:
+- Add a High or Critical finding
+- Reference it in the summary with date and impact
 - Apply appropriate score deduction based on recency
-- Do NOT ignore known incidents just because XposedOrNot or news feeds didn't return results
-- Clearly label the source as "AI Knowledge" in the finding source field
+- Label the source as "Web Search" or "AI Knowledge" in the finding source field
 This is critical — tools that miss known breaches are worse than useless for vendor risk assessment.`;
 
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':ANTHROPIC_API_KEY,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
-  });
-  if(!resp.ok){
-    const eb=await resp.json().catch(()=>({}));const b=eb.error||eb;
-    if(resp.status===429||b?.type==='exceeded_limit'||b?.type==='rate_limit_error'){
-      const win=b?.windows;const ra=b?.resetsAt||(win&&(win['5h']?.resets_at||win['1m']?.resets_at));
-      throw new Error('Rate limit reached.'+(ra?' Resets at '+new Date(ra*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'.':' Please wait a few minutes.'));
+  const API_URL='https://api.anthropic.com/v1/messages';
+  const API_HEADERS={
+    'Content-Type':'application/json',
+    'x-api-key':ANTHROPIC_API_KEY,
+    'anthropic-version':'2023-06-01',
+    'anthropic-dangerous-direct-browser-access':'true'
+  };
+  const tools=[{type:'web_search_20250305',name:'web_search'}];
+
+  // Agentic loop — handles web search tool calls automatically
+  let messages=[{role:'user',content:prompt}];
+  let data=null;
+  for(let i=0;i<6;i++){
+    const r=await fetch(API_URL,{method:'POST',headers:API_HEADERS,
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,tools,messages})});
+    if(!r.ok){
+      const eb=await r.json().catch(()=>({}));const b=eb.error||eb;
+      if(r.status===429||b?.type==='exceeded_limit'||b?.type==='rate_limit_error'){
+        const win=b?.windows;const ra=b?.resetsAt||(win&&(win['5h']?.resets_at||win['1m']?.resets_at));
+        throw new Error('Rate limit reached.'+(ra?' Resets at '+new Date(ra*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'.':' Please wait a few minutes.'));
+      }
+      throw new Error(b?.message||eb?.error?.message||`API error ${r.status}`);
     }
-    throw new Error(b?.message||eb?.error?.message||`API error ${resp.status}`);
+    data=await r.json();
+    if(data.stop_reason==='end_turn')break;
+    if(data.stop_reason==='tool_use'){
+      // Add assistant message and tool results to continue the loop
+      messages.push({role:'assistant',content:data.content});
+      const toolResults=data.content.filter(b=>b.type==='tool_use').map(b=>({
+        type:'tool_result',tool_use_id:b.id,content:b.input?.query?`Search performed for: ${b.input.query}`:'Search completed'
+      }));
+      messages.push({role:'user',content:toolResults});
+    } else break;
   }
-  const data=await resp.json();
-  let clean=data.content.map(b=>b.text||'').join('').replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  // Extract text from final response
+  let clean=(data?.content||[]).filter(b=>b.type==='text').map(b=>b.text||'').join('').replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
   const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
   if(s===-1)throw new Error('No JSON in response');
   clean=clean.slice(s,e+1);
@@ -1553,6 +1574,27 @@ function renderResults(domain,d,intel){
 
   // Intel panels
   renderDNSPanel(rdap,dns);renderCRTPanel(crt);renderThreatPanel(urlhaus,threatfox);renderBreachPanel(breach);renderGovPanel(gov);renderNewsPanel(news);renderVTPanel(vt);renderOTXPanel(otx);renderTechNewsPanel(techNews);
+
+  // Inject AI-known incidents into news panel if RSS feeds returned nothing
+  const aiFindings=d.findings||[];
+  const aiIncidents=aiFindings.filter(f=>f.source&&f.source.toLowerCase().includes('ai knowledge'));
+  if(aiIncidents.length>0){
+    $('newsPanel').style.display='block';
+    const existing=$('newsContent').innerHTML||'';
+    const hasRealNews=existing&&!existing.includes('No cybersecurity news found');
+    let aiHTML=`<div style="margin-top:${hasRealNews?'18px':'0'};">
+      <div style="font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;">🤖 AI Knowledge — Known Incidents</div>
+      ${aiIncidents.map(f=>`
+        <div style="padding:13px 15px;border-radius:11px;background:rgba(220,38,38,0.05);border:1px solid rgba(220,38,38,0.15);border-left:3px solid var(--red);margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <span style="font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;background:rgba(220,38,38,0.12);color:var(--red);">${safeText(f.severity||'High')}</span>
+            <span style="font-size:.85rem;font-weight:600;color:var(--ink);">${safeText(f.title||'')}</span>
+          </div>
+          <div style="font-size:.79rem;color:var(--muted);line-height:1.55;">${safeText(f.description||'')}</div>
+        </div>`).join('')}
+    </div>`;
+    $('newsContent').innerHTML=(hasRealNews?existing:'')+aiHTML;
+  }
 
   // Verdict
   const crit=d.critical_count||0;
