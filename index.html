@@ -1,6 +1,6 @@
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!-- API KEY — update this line when key changes          -->
-<!-- const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';      -->
+<!-- const ANTHROPIC_API_KEY = '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';      -->
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!DOCTYPE html>
 <!-- Colaboree Intel v2.0.0 - 2026-03-10 -->
@@ -336,6 +336,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   padding-top:9px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;}
 .src-footer a{color:var(--coral);text-decoration:none;}
 .error-box{border-radius:13px;padding:22px;text-align:center;}
+.intel-src{position:relative;}
+.intel-src .tooltip{
+  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--cream);font-size:.72rem;line-height:1.5;
+  padding:8px 12px;border-radius:8px;white-space:nowrap;max-width:220px;white-space:normal;
+  text-align:center;z-index:999;pointer-events:none;width:200px;
+  box-shadow:0 4px 16px rgba(13,13,13,0.2);
+}
+.intel-src .tooltip::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:var(--ink);
+}
+.intel-src:hover .tooltip{display:block;}
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:var(--cream);}
 ::-webkit-scrollbar-thumb{background:var(--warm);border-radius:3px;}
@@ -405,16 +418,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   </div>
 
   <div class="intel-bar">
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>RDAP WHOIS</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>DNS / DoH</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>crt.sh Certs</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>URLhaus</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>ThreatFox</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>XposedOrNot</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Governance</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Google News</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--coral);"></div>VirusTotal (key)</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);"></div>AlienVault OTX (key)</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>RDAP WHOIS<div class="tooltip">Checks domain registration — registrar, creation date, expiry, nameservers and status flags.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>DNS / DoH<div class="tooltip">Queries live DNS records: SPF, DMARC, MX, A records and IPv6 via Cloudflare DNS-over-HTTPS.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>crt.sh Certs<div class="tooltip">Searches certificate transparency logs for all SSL/TLS certs issued to this domain and subdomains.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>URLhaus<div class="tooltip">Checks abuse.ch URLhaus malware feed for domains hosting or distributing malicious content.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>ThreatFox<div class="tooltip">Checks abuse.ch ThreatFox for known indicators of compromise (IOCs) linked to this domain.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>XposedOrNot<div class="tooltip">Checks if email addresses from this domain appeared in known data breach databases.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Governance<div class="tooltip">Checks security.txt, HTTP headers, MTA-STS, BIMI, DKIM selectors and server banner exposure.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Google News<div class="tooltip">Searches Google News for breaches, ransomware attacks, cyber incidents and dark web mentions.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--coral);"></div>VirusTotal (key)<div class="tooltip">Scans domain across 70+ antivirus engines. Requires a free VirusTotal API key.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);"></div>AlienVault OTX (key)<div class="tooltip">Checks threat pulses, malware samples and passive DNS. Requires a free AlienVault OTX key.</div></div>
   </div>
 
   <div id="scanning">
@@ -579,7 +592,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 </section>
 
 <script>
-const ANTHROPIC_API_KEY='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'; // ← UPDATE KEY HERE
+const ANTHROPIC_API_KEY='YOUR_API_KE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'; // ← UPDATE KEY HERE
 const VERSION='2.0.0';
 const BUILD_DATE='2026-03-10';
 console.log(`Colaboree Intel v${VERSION} (${BUILD_DATE}) — 11 intel sources · AI-powered vendor risk assessment`);
@@ -1107,7 +1120,16 @@ GOVERNANCE SCORING INFLUENCE:
 
 CYBER NEWS INFLUENCE:
 - Recent incident articles found: mention in summary, add finding if relevant
-- Only penalise score if news clearly indicates a confirmed recent security incident`;
+- Only penalise score if news clearly indicates a confirmed recent security incident
+
+IMPORTANT — USE YOUR OWN KNOWLEDGE:
+You have training knowledge of major real-world cyber incidents. If the domain belongs to a company with a well-known breach or cyber incident (e.g. Medibank 2022 ransomware, Optus 2022 breach, Latitude Financial 2023, Canva 2019, etc.), you MUST:
+- Add a High or Critical finding for the known incident
+- Reference it in the summary
+- Apply appropriate score deduction based on recency
+- Do NOT ignore known incidents just because XposedOrNot or news feeds didn't return results
+- Clearly label the source as "AI Knowledge" in the finding source field
+This is critical — tools that miss known breaches are worse than useless for vendor risk assessment.`;
 
   const resp=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
