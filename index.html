@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>colaboree intel // domain intelligence</title>
+<title>Third Party Intel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=VT323&display=swap" rel="stylesheet"/>
 <style>
@@ -438,7 +438,7 @@ nav{
 
 <nav>
   <div class="nav-left">
-    <div class="nav-logo">colabo<span>ree</span>_intel</div>
+    <div class="nav-logo">third<span>party</span>_intel</div>
     <div class="nav-tag">v3.1.0</div>
   </div>
   <div class="nav-right">
@@ -450,29 +450,25 @@ nav{
 </nav>
 
 <section class="hero" id="heroSection">
-  <pre class="ascii-banner">
- ██████╗ ██████╗ ██╗      █████╗ ██████╗  ██████╗ ██████╗ ███████╗███████╗
-██╔════╝██╔═══██╗██║     ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔════╝██╔════╝
-██║     ██║   ██║██║     ███████║██████╔╝██║   ██║██████╔╝█████╗  █████╗  
-██║     ██║   ██║██║     ██╔══██║██╔══██╗██║   ██║██╔══██╗██╔══╝  ██╔══╝  
-╚██████╗╚██████╔╝███████╗██║  ██║██████╔╝╚██████╔╝██║  ██║███████╗███████╗
- ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-                       ██╗███╗   ██╗████████╗███████╗██╗                   
-                       ██║████╗  ██║╚══██╔══╝██╔════╝██║                   
-                       ██║██╔██╗ ██║   ██║   █████╗  ██║                   
-                       ██║██║╚██╗██║   ██║   ██╔══╝  ██║                   
-                       ██║██║ ╚████║   ██║   ███████╗███████╗              
-                       ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚══════╝</pre>
+  <div style="margin-bottom:32px;animation:fadeIn .8s ease both;">
+    <div style="font-family:'VT323',monospace;font-size:clamp(2.8rem,7vw,5.5rem);color:var(--orange);line-height:1;letter-spacing:.04em;text-shadow:0 0 30px rgba(255,106,26,0.5),0 0 60px rgba(255,106,26,0.2);margin-bottom:8px;">
+      THIRD<span style="color:var(--lime);text-shadow:0 0 30px rgba(168,255,62,0.5),0 0 60px rgba(168,255,62,0.2);">PARTY</span>
+    </div>
+    <div style="font-family:'VT323',monospace;font-size:clamp(1.8rem,4vw,3rem);color:var(--text2);letter-spacing:.18em;text-shadow:0 0 12px rgba(200,200,200,0.15);">
+      INTELLIGENCE
+    </div>
+    <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--lime),transparent);margin-top:16px;opacity:.4;"></div>
+  </div>
 
   <div class="prompt-line">
     <span class="prompt-sym">$</span>
-    <span>// raw vendor intelligence — 11 public sources — zero AI interpretation</span>
+    <span>// open-source vendor intelligence — 17 sources — zero ai interpretation</span>
   </div>
 
   <p class="hero-sub">
-    feed a domain. get <span>RDAP · DNS · crt.sh · URLhaus · ThreatFox</span><br/>
-    <span>XposedOrNot · Governance · Ransomware.live · Google News · VT · OTX</span><br/>
-    signal only. no scoring. no spin.
+    surface what vendors won't tell you.<br/>
+    <span>dark web · breach history · malware feeds · certificate exposure · routing intel</span><br/>
+    raw signal. public sources. your judgement.
   </p>
 
   <div class="search-wrap">
@@ -549,6 +545,8 @@ nav{
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>urlscan.io</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>abuseipdb*</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>pulsedive*</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>haveibeenpwned</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>breachdirectory</div>
   </div>
 
   <!-- SCAN PROGRESS -->
@@ -578,6 +576,8 @@ nav{
       <div class="scan-check" id="chk-urlscan"><span class="check-sym">·</span>urlscan.io</div>
       <div class="scan-check" id="chk-abuseipdb"><span class="check-sym">·</span>abuseipdb</div>
       <div class="scan-check" id="chk-pulsedive"><span class="check-sym">·</span>pulsedive</div>
+      <div class="scan-check" id="chk-hibp"><span class="check-sym">·</span>haveibeenpwned</div>
+      <div class="scan-check" id="chk-breachdir"><span class="check-sym">·</span>breachdirectory</div>
     </div>
   </div>
 </section>
@@ -740,6 +740,25 @@ nav{
     </div>
   </div>
 
+  <!-- HIBP + BREACHDIRECTORY -->
+  <div class="grid-2">
+    <div class="panel" id="hibpPanel" style="display:none;animation-delay:.36s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🔑</span>Have I Been Pwned — Breach Database</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="hibpContent"></div>
+    </div>
+    <div class="panel" id="breachdirPanel" style="display:none;animation-delay:.38s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">📂</span>Breach Directory — Credential Lookup</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="breachdirContent"></div>
+    </div>
+  </div>
+
+
 </section>
 
 <script>
@@ -749,8 +768,8 @@ function fillDomain(d){$('domainInput').value=d;}
 function toggleKeys(){$('keysBody').classList.toggle('open');$('keysToggle').classList.toggle('open');}
 
 // ── SCAN ANIMATION ────────────────────────────────────────────────────────────
-const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','shodan','bgpview','observatory','urlscan','abuseipdb','pulsedive'];
-const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…','shodan internetdb…','bgpview asn lookup…','mozilla observatory…','urlscan.io search…','abuseipdb check…','pulsedive lookup…'];
+const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','shodan','bgpview','observatory','urlscan','abuseipdb','pulsedive','hibp','breachdir'];
+const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…','shodan internetdb…','bgpview asn lookup…','mozilla observatory…','urlscan.io search…','abuseipdb check…','pulsedive lookup…','haveibeenpwned…','breachdirectory…'];
 let scanTimer=null;
 function animateScan(domain){
   $('scanning').classList.add('active');
@@ -1092,6 +1111,63 @@ async function fetchPulsedive(domain,apiKey){
 }
 
 
+async function fetchHIBP(domain){
+  // HIBP breach list is fully free — filter by company name client-side
+  const company = domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'').toLowerCase();
+  try{
+    // Full breach list — no key required
+    const r = await fetch('https://haveibeenpwned.com/api/v3/breaches', {
+      headers:{'User-Agent':'ThirdPartyIntel/3.1'},
+      signal:AbortSignal.timeout(10000)
+    });
+    if(!r.ok) return null;
+    const all = await r.json();
+    // Filter by domain match OR company name match
+    const matches = all.filter(b => {
+      const bDomain = (b.Domain||'').toLowerCase();
+      const bName = (b.Name||'').toLowerCase();
+      const bTitle = (b.Title||'').toLowerCase();
+      return bDomain === domain.toLowerCase() ||
+             bDomain.includes(company) ||
+             bName.includes(company) ||
+             bTitle.includes(company);
+    });
+    return {
+      company,
+      totalBreaches: all.length,
+      matches,
+      found: matches.length > 0,
+    };
+  }catch{return null;}
+}
+
+async function fetchBreachDirectory(domain){
+  // BreachDirectory free API — returns breach hits by domain
+  const company = domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'').toLowerCase();
+  try{
+    const r = await fetch(`https://breachdirectory.p.rapidapi.com/?func=auto&term=${encodeURIComponent(domain)}`, {
+      headers:{
+        'X-RapidAPI-Key':'',  // no key — falls through to public endpoint
+        'Accept':'application/json'
+      },
+      signal:AbortSignal.timeout(8000)
+    });
+    // BreachDirectory also has a public check endpoint
+    const r2 = await fetch(`https://api.breachdirectory.org/?func=auto&term=${encodeURIComponent(domain)}`,{
+      signal:AbortSignal.timeout(8000)
+    });
+    if(!r2.ok) return null;
+    const d = await r2.json();
+    return {
+      found: d.found || false,
+      count: d.count || 0,
+      sources: (d.sources||[]).slice(0,10),
+      result: (d.result||[]).slice(0,5),
+    };
+  }catch{return null;}
+}
+
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 async function startScan(){
   const raw=$('domainInput').value.trim();
@@ -1104,12 +1180,12 @@ async function startScan(){
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='RUNNING';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel']
+  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel']
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
-  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive;
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir;
   try{[rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx]=await Promise.all([
     fetchRDAP(domain),fetchDNS(domain),fetchCRT(domain),
     fetchURLhaus(domain),fetchThreatFox(domain),fetchBreachHistory(domain),
@@ -1120,20 +1196,22 @@ async function startScan(){
   try{
     const ips=dns?.aRecords||[];
     const primaryIP=ips[0]||null;
-    [shodan,bgpview,observatory,urlscanData,abuse,pulsedive]=await Promise.all([
+    [shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir]=await Promise.all([
       fetchShodan(ips),
       fetchBGPView(primaryIP),
       fetchObservatory(domain),
       fetchURLScan(domain),
       fetchAbuseIPDB(ips,abuseKey),
       fetchPulsedive(domain,pdKey),
+      fetchHIBP(domain),
+      fetchBreachDirectory(domain),
     ]);
   }catch(e){console.warn('Enrichment fetch:',e);}
   finishScanAnim();
   await new Promise(r=>setTimeout(r,300));
   $('scanning').classList.remove('active');
   $('heroSection').style.display='none';
-  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive});
+  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir});
   $('results').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   btn.disabled=false;btn.textContent='EXECUTE';
@@ -1141,7 +1219,7 @@ async function startScan(){
 
 // ── RENDERERS ─────────────────────────────────────────────────────────────────
 function renderAll(domain,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive}=intel;
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir}=intel;
   $('resultDomain').textContent=`// ${domain}`;
   $('resultTs').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';
   const chips=[
@@ -1162,6 +1240,8 @@ function renderAll(domain,intel){
     {l:'urlscan',ok:!!(urlscanData?.total>0),warn:urlscanData?.scans?.some(s=>s.verdict==='malicious'),icon:'🔍'},
     {l:'abuseipdb',ok:!!(abuse?.results?.length),warn:abuse?.results?.some(r=>r.abuseScore>25),skip:!abuse,icon:'🚫'},
     {l:'pulsedive',ok:!!(pulsedive&&!pulsedive.error),warn:pulsedive&&!pulsedive.error&&pulsedive.risk!=='none'&&pulsedive.risk!=='unknown',skip:!pulsedive,icon:'📡'},
+    {l:'hibp',ok:!!(hibp&&hibp.found!==undefined),warn:hibp?.found,icon:'🔑'},
+    {l:'breachdir',ok:!!(breachdir&&!breachdir.error),warn:breachdir?.found,icon:'📂'},
   ];
   $('intelStrip').innerHTML=chips.map(s=>{
     if(s.skip)return`<div class="chip skip">${s.l}: no key</div>`;
@@ -1178,6 +1258,8 @@ function renderAll(domain,intel){
   renderURLScan(urlscanData,domain);
   renderAbuse(abuse);
   renderPulsedive(pulsedive,domain);
+  renderHIBP(hibp,domain);
+  renderBreachDir(breachdir,domain);
 }
 
 function renderRDAP(rdap){
@@ -1623,6 +1705,83 @@ function renderPulsedive(pd,domain){
   }
   h+=`<div class="src-footer"><span>pulsedive.com · 30+ feeds aggregated · free key required</span><a href="https://pulsedive.com/indicator/${encodeURIComponent(domain)}" target="_blank">full report →</a></div>`;
   $('pulsediveContent').innerHTML=h;
+}
+
+
+function renderHIBP(hibp, domain){
+  if(!hibp) return;
+  $('hibpPanel').style.display='block';
+  const company = hibp.company || domain;
+  let h = '';
+
+  if(!hibp.found || !hibp.matches?.length){
+    h = `<div class="clean-msg">✓ no breaches found matching <strong>${safeText(company)}</strong> in hibp database</div>`;
+    h += `<div style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:6px;">searched across ${(hibp.totalBreaches||0).toLocaleString()} known breach events</div>`;
+  } else {
+    h += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:.72rem;color:var(--muted);">${(hibp.totalBreaches||0).toLocaleString()} total breaches searched</div>
+      <div style="font-family:'VT323',monospace;font-size:1.6rem;color:var(--red);text-shadow:0 0 10px rgba(255,51,51,0.5);">${hibp.matches.length} match${hibp.matches.length!==1?'es':''}</div>
+    </div>`;
+    hibp.matches.forEach(b => {
+      const yr = b.BreachDate ? b.BreachDate.substring(0,4) : '';
+      const age = yr ? new Date().getFullYear() - parseInt(yr) : null;
+      const isRecent = age !== null && age <= 3;
+      const borderCol = isRecent ? 'var(--red)' : age <= 5 ? 'var(--orange)' : 'var(--border2)';
+      h += `<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${borderCol};margin-bottom:6px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--orange);">${safeText(b.Title||b.Name)}</div>
+            ${b.Domain?`<div style="font-size:.68rem;color:var(--muted);margin-top:1px;">${safeText(b.Domain)}</div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:.72rem;color:${isRecent?'var(--red)':'var(--muted)'};">${safeText(b.BreachDate||'')}</div>
+            ${isRecent?'<div style="font-size:.6rem;color:var(--red);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">[recent]</div>':''}
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;font-size:.68rem;color:var(--muted);">
+          ${b.PwnCount?`<span>📊 ${Number(b.PwnCount).toLocaleString()} accounts</span>`:''}
+          ${b.IsVerified?'<span style="color:var(--lime);">✓ verified</span>':'<span style="color:var(--muted);">unverified</span>'}
+          ${b.IsSensitive?'<span style="color:var(--orange);">⚠ sensitive</span>':''}
+          ${b.IsRetired?'<span style="color:var(--muted);">retired</span>':''}
+        </div>
+        ${b.DataClasses?.length?`<div class="tags">${b.DataClasses.slice(0,8).map(dc=>`<span class="tag ${['Passwords','Password hints'].includes(dc)?'tag-red':['Email addresses','Phone numbers'].includes(dc)?'tag-orange':''}">${safeText(dc)}</span>`).join('')}</div>`:''}
+        ${b.Description?`<div style="font-size:.69rem;color:var(--muted2);margin-top:6px;line-height:1.5;">${safeText(b.Description.replace(/<[^>]+>/g,'').substring(0,200))}…</div>`:''}
+      </div>`;
+    });
+  }
+  h += `<div class="src-footer"><span>haveibeenpwned.com · troy hunt · ${(hibp.totalBreaches||0).toLocaleString()} breaches indexed</span><a href="https://haveibeenpwned.com/PwnedWebsites" target="_blank">full list →</a></div>`;
+  $('hibpContent').innerHTML = h;
+}
+
+function renderBreachDir(bd, domain){
+  if(!bd) return;
+  $('breachdirPanel').style.display='block';
+  let h = '';
+  if(bd.error || (!bd.found && !bd.count)){
+    h = `<div class="clean-msg">✓ no entries found in breachdirectory</div>`;
+    if(bd.error) h = `<div class="empty-msg">⚠ ${safeText(bd.error)}</div>`;
+  } else {
+    if(bd.count){
+      h += `<div style="text-align:center;padding:14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--red);margin-bottom:12px;">
+        <div style="font-family:'VT323',monospace;font-size:2.5rem;color:var(--red);text-shadow:0 0 12px rgba(255,51,51,0.5);">${bd.count.toLocaleString()}</div>
+        <div style="font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">credential entries found</div>
+      </div>`;
+    }
+    if(bd.sources?.length){
+      h += `<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">// breach sources</div>`;
+      h += `<div class="tags">${bd.sources.map(s=>`<span class="tag tag-red">${safeText(s)}</span>`).join('')}</div>`;
+    }
+    if(bd.result?.length){
+      h += `<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px;">// sample records (redacted)</div>`;
+      bd.result.forEach(rec => {
+        // Redact passwords, show only structure
+        const safe = Object.entries(rec).filter(([k])=>!['password','hash','salt','pass'].includes(k.toLowerCase()));
+        h += `<div class="t-row warn"><div style="flex:1;">${safe.map(([k,v])=>`<div class="t-val"><span style="color:var(--muted2);">${safeText(k)}:</span> ${safeText(String(v||'').substring(0,60))}</div>`).join('')}</div></div>`;
+      });
+    }
+  }
+  h += `<div class="src-footer"><span>breachdirectory.org · aggregated credential database</span><a href="https://breachdirectory.org" target="_blank">site →</a></div>`;
+  $('breachdirContent').innerHTML = h;
 }
 
 
