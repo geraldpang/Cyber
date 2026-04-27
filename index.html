@@ -1108,7 +1108,6 @@ async function startScan(){
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
-  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx;
   // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
   let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive;
   try{[rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx]=await Promise.all([
