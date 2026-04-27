@@ -432,6 +432,45 @@ nav{
   .gov-grid,.hdr-grid{grid-template-columns:1fr;}
   .scan-checks{grid-template-columns:1fr;}
 }
+
+/* EXPLAINER TOGGLE */
+.explain-toggle{
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:.62rem;color:var(--muted);padding:6px 0 0;
+  border-top:1px solid var(--border);margin-top:10px;
+  transition:color .2s;user-select:none;letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.explain-toggle:hover{color:var(--orange);}
+.explain-toggle .eq{
+  width:16px;height:16px;border:1px solid var(--dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.58rem;color:var(--muted);flex-shrink:0;
+  transition:all .2s;font-style:normal;
+}
+.explain-toggle:hover .eq{border-color:var(--orange);color:var(--orange);}
+.explain-body{
+  display:none;margin-top:8px;padding:10px 12px;
+  background:rgba(255,106,26,0.04);
+  border:1px solid rgba(255,106,26,0.15);
+  font-size:.71rem;color:var(--text2);line-height:1.7;
+}
+.explain-body.open{display:block;}
+.explain-body strong{color:var(--orange);}
+.explain-body .risk-high{color:var(--red);}
+.explain-body .risk-med{color:var(--orange);}
+.explain-body .risk-low{color:var(--lime);}
+
+/* RISK CALLOUT */
+.risk-callout{
+  padding:9px 12px;margin-bottom:10px;
+  border:1px solid;font-size:.72rem;line-height:1.6;
+}
+.risk-callout.critical{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
+.risk-callout.high{background:rgba(255,106,26,0.07);border-color:rgba(255,106,26,0.25);color:var(--orange);}
+.risk-callout.medium{background:rgba(255,217,61,0.06);border-color:rgba(255,217,61,0.2);color:var(--yellow);}
+.risk-callout.info{background:rgba(168,255,62,0.04);border-color:rgba(168,255,62,0.15);color:var(--lime);}
+.risk-callout .rc-head{font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 </style>
 </head>
 <body>
@@ -1218,6 +1257,28 @@ async function startScan(){
 }
 
 // ── RENDERERS ─────────────────────────────────────────────────────────────────
+// ── EXPLAINER HELPERS ─────────────────────────────────────────────────────────
+let _expId = 0;
+function explainer(what, watchFor, riskContext){
+  const id = 'exp-' + (++_expId);
+  return `<div class="explain-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.eq').textContent=this.nextElementSibling.classList.contains('open')?'−':'?'">
+    <span class="eq">?</span>what is this · what to look for
+  </div>
+  <div class="explain-body" id="${id}">
+    <strong>What this is:</strong> ${what}<br/>
+    <strong>What to look for:</strong> ${watchFor}<br/>
+    <strong>Risk context:</strong> ${riskContext}
+  </div>`;
+}
+
+function riskCallout(level, headline, detail){
+  return `<div class="risk-callout ${level}">
+    <div class="rc-head">${level === 'critical' ? '🚨' : level === 'high' ? '⚠' : level === 'medium' ? '◆' : '✓'} ${headline}</div>
+    ${detail}
+  </div>`;
+}
+
+
 function renderAll(domain,intel){
   const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir}=intel;
   $('resultDomain').textContent=`// ${domain}`;
@@ -1267,28 +1328,52 @@ function renderRDAP(rdap){
   const age=rdap.registered?Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000)):null;
   const exp=rdap.expiry?Math.floor((new Date(rdap.expiry)-Date.now())/86400000):null;
   const expCol=exp===null?'':exp<30?'class="bad"':exp<90?'class="warn"':'class="ok"';
-  $('rdapContent').innerHTML=`<table class="kv">
+  let rdapRisk = '';
+  if(rdap.expiry){
+    const daysLeft = Math.floor((new Date(rdap.expiry)-Date.now())/86400000);
+    if(daysLeft<30) rdapRisk = riskCallout('critical','Domain expiring in '+daysLeft+' days','If a vendor\'s domain expires, all services — email, web, APIs — go offline immediately. Attackers can also register expired domains to intercept traffic and impersonate the vendor.');
+    else if(daysLeft<90) rdapRisk = riskCallout('medium','Domain expires in '+daysLeft+' days','Short runway. Request the vendor confirm auto-renewal is enabled. Domain expiry is a common oversight that causes unexpected outages.');
+  }
+  const rdapExplain = explainer(
+    'RDAP (Registration Data Access Protocol) is the modern replacement for WHOIS. It shows who registered a domain, when it expires, and which nameservers control its DNS.',
+    'Check expiry date — domains expiring in under 90 days are a risk. Check nameservers — unexpected changes can indicate domain hijacking. Check registrar — premium registrars (Cloudflare, AWS Route53) suggest mature infrastructure.',
+    'Domain expiry and hijacking are underestimated risks. A vendor whose domain lapses loses all email and web services. Nameserver changes can redirect all traffic to an attacker. <span class="risk-high">High impact if misconfigured.</span>'
+  );
+  $('rdapContent').innerHTML=rdapRisk+`<table class="kv">
     <tr><td>registrar</td><td>${safeText(rdap.registrar)}</td></tr>
     <tr><td>registered</td><td>${rdap.registered?.split('T')[0]||'—'}${age!==null?` <span class="dim">(${age}y)</span>`:''}</td></tr>
     <tr><td>expires</td><td><span ${expCol}>${rdap.expiry?.split('T')[0]||'—'}${exp!==null?` (${exp}d)`:''}</span></td></tr>
     <tr><td>updated</td><td>${rdap.updated?.split('T')[0]||'—'}</td></tr>
     <tr><td>nameservers</td><td>${(rdap.nameservers||[]).join('<br/>')||'—'}</td></tr>
     <tr><td>status</td><td>${(rdap.status||[]).map(s=>`<span class="tag tag-blue">${safeText(s)}</span>`).join(' ')||'—'}</td></tr>
-  </table>`;
+  </table>`+rdapExplain;
 }
 
 function renderDNS(dns){
   if(!dns)return;$('dnsPanel').style.display='block';
   const spfPolicy=dns.spf?(dns.spf.includes('-all')?'<span class="ok"> [-all strict]</span>':dns.spf.includes('~all')?'<span class="warn"> [~all soft]</span>':'<span class="warn"> [+all neutral]</span>'):'';
   const dmarcPolicy=dns.dmarc?(()=>{const p=dns.dmarc.match(/p=(\w+)/)?.[1]||'none';return`<span class="${p==='reject'?'ok':p==='quarantine'?'warn':'warn'}"> [p=${p}]</span>`;})():'';
-  $('dnsContent').innerHTML=`<table class="kv">
+  const dnsMissing = [];
+  if(!dns.spf) dnsMissing.push('SPF');
+  if(!dns.dmarc) dnsMissing.push('DMARC');
+  let dnsRisk = '';
+  if(dnsMissing.length === 2)
+    dnsRisk = riskCallout('high','No email authentication (SPF + DMARC missing)','Anyone can send email pretending to be this vendor. Phishing attacks using their domain are trivially easy. This is one of the most common vectors for business email compromise (BEC) fraud — attackers impersonate a vendor to redirect invoice payments.');
+  else if(dnsMissing.length === 1)
+    dnsRisk = riskCallout('medium', dnsMissing[0]+' missing — partial email authentication only', 'Without both SPF and DMARC, email spoofing is still possible. '+dnsMissing[0]+' provides partial protection but can be bypassed. Request the vendor complete their email authentication setup.');
+  const dnsExplain = explainer(
+    'DNS (Domain Name System) records control how email and web traffic routes to a vendor. SPF specifies which servers can send email on behalf of the domain. DMARC tells receiving mail servers what to do with emails that fail SPF/DKIM checks.',
+    'SPF missing = anyone can spoof their email. DMARC missing = no enforcement even if SPF exists. DMARC p=none = monitoring only, not enforced. DMARC p=reject = strongest protection. IPv6 enabled shows modern infrastructure.',
+    'Email spoofing via missing SPF/DMARC is the #1 enabler of vendor impersonation fraud. <span class="risk-high">If a vendor processes invoices or payments, this is a critical gap.</span> DMARC at p=reject blocks spoofing entirely.'
+  );
+  $('dnsContent').innerHTML=dnsRisk+`<table class="kv">
     <tr><td>a / ipv4</td><td>${(dns.aRecords||[]).join(', ')||'—'}</td></tr>
     <tr><td>ipv6 (aaaa)</td><td>${dns.ipv6?'<span class="ok">enabled</span>':'<span class="dim">not configured</span>'}</td></tr>
     <tr><td>nameservers</td><td>${(dns.ns||[]).join('<br/>')||'—'}</td></tr>
     <tr><td>mx records</td><td>${(dns.mx||[]).join('<br/>')||'—'}</td></tr>
     <tr><td>spf</td><td>${dns.spf?`<span class="ok">present</span>${spfPolicy}<div style="font-size:.65rem;color:var(--muted);margin-top:2px;">${safeText(dns.spf.substring(0,90))}</div>`:'<span class="bad">missing</span> <span class="dim">// spoofing risk</span>'}</td></tr>
     <tr><td>dmarc</td><td>${dns.dmarc?`<span class="ok">present</span>${dmarcPolicy}<div style="font-size:.65rem;color:var(--muted);margin-top:2px;">${safeText(dns.dmarc.substring(0,90))}</div>`:'<span class="bad">missing</span> <span class="dim">// no email policy</span>'}</td></tr>
-  </table>`;
+  </table>`+dnsExplain;
 }
 
 function renderCRT(crt){
@@ -1315,6 +1400,12 @@ function renderCRT(crt){
         </div></div>`;
     });
   }
+  const crtExplain = explainer(
+    'Certificate Transparency (CT) logs are public records of every TLS/HTTPS certificate ever issued for a domain. crt.sh aggregates these logs, letting us see all certificates and discover subdomains.',
+    'High cert count = long-lived domain (good). Expired certs in use = poor certificate hygiene. Many subdomains = large attack surface — each subdomain is a potential entry point. Wildcard certs (*.domain.com) cover all subdomains with one cert — convenient but higher risk if key is compromised.',
+    'Subdomains reveal infrastructure: vpn.vendor.com = remote access portal; api.vendor.com = exposed API; staging.vendor.com = often less secured than production. <span class="risk-med">Attackers enumerate subdomains to find weak points.</span> Expired certs cause user-facing errors and indicate poor operational hygiene.'
+  );
+  h += crtExplain;
   $('crtContent').innerHTML=h;
 }
 
@@ -1341,6 +1432,12 @@ function renderThreat(urlhaus,threatfox){
         ${i.tags?.length?`<div class="tags" style="margin-top:4px;">${i.tags.slice(0,4).map(t=>`<span class="tag tag-red">${safeText(t)}</span>`).join('')}</div>`:''}
       </div></div>`);
   }else{h+=`<div class="clean-msg">✓ no iocs found</div>`;}
+  const threatExplain = explainer(
+    'URLhaus tracks malware distribution URLs reported by security researchers worldwide. ThreatFox is a community threat intelligence feed tracking indicators of compromise (IOCs) — domains, IPs, URLs associated with malware families.',
+    'Any hit here is serious. URLhaus = this domain is/was actively hosting malware. ThreatFox = this domain is linked to a known malware campaign. Check confidence level (higher = more reliable) and first-seen date (recent = active threat).',
+    '<span class="risk-high">A vendor domain flagged in malware feeds indicates active compromise or that infrastructure has been weaponised.</span> This is not a misconfiguration — it means the vendor\'s environment may be actively controlled by threat actors. Treat as critical and escalate immediately.'
+  );
+  h += threatExplain;
   $('threatContent').innerHTML=h;
 }
 
@@ -1367,6 +1464,12 @@ function renderBreach(breach,domain){
     });
   }
   h+=`<div class="src-footer"><span>xposedornot.com</span><a href="https://xposedornot.com/xposed/${safeText(domain)}" target="_blank">full report →</a></div>`;
+  const breachExplain = explainer(
+    'XposedOrNot aggregates publicly known data breaches and checks whether a domain\'s email accounts appeared in those breaches. This data comes from incidents that were disclosed or leaked publicly.',
+    'Look at the date — breaches older than 5 years with no recent incidents are lower risk (passwords likely rotated). Recent breaches (1-3 years) are high risk — credentials may still be active. Data types matter: passwords + emails = credential stuffing risk; personally identifiable info (PII) = regulatory and legal exposure.',
+    'Breached credentials are the #1 initial access vector for ransomware. <span class="risk-high">If a vendor\'s staff credentials are in breach databases, attackers use automated tools to try those passwords across VPNs, email portals, and cloud services.</span> Request evidence of mandatory password resets and MFA enforcement post-breach.'
+  );
+  h += breachExplain;
   $('breachContent').innerHTML=h;
 }
 
@@ -1415,6 +1518,12 @@ function renderGov(gov){
     if(hd.server)h+=`<div style="margin-top:8px;padding:7px 10px;background:rgba(255,106,26,0.05);border:1px solid rgba(255,106,26,0.2);font-size:.7rem;color:var(--orange);">⚠ server banner: <span style="color:var(--text);">${safeText(hd.server)}</span></div>`;
     if(hd.poweredBy)h+=`<div style="margin-top:5px;padding:7px 10px;background:rgba(255,106,26,0.05);border:1px solid rgba(255,106,26,0.2);font-size:.7rem;color:var(--orange);">⚠ x-powered-by: <span style="color:var(--text);">${safeText(hd.poweredBy)}</span></div>`;
   }
+  const govExplain = explainer(
+    'Security governance checks examine whether a vendor has implemented standard security programme signals: a vulnerability disclosure process (security.txt), email signing (DKIM), email transport encryption (MTA-STS), brand verification (BIMI), and HTTP security headers that protect web users.',
+    'security.txt present = vendor has a formal process for researchers to report vulnerabilities (maturity signal). HSTS = forces HTTPS, prevents downgrade attacks. CSP = prevents cross-site scripting. X-Frame-Options = prevents clickjacking. Score of 5-6/6 = strong hygiene. 0-2/6 = basic security neglected. Server banner exposed = reveals server software version to attackers.',
+    'HTTP security headers protect end users of the vendor\'s web applications. <span class="risk-med">A vendor with 0-2/6 headers is likely running default configurations — suggesting security hardening is not a priority.</span> Server banners disclosing version info help attackers identify unpatched vulnerabilities without any scanning.'
+  );
+  h += govExplain;
   $('govContent').innerHTML=h;
 }
 
@@ -1442,6 +1551,12 @@ function renderRansom(ransomware){
     });
   }
   h+=`<div class="src-footer"><span>ransomware.live</span><a href="https://ransomware.live/search?s=${encodeURIComponent(ransomware.company||'')}" target="_blank">search →</a></div>`;
+  const ransomExplain = explainer(
+    'Ransomware.live monitors the leak blogs and dark web sites operated by ransomware gangs. When gangs successfully compromise a company, they list the victim publicly to pressure payment — threatening to publish stolen data. This tool searches those listings by company name.',
+    'A listing here means the vendor was hit by ransomware and the gang is publicly claiming it. Check the date — recent listings (within 12 months) may still have active negotiations or ongoing data leak risk. Check the group — some gangs (LockBit, ALPHV, Cl0p) target specific industries.',
+    '<span class="risk-high">A confirmed ransomware listing is one of the most serious findings possible.</span> It means the vendor suffered a significant breach, data was exfiltrated, and the attacker had enough access to encrypt systems. Even if ransom was paid, stolen data may still be sold. Request incident report, forensics findings, and evidence of remediation.'
+  );
+  h += ransomExplain;
   $('ransomContent').innerHTML=h;
 }
 
@@ -1456,6 +1571,12 @@ function renderNews(news){
     if(older.length){h+=`<div style="font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 7px;">// older</div>`;older.slice(0,4).forEach(a=>h+=artCard(a));}
   }
   h+=`<div class="src-footer"><span>google news rss · 3 searches</span><a href="https://news.google.com/search?q=${encodeURIComponent((news.company||'')+' breach hack cyberattack')}" target="_blank">more →</a></div>`;
+  const newsExplain = explainer(
+    'This panel searches Google News RSS feeds for cybersecurity-related articles mentioning the vendor — breaches, ransomware attacks, regulatory fines, security incidents, and cyber-related legal actions.',
+    'News coverage is a lagging indicator — incidents are usually reported after they occur. Look for: confirmed data breaches, regulatory actions (OAIC, GDPR fines), class action lawsuits following incidents, repeated security failures. Filter by recency — articles older than 3 years are lower relevance.',
+    'Media coverage of security incidents often surfaces details that vendors don\'t disclose in formal notifications. <span class="risk-med">Multiple recent articles about the same vendor\'s security incidents suggests systemic issues, not isolated events.</span> Cross-reference with XposedOrNot and HIBP to verify.'
+  );
+  h += newsExplain;
   $('newsContent').innerHTML=h;
 }
 function artCard(a){
@@ -1496,6 +1617,18 @@ function renderVT(vt,domain){
     h+=`<div style="margin-top:10px;"><div class="tags">${cats.map(c=>`<span class="tag tag-blue">${safeText(c)}</span>`).join('')}</div></div>`;
   }
   if(vt.lastAnalysis)h+=`<div class="src-footer"><span>last analysed: ${new Date(vt.lastAnalysis*1000).toLocaleDateString()}</span><a href="https://www.virustotal.com/gui/domain/${safeText(domain)}" target="_blank">full report →</a></div>`;
+  const vtRisk = vt.malicious > 0
+    ? riskCallout('critical', vt.malicious+' of '+vt.totalEngines+' AV engines flagged this domain as malicious', 'A domain flagged by multiple antivirus engines is confirmed malware infrastructure. This is not a false positive at this scale. The vendor\'s domain is actively being used to distribute malware, host phishing pages, or serve as command-and-control.')
+    : vt.suspicious > 3
+    ? riskCallout('medium', vt.suspicious+' engines flagged as suspicious', 'Suspicious flags often indicate newly registered domains, domains with unusual behaviour patterns, or domains that have been associated with low-level threats. Not confirmed malicious but warrants caution.')
+    : '';
+  const vtExplain = explainer(
+    'VirusTotal aggregates results from 70+ antivirus engines, URL scanners, and domain reputation services. Each engine independently analyses the domain and returns a verdict: malicious, suspicious, harmless, or undetected.',
+    'Focus on the malicious count — even 1-2 detections from reputable engines (Kaspersky, CrowdStrike, ESET) is meaningful. Many detections = confirmed threat. Zero malicious + low suspicious = clean. Check categories — if engines classify it as phishing or malware, that\'s specific intelligence about the threat type.',
+    'VirusTotal is the gold standard for quick domain reputation checks. <span class="risk-high">Malicious detections from multiple independent engines is extremely reliable signal — false positives at scale are rare.</span> Even a single detection from a high-reputation engine warrants investigation.'
+  );
+  if(vtRisk) h = vtRisk + h;
+  h += vtExplain;
   $('vtContent').innerHTML=h;
 }
 
@@ -1524,6 +1657,18 @@ function renderOTX(otx,domain){
     h+=`</tbody></table>`;
   }
   h+=`<div class="src-footer"><span>alienvault otx</span><a href="https://otx.alienvault.com/indicator/domain/${safeText(domain)}" target="_blank">full report →</a></div>`;
+  const otxRisk = otx.pulseCount > 5
+    ? riskCallout('high', otx.pulseCount+' threat intelligence pulses linked to this domain', 'High pulse count means this domain appears frequently in threat reports submitted by security researchers. It\'s been observed in multiple malware campaigns, threat actor infrastructure, or attack patterns.')
+    : otx.pulseCount > 0
+    ? riskCallout('medium', otx.pulseCount+' threat pulse'+(otx.pulseCount>1?'s':'')+' found', 'This domain has been flagged in community threat intelligence. Check pulse dates — old pulses (2+ years) may reflect historical compromise that has since been remediated.')
+    : '';
+  const otxExplain = explainer(
+    'AlienVault OTX (Open Threat Exchange) is a community threat intelligence platform. Security researchers worldwide submit threat "pulses" — curated collections of indicators (domains, IPs, file hashes) associated with specific malware campaigns or threat actors.',
+    'Pulse count = how many threat campaigns have referenced this domain. Malware sample count = files that communicate with or originate from this domain. Passive DNS = historical DNS records showing where this domain has pointed over time — useful for spotting infrastructure changes.',
+    'OTX pulses provide context that automated scanners miss — human analysts documenting specific attacks. <span class="risk-med">Even old pulses are worth reviewing: they reveal the domain was previously used in attacks, which may indicate compromised infrastructure that was never fully cleaned up.</span>'
+  );
+  if(otxRisk) h = otxRisk + h;
+  h += otxExplain;
   $('otxContent').innerHTML=h;
 }
 
@@ -1564,6 +1709,18 @@ function renderShodan(shodan,ips){
     h+=`</div>`;
   });
   h+=`<div class="src-footer"><span>shodan internetdb · updated weekly · free no-key</span><a href="https://internetdb.shodan.io" target="_blank">docs →</a></div>`;
+  const shodanRisk = shodan.results?.some(r=>r.vulns?.length>0)
+    ? riskCallout('high', 'Known CVEs detected on internet-facing infrastructure', 'Shodan has identified unpatched vulnerabilities on the vendor\'s public IP addresses. These CVEs are publicly documented — attackers actively scan for and exploit them. The vendor\'s internet-facing servers have known, exploitable weaknesses.')
+    : shodan.results?.some(r=>r.ports?.some(p=>[3389,5900,23,21].includes(p)))
+    ? riskCallout('medium', 'High-risk ports exposed to the internet', 'RDP (3389), VNC (5900), Telnet (23), or FTP (21) are exposed. These are common ransomware entry points — especially RDP which is the #1 initial access vector for ransomware groups. These services should not be publicly exposed.')
+    : '';
+  const shodanExplain = explainer(
+    'Shodan InternetDB is a free API that returns known open ports, CVE vulnerabilities, and software fingerprints for any public IP address. Unlike active scanning, it uses passively collected data — safe and legal to query.',
+    'Open ports: 80/443 = normal web. 22 = SSH (remote access). 3389 = RDP (Windows remote desktop — high risk if exposed). 3306 = MySQL database. 27017 = MongoDB. CVEs = specific vulnerability IDs — look these up to understand severity. Tags like "vpn" or "cloud" indicate the type of infrastructure.',
+    '<span class="risk-high">Exposed RDP (3389) is the single most common ransomware entry point.</span> Exposed databases (3306, 27017) with no authentication have caused some of the largest breaches in history. CVEs on public-facing servers indicate the vendor is not patching promptly — a fundamental security failure.'
+  );
+  if(shodanRisk) h = shodanRisk + h;
+  h += shodanExplain;
   $('shodanContent').innerHTML=h;
 }
 
@@ -1581,6 +1738,12 @@ function renderBGPView(bgpview){
     ${bgpview.ptrRecord?`<tr><td>ptr record</td><td>${safeText(bgpview.ptrRecord)}</td></tr>`:''}
   </table>`;
   h+=`<div class="src-footer"><span>bgpview.io · free no-key</span><a href="https://bgpview.io/ip/${safeText(bgpview.ip)}" target="_blank">view full →</a></div>`;
+  const bgpExplain = explainer(
+    'BGPView provides routing intelligence — who actually hosts this vendor\'s infrastructure. BGP (Border Gateway Protocol) is the routing protocol that controls how traffic flows across the internet. ASN (Autonomous System Number) identifies the network operator.',
+    'Organisation name reveals the cloud/hosting provider — AWS, Azure, GCP, Cloudflare, or a generic hosting company. RIR (Regional Internet Registry) shows which region allocated the IP block. This is useful for data sovereignty — if your data goes through a vendor, it flows through their infrastructure provider\'s jurisdiction.',
+    'Knowing the hosting provider matters for <span class="risk-med">supply chain risk</span>. A vendor hosted on shared infrastructure with poor neighbours inherits their risk. Providers like Cloudflare, AWS, and Azure have strong security baselines. Unknown regional ISPs may not. Also relevant for regulatory compliance — data processed through certain countries may have different legal protections.'
+  );
+  h += bgpExplain;
   $('bgpviewContent').innerHTML=h;
 }
 
@@ -1604,6 +1767,16 @@ function renderObservatory(obs,domain){
     </div>
   </div>`;
   h+=`<div class="src-footer"><span>mozilla observatory · free no-key</span><a href="https://observatory.mozilla.org/analyze/${safeText(domain)}" target="_blank">full report →</a></div>`;
+  const obsRisk = obs.grade && !obs.grade.startsWith('A') && !obs.grade.startsWith('B')
+    ? riskCallout('medium', 'Mozilla Observatory grade: '+obs.grade+' ('+obs.score+'/100) — significant security header gaps', 'This vendor\'s web application is missing important browser security controls. Users accessing their web portals are exposed to attack types like clickjacking, cross-site scripting (XSS), and protocol downgrade attacks.')
+    : '';
+  const obsExplain = explainer(
+    'Mozilla Observatory tests a domain\'s HTTP security headers — browser-enforced security controls that protect users from common web attacks. It runs 11 distinct tests and grades the result A+ through F.',
+    'Grade A/A+ = excellent, headers properly configured. Grade B = good with minor gaps. Grade C/D = missing important controls. Grade F = dangerous omissions. Look at specific tests failed — each represents a specific attack type the site is vulnerable to.',
+    'These headers protect people who visit the vendor\'s web portals and applications. <span class="risk-med">A grade F means the vendor\'s web apps are vulnerable to a range of well-documented browser-based attacks.</span> For vendors who provide web portals your staff use, this is directly relevant — your users\'  browsers become attack surfaces.'
+  );
+  if(obsRisk) h = obsRisk + h;
+  h += obsExplain;
   $('observatoryContent').innerHTML=h;
 }
 
@@ -1639,6 +1812,12 @@ function renderURLScan(data,domain){
     });
   }
   h+=`<div class="src-footer"><span>urlscan.io · free · no key for search</span><a href="https://urlscan.io/search/#domain%3A${encodeURIComponent(domain)}" target="_blank">all scans →</a></div>`;
+  const urlExplain = explainer(
+    'URLScan.io is a website analysis service that scans URLs and records what they return — page content, redirects, resources loaded, screenshots. Security researchers submit suspicious URLs for analysis, building a public archive of scans.',
+    'Verdict = whether previous scans flagged this domain as malicious or suspicious. Server header reveals the web server software. TLS issuer shows the certificate authority. Tags indicate threat categories detected. View individual scans to see screenshots and full technical details of what the domain was serving at time of scan.',
+    'Historical URLScan results show what a domain was doing in the past — useful for identifying if a vendor\'s domain was temporarily compromised, redirected to malware, or hosting phishing pages. <span class="risk-med">A malicious verdict in a previous scan is significant even if the domain appears clean now — it indicates the domain was compromised.</span>'
+  );
+  h += urlExplain;
   $('urlscanContent').innerHTML=h;
 }
 
@@ -1671,6 +1850,18 @@ function renderAbuse(abuse){
     </div>`;
   });
   h+=`<div class="src-footer"><span>abuseipdb.com · free key required</span><a href="https://www.abuseipdb.com" target="_blank">check →</a></div>`;
+  const abuseRisk = abuse.results?.some(r=>r.abuseScore>=75)
+    ? riskCallout('high', 'High abuse confidence score detected', 'One or more of this vendor\'s IP addresses has been repeatedly reported to AbuseIPDB for malicious activity. This indicates the IP is actively being used for attacks — scanning, brute force, spam, or malware distribution.')
+    : abuse.results?.some(r=>r.abuseScore>=25)
+    ? riskCallout('medium', 'Moderate abuse reports on vendor IP addresses', 'Some abuse reports exist for vendor IP addresses. Could indicate shared hosting with malicious neighbours, historical compromise, or automated scanning behaviour. Review report types and dates.')
+    : '';
+  const abuseExplain = explainer(
+    'AbuseIPDB is a community-driven IP abuse database. Network administrators and security teams report IP addresses engaged in malicious activity — SSH brute force, port scanning, spam, DDoS, and malware. The abuse confidence score reflects how consistently an IP is reported.',
+    'Score 0% = no reports, clean. Score 25-74% = moderate concern, check report types. Score 75-100% = high confidence malicious — this IP is actively attacking others. Look at total reports and number of distinct reporters — many reporters = more reliable signal. Usage type shows if it\'s a data centre, ISP, or hosting provider.',
+    '<span class="risk-high">A vendor whose IP addresses are actively attacking other organisations is a significant concern</span> — it indicates compromised infrastructure or negligent security practices. Even if they\'re the victim of compromise rather than the attacker, it shows they\'re not detecting or remediating attacks originating from their network.'
+  );
+  if(abuseRisk) h = abuseRisk + h;
+  h += abuseExplain;
   $('abuseContent').innerHTML=h;
 }
 
@@ -1704,6 +1895,18 @@ function renderPulsedive(pd,domain){
     h+=`<div class="tags">${pd.feeds.map(f=>`<span class="tag tag-orange">${safeText(String(f))}</span>`).join('')}</div>`;
   }
   h+=`<div class="src-footer"><span>pulsedive.com · 30+ feeds aggregated · free key required</span><a href="https://pulsedive.com/indicator/${encodeURIComponent(domain)}" target="_blank">full report →</a></div>`;
+  const pdRisk = pd.risk==='critical'||pd.risk==='high'
+    ? riskCallout('critical','Pulsedive risk level: '+pd.risk,'This domain has been flagged across multiple threat intelligence feeds as '+pd.risk+' risk. A high/critical rating reflects consensus across multiple independent sources, not a single data point.')
+    : pd.risk==='medium'
+    ? riskCallout('medium','Pulsedive risk level: medium — appears in threat intelligence feeds','This domain has some threat intelligence activity. Review the linked threats and feeds to understand the specific threat types.')
+    : '';
+  const pdExplain = explainer(
+    'Pulsedive aggregates data from 30+ OSINT feeds — URLhaus, ThreatFox, PhishTank, MalwareBazaar, and more — into a single normalised risk score reflecting consensus across all sources.',
+    'Risk level: none/low = clean. Medium = some feed activity. High/Critical = flagged by multiple independent sources. Linked threats show specific malware families or threat actors. Feed list shows which sources flagged it.',
+    'Pulsedive surfaces cases where a domain looks clean in individual sources but has cumulative signals across many. <span class="risk-high">High/Critical ratings are highly reliable — they represent corroboration across dozens of independent sources.</span>'
+  );
+  if(pdRisk) h = pdRisk + h;
+  h += pdExplain;
   $('pulsediveContent').innerHTML=h;
 }
 
@@ -1750,6 +1953,20 @@ function renderHIBP(hibp, domain){
     });
   }
   h += `<div class="src-footer"><span>haveibeenpwned.com · troy hunt · ${(hibp.totalBreaches||0).toLocaleString()} breaches indexed</span><a href="https://haveibeenpwned.com/PwnedWebsites" target="_blank">full list →</a></div>`;
+  const hibpRisk = hibp.found && hibp.matches?.some(b => {
+    const yr = b.BreachDate ? parseInt(b.BreachDate.substring(0,4)) : 0;
+    return new Date().getFullYear() - yr <= 3;
+  }) ? riskCallout('high','Recent breach found in HIBP database (within 3 years)','A confirmed, recent data breach affects this vendor. HIBP only lists verified breaches — this is not a rumour. Credentials and personal data from this breach may still be actively exploited.')
+    : hibp.found
+    ? riskCallout('medium','Historical breach(es) found in HIBP database','This vendor has appeared in known breach databases. Older breaches carry lower risk if the vendor has since reset passwords and enforced MFA, but each event represents a past security failure worth documenting.')
+    : '';
+  const hibpExplain = explainer(
+    'Have I Been Pwned (HIBP) is maintained by security researcher Troy Hunt and is the most authoritative public breach database. It aggregates data from confirmed breaches — verified incidents where data was actually stolen and exposed. This search filters all 700+ indexed breaches by the vendor\'s company name and domain.',
+    'Look at breach date — recent breaches (within 3 years) are high priority. Look at data classes — "Passwords" is most critical (credential stuffing risk), "Email addresses" enables phishing, "Phone numbers" enables SIM swapping. PwnCount = number of accounts affected — indicates breach scale. IsVerified = HIBP has confirmed the breach is genuine.',
+    '<span class="risk-high">Any recent verified breach is a serious finding.</span> Request the vendor\'s post-breach actions: mandatory password resets, MFA enforcement, third-party forensics report. Older breaches (5+ years) with documented remediation carry lower ongoing risk but should still be noted in vendor risk registers.'
+  );
+  if(hibpRisk) h = hibpRisk + h;
+  h += hibpExplain;
   $('hibpContent').innerHTML = h;
 }
 
@@ -1781,6 +1998,18 @@ function renderBreachDir(bd, domain){
     }
   }
   h += `<div class="src-footer"><span>breachdirectory.org · aggregated credential database</span><a href="https://breachdirectory.org" target="_blank">site →</a></div>`;
+  const bdRisk = bd.count > 10000
+    ? riskCallout('high','Large credential exposure — '+bd.count.toLocaleString()+' entries found','A significant volume of credentials associated with this domain exist in breach databases. At this scale, staff accounts are almost certainly in the hands of threat actors and being tested against corporate systems.')
+    : bd.count > 0
+    ? riskCallout('medium', bd.count.toLocaleString()+' credential entries found in breach databases','Some credentials associated with this domain have appeared in breach data. The risk depends on whether affected accounts have been identified, passwords changed, and MFA enforced.')
+    : '';
+  const bdExplain = explainer(
+    'Breach Directory aggregates credential data from hundreds of data breaches and checks how many entries are associated with a domain. Unlike HIBP which lists breach events, Breach Directory focuses on the volume of raw credential records.',
+    'Count = total credential entries — higher numbers mean more staff accounts were compromised across various breaches. Sources = which breaches the credentials came from. Sample records show the structure of exposed data (passwords are redacted in this tool).',
+    'Credential exposure is the primary enabler of account takeover attacks. <span class="risk-high">Large numbers of exposed credentials mean attackers have a ready-made list of usernames and passwords to try against the vendor\'s VPN, email, and cloud systems.</span> Request evidence of systematic credential audit and mandatory MFA across all remote access points.'
+  );
+  if(bdRisk) h = bdRisk + h;
+  h += bdExplain;
   $('breachdirContent').innerHTML = h;
 }
 
