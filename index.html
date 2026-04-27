@@ -1,16 +1,14 @@
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
-<!-- API KEY — update this line when key changes          -->
-<!-- const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';      -->
+<!-- Colaboree Intel v3.0.0 - Pure Intel, No AI          -->
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 <!DOCTYPE html>
-<!-- Colaboree Intel v2.0.0 - 2026-03-10 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Colaboree Intel — Domain Security Assessment</title>
+<title>Colaboree Intel — Domain Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Cabinet+Grotesk:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=Cabinet+Grotesk:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --ink:#0d0d0d;
@@ -18,7 +16,6 @@
   --warm:#f0e6d3;
   --acid:#c8f135;
   --coral:#ff5c3a;
-  --coral2:#ff7a5c;
   --sky:#b8e0ff;
   --muted:#6b6560;
   --muted2:#9a948f;
@@ -26,8 +23,6 @@
   --border:rgba(13,13,13,0.1);
   --border2:rgba(13,13,13,0.16);
   --panel:rgba(13,13,13,0.04);
-  --panel2:rgba(13,13,13,0.07);
-  /* Status colours */
   --green:#16a34a;
   --yellow:#ca8a04;
   --orange:#ea580c;
@@ -40,13 +35,12 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:'Cabinet Grotesk',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
-h1,h2,h3,h4,.mono-head{font-family:'Syne',sans-serif;}
+h1,h2,h3,.syne{font-family:'Syne',sans-serif;}
 .mono{font-family:'JetBrains Mono',monospace;}
 
-/* BG TEXTURE */
+/* BG */
 .bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 50% at 10% 0%,rgba(200,241,53,0.12),transparent 60%),
+  background:radial-gradient(ellipse 60% 50% at 10% 0%,rgba(200,241,53,0.12),transparent 60%),
     radial-gradient(ellipse 50% 40% at 90% 100%,rgba(255,92,58,0.08),transparent 60%);}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(13,13,13,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(13,13,13,0.04) 1px,transparent 1px);
@@ -56,17 +50,10 @@ h1,h2,h3,h4,.mono-head{font-family:'Syne',sans-serif;}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 5%;height:62px;
-  background:rgba(245,240,232,0.92);
-  backdrop-filter:blur(16px);
+  background:rgba(245,240,232,0.92);backdrop-filter:blur(16px);
   border-bottom:1px solid var(--border);}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.brand-icon{width:32px;height:32px;border-radius:8px;
-  background:linear-gradient(135deg,var(--coral),var(--acid));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;color:var(--ink);
-  box-shadow:0 0 14px rgba(255,92,58,0.3);}
-.nav-brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--ink);}
-.nav-brand-name span{color:var(--coral);}
+.nav-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--ink);text-decoration:none;}
+.nav-brand span{color:var(--coral);}
 .nav-pill{background:rgba(200,241,53,0.2);border:1px solid rgba(200,241,53,0.4);border-radius:100px;
   padding:5px 14px;font-size:.78rem;font-weight:700;color:var(--ink);letter-spacing:.04em;}
 .nav-ver{background:var(--panel);border:1px solid var(--border);border-radius:100px;
@@ -85,20 +72,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes spin{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(360deg);}}
+@keyframes spin{from{transform:translateX(-50%) rotate(0deg)}to{transform:translateX(-50%) rotate(360deg)}}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
 
-.hero h1{font-size:clamp(1.3rem,2.2vw,1.9rem);font-weight:700;line-height:1.08;letter-spacing:-.03em;
-  color:var(--ink);margin-bottom:18px;animation:fadeUp .7s .1s ease both;}
-.hero h1 .grad{color:var(--coral);}
-.hero-sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:580px;margin:0 auto 34px;animation:fadeUp .7s .2s ease both;}
+.hero h1{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:700;line-height:1.1;letter-spacing:-.03em;
+  margin-bottom:16px;animation:fadeUp .7s .1s ease both;}
+.hero h1 span{color:var(--coral);}
+.hero-sub{font-size:1rem;color:var(--muted);line-height:1.7;max-width:560px;margin:0 auto 32px;animation:fadeUp .7s .2s ease both;}
 
 /* SEARCH */
 .search-wrap{width:100%;max-width:680px;margin:0 auto;animation:fadeUp .7s .3s ease both;}
 .search-box{display:flex;align-items:center;background:var(--card);border:1.5px solid var(--border2);
   border-radius:14px;padding:6px 6px 6px 20px;
-  transition:border-color .25s,box-shadow .25s;
-  box-shadow:0 8px 32px rgba(13,13,13,0.1);}
+  transition:border-color .25s,box-shadow .25s;box-shadow:0 8px 32px rgba(13,13,13,0.1);}
 .search-box:focus-within{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,92,58,0.12),0 8px 32px rgba(13,13,13,0.1);}
 .search-icon{font-size:1rem;margin-right:12px;opacity:.4;flex-shrink:0;}
 .search-input{flex:1;background:transparent;border:none;outline:none;
@@ -112,8 +98,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .search-btn:disabled{opacity:.6;cursor:not-allowed;}
 .search-examples{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
 .ex-chip{background:var(--card);border:1px solid var(--border);border-radius:100px;padding:4px 14px;
-  font-size:.78rem;color:var(--muted);cursor:pointer;transition:all .2s;
-  font-family:'JetBrains Mono',monospace;}
+  font-size:.78rem;color:var(--muted);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;}
 .ex-chip:hover{border-color:var(--coral);color:var(--coral);background:rgba(255,92,58,0.05);}
 
 /* API KEYS */
@@ -138,9 +123,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .badge-free{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
   background:rgba(22,163,74,0.1);color:var(--green);}
-.badge-soon{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
-  background:var(--panel);color:var(--muted);}
 
 /* INTEL BAR */
 .intel-bar{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:18px;
@@ -180,7 +162,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .loading-dots span:nth-child(3){animation-delay:.4s;}
 
 /* RESULTS */
-#results{display:none;position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 5% 80px;}
+#results{display:none;position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 4% 80px;}
 #results.active{display:block;animation:fadeIn .5s ease;}
 .action-bar{display:flex;gap:10px;justify-content:flex-end;margin-bottom:16px;flex-wrap:wrap;}
 .action-btn{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;
@@ -190,40 +172,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .action-btn:hover{border-color:var(--coral);color:var(--coral);background:rgba(255,92,58,0.05);}
 
 /* RESULT HEADER */
-.result-header{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;
-  background:var(--card);border:1px solid var(--border2);border-radius:22px;
-  padding:30px 34px;margin-bottom:20px;position:relative;overflow:hidden;
-  box-shadow:0 8px 32px rgba(13,13,13,0.08);}
+.result-header{background:var(--card);border:1px solid var(--border2);border-radius:22px;
+  padding:28px 32px;margin-bottom:20px;
+  box-shadow:0 8px 32px rgba(13,13,13,0.08);position:relative;overflow:hidden;}
 .result-header::before{content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,92,58,0.04),transparent 70%);
-  pointer-events:none;}
-.score-ring-wrap{position:relative;}
-.score-ring-svg{transform:rotate(-90deg);}
-.score-ring-svg circle{transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1);}
-.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.score-big{font-family:'Syne',sans-serif;font-size:2.1rem;font-weight:900;color:var(--ink);}
-.score-max{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
-.result-domain-label{font-family:'JetBrains Mono',monospace;font-size:.95rem;color:var(--coral);margin-bottom:6px;}
-.result-rating-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;
-  border-radius:100px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:12px;}
-.result-summary{font-size:.86rem;color:var(--muted);line-height:1.65;max-width:460px;}
-.result-stats{display:flex;flex-direction:column;gap:9px;min-width:135px;}
-.rstat{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:9px 13px;text-align:center;}
-.rstat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--ink);}
-.rstat-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
-
-/* INTEL STRIP */
-.intel-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px;}
+  background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(255,92,58,0.04),transparent 70%);pointer-events:none;}
+.result-header-top{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.result-domain-badge{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--coral);}
+.result-ts{font-size:.76rem;color:var(--muted);margin-left:auto;}
+.intel-strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px;}
 .intel-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;font-size:.74rem;font-weight:600;border:1px solid;}
 .intel-chip.ok{background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.2);color:var(--green);}
 .intel-chip.warn{background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.2);color:var(--orange);}
 .intel-chip.err{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);}
 .intel-chip.skip{background:var(--panel);border-color:var(--border);color:var(--muted);}
+.intel-chip.neutral{background:var(--panel);border-color:var(--border);color:var(--muted);}
 
-/* GRID */
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-.results-full{margin-bottom:18px;}
-@media(max-width:900px){.results-grid{grid-template-columns:1fr;}}
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;}
+.full-row{margin-bottom:18px;}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 
 /* PANEL */
 .panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;
@@ -232,132 +201,117 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .panel-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);}
 .panel-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;}
 .live-badge{font-size:.7rem;font-weight:700;letter-spacing:.05em;border-radius:6px;padding:2px 9px;border:1px solid;}
+.live-green{background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.2);color:var(--green);}
+.live-yellow{background:rgba(202,138,4,0.08);border-color:rgba(202,138,4,0.2);color:var(--yellow);}
+.live-red{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);}
+.live-blue{background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.2);color:var(--blue);}
+.live-orange{background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.2);color:var(--orange);}
 
-/* GRADES */
-.grade-badge{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.92rem;}
-.grade-A{background:rgba(22,163,74,0.12);color:var(--green);border:1.5px solid rgba(22,163,74,0.3);}
-.grade-B{background:rgba(13,148,136,0.12);color:var(--teal);border:1.5px solid rgba(13,148,136,0.3);}
-.grade-C{background:rgba(202,138,4,0.12);color:var(--yellow);border:1.5px solid rgba(202,138,4,0.3);}
-.grade-D{background:rgba(234,88,12,0.12);color:var(--orange);border:1.5px solid rgba(234,88,12,0.3);}
-.grade-F{background:rgba(220,38,38,0.12);color:var(--red);border:1.5px solid rgba(220,38,38,0.3);}
-.grade-N{background:var(--panel);color:var(--muted);border:1.5px solid var(--border);}
+/* STATUS INDICATORS */
+.status-ok{color:var(--green);font-weight:600;}
+.status-warn{color:var(--orange);font-weight:600;}
+.status-bad{color:var(--red);font-weight:600;}
+.status-muted{color:var(--muted);}
 
-/* RV LIST */
-.rv-list{display:flex;flex-direction:column;gap:8px;}
-.rv-row{display:flex;align-items:center;gap:11px;padding:10px 12px;
-  background:var(--warm);border:1px solid var(--border);border-radius:10px;transition:all .2s;}
-.rv-row:hover{border-color:var(--border2);background:var(--cream);}
-.rv-emoji{font-size:.95rem;width:20px;text-align:center;}
-.rv-info{flex:1;}
-.rv-name-row{display:flex;align-items:center;gap:7px;margin-bottom:2px;}
-.rv-name{font-size:.82rem;font-weight:600;color:var(--ink);}
-.rv-src{font-size:.63rem;font-weight:700;padding:1px 6px;border-radius:3px;
-  background:rgba(255,92,58,0.1);color:var(--coral);letter-spacing:.04em;}
-.rv-finding{font-size:.74rem;color:var(--muted);line-height:1.4;}
-.rv-bar{height:4px;border-radius:2px;background:rgba(13,13,13,0.08);margin-top:5px;overflow:hidden;}
-.rv-bar-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+/* KV TABLE */
+.kv-table{width:100%;border-collapse:collapse;}
+.kv-table td{padding:7px 11px;border-bottom:1px solid var(--border);font-size:.8rem;vertical-align:top;}
+.kv-table td:first-child{color:var(--muted);width:38%;font-weight:500;white-space:nowrap;}
+.kv-table td:last-child{color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.75rem;word-break:break-all;}
+.kv-table tr:last-child td{border-bottom:none;}
 
-/* FINDINGS */
-.findings-list{display:flex;flex-direction:column;gap:10px;}
-.finding-card{background:var(--warm);border:1px solid var(--border);border-radius:11px;padding:13px 15px;border-left:3px solid transparent;}
-.finding-card.critical{border-left-color:var(--red);}
-.finding-card.high{border-left-color:var(--orange);}
-.finding-card.medium{border-left-color:var(--yellow);}
-.finding-card.low{border-left-color:var(--green);}
-.finding-card.info{border-left-color:var(--coral);}
-.finding-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
-.sev-pill{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
-.sev-critical{background:rgba(220,38,38,0.12);color:var(--red);}
-.sev-high{background:rgba(234,88,12,0.12);color:var(--orange);}
-.sev-medium{background:rgba(202,138,4,0.12);color:var(--yellow);}
-.sev-low{background:rgba(22,163,74,0.12);color:var(--green);}
-.sev-info{background:rgba(255,92,58,0.1);color:var(--coral);}
-.finding-title{font-size:.85rem;font-weight:600;color:var(--ink);}
-.finding-src{font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:4px;background:rgba(200,241,53,0.2);color:var(--ink);letter-spacing:.04em;}
-.finding-desc{font-size:.79rem;color:var(--muted);line-height:1.55;}
-.finding-fix{margin-top:7px;padding:7px 11px;background:rgba(200,241,53,0.15);border-radius:7px;font-size:.76rem;color:var(--ink);line-height:1.5;border:1px solid rgba(200,241,53,0.3);}
-.finding-fix strong{color:var(--ink);font-weight:700;}
+/* DNS */
+.dns-two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:768px){.dns-two-col{grid-template-columns:1fr;}}
 
-/* INFRA TABLE */
-.infra-table{width:100%;border-collapse:collapse;}
-.infra-table td{padding:7px 11px;border-bottom:1px solid var(--border);font-size:.8rem;vertical-align:top;}
-.infra-table td:first-child{color:var(--muted);width:38%;font-weight:500;}
-.infra-table td:last-child{color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.75rem;word-break:break-all;}
-.infra-table tr:last-child td{border-bottom:none;}
+/* TAGS */
+.tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.tag{background:rgba(200,241,53,0.2);border:1px solid rgba(200,241,53,0.4);border-radius:4px;padding:1px 7px;font-size:.66rem;color:var(--ink);font-family:'JetBrains Mono',monospace;}
+.tag-red{background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.2);color:var(--red);}
+.tag-orange{background:rgba(234,88,12,0.1);border-color:rgba(234,88,12,0.2);color:var(--orange);}
+.tag-blue{background:rgba(37,99,235,0.1);border-color:rgba(37,99,235,0.2);color:var(--blue2);}
 
-/* COMPARE */
-.compare-row{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
-.compare-label{font-size:.77rem;color:var(--muted);width:115px;flex-shrink:0;}
-.compare-track{flex:1;height:6px;background:rgba(13,13,13,0.08);border-radius:3px;overflow:hidden;}
-.compare-fill{height:100%;border-radius:3px;transition:width 1.2s ease;}
+/* THREAT ROW */
+.threat-row{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:9px;margin-bottom:6px;background:var(--warm);border:1px solid var(--border);}
+.threat-label{font-size:.8rem;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.threat-val{font-size:.74rem;color:var(--muted);font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.4;}
 
-/* REC */
-.rec-list{display:flex;flex-direction:column;gap:9px;}
-.rec-item{display:flex;gap:11px;padding:11px 13px;background:var(--warm);border:1px solid var(--border);border-radius:11px;}
-.rec-num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--acid));
-  display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;
-  font-size:.7rem;font-weight:800;color:var(--ink);flex-shrink:0;margin-top:1px;}
-.rec-text{font-size:.82rem;color:var(--ink);line-height:1.6;}
+/* CERT */
+.crt-row{padding:8px 11px;border-radius:8px;background:var(--warm);border:1px solid var(--border);margin-bottom:5px;}
+.crt-cn{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--coral);}
+.crt-meta{font-size:.7rem;color:var(--muted);margin-top:2px;}
 
-/* VERDICT */
-.verdict-banner{padding:16px 20px;border-radius:12px;display:flex;align-items:center;gap:13px;border:1px solid;margin-bottom:14px;}
-.verdict-icon{font-size:1.45rem;}
-.verdict-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:3px;}
-.verdict-text{font-size:.81rem;line-height:1.55;}
+/* DNS TABLE */
+.dns-table{width:100%;border-collapse:collapse;font-size:.76rem;}
+.dns-table th{padding:4px 7px;color:var(--muted);text-transform:uppercase;font-size:.66rem;letter-spacing:.07em;text-align:left;border-bottom:1px solid var(--border);}
+.dns-table td{padding:5px 7px;border-bottom:1px solid rgba(13,13,13,0.04);font-family:'JetBrains Mono',monospace;font-size:.73rem;vertical-align:top;}
+.dns-table tr:last-child td{border-bottom:none;}
 
-.sec-title{font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.09em;margin:16px 0 9px;display:flex;align-items:center;gap:7px;}
-.sec-title:first-child{margin-top:0;}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px;}
+/* STAT CELLS */
+.stat-grid{display:grid;gap:9px;}
 .stat-cell{border-radius:10px;padding:12px 13px;text-align:center;}
 .stat-val{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;margin-bottom:2px;}
 .stat-lbl{font-size:.69rem;color:var(--muted);}
-.threat-row{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:9px;margin-bottom:6px;background:var(--warm);border:1px solid var(--border);}
-.threat-label{font-size:.78rem;font-weight:600;color:var(--ink);margin-bottom:1px;}
-.threat-val{font-size:.73rem;color:var(--muted);font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.4;}
-.tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
-.tag{background:rgba(200,241,53,0.2);border:1px solid rgba(200,241,53,0.4);border-radius:4px;padding:1px 7px;font-size:.66rem;color:var(--ink);}
-.clean-msg{text-align:center;padding:18px;color:var(--green);font-size:.86rem;}
-.dns-two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+
+/* GOVERNANCE */
+.gov-row{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;
+  border-radius:9px;margin-bottom:7px;border:1px solid;}
+.gov-row.ok{background:rgba(22,163,74,0.04);border-color:rgba(22,163,74,0.15);}
+.gov-row.fail{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.12);}
+.gov-status-pill{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.gov-ok{background:rgba(22,163,74,0.15);color:var(--green);}
+.gov-fail{background:rgba(239,68,68,0.12);color:var(--red);}
+.gov-label{font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.gov-detail{font-size:.74rem;color:var(--muted);line-height:1.5;}
+
+/* HTTP HEADERS GRID */
+.hdr-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px;}
+.hdr-cell{padding:8px 11px;border-radius:8px;border:1px solid;}
+.hdr-cell.ok{background:rgba(22,163,74,0.04);border-color:rgba(22,163,74,0.15);}
+.hdr-cell.fail{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.12);}
+.hdr-name{font-size:.76rem;font-weight:600;font-family:'JetBrains Mono',monospace;margin-bottom:2px;}
+.hdr-desc{font-size:.7rem;color:var(--muted2);}
+
+/* NEWS */
+.article-card{padding:11px 13px;border-radius:9px;background:var(--warm);border:1px solid var(--border);margin-bottom:7px;}
+.article-title{font-size:.84rem;font-weight:600;color:var(--blue2);text-decoration:none;line-height:1.4;display:block;margin-bottom:5px;}
+.article-title:hover{text-decoration:underline;}
+.article-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.article-source{font-size:.69rem;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 6px;}
+.article-date{font-size:.69rem;color:var(--muted);}
+.article-snippet{font-size:.76rem;color:var(--muted2);line-height:1.5;margin-top:5px;}
+.new-badge{font-size:.64rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,0.15);color:var(--green);}
+
+/* RANSOMWARE */
+.ransom-card{padding:13px 15px;border-radius:10px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);margin-bottom:8px;}
+
+/* VT */
 .vt-engine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:6px;}
 .vt-engine{padding:7px 9px;border-radius:7px;font-size:.74rem;background:var(--warm);border:1px solid var(--border);}
 .vt-engine-name{font-weight:600;color:var(--ink);margin-bottom:1px;}
 .vt-engine-result{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--red);}
-.crt-row{padding:7px 11px;border-radius:7px;background:var(--warm);border:1px solid var(--border);margin-bottom:5px;}
-.crt-cn{font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--coral);}
-.crt-meta{font-size:.7rem;color:var(--muted);margin-top:2px;}
-.dns-table{width:100%;border-collapse:collapse;font-size:.76rem;}
-.dns-table th{padding:4px 7px;color:var(--muted);text-transform:uppercase;font-size:.66rem;
-  letter-spacing:.07em;text-align:left;border-bottom:1px solid var(--border);}
-.dns-table td{padding:5px 7px;border-bottom:1px solid rgba(13,13,13,0.04);
-  font-family:'JetBrains Mono',monospace;font-size:.73rem;vertical-align:top;}
-.dns-table tr:last-child td{border-bottom:none;}
+
+/* SECTION TITLE */
+.sec-title{font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.09em;margin:14px 0 9px;display:flex;align-items:center;gap:7px;}
+.sec-title:first-child{margin-top:0;}
+
+/* CLEAN MSG */
+.clean-msg{text-align:center;padding:20px;color:var(--green);font-size:.86rem;font-weight:600;}
+.empty-msg{text-align:center;padding:20px;color:var(--muted);font-size:.84rem;}
+
+/* SRC FOOTER */
 .src-footer{margin-top:12px;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border);
   padding-top:9px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;}
 .src-footer a{color:var(--coral);text-decoration:none;}
-.error-box{border-radius:13px;padding:22px;text-align:center;}
-.intel-src{position:relative;}
-.intel-src .tooltip{
-  display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
-  background:var(--ink);color:var(--cream);font-size:.72rem;line-height:1.5;
-  padding:8px 12px;border-radius:8px;white-space:nowrap;max-width:220px;white-space:normal;
-  text-align:center;z-index:999;pointer-events:none;width:200px;
-  box-shadow:0 4px 16px rgba(13,13,13,0.2);
-}
-.intel-src .tooltip::after{
-  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
-  border:5px solid transparent;border-top-color:var(--ink);
-}
-.intel-src:hover .tooltip{display:block;}
+
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:var(--cream);}
 ::-webkit-scrollbar-thumb{background:var(--warm);border-radius:3px;}
 
 @media(max-width:768px){
-  .result-header{grid-template-columns:1fr;text-align:center;}
-  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .hdr-grid{grid-template-columns:1fr;}
   .scan-checks{grid-template-columns:1fr;}
-  .dns-two-col{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -366,25 +320,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 <div class="grid-bg"></div>
 
 <nav>
-  <a class="nav-brand" href="#">
-    <span class="nav-brand-name">Colabo<span>ree</span> Intel</span>
-  </a>
+  <a class="nav-brand" href="#">Colabo<span>ree</span> Intel</a>
   <div style="display:flex;align-items:center;gap:8px;">
-    <div class="nav-pill">11 Intel Sources · AI-Powered</div>
-    <div class="nav-ver">v2.0.0</div>
+    <div class="nav-pill">11 Sources · No AI</div>
+    <div class="nav-ver">v3.0.0</div>
   </div>
 </nav>
 
 <section class="hero" id="heroSection">
-  <div class="hero-eyebrow"><span class="pulse"></span>Vendor Security Assessment Platform</div>
-  <h1>Know your vendors.<br/><span class="grad">Before they become a risk.</span></h1>
-  <p class="hero-sub">11 public intelligence sources — live DNS, certificate transparency, WHOIS, malware feeds, VirusTotal &amp; AlienVault OTX — synthesised by AI into a vendor security grade.</p>
+  <div class="hero-eyebrow"><span class="pulse"></span>Raw Vendor Intelligence</div>
+  <h1>Signal, not spin.<br/><span>Pure intelligence on every vendor.</span></h1>
+  <p class="hero-sub">11 public intel sources — live DNS, certificate transparency, WHOIS, malware feeds, breach history, dark web listings — no AI interpretation. Just raw data.</p>
 
   <div class="search-wrap">
     <div class="search-box">
       <span class="search-icon">🔍</span>
       <input type="text" class="search-input" id="domainInput" placeholder="Enter vendor domain — e.g. victrack.com.au" autocomplete="off" spellcheck="false"/>
-      <button class="search-btn" id="scanBtn" onclick="startScan()">Assess Vendor</button>
+      <button class="search-btn" id="scanBtn" onclick="startScan()">Run Intel</button>
     </div>
     <div class="search-examples">
       <span class="ex-chip" onclick="fillDomain('victrack.com.au')">victrack.com.au</span>
@@ -404,13 +356,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
       <div style="font-size:.74rem;color:var(--muted);padding:2px 0 6px;">Keys stored in browser session only — sent directly to their respective APIs.</div>
       <div class="api-key-row">
         <div class="api-key-source"><div class="api-key-dot" style="background:var(--blue);"></div><div class="api-key-name">VirusTotal</div></div>
-        <input type="password" class="api-key-input" id="vtKey" placeholder="VT API key — 70+ AV engines, URL &amp; domain reputation"/>
+        <input type="password" class="api-key-input" id="vtKey" placeholder="VT API key — 70+ AV engines"/>
         <span class="badge-free">FREE</span>
         <a class="api-key-link" href="https://www.virustotal.com/gui/join-us" target="_blank">Get key →</a>
       </div>
       <div class="api-key-row">
         <div class="api-key-source"><div class="api-key-dot" style="background:var(--orange);"></div><div class="api-key-name">AlienVault OTX</div></div>
-        <input type="password" class="api-key-input" id="otxKey" placeholder="OTX API key — threat pulses, malware samples, passive DNS"/>
+        <input type="password" class="api-key-input" id="otxKey" placeholder="OTX API key — threat pulses, passive DNS"/>
         <span class="badge-free">FREE</span>
         <a class="api-key-link" href="https://otx.alienvault.com/api/" target="_blank">Get key →</a>
       </div>
@@ -418,18 +370,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   </div>
 
   <div class="intel-bar">
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>RDAP WHOIS<div class="tooltip">Checks domain registration — registrar, creation date, expiry, nameservers and status flags.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>DNS / DoH<div class="tooltip">Queries live DNS records: SPF, DMARC, MX, A records and IPv6 via Cloudflare DNS-over-HTTPS.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>crt.sh Certs<div class="tooltip">Searches certificate transparency logs for all SSL/TLS certs issued to this domain and subdomains.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>URLhaus<div class="tooltip">Checks abuse.ch URLhaus malware feed for domains hosting or distributing malicious content.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>ThreatFox<div class="tooltip">Checks abuse.ch ThreatFox for known indicators of compromise (IOCs) linked to this domain.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>XposedOrNot<div class="tooltip">Checks if email addresses from this domain appeared in known data breach databases.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Governance<div class="tooltip">Checks security.txt, HTTP headers, MTA-STS, BIMI, DKIM selectors and server banner exposure.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Google News<div class="tooltip">Searches Google News for breaches, ransomware attacks, cyber incidents and dark web mentions.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--coral);"></div>VirusTotal (key)<div class="tooltip">Scans domain across 70+ antivirus engines. Requires a free VirusTotal API key.</div></div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);"></div>AlienVault OTX (key)<div class="tooltip">Checks threat pulses, malware samples and passive DNS. Requires a free AlienVault OTX key.</div></div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>RDAP</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>DNS/DoH</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>crt.sh</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>URLhaus</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>ThreatFox</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>XposedOrNot</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Governance</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Ransomware.live</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--green);"></div>Google News</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--coral);"></div>VirusTotal (key)</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);"></div>OTX (key)</div>
   </div>
 
+  <!-- SCAN PROGRESS -->
   <div id="scanning">
     <div class="scan-header">
       <div class="scan-radar"></div>
@@ -450,195 +404,148 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
       <div class="scan-check" id="chk-news"><div class="check-dot">●</div>Cyber News Intel</div>
       <div class="scan-check" id="chk-vt"><div class="check-dot">●</div>VirusTotal</div>
       <div class="scan-check" id="chk-otx"><div class="check-dot">●</div>AlienVault OTX</div>
-      <div class="scan-check" id="chk-technews"><div class="check-dot">●</div>Company Intelligence</div>
-      <div class="scan-check" id="chk-ai"><div class="check-dot">●</div>AI Risk Synthesis</div>
     </div>
   </div>
 </section>
 
+<!-- RESULTS -->
 <section id="results">
   <div class="action-bar">
-    <button class="action-btn" onclick="copyReport()">📋 Copy Report</button>
     <button class="action-btn" onclick="resetScan()">← New Assessment</button>
   </div>
 
-  <div class="result-header">
-    <div class="score-ring-wrap">
-      <svg class="score-ring-svg" width="110" height="110" viewBox="0 0 110 110">
-        <defs><linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#ff5c3a"/><stop offset="100%" stop-color="#c8f135"/>
-        </linearGradient></defs>
-        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(13,13,13,0.08)" stroke-width="8"/>
-        <circle id="scoreArc" cx="55" cy="55" r="46" fill="none" stroke="url(#scoreGrad)" stroke-width="8"
-          stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289"/>
-      </svg>
-      <div class="score-center">
-        <div class="score-big" id="scoreNum">—</div>
-        <div class="score-max">/ 100</div>
+  <!-- HEADER STRIP -->
+  <div class="result-header" id="resultHeader">
+    <div class="result-header-top">
+      <div class="result-domain-badge" id="resultDomain">—</div>
+      <div class="result-ts" id="resultTs">—</div>
+    </div>
+    <div class="intel-strip" id="intelStrip"></div>
+  </div>
+
+  <!-- ROW 1: WHOIS + DNS -->
+  <div class="grid-2">
+    <div class="panel" id="rdapPanel" style="display:none;animation-delay:.04s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(22,163,74,0.1);">📋</div>RDAP / WHOIS</div>
+        <span class="live-badge live-green">LIVE</span>
       </div>
-      <div id="scoreGrade" style="text-align:center;margin-top:3px;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--muted);"></div>
+      <div id="rdapContent"></div>
     </div>
-    <div>
-      <div class="result-domain-label" id="resultDomain">—</div>
-      <div class="result-rating-badge" id="resultBadge">—</div>
-      <div class="result-summary" id="resultSummary">—</div>
-    </div>
-    <div class="result-stats">
-      <div class="rstat"><div class="rstat-val" id="statFindings">—</div><div class="rstat-lbl">Findings</div></div>
-      <div class="rstat"><div class="rstat-val" id="statCritical">—</div><div class="rstat-lbl">Critical</div></div>
-      <div class="rstat"><div class="rstat-val" id="statSources">—</div><div class="rstat-lbl">Intel Sources</div></div>
-    </div>
-  </div>
-
-  <div class="intel-strip" id="intelStrip"></div>
-
-  <div class="results-grid">
-    <div class="panel" style="animation-delay:.06s">
-      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(255,92,58,0.1);">🎯</div>Risk Vectors</div></div>
-      <div class="rv-list" id="rvList"></div>
-    </div>
-    <div class="panel" style="animation-delay:.1s">
-      <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🏗️</div>Infrastructure</div></div>
-      <table class="infra-table" id="infraTable"></table>
-      <div style="margin-top:16px;">
-        <div style="font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;">vs. Industry Benchmark</div>
-        <div id="compareRows"></div>
+    <div class="panel" id="dnsPanel" style="display:none;animation-delay:.06s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(59,130,246,0.1);">🌐</div>DNS Records</div>
+        <span class="live-badge live-green">LIVE</span>
       </div>
+      <div id="dnsContent"></div>
     </div>
   </div>
 
-  <div class="results-full panel" id="dnsPanel" style="display:none;animation-delay:.12s;">
+  <!-- ROW 2: Certificates full width -->
+  <div class="full-row panel" id="crtPanel" style="display:none;animation-delay:.08s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(22,163,74,0.1);">🌐</div>DNS Records &amp; WHOIS — Live Data</div>
-      <span class="live-badge" style="background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.2);color:var(--green);">LIVE</span>
-    </div>
-    <div id="dnsContent"></div>
-  </div>
-
-  <div class="results-full panel" id="crtPanel" style="display:none;animation-delay:.14s;">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">📜</div>Certificate Transparency — crt.sh</div>
-      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(124,58,237,0.1);">📜</div>Certificate Transparency — crt.sh</div>
+      <span class="live-badge live-green">LIVE</span>
     </div>
     <div id="crtContent"></div>
   </div>
 
-  <div class="results-full panel" id="threatPanel" style="display:none;animation-delay:.16s;">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🦠</div>Malware &amp; IOC Feeds — abuse.ch</div>
-      <span class="live-badge" style="background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);">LIVE</span>
+  <!-- ROW 3: Threat feeds + Breach -->
+  <div class="grid-2">
+    <div class="panel" id="threatPanel" style="display:none;animation-delay:.10s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🦠</div>Malware &amp; IOC Feeds</div>
+        <span class="live-badge live-red">LIVE</span>
+      </div>
+      <div id="threatContent"></div>
     </div>
-    <div id="threatContent"></div>
+    <div class="panel" id="breachPanel" style="display:none;animation-delay:.12s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🔓</div>Breach History — XposedOrNot</div>
+        <span class="live-badge live-red">LIVE</span>
+      </div>
+      <div id="breachContent"></div>
+    </div>
   </div>
 
-  <div class="results-full panel" id="breachPanel" style="display:none;animation-delay:.17s;background:linear-gradient(135deg,rgba(220,38,38,0.03),rgba(234,88,12,0.02));border-color:rgba(220,38,38,0.12);">
+  <!-- ROW 4: Governance full width -->
+  <div class="full-row panel" id="govPanel" style="display:none;animation-delay:.14s;">
     <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🔓</div>Breach History — XposedOrNot</div>
-      <span class="live-badge" style="background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.2);color:var(--red);">LIVE</span>
-    </div>
-    <div id="breachContent"></div>
-  </div>
-
-  <div class="results-full panel" id="govPanel" style="display:none;animation-delay:.19s;background:linear-gradient(135deg,rgba(200,241,53,0.06),rgba(255,92,58,0.02));border-color:rgba(200,241,53,0.2);">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🏛️</div>Security Governance &amp; Web Hygiene</div>
-      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
+      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.2);">🏛️</div>Security Governance &amp; Web Hygiene</div>
+      <span class="live-badge live-green">LIVE</span>
     </div>
     <div id="govContent"></div>
   </div>
 
-  <div class="results-full panel" id="newsPanel" style="display:none;animation-delay:.20s;">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(202,138,4,0.1);">📰</div>Cyber News, Dark Web &amp; Incident Intelligence</div>
-      <span class="live-badge" style="background:rgba(202,138,4,0.08);border-color:rgba(202,138,4,0.2);color:var(--yellow);">LIVE</span>
+  <!-- ROW 5: Dark web + Cyber News -->
+  <div class="grid-2">
+    <div class="panel" id="ransomPanel" style="display:none;animation-delay:.16s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">🕵️</div>Dark Web — Ransomware.live</div>
+        <span class="live-badge live-red">LIVE</span>
+      </div>
+      <div id="ransomContent"></div>
     </div>
-    <div id="newsContent"></div>
-  </div>
-
-  <div class="results-full panel" id="vtPanel" style="display:none;animation-delay:.18s;">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(37,99,235,0.1);">🔬</div>VirusTotal — Multi-Engine Analysis</div>
-      <span class="live-badge" style="background:rgba(37,99,235,0.08);border-color:rgba(37,99,235,0.2);color:var(--blue);">LIVE</span>
+    <div class="panel" id="newsPanel" style="display:none;animation-delay:.18s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(202,138,4,0.1);">📰</div>Cyber News</div>
+        <span class="live-badge live-yellow">LIVE</span>
+      </div>
+      <div id="newsContent"></div>
     </div>
-    <div id="vtContent"></div>
   </div>
 
-  <div class="results-full panel" id="otxPanel" style="display:none;animation-delay:.2s;background:linear-gradient(135deg,rgba(234,88,12,0.03),rgba(220,38,38,0.02));border-color:rgba(234,88,12,0.12);">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(234,88,12,0.1);">🛡️</div>AlienVault OTX — Threat Intelligence</div>
-      <span class="live-badge" style="background:rgba(234,88,12,0.08);border-color:rgba(234,88,12,0.2);color:var(--orange);">LIVE</span>
+  <!-- ROW 6: VT + OTX -->
+  <div class="grid-2">
+    <div class="panel" id="vtPanel" style="display:none;animation-delay:.20s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(37,99,235,0.1);">🔬</div>VirusTotal</div>
+        <span class="live-badge live-blue">LIVE</span>
+      </div>
+      <div id="vtContent"></div>
     </div>
-    <div id="otxContent"></div>
-  </div>
-
-  <div class="results-full panel" id="techNewsPanel" style="display:none;animation-delay:.30s;background:linear-gradient(135deg,rgba(200,241,53,0.06),rgba(255,92,58,0.02));border-color:rgba(200,241,53,0.2);">
-    <div class="panel-hdr">
-      <div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">🗞️</div>Company Intelligence — Tech &amp; General News</div>
-      <span class="live-badge" style="background:rgba(200,241,53,0.1);border-color:rgba(200,241,53,0.3);color:var(--ink);">LIVE</span>
+    <div class="panel" id="otxPanel" style="display:none;animation-delay:.22s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><div class="panel-icon" style="background:rgba(234,88,12,0.1);">🛡️</div>AlienVault OTX</div>
+        <span class="live-badge live-orange">LIVE</span>
+      </div>
+      <div id="otxContent"></div>
     </div>
-    <div id="techNewsContent"></div>
   </div>
 
-  <div class="results-full panel" style="animation-delay:.22s;">
-    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(220,38,38,0.1);">⚠️</div>Security Findings</div></div>
-    <div id="verdictBanner"></div>
-    <div class="findings-list" id="findingsList"></div>
-  </div>
-
-  <div class="results-full panel" style="animation-delay:.26s;">
-    <div class="panel-hdr"><div class="panel-title"><div class="panel-icon" style="background:rgba(200,241,53,0.15);">✅</div>Remediation Roadmap</div></div>
-    <div class="rec-list" id="recList"></div>
-  </div>
 </section>
 
 <script>
-const ANTHROPIC_API_KEY='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'; // ← UPDATE KEY HERE
-const VERSION='2.0.0';
-const BUILD_DATE='2026-03-10';
-console.log(`Colaboree Intel v${VERSION} (${BUILD_DATE}) — 11 intel sources · AI-powered vendor risk assessment`);
-
+const VERSION='3.0.0';
 const $=id=>document.getElementById(id);
-function fillDomain(d){$('domainInput').value=d;$('domainInput').focus();}
-function toggleKeys(){$('keysBody').classList.toggle('open');$('keysToggle').classList.toggle('open');}
 function safeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function gradeColor(g){return{A:'var(--green)',B:'var(--teal)',C:'var(--yellow)',D:'var(--orange)',F:'var(--red)'}[g]||'var(--muted)';}
-function gradeClass(g){return'grade-'+(g||'N');}
-function scoreColor(s){return s>=70?'var(--green)':s>=55?'var(--teal)':s>=40?'var(--yellow)':s>=25?'var(--orange)':'var(--red)';}
-function scoreToGrade(s){return s>=70?'A':s>=55?'B':s>=40?'C':s>=25?'D':'F';}
-function ratingLabel(s){
-  if(s>=70)return{grade:'A',label:'Grade A — Advanced',   color:'var(--green)', bg:'rgba(34,197,94,0.12)', border:'rgba(34,197,94,0.3)'};
-  if(s>=55)return{grade:'B',label:'Grade B — Proficient', color:'var(--teal)',  bg:'rgba(20,184,166,0.12)',border:'rgba(20,184,166,0.3)'};
-  if(s>=40)return{grade:'C',label:'Grade C — Basic',      color:'var(--yellow)',bg:'rgba(234,179,8,0.12)', border:'rgba(234,179,8,0.3)'};
-  if(s>=25)return{grade:'D',label:'Grade D — Beginner',   color:'var(--orange)',bg:'rgba(249,115,22,0.12)',border:'rgba(249,115,22,0.3)'};
-  return        {grade:'F',label:'Grade F — High Risk',   color:'var(--red)',   bg:'rgba(239,68,68,0.12)', border:'rgba(239,68,68,0.3)'};
-}
-function sevClass(s){return{critical:'sev-critical',high:'sev-high',medium:'sev-medium',low:'sev-low',info:'sev-info'}[s?.toLowerCase()]||'sev-info';}
+function fillDomain(d){$('domainInput').value=d;}
+function toggleKeys(){$('keysBody').classList.toggle('open');$('keysToggle').classList.toggle('open');}
 
-// ── Scan animation ─────────────────────────────────────────────────────────────
-const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','technews','ai'];
-const STATUSES=['Querying RDAP WHOIS…','Fetching live DNS records…','Checking certificate transparency…','Scanning URLhaus malware feed…','Querying ThreatFox IOC database…','Checking breach history…','Checking governance & hygiene…','Scanning cyber news…','Contacting VirusTotal…','Pulling AlienVault OTX…','Fetching company news…','AI risk synthesis…'];
+// ── SCAN ANIMATION ────────────────────────────────────────────────────────────
+const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx'];
+const STATUSES=['Querying RDAP WHOIS…','Fetching live DNS records…','Checking certificate transparency…','Scanning URLhaus malware feed…','Querying ThreatFox IOC database…','Checking breach history…','Checking governance & hygiene…','Scanning cyber news…','Contacting VirusTotal…','Pulling AlienVault OTX…'];
 let scanTimer=null;
 function animateScan(domain){
   $('scanning').classList.add('active');
   $('scanDomain').textContent=domain;
-  CHECKS.forEach(k=>{const e=$('chk-'+k);e.className='scan-check';e.querySelector('.check-dot').textContent='●';});
+  CHECKS.forEach(k=>{const e=$('chk-'+k);if(e){e.className='scan-check';e.querySelector('.check-dot').textContent='●';}});
   $('scanBar').style.width='0%';
   let idx=0;
   function tick(){
-    if(idx>0){const p=$('chk-'+CHECKS[idx-1]);p.className='scan-check done';p.querySelector('.check-dot').textContent='✓';}
-    if(idx<CHECKS.length){$('chk-'+CHECKS[idx]).className='scan-check active-check';$('scanStatus').innerHTML=STATUSES[idx]+'<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';}
+    if(idx>0){const p=$('chk-'+CHECKS[idx-1]);if(p){p.className='scan-check done';p.querySelector('.check-dot').textContent='✓';}}
+    if(idx<CHECKS.length){const c=$('chk-'+CHECKS[idx]);if(c)c.className='scan-check active-check';$('scanStatus').innerHTML=STATUSES[idx]+'<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>';}
     $('scanBar').style.width=Math.min((idx/CHECKS.length)*90,90)+'%';idx++;
   }
-  tick();scanTimer=setInterval(()=>{if(idx<=CHECKS.length)tick();else clearInterval(scanTimer);},500);
+  tick();scanTimer=setInterval(()=>{if(idx<=CHECKS.length)tick();else clearInterval(scanTimer);},700);
 }
 function finishScanAnim(){
   clearInterval(scanTimer);
-  CHECKS.forEach(k=>{const e=$('chk-'+k);e.className='scan-check done';e.querySelector('.check-dot').textContent='✓';});
-  $('scanBar').style.width='100%';$('scanStatus').innerHTML='Assessment complete ✓';
+  CHECKS.forEach(k=>{const e=$('chk-'+k);if(e){e.className='scan-check done';e.querySelector('.check-dot').textContent='✓';}});
+  $('scanBar').style.width='100%';$('scanStatus').innerHTML='Intel complete ✓';
 }
 
-// ── FREE INTEL SOURCES ─────────────────────────────────────────────────────────
-
+// ── DATA FETCHERS ─────────────────────────────────────────────────────────────
 async function fetchRDAP(domain){
   try{
     const r=await fetch(`https://rdap.org/domain/${domain}`,{signal:AbortSignal.timeout(8000)});
@@ -660,7 +567,7 @@ async function fetchDNS(domain){
   };
   const [mx,txt,dmarc,ns,a,aaaa]=await Promise.all([q(domain,'MX'),q(domain,'TXT'),q(`_dmarc.${domain}`,'TXT'),q(domain,'NS'),q(domain,'A'),q(domain,'AAAA')]);
   return{
-    mx:mx.map(r=>r.data).filter(Boolean).slice(0,5),
+    mx:mx.map(r=>r.data).filter(Boolean).slice(0,6),
     spf:txt.find(r=>r.data?.includes('v=spf1'))?.data||null,
     dmarc:dmarc.find(r=>r.data?.includes('v=DMARC1'))?.data||null,
     ns:ns.map(r=>r.data).filter(Boolean).slice(0,4),
@@ -680,7 +587,9 @@ async function fetchCRT(domain){
       if(c.common_name&&!c.common_name.includes('*')&&c.common_name.endsWith(domain))subs.add(c.common_name);
       (c.name_value||'').split('\n').forEach(n=>{if(n&&!n.includes('*')&&n.endsWith(domain))subs.add(n);});
     });
-    return{certs:unique,totalCount:data.length,subdomains:[...subs].slice(0,24)};
+    const now=new Date();
+    return{certs:unique,totalCount:data.length,subdomains:[...subs].slice(0,30),
+      activeCerts:unique.filter(c=>new Date(c.not_after)>now).length};
   }catch{return null;}
 }
 
@@ -690,7 +599,7 @@ async function fetchURLhaus(domain){
     const d=await r.json();
     if(d.query_status==='no_results')return{found:false,urls:[],blacklists:{}};
     return{found:true,urlCount:d.urls?.length||0,activeCount:d.urls?.filter(u=>u.url_status==='online').length||0,
-      urls:(d.urls||[]).slice(0,5).map(u=>({url:u.url,status:u.url_status,threat:u.threat,added:u.date_added?.split(' ')[0]})),
+      urls:(d.urls||[]).slice(0,6).map(u=>({url:u.url,status:u.url_status,threat:u.threat,added:u.date_added?.split(' ')[0]})),
       blacklists:d.blacklists||{}};
   }catch{return null;}
 }
@@ -700,7 +609,7 @@ async function fetchThreatFox(domain){
     const r=await fetch('https://threatfox-api.abuse.ch/api/v1/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:'search_ioc',search_term:domain}),signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     if(d.query_status==='no_results'||!d.data)return{found:false,iocs:[]};
-    return{found:true,iocCount:d.data.length,iocs:d.data.slice(0,5).map(i=>({iocType:i.ioc_type,malwareFamily:i.malware_printable,confidence:i.confidence_level,firstSeen:i.first_seen?.split(' ')[0],tags:i.tags||[]}))};
+    return{found:true,iocCount:d.data.length,iocs:d.data.slice(0,6).map(i=>({iocType:i.ioc_type,malwareFamily:i.malware_printable,confidence:i.confidence_level,firstSeen:i.first_seen?.split(' ')[0],tags:i.tags||[]}))};
   }catch{return null;}
 }
 
@@ -712,99 +621,70 @@ async function fetchBreachHistory(domain){
     const d=await r.json();
     const breaches=d.exposedBreaches?.breachedDomains||d.breaches||[];
     const list=Array.isArray(breaches)?breaches:Object.values(breaches);
-    return{
-      found:list.length>0,
-      breachCount:list.length,
+    return{found:list.length>0,breachCount:list.length,
       totalRecords:list.reduce((s,b)=>s+(b.exposedData||b.records||0),0),
-      breaches:list.slice(0,8).map(b=>({
-        name:b.breach||b.name||'Unknown',
-        date:b.date||b.year||'',
-        dataTypes:(b.exposedData_types||b.types||[]).slice(0,5),
-        records:b.exposedData||b.records||0,
-      }))
-    };
+      breaches:list.slice(0,10).map(b=>({name:b.breach||b.name||'Unknown',date:b.date||b.year||'',
+        dataTypes:(b.exposedData_types||b.types||[]).slice(0,5),records:b.exposedData||b.records||0}))};
   }catch{return null;}
 }
 
 async function fetchGovernance(domain){
   const results={securityTxt:null,headers:null,mtaSts:null,bimi:null,dkim:null};
-  // security.txt
   try{
     const paths=['/.well-known/security.txt','/security.txt'];
     for(const p of paths){
       try{
         const r=await fetch(`https://${domain}${p}`,{signal:AbortSignal.timeout(5000),mode:'cors'});
-        if(r.ok){
-          const t=await r.text();
-          if(t.includes('Contact:')||t.includes('contact:')){
-            const contact=t.match(/Contact:\s*(.+)/i)?.[1]?.trim();
-            const expires=t.match(/Expires:\s*(.+)/i)?.[1]?.trim();
-            const policy=t.match(/Policy:\s*(.+)/i)?.[1]?.trim();
-            const pgp=t.includes('BEGIN PGP');
-            results.securityTxt={found:true,contact,expires,policy,hasPGP:pgp};
-            break;
-          }
-        }
+        if(r.ok){const t=await r.text();if(t.includes('Contact:')||t.includes('contact:')){
+          results.securityTxt={found:true,contact:t.match(/Contact:\s*(.+)/i)?.[1]?.trim(),
+            expires:t.match(/Expires:\s*(.+)/i)?.[1]?.trim(),hasPGP:t.includes('BEGIN PGP')};break;}}
       }catch{}
     }
     if(!results.securityTxt)results.securityTxt={found:false};
   }catch{}
-
-  // HTTP security headers via HackerTarget
   try{
     const r=await fetch(`https://api.hackertarget.com/httpheaders/?q=https://${domain}`,{signal:AbortSignal.timeout(8000)});
-    if(r.ok){
-      const t=await r.text();
-      const hdr=t.toLowerCase();
-      results.headers={
-        raw:t.substring(0,1200),
-        hsts:hdr.includes('strict-transport-security'),
-        csp:hdr.includes('content-security-policy'),
-        xframe:hdr.includes('x-frame-options'),
-        xcto:hdr.includes('x-content-type-options'),
-        referrer:hdr.includes('referrer-policy'),
-        permissions:hdr.includes('permissions-policy'),
+    if(r.ok){const t=await r.text();const hdr=t.toLowerCase();
+      results.headers={hsts:hdr.includes('strict-transport-security'),csp:hdr.includes('content-security-policy'),
+        xframe:hdr.includes('x-frame-options'),xcto:hdr.includes('x-content-type-options'),
+        referrer:hdr.includes('referrer-policy'),permissions:hdr.includes('permissions-policy'),
         server:t.match(/server:\s*([^\r\n]+)/i)?.[1]?.trim()||null,
-        poweredBy:t.match(/x-powered-by:\s*([^\r\n]+)/i)?.[1]?.trim()||null,
-        score:0
-      };
-      const h=results.headers;
-      h.score=[h.hsts,h.csp,h.xframe,h.xcto,h.referrer,h.permissions].filter(Boolean).length;
-    }
+        poweredBy:t.match(/x-powered-by:\s*([^\r\n]+)/i)?.[1]?.trim()||null};
+      results.headers.score=[results.headers.hsts,results.headers.csp,results.headers.xframe,
+        results.headers.xcto,results.headers.referrer,results.headers.permissions].filter(Boolean).length;}
   }catch{}
-
-  // MTA-STS via DoH
   try{
     const r=await fetch(`https://cloudflare-dns.com/dns-query?name=_mta-sts.${domain}&type=TXT`,{headers:{'Accept':'application/dns-json'},signal:AbortSignal.timeout(5000)});
-    const d=await r.json();
-    const rec=d.Answer?.find(a=>a.data?.includes('v=STSv1'));
+    const d=await r.json();const rec=d.Answer?.find(a=>a.data?.includes('v=STSv1'));
     results.mtaSts=rec?{found:true,record:rec.data}:{found:false};
   }catch{results.mtaSts={found:false};}
-
-  // BIMI via DoH
   try{
     const r=await fetch(`https://cloudflare-dns.com/dns-query?name=default._bimi.${domain}&type=TXT`,{headers:{'Accept':'application/dns-json'},signal:AbortSignal.timeout(5000)});
-    const d=await r.json();
-    const rec=d.Answer?.find(a=>a.data?.includes('v=BIMI1'));
+    const d=await r.json();const rec=d.Answer?.find(a=>a.data?.includes('v=BIMI1'));
     results.bimi=rec?{found:true,record:rec.data}:{found:false};
   }catch{results.bimi={found:false};}
-
-  // DKIM selector probing via DoH
   try{
     const selectors=['google','selector1','selector2','default','k1','dkim','mail','smtp'];
     const checks=await Promise.all(selectors.map(async s=>{
-      try{
-        const r=await fetch(`https://cloudflare-dns.com/dns-query?name=${s}._domainkey.${domain}&type=TXT`,{headers:{'Accept':'application/dns-json'},signal:AbortSignal.timeout(4000)});
-        const d=await r.json();
-        const found=d.Answer?.some(a=>a.data?.includes('v=DKIM1'));
-        return found?s:null;
-      }catch{return null;}
+      try{const r=await fetch(`https://cloudflare-dns.com/dns-query?name=${s}._domainkey.${domain}&type=TXT`,{headers:{'Accept':'application/dns-json'},signal:AbortSignal.timeout(4000)});
+        const d=await r.json();return d.Answer?.some(a=>a.data?.includes('v=DKIM1'))?s:null;}catch{return null;}
     }));
-    const found=checks.filter(Boolean);
-    results.dkim={found:found.length>0,selectors:found};
+    results.dkim={found:checks.filter(Boolean).length>0,selectors:checks.filter(Boolean)};
   }catch{results.dkim={found:false,selectors:[]};}
-
   return results;
+}
+
+async function fetchRansomware(domain){
+  const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
+  try{
+    const r=await fetch(`https://api.ransomware.live/v2/searchvictims/${encodeURIComponent(company)}`,{signal:AbortSignal.timeout(8000)});
+    if(r.ok){const d=await r.json();
+      return{company,found:Array.isArray(d)&&d.length>0,victims:(Array.isArray(d)?d:[]).slice(0,5).map(v=>({
+        victim:v.victim||v.name||company,group:v.group||'Unknown',date:v.attackdate||v.date||'',
+        country:v.country||'',description:v.description||'',url:v.post_url||v.url||null}))};
+    }
+  }catch{}
+  return{company,found:false,victims:[]};
 }
 
 async function fetchCyberNews(domain){
@@ -813,147 +693,40 @@ async function fetchCyberNews(domain){
   const clean=s=>(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
   const cutoff2y=new Date();cutoff2y.setFullYear(cutoff2y.getFullYear()-2);
   const cutoff5y=new Date();cutoff5y.setFullYear(cutoff5y.getFullYear()-5);
-
-  // ── A. Ransomware.live — dark web victim search ──
-  let ransomware=[];
-  try{
-    const r=await fetch(`https://api.ransomware.live/v2/searchvictims/${encodeURIComponent(company)}`,{signal:AbortSignal.timeout(8000)});
-    if(r.ok){
-      const d=await r.json();
-      ransomware=(Array.isArray(d)?d:[]).slice(0,5).map(v=>({
-        victim:v.victim||v.name||company,
-        group:v.group||'Unknown group',
-        date:v.attackdate||v.date||'',
-        country:v.country||'',
-        description:v.description||'',
-        url:v.post_url||v.url||null,
-      }));
-    }
-  }catch{}
-
-  // ── B. Google News — 3 targeted searches in parallel ──
   const enc=s=>encodeURIComponent(s);
   const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
   const [r1,r2,r3]=await Promise.all([
     rss2json(gNews(`"${company}" breach OR hack OR ransomware OR "data leak"`)),
-    rss2json(gNews(`"${company}" cyberattack OR "security incident" OR "data breach" OR GDPR fine`)),
-    rss2json(gNews(`"${company}" malware OR phishing OR "cyber incident" OR "compromised"`)),
+    rss2json(gNews(`"${company}" cyberattack OR "security incident" OR "data breach"`)),
+    rss2json(gNews(`"${company}" malware OR phishing OR "cyber incident"`)),
   ]);
-
-  const seen=new Set();
-  const allArticles=[];
+  const seen=new Set();const allArticles=[];
   [r1,r2,r3].forEach(d=>{
     if(d?.status!=='ok')return;
     (d.items||[]).forEach(a=>{
-      const title=clean(a.title||'');
-      if(!title||seen.has(title.toLowerCase().substring(0,40)))return;
+      const title=clean(a.title||'');if(!title||seen.has(title.toLowerCase().substring(0,40)))return;
       seen.add(title.toLowerCase().substring(0,40));
-      const pub=new Date(a.pubDate||0);
-      if(pub<cutoff5y)return; // skip anything older than 5 years
-      allArticles.push({
-        title,
-        source:clean(a.author)||new URL(a.link||'https://x.com').hostname.replace('www.','').replace('news.google.com','Google News'),
-        date:a.pubDate?.split(' ').slice(0,4).join(' ')||'',
-        pubDate:pub,
-        link:a.link||'#',
-        snippet:clean(a.description||'').substring(0,200),
-        isRecent:pub>cutoff2y,
-      });
+      const pub=new Date(a.pubDate||0);if(pub<cutoff5y)return;
+      allArticles.push({title,source:clean(a.author)||new URL(a.link||'https://x.com').hostname.replace('www.',''),
+        date:a.pubDate?.split(' ').slice(0,4).join(' ')||'',pubDate:pub,link:a.link||'#',
+        snippet:clean(a.description||'').substring(0,200),isRecent:pub>cutoff2y});
     });
   });
-
-  // Sort by date descending, dedupe, cap at 12
   allArticles.sort((a,b)=>b.pubDate-a.pubDate);
-  const articles=allArticles.slice(0,12);
-
-  // ── C. The Hacker News RSS — company-specific filter ──
-  let thnArticles=[];
-  try{
-    const thn=await rss2json('https://feeds.feedburner.com/TheHackersNews');
-    if(thn?.status==='ok'){
-      thnArticles=(thn.items||[]).filter(a=>{
-        const t=(clean(a.title)+clean(a.description)).toLowerCase();
-        return t.includes(company.toLowerCase());
-      }).slice(0,3).map(a=>({
-        title:clean(a.title),
-        source:'The Hacker News',
-        date:a.pubDate?.split(' ').slice(0,4).join(' ')||'',
-        pubDate:new Date(a.pubDate||0),
-        link:a.link||'#',
-        snippet:clean(a.description||'').substring(0,200),
-        isRecent:new Date(a.pubDate||0)>cutoff2y,
-        isTHN:true,
-      }));
-    }
-  }catch{}
-
-  return{
-    company,
-    ransomware,
-    articles,
-    thnArticles,
-    found:ransomware.length>0||articles.length>0||thnArticles.length>0,
-  };
-}
-
-async function fetchCompanyNews(domain){
-  const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
-  const rss2json=url=>fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12`,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?r.json():null).catch(()=>null);
-  const clean=s=>(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#\d+;/g,'').trim();
-  const cutoff=new Date();cutoff.setFullYear(cutoff.getFullYear()-3);
-
-  const enc=s=>encodeURIComponent(s);
-  const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
-
-  // Fire 4 parallel searches covering different angles
-  const [r1,r2,r3,r4]=await Promise.all([
-    rss2json(gNews(`"${company}" technology OR software OR cloud OR AI OR digital`)),
-    rss2json(gNews(`"${company}" partnership OR acquisition OR launch OR product OR funding`)),
-    rss2json(gNews(`"${company}" revenue OR growth OR strategy OR CEO OR leadership`)),
-    rss2json(gNews(`"${company}" Australia OR Melbourne OR Sydney OR government OR contract`)),
-  ]);
-
-  const seen=new Set();
-  const articles=[];
-  [r1,r2,r3,r4].forEach((d,si)=>{
-    if(d?.status!=='ok')return;
-    const cats=['Technology & Digital','Business & Strategy','Company & Leadership','Industry & Contracts'];
-    (d.items||[]).forEach(a=>{
-      const title=clean(a.title||'');
-      const key=title.toLowerCase().substring(0,45);
-      if(!title||seen.has(key))return;
-      seen.add(key);
-      const pub=new Date(a.pubDate||0);
-      if(pub<cutoff)return;
-      articles.push({
-        title,
-        source:clean(a.author)||new URL(a.link||'https://x.com').hostname.replace('www.','').replace('news.google.com','Google News'),
-        date:a.pubDate?.split(' ').slice(0,4).join(' ')||'',
-        pubDate:pub,
-        link:a.link||'#',
-        snippet:clean(a.description||'').substring(0,220),
-        category:cats[si],
-        isRecent:pub>new Date(Date.now()-365*24*3600*1000),
-      });
-    });
-  });
-
-  articles.sort((a,b)=>b.pubDate-a.pubDate);
-  return{company,articles:articles.slice(0,20),found:articles.length>0};
+  return{company,articles:allArticles.slice(0,12),found:allArticles.length>0};
 }
 
 async function fetchVirusTotal(domain,apiKey){
   if(!apiKey)return null;
   try{
     const r=await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(domain)}`,{headers:{'x-apikey':apiKey},signal:AbortSignal.timeout(14000)});
-    if(r.status===401||r.status===403)return{error:'Invalid API key'};
     if(!r.ok)return{error:`VT error ${r.status}`};
     const d=await r.json();
     const stats=d.data?.attributes?.last_analysis_stats||{};
     const results=d.data?.attributes?.last_analysis_results||{};
     const malEngines=Object.entries(results).filter(([,v])=>v.category==='malicious').map(([n,v])=>({name:n,result:v.result}));
-    return{malicious:stats.malicious||0,suspicious:stats.suspicious||0,harmless:stats.harmless||0,undetected:stats.undetected||0,
-      totalEngines:Object.keys(results).length,malEngines:malEngines.slice(0,8),
+    return{malicious:stats.malicious||0,suspicious:stats.suspicious||0,harmless:stats.harmless||0,
+      undetected:stats.undetected||0,totalEngines:Object.keys(results).length,malEngines:malEngines.slice(0,10),
       reputation:d.data?.attributes?.reputation||0,categories:d.data?.attributes?.categories||{},
       lastAnalysis:d.data?.attributes?.last_analysis_date};
   }catch(e){return{error:e.message};}
@@ -972,273 +745,157 @@ async function fetchOTX(domain,apiKey){
     ]);
     if(!gen)return{error:'Invalid OTX key or not found'};
     return{pulseCount:gen?.pulse_info?.count||0,pulses:(gen?.pulse_info?.pulses||[]).slice(0,6),
-      malwareCount:mal?.data?.length||0,malwareSamples:(mal?.data||[]).slice(0,4).map(m=>m.hash||m.hash_md5||''),
-      urlCount:urls?.url_list?.length||0,dnsRecords:(dns?.passive_dns||[]).slice(0,8),
+      malwareCount:mal?.data?.length||0,malwareSamples:(mal?.data||[]).slice(0,5).map(m=>m.hash||m.hash_md5||''),
+      urlCount:urls?.url_list?.length||0,dnsRecords:(dns?.passive_dns||[]).slice(0,10),
       asn:gen?.asn||'',country:gen?.country_code||''};
   }catch(e){return{error:e.message};}
 }
 
-// ── MAIN SCAN ──────────────────────────────────────────────────────────────────
+// ── MAIN SCAN ─────────────────────────────────────────────────────────────────
 async function startScan(){
   const raw=$('domainInput').value.trim();
   if(!raw){alert('Please enter a domain.');return;}
   const domain=raw.replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase().trim();
   const vtKey=$('vtKey').value.trim();
   const otxKey=$('otxKey').value.trim();
-  const btn=$('scanBtn');btn.disabled=true;btn.textContent='Assessing…';
+  const btn=$('scanBtn');btn.disabled=true;btn.textContent='Running…';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','newsPanel','vtPanel','otxPanel','techNewsPanel'].forEach(id=>$(id).style.display='none');
+  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel']
+    .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
-  let rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews;
+
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx;
   try{
-    [rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews]=await Promise.all([
+    [rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx]=await Promise.all([
       fetchRDAP(domain),fetchDNS(domain),fetchCRT(domain),
-      fetchURLhaus(domain),fetchThreatFox(domain),
-      fetchBreachHistory(domain),fetchGovernance(domain),fetchCyberNews(domain),
+      fetchURLhaus(domain),fetchThreatFox(domain),fetchBreachHistory(domain),
+      fetchGovernance(domain),fetchRansomware(domain),fetchCyberNews(domain),
       fetchVirusTotal(domain,vtKey),fetchOTX(domain,otxKey),
-      fetchCompanyNews(domain),
     ]);
-  }catch(e){console.warn('Free intel partial failure:',e);}
-  try{
-    const aiData=await callClaudeAPI(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
-    finishScanAnim();
-    await new Promise(r=>setTimeout(r,500));
-    $('scanning').classList.remove('active');
-    $('heroSection').style.display='none';
-    renderResults(domain,aiData,{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews});
-    window.scrollTo({top:0,behavior:'smooth'});
-  }catch(e){
-    // AI failed — show free intel fallback (news + tech news)
-    finishScanAnim();$('scanning').classList.remove('active');console.error(e);
-    showFallback(domain,e.message,{news,techNews,dns,rdap,crt});
-  }finally{btn.disabled=false;btn.textContent='Assess Vendor';}
+  }catch(e){console.warn('Partial fetch failure:',e);}
+
+  finishScanAnim();
+  await new Promise(r=>setTimeout(r,400));
+  $('scanning').classList.remove('active');
+  $('heroSection').style.display='none';
+
+  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx});
+  $('results').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  btn.disabled=false;btn.textContent='Run Intel';
 }
 
-// ── CLAUDE API ─────────────────────────────────────────────────────────────────
-async function callClaudeAPI(domain,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews}=intel;
-  const ctx=[];
-  if(rdap)ctx.push(`WHOIS: Registrar=${rdap.registrar}, Registered=${rdap.registered?.split('T')[0]||'?'}, Expires=${rdap.expiry?.split('T')[0]||'?'}, NS=[${rdap.nameservers?.join(',')}]`);
-  if(dns)ctx.push(`DNS: IPs=[${dns.aRecords?.join(',')}], MX=[${dns.mx?.slice(0,3).join(',')}], SPF=${dns.spf?'PRESENT:'+dns.spf.substring(0,70):'MISSING'}, DMARC=${dns.dmarc?'PRESENT:'+dns.dmarc.substring(0,70):'MISSING'}, IPv6=${dns.ipv6}`);
-  if(crt)ctx.push(`Certificates: ${crt.totalCount} certs in CT logs, ${crt.subdomains?.length} subdomains: [${crt.subdomains?.slice(0,6).join(',')}]`);
-  if(urlhaus)ctx.push(`URLhaus: ${urlhaus.found?`FLAGGED — ${urlhaus.urlCount} URLs, ${urlhaus.activeCount} active`:'Clean'}`);
-  if(threatfox)ctx.push(`ThreatFox: ${threatfox.found?`FLAGGED — ${threatfox.iocCount} IOCs: ${threatfox.iocs?.map(i=>i.malwareFamily).join(',')}`:'Clean'}`);
-  if(breach&&breach.found)ctx.push(`BREACH HISTORY (XposedOrNot): ${breach.breachCount} breaches found — ${breach.breaches?.map(b=>b.name+(b.date?' ('+b.date+')':'')).join(', ')}. Total records exposed: ${breach.totalRecords?.toLocaleString()}`);
-  else if(breach)ctx.push('BREACH HISTORY: No breaches found in XposedOrNot database');
-  if(gov){
-    const hdrs=gov.headers;
-    ctx.push(`GOVERNANCE: security.txt=${gov.securityTxt?.found?'PRESENT (contact:'+gov.securityTxt.contact+')':'MISSING'}, MTA-STS=${gov.mtaSts?.found?'PRESENT':'MISSING'}, BIMI=${gov.bimi?.found?'PRESENT':'MISSING'}, DKIM selectors found=[${gov.dkim?.selectors?.join(',')||'none probed'}]`);
-    if(hdrs)ctx.push(`HTTP SECURITY HEADERS (${hdrs.score}/6): HSTS=${hdrs.hsts?'YES':'NO'}, CSP=${hdrs.csp?'YES':'NO'}, X-Frame-Options=${hdrs.xframe?'YES':'NO'}, X-Content-Type=${hdrs.xcto?'YES':'NO'}, Referrer-Policy=${hdrs.referrer?'YES':'NO'}, Permissions-Policy=${hdrs.permissions?'YES':'NO'}${hdrs.server?' Server banner: '+hdrs.server:''}`);
-  }
-  if(news){
-    if(news.ransomware?.length)ctx.push(`RANSOMWARE.LIVE: ${news.ransomware.length} victim listing(s) found — Groups: ${news.ransomware.map(v=>v.group+'('+v.date.substring(0,7)+')').join(', ')}`);
-    if(news.thnArticles?.length)ctx.push(`THE HACKER NEWS: ${news.thnArticles.length} verified mention(s) — ${news.thnArticles.map(a=>a.title).join(' | ')}`);
-    if(news.articles?.length)ctx.push(`CYBER NEWS: ${news.articles.length} articles found — recent headlines: ${news.articles.filter(a=>a.isRecent).slice(0,3).map(a=>a.title).join(' | ')}`);
-  }
-  if(vt&&!vt.error)ctx.push(`VirusTotal: ${vt.malicious} malicious/${vt.suspicious} suspicious/${vt.harmless} harmless out of ${vt.totalEngines} engines. Flagged by: ${vt.malEngines?.map(e=>e.name).join(',')||'none'}`);
-  if(otx&&!otx.error)ctx.push(`OTX: ${otx.pulseCount} pulses, ${otx.malwareCount} malware samples. Pulses: ${otx.pulses?.map(p=>p.name).join(';')||'none'}`);
-  const intelCtx=ctx.length?`\n\nREAL LIVE INTELLIGENCE (use to drive scoring):\n${ctx.join('\n')}`:'';
+// ── RENDERERS ─────────────────────────────────────────────────────────────────
+function renderAll(domain,intel){
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx}=intel;
 
-  const prompt=`Vendor security assessment for domain: ${domain}${intelCtx}
+  // Header
+  $('resultDomain').textContent=domain;
+  $('resultTs').textContent='Assessed '+new Date().toLocaleString('en-AU',{dateStyle:'medium',timeStyle:'short'});
 
-Return ONLY raw JSON:
-{"score":<0-100>,"rating":"<A|B|C|D|F>","summary":"<2 sentences using real intel>","total_findings":<int>,"critical_count":<int>,
-"infrastructure":{"hosting":"<provider>","country":"<country>","industry":"<vertical>","asn":"<ASN>","ip_range":"<from intel>","mail_servers":"<from intel>","cdn":"<CDN or None>","employees_est":"<range>","domain_age":"<age from registration date>"},
-"risk_vectors":[
-{"name":"SPF","emoji":"📧","grade":"<A-F>","score":<0-100>,"finding":"<based on real DNS data>","source":"DNS"},
-{"name":"DMARC","emoji":"📬","grade":"<A-F>","score":<0-100>,"finding":"<based on real DNS>","source":"DNS"},
-{"name":"DKIM","emoji":"🔑","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"DNS"},
-{"name":"TLS/SSL","emoji":"🔒","grade":"<A-F>","score":<0-100>,"finding":"<based on cert data>","source":"crt.sh"},
-{"name":"Open Ports","emoji":"🔌","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"AI"},
-{"name":"Web App Security","emoji":"🌐","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"AI"},
-{"name":"DNSSEC","emoji":"🛡️","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"DNS"},
-{"name":"Patching Cadence","emoji":"⚡","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"AI"},
-{"name":"Malware / Botnet","emoji":"🦠","grade":"<A-F>","score":<0-100>,"finding":"<from URLhaus/ThreatFox/VT/OTX>","source":"Threat Feeds"},
-{"name":"Attack Surface","emoji":"🗺️","grade":"<A-F>","score":<0-100>,"finding":"<based on CT subdomains count>","source":"crt.sh"},
-{"name":"Domain Reputation","emoji":"⭐","grade":"<A-F>","score":<0-100>,"finding":"<from VT/OTX reputation>","source":"VT/OTX"},
-{"name":"Exposed Credentials","emoji":"🔐","grade":"<A-F>","score":<0-100>,"finding":"<1 sentence>","source":"AI"}
-],
-"findings":[{"severity":"<Critical|High|Medium|Low|Info>","title":"<title>","description":"<2 sentences with real data>","remediation":"<fix>","source":"<DNS|crt.sh|URLhaus|ThreatFox|VT|OTX|WHOIS|AI>"}],
-"recommendations":["<rec 1>","<rec 2>","<rec 3>","<rec 4>","<rec 5>"],
-"benchmark":{"your_score":<score>,"industry_avg":<0-100>,"top_10pct":<0-100>}}
+  // Intel strip chips
+  const chips=[
+    {label:'RDAP',ok:!!rdap,icon:'📋'},
+    {label:'DNS',ok:!!dns,icon:'🌐'},
+    {label:'crt.sh',ok:!!crt,icon:'📜'},
+    {label:'URLhaus',ok:!!urlhaus,warn:urlhaus?.found,icon:'🔗'},
+    {label:'ThreatFox',ok:!!threatfox,warn:threatfox?.found,icon:'🎯'},
+    {label:'XposedOrNot',ok:!!breach,warn:breach?.found,icon:'🔓'},
+    {label:'Governance',ok:!!gov,icon:'🏛️'},
+    {label:'Ransomware.live',ok:!!ransomware,warn:ransomware?.found,icon:'🕵️'},
+    {label:'Cyber News',ok:!!news,warn:news?.found&&news.articles?.length>0,icon:'📰'},
+    {label:'VirusTotal',ok:vt&&!vt.error,warn:vt&&!vt.error&&vt.malicious>0,skip:!vt,icon:'🔬'},
+    {label:'OTX',ok:otx&&!otx.error,warn:otx&&!otx.error&&otx.pulseCount>0,skip:!otx,icon:'🛡️'},
+  ];
+  $('intelStrip').innerHTML=chips.map(s=>{
+    if(s.skip)return`<div class="intel-chip skip">${s.icon} ${s.label}: no key</div>`;
+    if(!s.ok)return`<div class="intel-chip err">${s.icon} ${s.label}: failed</div>`;
+    if(s.warn)return`<div class="intel-chip warn">${s.icon} ${s.label} ⚠️</div>`;
+    return`<div class="intel-chip ok">${s.icon} ${s.label} ✓</div>`;
+  }).join('');
 
-SCORING CALIBRATION — use a realistic, balanced distribution like real security rating platforms:
-
-GRADE THRESHOLDS: A=70-100, B=55-69, C=40-54, D=25-39, F=0-24
-
-REALISTIC BASELINE — calibrate scores so most legitimate businesses land at B or A. Use this distribution:
-- Enterprise / large tech (Microsoft, Google, AWS, GitHub): typically 80-95
-- Mid-size established companies with good hygiene: typically 70-85
-- Small-medium businesses with basic security: typically 55-72
-- Small businesses / startups with some gaps: typically 45-62
-- Government / critical infrastructure: typically 65-82
-- Domains with confirmed active malware/C2: 10-30
-- Domains with minor threat intel hits (old pulses, low confidence): 40-60
-
-VECTOR SCORING GUIDANCE (avoid over-penalising common gaps):
-- SPF missing: score 35-45 for that vector (it matters, but don't collapse overall)
-- SPF present but not strict (~all): score 65-75
-- SPF strict (-all): score 85-95
-- DMARC missing: score 40-50 (common, especially smaller orgs)
-- DMARC present (p=none): score 60-70 (monitoring only, partial credit)
-- DMARC enforced (p=quarantine/reject): score 85-95
-- DKIM: if unknown, default to 60 (most orgs have it, we just can't verify)
-- TLS/SSL: if certs exist in crt.sh, score 75-90; expired cert = 30
-- DNSSEC: absence is common — score 45-55, not an F (most orgs don't use it)
-- Open Ports: default 65-75 unless specific evidence of dangerous exposure
-- Patching: default 65-75 unless specific CVE evidence
-- Malware/Botnet: 85-95 if clean in all feeds; deduct heavily only for confirmed active threats
-- Attack Surface: up to 20 subdomains = normal (70+); 50+ subdomains = more risk (55-65)
-- Domain Reputation: clean VT + no OTX pulses = 85-95; flag only real detections
-
-OVERALL SCORE WEIGHTING:
-- Missing SPF alone: deduct ~8-12 points from overall
-- Missing DMARC alone: deduct ~6-10 points
-- Missing both SPF+DMARC: deduct ~15-20 points total
-- Active confirmed malware (URLhaus/VT flagged): deduct 25-40 points
-- OTX threat pulses (active): deduct 15-25 points
-- Everything clean: baseline 70-85 depending on domain maturity
-
-DO NOT score a normal legitimate business below 45 just for missing DMARC/SPF.
-DO NOT give F grades to well-known businesses unless there is confirmed active threat intel.
-Include 4-6 findings — not every missing best-practice is a Critical. Reserve Critical for confirmed exploitable issues.
-
-BREACH HISTORY INFLUENCE:
-- No breaches found: neutral (no deduction)
-- Old breaches (5+ years ago, no recent): minor deduction 3-5 pts, Low severity finding
-- Recent breaches (1-3 years ago): moderate deduction 8-12 pts, High severity finding  
-- Very recent breach (<1 year): significant deduction 15-20 pts, Critical finding
-
-GOVERNANCE SCORING INFLUENCE:
-- security.txt present: +3 pts (shows mature security programme)
-- MTA-STS present: +3 pts (advanced email security)
-- BIMI present: +2 pts (strong DMARC maturity signal)
-- HTTP headers score 5-6/6: +5 pts; 3-4/6: neutral; 0-2/6: -5 pts
-- Server banner / X-Powered-By exposed: flag as Low finding
-
-CYBER NEWS INFLUENCE:
-- Recent incident articles found: mention in summary, add finding if relevant
-- Only penalise score if news clearly indicates a confirmed recent security incident
-
-IMPORTANT — SEARCH THE WEB + USE YOUR OWN KNOWLEDGE:
-You have access to a web_search tool. You MUST use it to search for recent breach and security incident information about this vendor. Search for:
-1. "[company name] data breach OR ransomware OR cyber attack OR hack"
-2. "[company name] security incident OR data leak 2023 OR 2024 OR 2025"
-
-Also use your own training knowledge of major real-world cyber incidents (e.g. Medibank 2022 ransomware, Optus 2022 breach, Latitude Financial 2023, Canva 2019, etc.).
-
-For ANY known or discovered incident you MUST:
-- Add a High or Critical finding
-- Reference it in the summary with date and impact
-- Apply appropriate score deduction based on recency
-- Label the source as "Web Search" or "AI Knowledge" in the finding source field
-This is critical — tools that miss known breaches are worse than useless for vendor risk assessment.`;
-
-  const API_URL='https://api.anthropic.com/v1/messages';
-  const API_HEADERS={
-    'Content-Type':'application/json',
-    'x-api-key':ANTHROPIC_API_KEY,
-    'anthropic-version':'2023-06-01',
-    'anthropic-dangerous-direct-browser-access':'true'
-  };
-  const tools=[{type:'web_search_20250305',name:'web_search'}];
-
-  // Agentic loop — handles web search tool calls automatically
-  let messages=[{role:'user',content:prompt}];
-  let data=null;
-  for(let i=0;i<6;i++){
-    const r=await fetch(API_URL,{method:'POST',headers:API_HEADERS,
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,tools,messages})});
-    if(!r.ok){
-      const eb=await r.json().catch(()=>({}));const b=eb.error||eb;
-      if(r.status===429||b?.type==='exceeded_limit'||b?.type==='rate_limit_error'){
-        const win=b?.windows;const ra=b?.resetsAt||(win&&(win['5h']?.resets_at||win['1m']?.resets_at));
-        throw new Error('Rate limit reached.'+(ra?' Resets at '+new Date(ra*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'.':' Please wait a few minutes.'));
-      }
-      throw new Error(b?.message||eb?.error?.message||`API error ${r.status}`);
-    }
-    data=await r.json();
-    if(data.stop_reason==='end_turn')break;
-    if(data.stop_reason==='tool_use'){
-      // Add assistant message and tool results to continue the loop
-      messages.push({role:'assistant',content:data.content});
-      const toolResults=data.content.filter(b=>b.type==='tool_use').map(b=>({
-        type:'tool_result',tool_use_id:b.id,content:b.input?.query?`Search performed for: ${b.input.query}`:'Search completed'
-      }));
-      messages.push({role:'user',content:toolResults});
-    } else break;
-  }
-  // Extract text from final response
-  let clean=(data?.content||[]).filter(b=>b.type==='text').map(b=>b.text||'').join('').replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
-  const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-  if(s===-1)throw new Error('No JSON in response');
-  clean=clean.slice(s,e+1);
-  try{return JSON.parse(clean);}catch(_){}
-  function repair(str){
-    let depth=0,inS=false,esc=false,last=0;
-    for(let i=0;i<str.length;i++){const c=str[i];if(esc){esc=false;continue;}if(c==='\\'&&inS){esc=true;continue;}if(c==='"'){inS=!inS;continue;}if(inS)continue;if(c==='{'||c==='[')depth++;if(c==='}'||c===']'){depth--;if(depth===1)last=i+1;}}
-    return str.slice(0,last).replace(/,\s*$/,'')+'}';
-  }
-  try{return JSON.parse(repair(clean));}catch(err){throw new Error(`Parse error: ${err.message}`);}
+  renderRDAP(rdap);
+  renderDNS(dns);
+  renderCRT(crt);
+  renderThreat(urlhaus,threatfox);
+  renderBreach(breach,domain);
+  renderGov(gov);
+  renderRansom(ransomware);
+  renderNews(news);
+  renderVT(vt,domain);
+  renderOTX(otx,domain);
 }
 
-// ── RENDER PANELS ──────────────────────────────────────────────────────────────
+function renderRDAP(rdap){
+  if(!rdap)return;
+  $('rdapPanel').style.display='block';
+  const age=rdap.registered?Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000)):null;
+  const exp=rdap.expiry?Math.floor((new Date(rdap.expiry)-Date.now())/86400000):null;
+  const expColor=exp===null?'var(--muted)':exp<30?'var(--red)':exp<90?'var(--orange)':'var(--green)';
+  $('rdapContent').innerHTML=`<table class="kv-table">
+    <tr><td>Registrar</td><td>${safeText(rdap.registrar)}</td></tr>
+    <tr><td>Registered</td><td>${rdap.registered?.split('T')[0]||'—'}${age!==null?` <span style="color:var(--muted)">(${age}y old)</span>`:''}</td></tr>
+    <tr><td>Expires</td><td><span style="color:${expColor}">${rdap.expiry?.split('T')[0]||'—'}${exp!==null?` (${exp}d)`:''}</span></td></tr>
+    <tr><td>Last Updated</td><td>${rdap.updated?.split('T')[0]||'—'}</td></tr>
+    <tr><td>Nameservers</td><td>${(rdap.nameservers||[]).join('<br>')||'—'}</td></tr>
+    <tr><td>Status</td><td>${(rdap.status||[]).map(s=>`<span style="font-size:.68rem;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:3px;padding:1px 5px;color:var(--blue2);">${safeText(s)}</span>`).join(' ')||'—'}</td></tr>
+  </table>`;
+}
 
-function renderDNSPanel(rdap,dns){
-  if(!rdap&&!dns)return;
+function renderDNS(dns){
+  if(!dns)return;
   $('dnsPanel').style.display='block';
-  let h='<div class="dns-two-col">';
-  if(rdap){
-    const age=rdap.registered?Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000)):null;
-    const exp=rdap.expiry?Math.floor((new Date(rdap.expiry)-Date.now())/86400000):null;
-    h+=`<div><div class="sec-title">📋 WHOIS / RDAP</div><table class="infra-table">
-      <tr><td>Registrar</td><td>${safeText(rdap.registrar)}</td></tr>
-      <tr><td>Registered</td><td>${rdap.registered?.split('T')[0]||'—'}${age!==null?` <span style="color:var(--muted)">(${age}y)</span>`:''}</td></tr>
-      <tr><td>Expires</td><td>${rdap.expiry?.split('T')[0]||'—'}${exp!==null?` <span style="color:${exp<60?'var(--red)':exp<180?'var(--yellow)':'var(--green)'}">(${exp}d)</span>`:''}</td></tr>
-      <tr><td>Last Updated</td><td>${rdap.updated?.split('T')[0]||'—'}</td></tr>
-      <tr><td>Status</td><td>${(rdap.status||[]).map(s=>`<span style="font-size:.68rem;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:3px;padding:1px 5px;color:var(--blue2);">${safeText(s)}</span>`).join(' ')||'—'}</td></tr>
-      <tr><td>Nameservers</td><td>${(rdap.nameservers||[]).join('<br>')||'—'}</td></tr>
-    </table></div>`;
+  const spfColor=dns.spf?'var(--green)':'var(--red)';
+  const dmarcColor=dns.dmarc?'var(--green)':'var(--red)';
+  let spfDetail='';
+  if(dns.spf){
+    const strict=dns.spf.includes('-all');const soft=dns.spf.includes('~all');
+    spfDetail=`<div style="font-size:.68rem;color:var(--muted2);margin-top:2px;font-family:'JetBrains Mono',monospace;">${safeText(dns.spf.substring(0,100))}</div>
+    <div style="margin-top:3px;font-size:.7rem;color:${strict?'var(--green)':soft?'var(--yellow)':'var(--orange)'};">${strict?'✓ Strict (-all)':soft?'⚠ Soft fail (~all)':'⚠ Neutral (+all)'}</div>`;
   }
-  if(dns){
-    h+=`<div><div class="sec-title">🌐 Live DNS Records</div><table class="infra-table">
-      <tr><td>A / IPv4</td><td>${(dns.aRecords||[]).join(', ')||'—'}</td></tr>
-      <tr><td>IPv6 (AAAA)</td><td>${dns.ipv6?'<span style="color:var(--green)">✓ Enabled</span>':'<span style="color:var(--muted)">Not configured</span>'}</td></tr>
-      <tr><td>MX Records</td><td>${(dns.mx||[]).map(safeText).join('<br>')||'—'}</td></tr>
-      <tr><td>SPF</td><td>${dns.spf?`<span style="color:var(--green)">✓ Present</span><div style="font-size:.68rem;color:var(--muted2);margin-top:2px;">${safeText(dns.spf.substring(0,90))}</div>`:'<span style="color:var(--red)">✗ Missing — phishing risk</span>'}</td></tr>
-      <tr><td>DMARC</td><td>${dns.dmarc?`<span style="color:var(--green)">✓ Present</span><div style="font-size:.68rem;color:var(--muted2);margin-top:2px;">${safeText(dns.dmarc.substring(0,90))}</div>`:'<span style="color:var(--red)">✗ Missing — no email policy</span>'}</td></tr>
-      <tr><td>Nameservers</td><td>${(dns.ns||[]).map(safeText).join(', ')||'—'}</td></tr>
-    </table></div>`;
+  let dmarcDetail='';
+  if(dns.dmarc){
+    const policy=dns.dmarc.match(/p=(\w+)/)?.[1]||'none';
+    const pColor=policy==='reject'?'var(--green)':policy==='quarantine'?'var(--yellow)':'var(--orange)';
+    dmarcDetail=`<div style="font-size:.68rem;color:var(--muted2);margin-top:2px;font-family:'JetBrains Mono',monospace;">${safeText(dns.dmarc.substring(0,100))}</div>
+    <div style="margin-top:3px;font-size:.7rem;color:${pColor};">Policy: ${policy}</div>`;
   }
-  h+='</div>';
-  $('dnsContent').innerHTML=h;
+  $('dnsContent').innerHTML=`<table class="kv-table">
+    <tr><td>A / IPv4</td><td>${(dns.aRecords||[]).join(', ')||'—'}</td></tr>
+    <tr><td>IPv6 (AAAA)</td><td>${dns.ipv6?'<span class="status-ok">✓ Enabled</span>':'<span class="status-muted">Not configured</span>'}</td></tr>
+    <tr><td>Nameservers</td><td>${(dns.ns||[]).join('<br>')||'—'}</td></tr>
+    <tr><td>MX Records</td><td>${(dns.mx||[]).join('<br>')||'—'}</td></tr>
+    <tr><td>SPF</td><td>${dns.spf?`<span class="status-ok">✓ Present</span>${spfDetail}`:`<span class="status-bad">✗ Missing</span><div style="font-size:.72rem;color:var(--muted);margin-top:2px;">Spoofing not prevented</div>`}</td></tr>
+    <tr><td>DMARC</td><td>${dns.dmarc?`<span class="status-ok">✓ Present</span>${dmarcDetail}`:`<span class="status-bad">✗ Missing</span><div style="font-size:.72rem;color:var(--muted);margin-top:2px;">No email policy enforced</div>`}</td></tr>
+  </table>`;
 }
 
-function renderCRTPanel(crt){
+function renderCRT(crt){
   if(!crt)return;
   $('crtPanel').style.display='block';
   const now=new Date();
-  let h=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;">
-    <div class="stat-cell" style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.18);">
-      <div class="stat-val" style="color:var(--purple);">${crt.totalCount}</div><div class="stat-lbl">Certs Issued (all time)</div></div>
-    <div class="stat-cell" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.18);">
+  let h=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px;">
+    <div class="stat-cell" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);">
+      <div class="stat-val" style="color:var(--purple);">${crt.totalCount.toLocaleString()}</div><div class="stat-lbl">Total Certs Issued</div></div>
+    <div class="stat-cell" style="background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.15);">
+      <div class="stat-val" style="color:var(--green);">${crt.activeCerts}</div><div class="stat-lbl">Currently Active</div></div>
+    <div class="stat-cell" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);">
       <div class="stat-val" style="color:var(--blue2);">${crt.subdomains?.length||0}</div><div class="stat-lbl">Subdomains Found</div></div>
-    <div class="stat-cell" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);">
-      <div class="stat-val" style="color:var(--green);">${crt.certs?.filter(c=>new Date(c.not_after)>now).length||0}</div><div class="stat-lbl">Active Certs</div></div>
   </div>`;
   if(crt.subdomains?.length){
-    h+=`<div class="sec-title">🌿 Discovered Subdomains (attack surface)</div><div class="tag-list">${crt.subdomains.map(s=>`<span class="tag">${safeText(s)}</span>`).join('')}</div>`;
+    h+=`<div class="sec-title">Discovered Subdomains (attack surface)</div>
+    <div class="tag-list">${crt.subdomains.map(s=>`<span class="tag">${safeText(s)}</span>`).join('')}</div>`;
   }
   if(crt.certs?.length){
-    h+=`<div class="sec-title" style="margin-top:14px;">📜 Recent Certificates</div>`;
-    crt.certs.slice(0,6).forEach(c=>{
+    h+=`<div class="sec-title" style="margin-top:14px;">Recent Certificates</div>`;
+    crt.certs.slice(0,8).forEach(c=>{
       const exp=c.not_after?new Date(c.not_after):null;
       const expired=exp&&exp<now;const soon=exp&&!expired&&(exp-now)<(30*86400000);
       h+=`<div class="crt-row"><div class="crt-cn">${safeText(c.common_name||c.name_value?.split('\n')[0])}</div>
         <div class="crt-meta">Issuer: ${safeText(c.issuer_name?.replace(/^CN=/,'').split(',')[0]||'—')}
-        ${exp?` · Expires: <span style="color:${expired?'var(--red)':soon?'var(--yellow)':'var(--muted2)'}">${exp.toISOString().split('T')[0]}${expired?' (EXPIRED)':soon?' (soon)':''}</span>`:''}
+        ${exp?` · Expires: <span style="color:${expired?'var(--red)':soon?'var(--yellow)':'var(--muted2)'}">${exp.toISOString().split('T')[0]}${expired?' ⚠ EXPIRED':soon?' ⚠ Soon':''}</span>`:''}
         ${c.entry_timestamp?` · Logged: ${c.entry_timestamp.split('T')[0]}`:''}
         </div></div>`;
     });
@@ -1246,598 +903,280 @@ function renderCRTPanel(crt){
   $('crtContent').innerHTML=h;
 }
 
-function renderThreatPanel(urlhaus,threatfox){
+function renderThreat(urlhaus,threatfox){
   if(!urlhaus&&!threatfox)return;
   $('threatPanel').style.display='block';
   let h='';
-  if(urlhaus){
-    h+=`<div class="sec-title">🔗 URLhaus — Malware URL Database</div>`;
-    if(urlhaus.found&&urlhaus.urlCount>0){
-      h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px;">
-        <div class="stat-cell" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);"><div class="stat-val" style="color:var(--red);">${urlhaus.urlCount}</div><div class="stat-lbl">Malware URLs</div></div>
-        <div class="stat-cell" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);"><div class="stat-val" style="color:var(--orange);">${urlhaus.activeCount}</div><div class="stat-lbl">Currently Online</div></div>
-        <div class="stat-cell" style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);"><div class="stat-val" style="color:var(--yellow);">${Object.values(urlhaus.blacklists||{}).filter(v=>v==='listed').length}</div><div class="stat-lbl">Blacklists Hit</div></div>
-      </div>`;
-      urlhaus.urls?.forEach(u=>h+=`<div class="threat-row"><div style="color:var(--red);">⛔</div><div>
-        <div class="threat-label">${safeText(u.threat||'Malware')} <span style="font-size:.68rem;color:${u.status==='online'?'var(--red)':'var(--muted)'};">[${safeText(u.status)}]</span></div>
-        <div class="threat-val">${safeText(u.url)}</div>${u.added?`<div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Added: ${u.added}</div>`:''}
+  // URLhaus
+  h+=`<div class="sec-title">URLhaus — Malware URL Database</div>`;
+  if(urlhaus?.found&&urlhaus.urlCount>0){
+    h+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;">
+      <div class="stat-cell" style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);">
+        <div class="stat-val" style="color:var(--red);">${urlhaus.urlCount}</div><div class="stat-lbl">Malware URLs</div></div>
+      <div class="stat-cell" style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.2);">
+        <div class="stat-val" style="color:var(--orange);">${urlhaus.activeCount}</div><div class="stat-lbl">Currently Live</div></div>
+      <div class="stat-cell" style="background:rgba(202,138,4,0.06);border:1px solid rgba(202,138,4,0.2);">
+        <div class="stat-val" style="color:var(--yellow);">${Object.values(urlhaus.blacklists||{}).filter(v=>v==='listed').length}</div><div class="stat-lbl">Blacklists</div></div>
+    </div>`;
+    urlhaus.urls?.forEach(u=>h+=`<div class="threat-row">
+      <span style="color:var(--red);font-size:.9rem;">⛔</span>
+      <div><div class="threat-label">${safeText(u.threat||'Malware')}
+        <span style="font-size:.68rem;color:${u.status==='online'?'var(--red)':'var(--muted)'};">[${safeText(u.status)}]</span></div>
+        <div class="threat-val">${safeText(u.url)}</div>
+        ${u.added?`<div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Added: ${u.added}</div>`:''}
       </div></div>`);
-    }else h+=`<div class="clean-msg">✅ No malware URLs found for this domain</div>`;
+  }else{
+    h+=`<div class="clean-msg">✅ No malware URLs found</div>`;
   }
-  if(threatfox){
-    h+=`<div class="sec-title" style="margin-top:${urlhaus?'16px':'0'};">🎯 ThreatFox — IOC Intelligence</div>`;
-    if(threatfox.found&&threatfox.iocCount>0){
-      threatfox.iocs?.forEach(i=>h+=`<div class="threat-row"><div style="color:var(--orange);">⚠️</div><div>
-        <div class="threat-label">${safeText(i.malwareFamily)} <span style="font-size:.68rem;color:var(--muted);">${safeText(i.iocType)}</span></div>
+  // ThreatFox
+  h+=`<div class="sec-title" style="margin-top:12px;">ThreatFox — IOC Intelligence</div>`;
+  if(threatfox?.found&&threatfox.iocCount>0){
+    threatfox.iocs?.forEach(i=>h+=`<div class="threat-row">
+      <span style="color:var(--orange);font-size:.9rem;">⚠️</span>
+      <div><div class="threat-label">${safeText(i.malwareFamily)} <span style="font-size:.68rem;color:var(--muted);">${safeText(i.iocType)}</span></div>
         <div class="threat-val">Confidence: ${i.confidence}% · First seen: ${i.firstSeen||'?'}</div>
-        ${i.tags?.length?`<div class="tag-list" style="margin-top:4px;">${i.tags.map(t=>`<span class="tag">${safeText(t)}</span>`).join('')}</div>`:''}
+        ${i.tags?.length?`<div class="tag-list">${i.tags.slice(0,4).map(t=>`<span class="tag tag-red">${safeText(t)}</span>`).join('')}</div>`:''}
       </div></div>`);
-    }else h+=`<div class="clean-msg">✅ No IOCs found in ThreatFox</div>`;
+  }else{
+    h+=`<div class="clean-msg">✅ No IOCs found</div>`;
   }
   $('threatContent').innerHTML=h;
 }
 
-function renderBreachPanel(breach){
+function renderBreach(breach,domain){
   if(!breach)return;
   $('breachPanel').style.display='block';
   let h='';
   if(!breach.found){
-    h='<div class="clean-msg">✅ No breaches found for this domain in XposedOrNot database</div>';
+    h=`<div class="clean-msg">✅ No breaches found in XposedOrNot</div>`;
   }else{
-    h+=`<div class="stat-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:14px;">
-      <div class="stat-cell" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);">
+    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;">
+      <div class="stat-cell" style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.2);">
         <div class="stat-val" style="color:var(--red);">${breach.breachCount}</div><div class="stat-lbl">Breach Events</div></div>
-      <div class="stat-cell" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);">
+      <div class="stat-cell" style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.2);">
         <div class="stat-val" style="color:var(--orange);">${breach.totalRecords>0?breach.totalRecords.toLocaleString():'Unknown'}</div><div class="stat-lbl">Records Exposed</div></div>
     </div>`;
-    h+='<div class="sec-title">🔓 Breach Events</div>';
     breach.breaches?.forEach(b=>{
       const yr=b.date?String(b.date).substring(0,4):'';
       const age=yr?new Date().getFullYear()-parseInt(yr):null;
       h+=`<div class="threat-row">
-        <div style="font-size:1.1rem;">${age!==null&&age<=2?'🚨':age!==null&&age<=5?'⚠️':'📁'}</div>
+        <span style="font-size:1rem;">${age!==null&&age<=2?'🚨':age!==null&&age<=5?'⚠️':'📁'}</span>
         <div style="flex:1;">
           <div class="threat-label">${safeText(b.name)} ${yr?`<span style="font-size:.7rem;color:var(--muted);">(${yr})</span>`:''}
-            ${age!==null&&age<=2?'<span style="font-size:.68rem;background:rgba(239,68,68,0.15);color:var(--red);border-radius:3px;padding:1px 6px;margin-left:4px;">RECENT</span>':''}
+            ${age!==null&&age<=2?'<span style="font-size:.68rem;background:rgba(220,38,38,0.15);color:var(--red);border-radius:3px;padding:1px 6px;margin-left:4px;">RECENT</span>':''}
           </div>
           ${b.records>0?`<div class="threat-val">${b.records.toLocaleString()} records exposed</div>`:''}
-          ${b.dataTypes?.length?`<div class="tag-list" style="margin-top:4px;">${b.dataTypes.map(t=>`<span class="tag">${safeText(t)}</span>`).join('')}</div>`:''}
+          ${b.dataTypes?.length?`<div class="tag-list">${b.dataTypes.map(t=>`<span class="tag">${safeText(t)}</span>`).join('')}</div>`:''}
         </div>
-        <div style="font-size:.72rem;color:var(--muted);text-align:right;">${b.date||''}</div>
+        <div style="font-size:.72rem;color:var(--muted);">${b.date||''}</div>
       </div>`;
     });
   }
-  h+=`<div class="src-footer"><span>Source: XposedOrNot.com</span><a href="https://xposedornot.com/xposed/${$('resultDomain').textContent.replace('🌐 ','').trim()}" target="_blank">View full report →</a></div>`;
+  h+=`<div class="src-footer"><span>XposedOrNot.com</span><a href="https://xposedornot.com/xposed/${safeText(domain)}" target="_blank">Full report →</a></div>`;
   $('breachContent').innerHTML=h;
 }
 
-function renderGovPanel(gov){
+function renderGov(gov){
   if(!gov)return;
   $('govPanel').style.display='block';
   const checks=[
-    {label:'security.txt (Vulnerability Disclosure)',ok:gov.securityTxt?.found,detail:gov.securityTxt?.found?`Contact: ${safeText(gov.securityTxt.contact||'—')}${gov.securityTxt.hasPGP?' · PGP signed':''}${gov.securityTxt.expires?' · Expires: '+gov.securityTxt.expires.substring(0,10):''}`:'No security contact published — vulnerability reporters have no official channel',icon:'🔐'},
-    {label:'MTA-STS (Encrypted Email Transport)',ok:gov.mtaSts?.found,detail:gov.mtaSts?.found?'Email transport security policy enforced — SMTP encryption required':'MTA-STS not configured — email in transit may not be encrypted',icon:'📧'},
-    {label:'BIMI (Brand Identity & DMARC Maturity)',ok:gov.bimi?.found,detail:gov.bimi?.found?'BIMI record present — indicates DMARC at enforcement level':'No BIMI record — DMARC may not be at enforcement level',icon:'🏷️'},
-    {label:'DKIM Email Signing',ok:gov.dkim?.found,detail:gov.dkim?.found?`Active selectors found: ${gov.dkim.selectors.join(', ')}`:'No DKIM selectors detected via common selector probing',icon:'✍️'},
+    {label:'security.txt (Vulnerability Disclosure)',icon:'🔐',
+      ok:gov.securityTxt?.found,
+      detail:gov.securityTxt?.found
+        ?`Contact: ${safeText(gov.securityTxt.contact||'—')}${gov.securityTxt.hasPGP?' · PGP signed':''}${gov.securityTxt.expires?' · Expires: '+gov.securityTxt.expires.substring(0,10):''}`
+        :'Not published — no official channel for security researchers'},
+    {label:'DKIM Email Signing',icon:'✍️',
+      ok:gov.dkim?.found,
+      detail:gov.dkim?.found?`Active selectors: ${gov.dkim.selectors.join(', ')}`:'No DKIM selectors detected via common probing'},
+    {label:'MTA-STS (Encrypted Email Transport)',icon:'📧',
+      ok:gov.mtaSts?.found,
+      detail:gov.mtaSts?.found?'Email transport policy enforced':'Not configured'},
+    {label:'BIMI (Brand / DMARC Maturity Signal)',icon:'🏷️',
+      ok:gov.bimi?.found,
+      detail:gov.bimi?.found?'BIMI record present — strong DMARC maturity indicator':'Not configured'},
   ];
-
-  let h='<div class="sec-title">🔐 Security Programme Signals</div>';
+  let h=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">`;
   checks.forEach(c=>{
-    h+=`<div class="threat-row" style="margin-bottom:8px;">
-      <div style="font-size:1rem;width:20px;text-align:center;">${c.icon}</div>
+    h+=`<div class="gov-row ${c.ok?'ok':'fail'}">
+      <span style="font-size:1rem;">${c.icon}</span>
       <div style="flex:1;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-          <span style="font-size:.8rem;font-weight:600;color:var(--text);">${c.label}</span>
-          <span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:100px;${c.ok?'background:rgba(34,197,94,0.15);color:var(--green);':'background:rgba(239,68,68,0.12);color:var(--red);'}">${c.ok?'✓ Present':'✗ Missing'}</span>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px;flex-wrap:wrap;">
+          <span class="gov-label">${c.label}</span>
+          <span class="gov-status-pill ${c.ok?'gov-ok':'gov-fail'}">${c.ok?'✓ Present':'✗ Missing'}</span>
         </div>
-        <div class="threat-val">${c.detail}</div>
+        <div class="gov-detail">${c.detail}</div>
       </div>
     </div>`;
   });
-
+  h+=`</div>`;
   // HTTP Headers
   if(gov.headers){
-    const h2=gov.headers;
-    const score=h2.score;
-    const scoreCol=score>=5?'var(--green)':score>=3?'var(--yellow)':'var(--red)';
-    h+=`<div class="sec-title" style="margin-top:16px;">🌐 HTTP Security Headers (${score}/6)</div>`;
-    h+=`<div style="height:6px;background:rgba(255,255,255,0.07);border-radius:3px;margin-bottom:14px;overflow:hidden;">
-      <div style="width:${(score/6)*100}%;background:${scoreCol};height:100%;border-radius:3px;transition:width 1s;"></div></div>`;
+    const hd=gov.headers;
+    const scoreCol=hd.score>=5?'var(--green)':hd.score>=3?'var(--yellow)':'var(--red)';
+    h+=`<div class="sec-title">HTTP Security Headers (${hd.score}/6)</div>`;
+    h+=`<div style="height:6px;background:rgba(13,13,13,0.08);border-radius:3px;margin-bottom:12px;overflow:hidden;">
+      <div style="width:${(hd.score/6)*100}%;background:${scoreCol};height:100%;border-radius:3px;transition:width 1s;"></div></div>`;
     const hdrs=[
-      ['HSTS','Strict-Transport-Security — forces HTTPS',h2.hsts],
-      ['CSP','Content-Security-Policy — prevents XSS',h2.csp],
-      ['X-Frame-Options','Clickjacking protection',h2.xframe],
-      ['X-Content-Type-Options','MIME sniffing prevention',h2.xcto],
-      ['Referrer-Policy','Controls referrer information leakage',h2.referrer],
-      ['Permissions-Policy','Controls browser feature access',h2.permissions],
+      ['HSTS','Strict-Transport-Security — forces HTTPS',hd.hsts],
+      ['CSP','Content-Security-Policy — prevents XSS',hd.csp],
+      ['X-Frame-Options','Clickjacking protection',hd.xframe],
+      ['X-Content-Type-Options','MIME sniffing prevention',hd.xcto],
+      ['Referrer-Policy','Controls referrer leakage',hd.referrer],
+      ['Permissions-Policy','Browser feature access control',hd.permissions],
     ];
-    h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">`;
+    h+=`<div class="hdr-grid">`;
     hdrs.forEach(([name,desc,present])=>{
-      h+=`<div style="padding:8px 11px;border-radius:8px;background:${present?'rgba(34,197,94,0.06)':'rgba(239,68,68,0.06)'};border:1px solid ${present?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.12)'};">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-          <span style="font-size:.68rem;font-weight:700;color:${present?'var(--green)':'var(--red)'};">${present?'✓':'✗'}</span>
-          <span style="font-size:.78rem;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace;">${name}</span>
-        </div>
-        <div style="font-size:.7rem;color:var(--muted2);">${desc}</div>
+      h+=`<div class="hdr-cell ${present?'ok':'fail'}">
+        <div class="hdr-name" style="color:${present?'var(--green)':'var(--red)'};">${present?'✓':'✗'} ${name}</div>
+        <div class="hdr-desc">${desc}</div>
       </div>`;
     });
-    h+='</div>';
-    if(h2.server)h+=`<div style="margin-top:10px;padding:8px 11px;border-radius:8px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);font-size:.78rem;color:var(--orange);">⚠️ Server banner disclosed: <span style="font-family:'JetBrains Mono',monospace;">${safeText(h2.server)}</span> — consider suppressing version info</div>`;
-    if(h2.poweredBy)h+=`<div style="margin-top:6px;padding:8px 11px;border-radius:8px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);font-size:.78rem;color:var(--orange);">⚠️ X-Powered-By disclosed: <span style="font-family:'JetBrains Mono',monospace;">${safeText(h2.poweredBy)}</span></div>`;
+    h+=`</div>`;
+    if(hd.server)h+=`<div style="margin-top:10px;padding:8px 11px;border-radius:8px;background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);font-size:.78rem;color:var(--orange);">⚠️ Server banner: <span style="font-family:'JetBrains Mono',monospace;">${safeText(hd.server)}</span></div>`;
+    if(hd.poweredBy)h+=`<div style="margin-top:6px;padding:8px 11px;border-radius:8px;background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);font-size:.78rem;color:var(--orange);">⚠️ X-Powered-By: <span style="font-family:'JetBrains Mono',monospace;">${safeText(hd.poweredBy)}</span></div>`;
   }
-
   $('govContent').innerHTML=h;
 }
 
-function renderNewsPanel(news){
-  if(!news)return;
-  $('newsPanel').style.display='block';
-  const co=safeText(news.company||'this vendor');
+function renderRansom(ransomware){
+  if(!ransomware)return;
+  $('ransomPanel').style.display='block';
   let h='';
-
-  // ── Ransomware.live section ──
-  h+=`<div class="sec-title">🕵️ Dark Web — Ransomware Gang Victim Listings (ransomware.live)</div>`;
-  if(news.ransomware?.length){
-    news.ransomware.forEach(v=>{
+  if(!ransomware.found||!ransomware.victims?.length){
+    h=`<div class="clean-msg">✅ No victim listings found for <strong>${safeText(ransomware.company)}</strong></div>`;
+  }else{
+    ransomware.victims.forEach(v=>{
       const yr=v.date?v.date.substring(0,4):'';
       const age=yr?new Date().getFullYear()-parseInt(yr):null;
-      h+=`<div style="padding:13px 15px;border-radius:10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap;">
-          <span style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:100px;background:rgba(239,68,68,0.18);color:var(--red);">🚨 RANSOMWARE HIT</span>
-          <span style="font-size:.78rem;font-weight:700;color:var(--orange);">by ${safeText(v.group)}</span>
+      h+=`<div class="ransom-card">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;">
+          <span style="font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 9px;border-radius:100px;background:rgba(220,38,38,0.18);color:var(--red);">🚨 Ransomware Hit</span>
+          <span style="font-size:.8rem;font-weight:700;color:var(--orange);">${safeText(v.group)}</span>
           ${v.date?`<span style="font-size:.72rem;color:var(--muted);">${v.date.substring(0,10)}</span>`:''}
-          ${age!==null&&age<=1?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:4px;background:rgba(239,68,68,0.2);color:var(--red);">WITHIN LAST YEAR</span>':''}
+          ${age!==null&&age<=1?'<span style="font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:4px;background:rgba(220,38,38,0.2);color:var(--red);">Within last year</span>':''}
           ${v.country?`<span style="font-size:.7rem;color:var(--muted);">📍 ${safeText(v.country)}</span>`:''}
         </div>
-        <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px;">${safeText(v.victim)}</div>
+        <div style="font-size:.83rem;font-weight:600;color:var(--ink);margin-bottom:4px;">${safeText(v.victim)}</div>
         ${v.description?`<div style="font-size:.77rem;color:var(--muted2);line-height:1.5;">${safeText(v.description.substring(0,220))}</div>`:''}
         ${v.url?`<a href="${v.url}" target="_blank" rel="noopener" style="font-size:.72rem;color:var(--blue2);margin-top:5px;display:inline-block;">View original post →</a>`:''}
       </div>`;
     });
-  }else{
-    h+=`<div class="clean-msg">✅ No ransomware gang victim listings found for <strong>${co}</strong></div>`;
   }
+  h+=`<div class="src-footer"><span>ransomware.live</span><a href="https://ransomware.live/search?s=${encodeURIComponent(ransomware.company)}" target="_blank">Search →</a></div>`;
+  $('ransomContent').innerHTML=h;
+}
 
-  // ── The Hacker News section ──
-  if(news.thnArticles?.length){
-    h+=`<div class="sec-title" style="margin-top:18px;">📡 The Hacker News — Verified Mentions</div>`;
-    news.thnArticles.forEach(a=>h+=articleCard(a,'rgba(59,130,246,0.06)','rgba(59,130,246,0.18)'));
-  }
-
-  // ── Google News section ──
-  h+=`<div class="sec-title" style="margin-top:18px;">📰 News & Cyber Incident Reports</div>`;
-  if(!news.articles?.length){
-    h+=`<div class="clean-msg" style="color:var(--muted2);">✅ No cybersecurity news found for <strong>${co}</strong> in the past 5 years</div>`;
+function renderNews(news){
+  if(!news)return;
+  $('newsPanel').style.display='block';
+  let h='';
+  if(!news.found||!news.articles?.length){
+    h=`<div class="empty-msg">No cybersecurity news found for <strong>${safeText(news.company)}</strong> in public feeds.</div>`;
   }else{
-    h+=`<div style="font-size:.78rem;color:var(--muted2);margin-bottom:12px;padding:7px 11px;background:rgba(234,179,8,0.05);border:1px solid rgba(234,179,8,0.12);border-radius:7px;">
-      ⚠️ Articles mentioning <strong style="color:var(--text);">${co}</strong> in a cybersecurity context. Some may be industry news rather than incidents — verify before using in assessments.
-    </div>`;
-    // Split recent vs older
     const recent=news.articles.filter(a=>a.isRecent);
     const older=news.articles.filter(a=>!a.isRecent);
     if(recent.length){
-      h+=`<div style="font-size:.72rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Recent (past 2 years)</div>`;
-      recent.forEach(a=>h+=articleCard(a,'rgba(249,115,22,0.04)','rgba(249,115,22,0.14)'));
+      h+=`<div style="font-size:.72rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Recent — past 2 years</div>`;
+      recent.forEach(a=>h+=articleCard(a));
     }
     if(older.length){
-      h+=`<div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 8px;">Older articles</div>`;
-      older.forEach(a=>h+=articleCard(a,'rgba(255,255,255,0.02)','rgba(255,255,255,0.08)'));
+      h+=`<div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 8px;">Older</div>`;
+      older.slice(0,4).forEach(a=>h+=articleCard(a));
     }
   }
-
-  h+=`<div class="src-footer">
-    <span>Sources: ransomware.live · Google News · The Hacker News</span>
-    <a href="https://news.google.com/search?q=${encodeURIComponent((news.company||'')+' breach hack cyberattack')}" target="_blank">More on Google News →</a>
-  </div>`;
+  h+=`<div class="src-footer"><span>Google News RSS</span><a href="https://news.google.com/search?q=${encodeURIComponent((news.company||'')+' breach hack cyberattack')}" target="_blank">More →</a></div>`;
   $('newsContent').innerHTML=h;
 }
 
-function articleCard(a,bg,borderCol){
-  return `<div style="padding:11px 13px;border-radius:9px;background:${bg};border:1px solid ${borderCol};margin-bottom:7px;">
-    <a href="${a.link||'#'}" target="_blank" rel="noopener" style="font-size:.83rem;font-weight:600;color:var(--blue2);text-decoration:none;line-height:1.4;display:block;margin-bottom:5px;">${safeText(a.title)}</a>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
-      <span style="font-size:.69rem;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 6px;">${safeText(a.source)}</span>
-      <span style="font-size:.69rem;color:var(--muted);">${a.date||''}</span>
-      ${a.isTHN?'<span style="font-size:.66rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(59,130,246,0.15);color:var(--blue2);">THN</span>':''}
+function articleCard(a){
+  return`<div class="article-card">
+    <a href="${a.link||'#'}" target="_blank" rel="noopener" class="article-title">${safeText(a.title)}</a>
+    <div class="article-meta">
+      <span class="article-source">${safeText(a.source)}</span>
+      <span class="article-date">${a.date||''}</span>
+      ${a.isRecent?'<span class="new-badge">NEW</span>':''}
     </div>
-    ${a.snippet?`<div style="font-size:.76rem;color:var(--muted2);line-height:1.5;">${safeText(a.snippet)}…</div>`:''}
+    ${a.snippet?`<div class="article-snippet">${safeText(a.snippet)}…</div>`:''}
   </div>`;
 }
 
-function renderVTPanel(vt){
+function renderVT(vt,domain){
   if(!vt)return;
   $('vtPanel').style.display='block';
-  if(vt.error){$('vtContent').innerHTML=`<div style="color:var(--muted2);font-size:.84rem;padding:10px;">⚠️ ${safeText(vt.error)}</div>`;return;}
+  if(vt.error){$('vtContent').innerHTML=`<div class="empty-msg">⚠️ ${safeText(vt.error)}</div>`;return;}
   const total=vt.malicious+vt.suspicious+vt.harmless+vt.undetected;
-  let h=`<div class="stat-grid">
-    <div class="stat-cell" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);"><div class="stat-val" style="color:var(--red);">${vt.malicious}</div><div class="stat-lbl">Malicious</div></div>
-    <div class="stat-cell" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);"><div class="stat-val" style="color:var(--orange);">${vt.suspicious}</div><div class="stat-lbl">Suspicious</div></div>
-    <div class="stat-cell" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);"><div class="stat-val" style="color:var(--green);">${vt.harmless}</div><div class="stat-lbl">Harmless</div></div>
-    <div class="stat-cell" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);"><div class="stat-val" style="color:var(--muted2);">${vt.totalEngines}</div><div class="stat-lbl">Engines</div></div>
+  const malPct=total?(vt.malicious/total*100):0;
+  const okPct=total?(vt.harmless/total*100):0;
+  let h=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;">
+    <div class="stat-cell" style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.18);">
+      <div class="stat-val" style="color:var(--red);">${vt.malicious}</div><div class="stat-lbl">Malicious</div></div>
+    <div class="stat-cell" style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.18);">
+      <div class="stat-val" style="color:var(--orange);">${vt.suspicious}</div><div class="stat-lbl">Suspicious</div></div>
+    <div class="stat-cell" style="background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.18);">
+      <div class="stat-val" style="color:var(--green);">${vt.harmless}</div><div class="stat-lbl">Harmless</div></div>
+    <div class="stat-cell" style="background:var(--panel);border:1px solid var(--border);">
+      <div class="stat-val" style="color:var(--muted2);">${vt.totalEngines}</div><div class="stat-lbl">Engines</div></div>
   </div>`;
-  const malPct=total?(vt.malicious/total*100):0;const okPct=total?(vt.harmless/total*100):0;
-  h+=`<div style="height:7px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;margin-bottom:13px;display:flex;">
-    <div style="width:${malPct}%;background:var(--red);"></div><div style="width:${okPct}%;background:var(--green);"></div></div>`;
+  h+=`<div style="height:7px;background:rgba(13,13,13,0.06);border-radius:4px;overflow:hidden;margin-bottom:12px;display:flex;">
+    <div style="width:${malPct}%;background:var(--red);"></div>
+    <div style="width:${okPct}%;background:var(--green);"></div></div>`;
   if(vt.malEngines?.length){
-    h+=`<div class="sec-title">🚨 Flagged By</div><div class="vt-engine-grid">`;
+    h+=`<div class="sec-title">Flagged By</div><div class="vt-engine-grid">`;
     vt.malEngines.forEach(e=>h+=`<div class="vt-engine"><div class="vt-engine-name">${safeText(e.name)}</div><div class="vt-engine-result">${safeText(e.result)}</div></div>`);
-    h+='</div>';
-  }else h+=`<div class="clean-msg">✅ No malicious detections across ${vt.totalEngines} engines</div>`;
+    h+=`</div>`;
+  }else{
+    h+=`<div class="clean-msg">✅ No malicious detections</div>`;
+  }
   if(vt.categories&&Object.keys(vt.categories).length){
     const cats=[...new Set(Object.values(vt.categories))].slice(0,6);
-    h+=`<div class="sec-title">🏷️ Categories</div><div class="tag-list">${cats.map(c=>`<span class="tag">${safeText(c)}</span>`).join('')}</div>`;
+    h+=`<div class="sec-title" style="margin-top:10px;">Categories</div><div class="tag-list">${cats.map(c=>`<span class="tag tag-blue">${safeText(c)}</span>`).join('')}</div>`;
   }
-  if(vt.lastAnalysis)h+=`<div class="src-footer"><span>Last analysed: ${new Date(vt.lastAnalysis*1000).toLocaleDateString()}</span><a href="https://www.virustotal.com/gui/domain/${$('resultDomain').textContent.replace('🌐 ','').trim()}" target="_blank">Full VT report →</a></div>`;
+  if(vt.lastAnalysis)h+=`<div class="src-footer"><span>Last analysed: ${new Date(vt.lastAnalysis*1000).toLocaleDateString()}</span><a href="https://www.virustotal.com/gui/domain/${safeText(domain)}" target="_blank">Full VT report →</a></div>`;
   $('vtContent').innerHTML=h;
 }
 
-function renderOTXPanel(otx){
+function renderOTX(otx,domain){
   if(!otx)return;
   $('otxPanel').style.display='block';
-  if(otx.error){$('otxContent').innerHTML=`<div style="color:var(--muted2);font-size:.84rem;padding:10px;">⚠️ ${safeText(otx.error)}</div>`;return;}
-  const domainClean=$('resultDomain').textContent.replace('🌐 ','').trim();
-  let h=`<div class="stat-grid">
-    <div class="stat-cell" style="background:${otx.pulseCount>0?'rgba(239,68,68,0.08)':'rgba(34,197,94,0.08)'};border:1px solid ${otx.pulseCount>0?'rgba(239,68,68,0.2)':'rgba(34,197,94,0.2)'};">
+  if(otx.error){$('otxContent').innerHTML=`<div class="empty-msg">⚠️ ${safeText(otx.error)}</div>`;return;}
+  let h=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:12px;">
+    <div class="stat-cell" style="background:${otx.pulseCount>0?'rgba(220,38,38,0.06)':'rgba(22,163,74,0.06)'};border:1px solid ${otx.pulseCount>0?'rgba(220,38,38,0.18)':'rgba(22,163,74,0.18)'};">
       <div class="stat-val" style="color:${otx.pulseCount>0?'var(--red)':'var(--green)'};">${otx.pulseCount}</div><div class="stat-lbl">Threat Pulses</div></div>
-    <div class="stat-cell" style="background:${otx.malwareCount>0?'rgba(239,68,68,0.08)':'rgba(34,197,94,0.08)'};border:1px solid ${otx.malwareCount>0?'rgba(239,68,68,0.2)':'rgba(34,197,94,0.2)'};">
+    <div class="stat-cell" style="background:${otx.malwareCount>0?'rgba(220,38,38,0.06)':'rgba(22,163,74,0.06)'};border:1px solid ${otx.malwareCount>0?'rgba(220,38,38,0.18)':'rgba(22,163,74,0.18)'};">
       <div class="stat-val" style="color:${otx.malwareCount>0?'var(--red)':'var(--green)'};">${otx.malwareCount}</div><div class="stat-lbl">Malware Samples</div></div>
-    <div class="stat-cell" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);"><div class="stat-val" style="color:var(--text);">${otx.urlCount}</div><div class="stat-lbl">URLs Found</div></div>
-    <div class="stat-cell" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);"><div class="stat-val" style="color:var(--text);">${otx.dnsRecords?.length||0}</div><div class="stat-lbl">Passive DNS</div></div>
   </div>`;
   if(otx.pulses?.length){
-    h+=`<div class="sec-title">⚠️ Active Threat Pulses</div>`;
-    otx.pulses.forEach(p=>h+=`<div class="threat-row"><div style="color:var(--red);">🚨</div><div>
-      <div class="threat-label">${safeText(p.name)}</div>
-      <div class="threat-val">${p.created?.split('T')[0]||''}${p.author_name?' · '+safeText(p.author_name):''}${p.tags?.length?' · '+p.tags.slice(0,3).join(', '):''}</div>
-    </div></div>`);
-  }else h+=`<div class="clean-msg">✅ No active threat pulses in OTX</div>`;
+    h+=`<div class="sec-title">Threat Pulses</div>`;
+    otx.pulses.forEach(p=>h+=`<div class="threat-row">
+      <span style="color:var(--red);">🚨</span>
+      <div><div class="threat-label">${safeText(p.name)}</div>
+        <div class="threat-val">${p.created?.split('T')[0]||''}${p.author_name?' · '+safeText(p.author_name):''}${p.tags?.length?' · '+p.tags.slice(0,3).join(', '):''}</div>
+      </div></div>`);
+  }else{
+    h+=`<div class="clean-msg">✅ No active threat pulses</div>`;
+  }
   if(otx.malwareSamples?.length){
-    h+=`<div class="sec-title" style="margin-top:14px;">🦠 Malware Hashes</div>`;
-    otx.malwareSamples.forEach(hs=>h+=`<div class="threat-row"><div style="color:var(--orange);">🔴</div><div><div class="threat-val">${safeText(hs)}</div></div></div>`);
+    h+=`<div class="sec-title" style="margin-top:10px;">Malware Hashes</div>`;
+    otx.malwareSamples.forEach(hs=>h+=`<div class="threat-row"><span style="color:var(--orange);">🔴</span><div class="threat-val">${safeText(hs)}</div></div>`);
   }
   if(otx.dnsRecords?.length){
-    h+=`<div class="sec-title" style="margin-top:14px;">🌐 Passive DNS History</div>
-    <table class="dns-table"><thead><tr><th>Hostname</th><th>IP Address</th><th>First Seen</th><th>Last Seen</th></tr></thead><tbody>`;
-    otx.dnsRecords.forEach(r=>h+=`<tr><td style="color:var(--blue2);">${safeText(r.hostname||'—')}</td><td>${safeText(r.address||'—')}</td><td style="color:var(--muted);">${r.first?.split('T')[0]||'—'}</td><td style="color:var(--muted);">${r.last?.split('T')[0]||'—'}</td></tr>`);
-    h+='</tbody></table>';
+    h+=`<div class="sec-title" style="margin-top:10px;">Passive DNS History</div>
+    <table class="dns-table"><thead><tr><th>Hostname</th><th>IP</th><th>First Seen</th><th>Last Seen</th></tr></thead><tbody>`;
+    otx.dnsRecords.forEach(r=>h+=`<tr><td style="color:var(--blue2);">${safeText(r.hostname||'—')}</td><td>${safeText(r.address||'—')}</td><td>${r.first?.split('T')[0]||'—'}</td><td>${r.last?.split('T')[0]||'—'}</td></tr>`);
+    h+=`</tbody></table>`;
   }
-  h+=`<div class="src-footer"><span>Retrieved: ${new Date().toUTCString()}</span><a href="https://otx.alienvault.com/indicator/domain/${domainClean}" target="_blank">Full OTX report →</a></div>`;
+  h+=`<div class="src-footer"><span>AlienVault OTX</span><a href="https://otx.alienvault.com/indicator/domain/${safeText(domain)}" target="_blank">Full OTX report →</a></div>`;
   $('otxContent').innerHTML=h;
 }
 
-// ── RENDER RESULTS ─────────────────────────────────────────────────────────────
-function renderResults(domain,d,intel){
-  $('results').classList.add('active');
-  const score=Math.max(0,Math.min(100,d.score||65));
-  const CIRC=314;
-  $('scoreArc').style.stroke=scoreColor(score);
-  setTimeout(()=>{
-    $('scoreArc').style.strokeDashoffset=CIRC-(score/100*CIRC);
-    let cur=0;const step=score/50;
-    const t=setInterval(()=>{cur=Math.min(cur+step,score);$('scoreNum').textContent=Math.round(cur);if(cur>=score)clearInterval(t);},24);
-  },100);
-  $('resultDomain').textContent='🌐 '+domain;
-  const rl=ratingLabel(score);
-  $('resultBadge').textContent=rl.label;
-  $('resultBadge').style.cssText=`background:${rl.bg};color:${rl.color};border:1px solid ${rl.border};font-size:.9rem;padding:6px 18px;`;
-  $('resultSummary').textContent=d.summary||'';
-  $('statFindings').textContent=d.total_findings||d.findings?.length||0;
-  $('statCritical').textContent=d.critical_count||0;
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,news,vt,otx,techNews}=intel;
-  const srcCount=[rdap,dns,crt,urlhaus,threatfox,breach,gov,news,techNews,vt&&!vt.error,otx&&!otx.error].filter(Boolean).length;
-  $('statSources').textContent=srcCount+'/7';
-  $('scoreGrade').textContent='Grade '+rl.grade;$('scoreGrade').style.color=rl.color;
-
-  // Intel strip
-  $('intelStrip').innerHTML=[
-    {label:'RDAP',ok:!!rdap,icon:'📋'},
-    {label:'DNS/DoH',ok:!!dns,icon:'🌐'},
-    {label:'crt.sh',ok:!!crt,icon:'📜'},
-    {label:'URLhaus',ok:!!urlhaus,icon:'🔗',warn:urlhaus?.found&&urlhaus.urlCount>0},
-    {label:'ThreatFox',ok:!!threatfox,icon:'🎯',warn:threatfox?.found&&threatfox.iocCount>0},
-    {label:'Breaches',ok:!!breach,icon:'🔓',warn:breach?.found&&breach.breachCount>0},
-    {label:'Governance',ok:!!gov,icon:'🏛️'},
-    {label:'Ransomware DB',ok:!!news,icon:'🕵️',warn:news?.ransomware?.length>0},
-    {label:'Cyber News',ok:!!news,icon:'📰',warn:news?.found&&(news.articles?.length>0||news.thnArticles?.length>0)},
-    {label:'VirusTotal',ok:vt&&!vt.error,icon:'🔬',warn:vt&&!vt.error&&vt.malicious>0,skip:!vt},
-    {label:'OTX',ok:otx&&!otx.error,icon:'🛡️',warn:otx&&!otx.error&&otx.pulseCount>0,skip:!otx},
-  ].map(s=>{
-    if(s.skip)return`<div class="intel-chip skip">${s.icon} ${s.label}: no key</div>`;
-    if(!s.ok)return`<div class="intel-chip err">${s.icon} ${s.label}: failed</div>`;
-    if(s.warn)return`<div class="intel-chip warn">${s.icon} ${s.label}: threats found ⚠️</div>`;
-    return`<div class="intel-chip ok">${s.icon} ${s.label}: clean ✓</div>`;
-  }).join('');
-
-  // Risk vectors
-  $('rvList').innerHTML=(d.risk_vectors||[]).map(rv=>`
-    <div class="rv-row">
-      <div class="rv-emoji">${rv.emoji||'🔹'}</div>
-      <div class="rv-info">
-        <div class="rv-name-row"><div class="rv-name">${safeText(rv.name)}</div>${rv.source?`<span class="rv-src">${safeText(rv.source)}</span>`:''}</div>
-        <div class="rv-finding">${safeText(rv.finding||'')}</div>
-        <div class="rv-bar"><div class="rv-bar-fill" style="width:${rv.score||50}%;background:${gradeColor(rv.grade)};"></div></div>
-      </div>
-      <div class="grade-badge ${gradeClass(rv.grade)}">${rv.grade||'N'}</div>
-    </div>`).join('');
-
-  // Infra
-  const inf=d.infrastructure||{};
-  $('infraTable').innerHTML=[['Hosting',inf.hosting],['Country',inf.country],['Industry',inf.industry],['ASN',inf.asn],
-    ['IP Range',inf.ip_range],['Mail Servers',inf.mail_servers],['CDN',inf.cdn],['Domain Age',inf.domain_age],['Est. Employees',inf.employees_est]]
-    .filter(r=>r[1]).map(([k,v])=>`<tr><td>${k}</td><td>${safeText(v)}</td></tr>`).join('');
-
-  // Benchmark
-  const bench=d.benchmark||{your_score:score,industry_avg:65,top_10pct:88};
-  $('compareRows').innerHTML=[['This vendor',bench.your_score,scoreColor(bench.your_score)],['Industry avg.',bench.industry_avg,'var(--muted2)'],['Top 10%',bench.top_10pct,'var(--teal)']]
-    .map(([l,v,c])=>`<div class="compare-row"><div class="compare-label">${l}</div><div class="compare-track"><div class="compare-fill" style="width:${v}%;background:${c};"></div></div>
-      <div style="font-family:'Sora',sans-serif;font-size:.8rem;font-weight:700;color:${c};width:38px;text-align:right;">${v}<span style="font-size:.6rem;color:var(--muted);font-weight:400;">/100</span></div></div>`).join('');
-
-  // Intel panels
-  renderDNSPanel(rdap,dns);renderCRTPanel(crt);renderThreatPanel(urlhaus,threatfox);renderBreachPanel(breach);renderGovPanel(gov);renderNewsPanel(news);renderVTPanel(vt);renderOTXPanel(otx);renderTechNewsPanel(techNews);
-
-  // Inject AI-known incidents into news panel if RSS feeds returned nothing
-  const aiFindings=d.findings||[];
-  const aiIncidents=aiFindings.filter(f=>f.source&&f.source.toLowerCase().includes('ai knowledge'));
-  if(aiIncidents.length>0){
-    $('newsPanel').style.display='block';
-    const existing=$('newsContent').innerHTML||'';
-    const hasRealNews=existing&&!existing.includes('No cybersecurity news found');
-    let aiHTML=`<div style="margin-top:${hasRealNews?'18px':'0'};">
-      <div style="font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px;">🤖 AI Knowledge — Known Incidents</div>
-      ${aiIncidents.map(f=>`
-        <div style="padding:13px 15px;border-radius:11px;background:rgba(220,38,38,0.05);border:1px solid rgba(220,38,38,0.15);border-left:3px solid var(--red);margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-            <span style="font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;background:rgba(220,38,38,0.12);color:var(--red);">${safeText(f.severity||'High')}</span>
-            <span style="font-size:.85rem;font-weight:600;color:var(--ink);">${safeText(f.title||'')}</span>
-          </div>
-          <div style="font-size:.79rem;color:var(--muted);line-height:1.55;">${safeText(f.description||'')}</div>
-        </div>`).join('')}
-    </div>`;
-    $('newsContent').innerHTML=(hasRealNews?existing:'')+aiHTML;
-  }
-
-  // Verdict
-  const crit=d.critical_count||0;
-  const anyThreat=(urlhaus?.found&&urlhaus.urlCount>0)||(threatfox?.found&&threatfox.iocCount>0)||(vt&&vt.malicious>0)||(otx&&otx.pulseCount>0);
-  const threatSrcs=[urlhaus?.found?'URLhaus':null,threatfox?.found?'ThreatFox':null,vt?.malicious>0?`VirusTotal (${vt.malicious} engines)`:null,otx?.pulseCount>0?`OTX (${otx.pulseCount} pulses)`:null].filter(Boolean).join(', ');
-  let bHTML='';
-  if(anyThreat)bHTML=`<div class="verdict-banner" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.35);">
-    <div class="verdict-icon">🚨</div><div><div class="verdict-title">Active Threats Detected — ${threatSrcs}</div>
-    <div class="verdict-text" style="color:var(--muted2);">This vendor domain has been flagged in live threat intelligence feeds. Exercise extreme caution before onboarding.</div></div></div>`;
-  else if(crit>0)bHTML=`<div class="verdict-banner" style="background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.25);">
-    <div class="verdict-icon">🚨</div><div><div class="verdict-title">${crit} Critical Issue${crit>1?'s':''} Found</div>
-    <div class="verdict-text" style="color:var(--muted2);">Immediate remediation required. Escalate to vendor security team before proceeding.</div></div></div>`;
-  else if(score>=70)bHTML=`<div class="verdict-banner" style="background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.25);">
-    <div class="verdict-icon">✅</div><div><div class="verdict-title">Strong Vendor Security — Grade A</div>
-    <div class="verdict-text" style="color:var(--muted2);">No active threats across ${srcCount} intel sources. Vendor demonstrates good security hygiene.</div></div></div>`;
-  else if(score>=55)bHTML=`<div class="verdict-banner" style="background:rgba(20,184,166,0.07);border-color:rgba(20,184,166,0.25);">
-    <div class="verdict-icon">🔵</div><div><div class="verdict-title">Good Vendor Security — Grade B</div>
-    <div class="verdict-text" style="color:var(--muted2);">Minor gaps identified. Request vendor remediation plan for findings below.</div></div></div>`;
-  else if(score>=40)bHTML=`<div class="verdict-banner" style="background:rgba(234,179,8,0.07);border-color:rgba(234,179,8,0.25);">
-    <div class="verdict-icon">⚠️</div><div><div class="verdict-title">Basic Vendor Security — Grade C</div>
-    <div class="verdict-text" style="color:var(--muted2);">Notable security gaps. Include remediation requirements in vendor contract.</div></div></div>`;
-  else bHTML=`<div class="verdict-banner" style="background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.25);">
-    <div class="verdict-icon">🚨</div><div><div class="verdict-title">High Risk Vendor — Grade ${scoreToGrade(score)}</div>
-    <div class="verdict-text" style="color:var(--muted2);">Significant deficiencies. Consider risk acceptance or remediation before onboarding.</div></div></div>`;
-  $('verdictBanner').innerHTML=bHTML+'<div style="margin-top:13px;"></div>';
-
-  // Findings
-  $('findingsList').innerHTML=(d.findings||[]).length
-    ?(d.findings.map((f,i)=>`<div class="finding-card ${(f.severity||'info').toLowerCase()}" style="animation:fadeUp .4s ${i*.07}s ease both;">
-        <div class="finding-top">
-          <span class="sev-pill ${sevClass(f.severity)}">${f.severity||'Info'}</span>
-          <span class="finding-title">${safeText(f.title||'')}</span>
-          ${f.source?`<span class="finding-src">${safeText(f.source)}</span>`:''}
-        </div>
-        <div class="finding-desc">${safeText(f.description||'')}</div>
-        ${f.remediation?`<div class="finding-fix"><strong>Fix:</strong> ${safeText(f.remediation)}</div>`:''}
-      </div>`).join(''))
-    :`<div style="text-align:center;padding:28px;color:var(--muted);">No findings — clean security posture!</div>`;
-
-  // Recs
-  $('recList').innerHTML=(d.recommendations||[]).map((r,i)=>`
-    <div class="rec-item" style="animation:fadeUp .4s ${i*.07+.1}s ease both;">
-      <div class="rec-num">${i+1}</div><div class="rec-text">${safeText(r)}</div>
-    </div>`).join('');
-}
-
-// ── UTILS ──────────────────────────────────────────────────────────────────────
-function renderTechNewsPanel(techNews){
-  if(!techNews)return;
-  $('techNewsPanel').style.display='block';
-  const co=safeText(techNews.company||'this company');
-  let h='';
-
-  if(!techNews.found||!techNews.articles?.length){
-    h=`<div class="clean-msg" style="color:var(--muted2);">No recent news found for <strong>${co}</strong> in the past 3 years.</div>`;
-    $('techNewsContent').innerHTML=h;return;
-  }
-
-  // Group by category
-  const cats={};
-  techNews.articles.forEach(a=>{
-    const c=a.category||'General';
-    if(!cats[c])cats[c]=[];
-    cats[c].push(a);
-  });
-
-  const catIcons={'Technology & Digital':'💻','Business & Strategy':'📈','Company & Leadership':'👔','Industry & Contracts':'🏛️','General':'📰'};
-  const catColors={'Technology & Digital':'rgba(99,102,241,0.08)','Business & Strategy':'rgba(20,184,166,0.08)','Company & Leadership':'rgba(167,139,250,0.08)','Industry & Contracts':'rgba(59,130,246,0.08)','General':'rgba(255,255,255,0.03)'};
-  const catBorders={'Technology & Digital':'rgba(99,102,241,0.2)','Business & Strategy':'rgba(20,184,166,0.2)','Company & Leadership':'rgba(167,139,250,0.2)','Industry & Contracts':'rgba(59,130,246,0.2)','General':'var(--border)'};
-
-  // Summary bar
-  const recent=techNews.articles.filter(a=>a.isRecent).length;
-  h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
-    <div style="padding:8px 14px;border-radius:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);font-size:.8rem;">
-      <span style="font-weight:700;color:#818cf8;font-size:1.1rem;">${techNews.articles.length}</span> <span style="color:var(--muted2);">articles found</span>
-    </div>
-    <div style="padding:8px 14px;border-radius:8px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);font-size:.8rem;">
-      <span style="font-weight:700;color:var(--green);font-size:1.1rem;">${recent}</span> <span style="color:var(--muted2);">from past 12 months</span>
-    </div>
-    <div style="padding:8px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:.8rem;">
-      <span style="font-weight:700;color:var(--text);font-size:1.1rem;">${Object.keys(cats).length}</span> <span style="color:var(--muted2);">topic categories</span>
-    </div>
-  </div>`;
-
-  // Render each category
-  Object.entries(cats).forEach(([cat,arts])=>{
-    const icon=catIcons[cat]||'📰';
-    h+=`<div style="margin-bottom:20px;">
-      <div class="sec-title">${icon} ${safeText(cat)} <span style="font-size:.68rem;font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0;">(${arts.length} article${arts.length>1?'s':''})</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">`;
-    arts.slice(0,6).forEach(a=>{
-      const bg=catColors[cat]||'rgba(255,255,255,0.03)';
-      const br=catBorders[cat]||'var(--border)';
-      h+=`<div style="padding:11px 13px;border-radius:9px;background:${bg};border:1px solid ${br};display:flex;flex-direction:column;gap:5px;">
-        <a href="${a.link||'#'}" target="_blank" rel="noopener"
-          style="font-size:.82rem;font-weight:600;color:var(--blue2);text-decoration:none;line-height:1.4;">${safeText(a.title)}</a>
-        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-          <span style="font-size:.68rem;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 6px;">${safeText(a.source)}</span>
-          <span style="font-size:.68rem;color:var(--muted);">${a.date||''}</span>
-          ${a.isRecent?'<span style="font-size:.64rem;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(34,197,94,0.15);color:var(--green);">NEW</span>':''}
-        </div>
-        ${a.snippet?`<div style="font-size:.74rem;color:var(--muted2);line-height:1.5;">${safeText(a.snippet.substring(0,150))}…</div>`:''}
-      </div>`;
-    });
-    h+=`</div></div>`;
-  });
-
-  h+=`<div class="src-footer">
-    <span>Source: Google News RSS · Past 3 years · ${techNews.articles.length} articles across ${Object.keys(cats).length} categories</span>
-    <a href="https://news.google.com/search?q=${encodeURIComponent(techNews.company||'')}" target="_blank">Search all news →</a>
-  </div>`;
-
-  $('techNewsContent').innerHTML=h;
-}
-
-function showFallback(domain,msg,intel){
-  // Hide hero, show a simple fallback panel
-  $('heroSection').style.display='none';
+function resetScan(){
   $('results').classList.remove('active');
-
-  // Remove old fallback if exists
-  const old=$('fallbackPanel');if(old)old.remove();
-
-  const company=domain.replace(/\..+$/,'').replace(/-/g,' ');
-  const googleNewsURL=`https://news.google.com/search?q=${encodeURIComponent(company+' cybersecurity OR technology OR breach OR hack')}&hl=en`;
-  const googleNewsGenURL=`https://news.google.com/search?q=${encodeURIComponent(company)}&hl=en`;
-
-  // Build news links from fetched data
-  let cyberHTML='';
-  if(intel.news&&intel.news.articles&&intel.news.articles.length){
-    cyberHTML=intel.news.articles.slice(0,8).map(a=>`
-      <a href="${a.link||'#'}" target="_blank" rel="noopener" style="display:block;padding:12px 14px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
-        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--coral);margin-bottom:4px;">${safeText(a.title||'')}</div>
-        <div style="font-size:.75rem;color:var(--muted);">${safeText(a.source||'')} · ${a.date||''}</div>
-        ${a.snippet?`<div style="font-size:.78rem;color:var(--ink);margin-top:5px;line-height:1.5;">${safeText(a.snippet.substring(0,180))}…</div>`:''}
-      </a>`).join('');
-  } else {
-    cyberHTML=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:.85rem;">No cybersecurity news found in public feeds.</div>`;
-  }
-
-  const co=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
-  let techHTML='';
-  if(intel.techNews&&intel.techNews.articles&&intel.techNews.articles.length){
-    techHTML=intel.techNews.articles.slice(0,8).map(a=>`
-      <a href="${a.link||'#'}" target="_blank" rel="noopener" style="display:block;padding:12px 14px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
-        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:4px;">${safeText(a.title||'')}</div>
-        <div style="font-size:.75rem;color:var(--muted);">${safeText(a.source||'')} · ${a.date||''}</div>
-        ${a.snippet?`<div style="font-size:.78rem;color:var(--muted);margin-top:5px;line-height:1.5;">${safeText(a.snippet.substring(0,180))}…</div>`:''}
-      </a>`).join('');
-  } else {
-    // Fallback: show quick search links to Google News
-    const searches=[
-      {label:'General News',q:co},
-      {label:'Technology & Digital',q:co+' technology OR software OR AI OR digital'},
-      {label:'Business & Strategy',q:co+' business OR acquisition OR partnership OR growth'},
-      {label:'Cybersecurity',q:co+' security OR breach OR hack OR cyber'},
-    ];
-    techHTML=`
-      <div style="font-size:.83rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
-        Real-time news couldn't be fetched (RSS rate limit). Click below to search Google News directly:
-      </div>
-      ${searches.map(s=>`
-        <a href="https://news.google.com/search?q=${encodeURIComponent(s.q)}&hl=en" target="_blank" rel="noopener"
-          style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:10px;background:var(--warm);border:1px solid var(--border);margin-bottom:8px;text-decoration:none;transition:border-color .2s;">
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--ink);">${s.label}</div>
-            <div style="font-size:.73rem;color:var(--muted);margin-top:2px;">${s.q}</div>
-          </div>
-          <span style="color:var(--coral);font-size:.85rem;font-weight:700;">→</span>
-        </a>`).join('')}`;
-  }
-
-  const panel=document.createElement('div');
-  panel.id='fallbackPanel';
-  panel.style.cssText='position:relative;z-index:1;max-width:900px;margin:30px auto 80px;padding:0 5%;';
-  panel.innerHTML=`
-    <!-- Header -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px 28px;margin-bottom:20px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--coral);margin-bottom:6px;">${safeText(domain)}</div>
-          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,92,58,0.08);border:1px solid rgba(255,92,58,0.2);border-radius:100px;padding:5px 14px;font-size:.78rem;font-weight:700;color:var(--coral);">
-            ⚠️ AI scoring unavailable — showing public intel
-          </div>
-          <div style="font-size:.82rem;color:var(--muted);margin-top:10px;max-width:500px;line-height:1.6;">
-            The AI engine could not be reached (network or proxy restriction). Cybersecurity and company news from public sources are shown below.
-          </div>
-        </div>
-        <button onclick="resetScan()" style="background:var(--ink);color:var(--cream);border:none;border-radius:8px;padding:10px 20px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;">← New Search</button>
-      </div>
-    </div>
-
-    <!-- Cyber News -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);">
-          <div style="width:30px;height:30px;border-radius:8px;background:rgba(220,38,38,0.1);display:flex;align-items:center;justify-content:center;">📰</div>
-          Cybersecurity News
-        </div>
-        <a href="${googleNewsURL}" target="_blank" style="font-size:.78rem;color:var(--coral);text-decoration:none;font-weight:600;">View all →</a>
-      </div>
-      ${cyberHTML}
-    </div>
-
-    <!-- Company / Tech News -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 4px 16px rgba(13,13,13,0.06);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:.93rem;font-weight:700;color:var(--ink);">
-          <div style="width:30px;height:30px;border-radius:8px;background:rgba(200,241,53,0.15);display:flex;align-items:center;justify-content:center;">🗞️</div>
-          Company & Technology News
-        </div>
-        <a href="${googleNewsGenURL}" target="_blank" style="font-size:.78rem;color:var(--coral);text-decoration:none;font-weight:600;">View all →</a>
-      </div>
-      ${techHTML}
-    </div>
-  `;
-
-  document.querySelector('.hero').after(panel);
+  $('heroSection').style.display='flex';
+  $('domainInput').value='';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showError(domain,msg){
-  $('heroSection').style.display='flex';
-  const ex=$('scanError');if(ex)ex.remove();
-  const err=document.createElement('div');err.id='scanError';
-  const isRate=msg&&msg.toLowerCase().includes('rate limit');
-  err.style.cssText=`position:relative;z-index:1;max-width:680px;margin:24px auto 0;border-radius:13px;padding:22px;text-align:center;
-    background:${isRate?'rgba(234,179,8,0.08)':'rgba(239,68,68,0.08)'};border:1px solid ${isRate?'rgba(234,179,8,0.3)':'rgba(239,68,68,0.25)'};`;
-  err.innerHTML=isRate
-    ?`<div style="font-size:1.8rem;margin-bottom:9px;">⏱️</div><h3 style="font-family:Sora,sans-serif;color:var(--yellow);margin-bottom:8px;font-size:.95rem;">API Rate Limit Reached</h3>
-       <p style="font-size:.85rem;color:var(--muted2);line-height:1.6;">${msg}</p>
-       <p style="font-size:.78rem;color:var(--muted);margin-top:7px;">All free intel sources (DNS, crt.sh, URLhaus, ThreatFox, RDAP) still ran successfully.</p>`
-    :`<div style="font-size:1.8rem;margin-bottom:9px;">⚠️</div><h3 style="font-family:Sora,sans-serif;color:var(--red);margin-bottom:8px;font-size:.95rem;">Assessment Failed — ${safeText(domain)}</h3>
-       <p style="font-size:.85rem;color:var(--muted2);">${safeText(msg)||'Please try again.'}</p>`;
-  document.querySelector('.search-wrap').after(err);
-}
-function resetScan(){$('results').classList.remove('active');$('heroSection').style.display='flex';$('domainInput').value='';window.scrollTo({top:0,behavior:'smooth'});}
-function copyReport(){
-  navigator.clipboard.writeText(`CyberScore Vendor Assessment\n${$('resultDomain').textContent}\nScore: ${$('scoreNum').textContent}/100 — ${$('resultBadge').textContent}\n\n${$('resultSummary').textContent}`)
-    .then(()=>alert('Summary copied!'));
-}
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
 </script>
-
 </body>
 </html>
