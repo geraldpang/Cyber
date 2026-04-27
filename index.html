@@ -514,6 +514,20 @@ nav{
         <span class="badge-free">free</span>
         <a class="api-key-link" href="https://otx.alienvault.com/api/" target="_blank">get →</a>
       </div>
+      <div class="api-key-row">
+        <div class="api-key-dot" style="background:var(--red);box-shadow:0 0 4px var(--red);"></div>
+        <div class="api-key-name">AbuseIPDB</div>
+        <input type="password" class="api-key-input" id="abuseKey" placeholder="paste api key — ip abuse reports & confidence score"/>
+        <span class="badge-free">free</span>
+        <a class="api-key-link" href="https://www.abuseipdb.com/api" target="_blank">get →</a>
+      </div>
+      <div class="api-key-row">
+        <div class="api-key-dot" style="background:var(--yellow);box-shadow:0 0 4px var(--yellow);"></div>
+        <div class="api-key-name">Pulsedive</div>
+        <input type="password" class="api-key-input" id="pdKey" placeholder="paste api key — risk score across 30+ threat feeds"/>
+        <span class="badge-free">free</span>
+        <a class="api-key-link" href="https://pulsedive.com/api/" target="_blank">get →</a>
+      </div>
     </div>
   </div>
 
@@ -529,6 +543,12 @@ nav{
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>google news</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>virustotal*</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>otx*</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>shodan internetdb</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>bgpview</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>mozilla observatory</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>urlscan.io</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>abuseipdb*</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>pulsedive*</div>
   </div>
 
   <!-- SCAN PROGRESS -->
@@ -552,6 +572,12 @@ nav{
       <div class="scan-check" id="chk-news"><span class="check-sym">·</span>cyber news</div>
       <div class="scan-check" id="chk-vt"><span class="check-sym">·</span>virustotal</div>
       <div class="scan-check" id="chk-otx"><span class="check-sym">·</span>alienvault otx</div>
+      <div class="scan-check" id="chk-shodan"><span class="check-sym">·</span>shodan internetdb</div>
+      <div class="scan-check" id="chk-bgpview"><span class="check-sym">·</span>bgpview asn</div>
+      <div class="scan-check" id="chk-observatory"><span class="check-sym">·</span>mozilla observatory</div>
+      <div class="scan-check" id="chk-urlscan"><span class="check-sym">·</span>urlscan.io</div>
+      <div class="scan-check" id="chk-abuseipdb"><span class="check-sym">·</span>abuseipdb</div>
+      <div class="scan-check" id="chk-pulsedive"><span class="check-sym">·</span>pulsedive</div>
     </div>
   </div>
 </section>
@@ -659,6 +685,61 @@ nav{
       <div class="panel-body" id="otxContent"></div>
     </div>
   </div>
+
+  <!-- SHODAN INTERNETDB + BGPVIEW -->
+  <div class="grid-2">
+    <div class="panel" id="shodanPanel" style="display:none;animation-delay:.24s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🔌</span>Shodan InternetDB — Open Ports &amp; CVEs</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="shodanContent"></div>
+    </div>
+    <div class="panel" id="bgpviewPanel" style="display:none;animation-delay:.26s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🌍</span>BGPView — ASN &amp; Routing Intelligence</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="bgpviewContent"></div>
+    </div>
+  </div>
+
+  <!-- MOZILLA OBSERVATORY + URLSCAN -->
+  <div class="grid-2">
+    <div class="panel" id="observatoryPanel" style="display:none;animation-delay:.28s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🦊</span>Mozilla Observatory — HTTP Security Grade</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="observatoryContent"></div>
+    </div>
+    <div class="panel" id="urlscanPanel" style="display:none;animation-delay:.30s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🔍</span>URLScan.io — Previous Scan Results</div>
+        <span class="live-tag live-lime">live · no key</span>
+      </div>
+      <div class="panel-body" id="urlscanContent"></div>
+    </div>
+  </div>
+
+  <!-- ABUSEIPDB + PULSEDIVE -->
+  <div class="grid-2">
+    <div class="panel" id="abusePanel" style="display:none;animation-delay:.32s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">🚫</span>AbuseIPDB — IP Abuse Reports</div>
+        <span class="live-tag live-red">live</span>
+      </div>
+      <div class="panel-body" id="abuseContent"></div>
+    </div>
+    <div class="panel" id="pulsedivePanel" style="display:none;animation-delay:.34s;">
+      <div class="panel-hdr">
+        <div class="panel-title"><span class="panel-icon">📡</span>Pulsedive — Aggregated Threat Intel</div>
+        <span class="live-tag live-yellow">live</span>
+      </div>
+      <div class="panel-body" id="pulsediveContent"></div>
+    </div>
+  </div>
+
 </section>
 
 <script>
@@ -668,8 +749,8 @@ function fillDomain(d){$('domainInput').value=d;}
 function toggleKeys(){$('keysBody').classList.toggle('open');$('keysToggle').classList.toggle('open');}
 
 // ── SCAN ANIMATION ────────────────────────────────────────────────────────────
-const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx'];
-const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…'];
+const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','shodan','bgpview','observatory','urlscan','abuseipdb','pulsedive'];
+const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…','shodan internetdb…','bgpview asn lookup…','mozilla observatory…','urlscan.io search…','abuseipdb check…','pulsedive lookup…'];
 let scanTimer=null;
 function animateScan(domain){
   $('scanning').classList.add('active');
@@ -853,6 +934,164 @@ async function fetchOTX(domain,apiKey){
   }catch(e){return{error:e.message};}
 }
 
+// ── NEW SOURCES ───────────────────────────────────────────────────────────────
+
+async function fetchShodan(ips){
+  // InternetDB: free, no key, returns ports/CVEs/tags per IP
+  if(!ips||!ips.length)return null;
+  try{
+    const results=await Promise.all(ips.slice(0,4).map(async ip=>{
+      try{
+        const r=await fetch(`https://internetdb.shodan.io/${ip}`,{signal:AbortSignal.timeout(7000)});
+        if(!r.ok)return{ip,error:r.status};
+        const d=await r.json();
+        return{ip,ports:d.ports||[],vulns:d.vulns||[],tags:d.tags||[],cpes:d.cpes||[],hostnames:d.hostnames||[]};
+      }catch{return{ip,error:'timeout'};}
+    }));
+    return{results:results.filter(r=>!r.error||r.ports)};
+  }catch{return null;}
+}
+
+async function fetchBGPView(ip){
+  // BGPView: free, no key, ASN + routing + abuse contact
+  if(!ip)return null;
+  try{
+    const r=await fetch(`https://api.bgpview.io/ip/${ip}`,{signal:AbortSignal.timeout(8000)});
+    if(!r.ok)return null;
+    const d=await r.json();
+    const data=d.data||{};
+    const pfx=data.prefixes?.[0]||{};
+    const asn=pfx.asn||{};
+    return{
+      ip,
+      asn:asn.asn||null,
+      asnName:asn.name||null,
+      asnDescription:asn.description||null,
+      asnCountry:asn.country_code||null,
+      prefix:pfx.prefix||null,
+      rir:pfx.rir_allocation?.rir_name||null,
+      abuseContact:data.rir_allocation?.country_code||null,
+      ptrRecord:data.ptr_record||null,
+    };
+  }catch{return null;}
+}
+
+async function fetchObservatory(domain){
+  // Mozilla Observatory: free, no key, HTTP security grading
+  try{
+    // Trigger scan first (POST)
+    const scan=await fetch(`https://http-observatory.security.mozilla.org/api/v1/analyze?host=${encodeURIComponent(domain)}`,{
+      method:'POST',body:'hidden=true',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      signal:AbortSignal.timeout(15000)
+    });
+    if(!scan.ok)return null;
+    const data=await scan.json();
+    if(data.state==='FAILED'||data.error)return{error:data.error||'scan failed'};
+    // Poll if still running (max 3 attempts)
+    let result=data;
+    let attempts=0;
+    while((result.state==='PENDING'||result.state==='RUNNING')&&attempts<4){
+      await new Promise(r=>setTimeout(r,2000));
+      const poll=await fetch(`https://http-observatory.security.mozilla.org/api/v1/analyze?host=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
+      if(poll.ok)result=await poll.json();
+      attempts++;
+    }
+    if(!result.score&&result.score!==0)return null;
+    return{
+      grade:result.grade||'?',
+      score:result.score??null,
+      testsPassed:result.tests_passed??null,
+      testsFailed:result.tests_failed??null,
+      testsQuantity:result.tests_quantity??null,
+      state:result.state,
+    };
+  }catch{return null;}
+}
+
+async function fetchURLScan(domain){
+  // URLScan.io search: free, no key for searching existing scans
+  try{
+    const r=await fetch(`https://urlscan.io/api/v1/search/?q=domain%3A${encodeURIComponent(domain)}&size=5`,{
+      headers:{'Accept':'application/json'},
+      signal:AbortSignal.timeout(10000)
+    });
+    if(!r.ok)return null;
+    const d=await r.json();
+    const results=(d.results||[]).slice(0,5);
+    return{
+      total:d.total||0,
+      scans:results.map(s=>({
+        id:s.task?.uuid,
+        url:s.task?.url,
+        time:s.task?.time,
+        country:s.task?.country,
+        verdict:s.verdicts?.overall?.malicious?'malicious':s.verdicts?.overall?.suspicious?'suspicious':'clean',
+        score:s.verdicts?.overall?.score||0,
+        tags:s.verdicts?.overall?.tags||[],
+        screenshot:s.screenshot||null,
+        domain:s.page?.domain,
+        ip:s.page?.ip,
+        country:s.page?.country,
+        server:s.page?.server,
+        tlsIssuer:s.page?.tlsIssuer,
+      })),
+    };
+  }catch{return null;}
+}
+
+async function fetchAbuseIPDB(ips,apiKey){
+  if(!apiKey||!ips||!ips.length)return null;
+  try{
+    const results=await Promise.all(ips.slice(0,4).map(async ip=>{
+      try{
+        const r=await fetch(`https://api.abuseipdb.com/api/v2/check?ipAddress=${encodeURIComponent(ip)}&maxAgeInDays=90&verbose`,{
+          headers:{'Key':apiKey,'Accept':'application/json'},
+          signal:AbortSignal.timeout(8000)
+        });
+        if(!r.ok)return{ip,error:r.status};
+        const d=await r.json();
+        const data=d.data||{};
+        return{
+          ip,
+          abuseScore:data.abuseConfidenceScore??null,
+          totalReports:data.totalReports||0,
+          numDistinctUsers:data.numDistinctUsers||0,
+          lastReported:data.lastReportedAt||null,
+          usageType:data.usageType||null,
+          isp:data.isp||null,
+          domain:data.domain||null,
+          isWhitelisted:data.isWhitelisted||false,
+          countryCode:data.countryCode||null,
+        };
+      }catch{return{ip,error:'failed'};}
+    }));
+    return{results:results.filter(r=>r.abuseScore!==undefined||r.error)};
+  }catch{return null;}
+}
+
+async function fetchPulsedive(domain,apiKey){
+  if(!apiKey)return null;
+  try{
+    const r=await fetch(`https://pulsedive.com/api/info.php?indicator=${encodeURIComponent(domain)}&pretty=1&key=${encodeURIComponent(apiKey)}`,{
+      signal:AbortSignal.timeout(10000)
+    });
+    if(!r.ok)return{error:`HTTP ${r.status}`};
+    const d=await r.json();
+    if(d.error)return{error:d.error};
+    return{
+      risk:d.risk||'unknown',
+      riskScore:d.risk_recommended||null,
+      threats:(d.threats||[]).slice(0,5).map(t=>({name:t.name,category:t.category,risk:t.risk})),
+      feeds:(d.feeds||[]).slice(0,6).map(f=>f.name||f),
+      attributes:d.attributes||{},
+      stamp_seen:d.stamp_seen||null,
+      stamp_updated:d.stamp_updated||null,
+    };
+  }catch(e){return{error:e.message};}
+}
+
+
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 async function startScan(){
   const raw=$('domainInput').value.trim();
@@ -860,25 +1099,42 @@ async function startScan(){
   const domain=raw.replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase().trim();
   const vtKey=$('vtKey').value.trim();
   const otxKey=$('otxKey').value.trim();
+  const abuseKey=$('abuseKey').value.trim();
+  const pdKey=$('pdKey').value.trim();
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='RUNNING';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel']
+  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel']
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx;
+  // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive;
   try{[rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx]=await Promise.all([
     fetchRDAP(domain),fetchDNS(domain),fetchCRT(domain),
     fetchURLhaus(domain),fetchThreatFox(domain),fetchBreachHistory(domain),
     fetchGovernance(domain),fetchRansomware(domain),fetchCyberNews(domain),
     fetchVirusTotal(domain,vtKey),fetchOTX(domain,otxKey),
   ]);}catch(e){console.warn('Partial fetch:',e);}
+  // Second pass: IP-dependent sources + keyless enrichment
+  try{
+    const ips=dns?.aRecords||[];
+    const primaryIP=ips[0]||null;
+    [shodan,bgpview,observatory,urlscanData,abuse,pulsedive]=await Promise.all([
+      fetchShodan(ips),
+      fetchBGPView(primaryIP),
+      fetchObservatory(domain),
+      fetchURLScan(domain),
+      fetchAbuseIPDB(ips,abuseKey),
+      fetchPulsedive(domain,pdKey),
+    ]);
+  }catch(e){console.warn('Enrichment fetch:',e);}
   finishScanAnim();
   await new Promise(r=>setTimeout(r,300));
   $('scanning').classList.remove('active');
   $('heroSection').style.display='none';
-  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx});
+  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive});
   $('results').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   btn.disabled=false;btn.textContent='EXECUTE';
@@ -886,7 +1142,7 @@ async function startScan(){
 
 // ── RENDERERS ─────────────────────────────────────────────────────────────────
 function renderAll(domain,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx}=intel;
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive}=intel;
   $('resultDomain').textContent=`// ${domain}`;
   $('resultTs').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';
   const chips=[
@@ -901,6 +1157,12 @@ function renderAll(domain,intel){
     {l:'cyber news',ok:!!news,warn:news?.found&&news.articles?.length>0,icon:'📰'},
     {l:'virustotal',ok:vt&&!vt.error,warn:vt&&!vt.error&&vt.malicious>0,skip:!vt,icon:'🔬'},
     {l:'otx',ok:otx&&!otx.error,warn:otx&&!otx.error&&otx.pulseCount>0,skip:!otx,icon:'🛡️'},
+    {l:'shodan',ok:!!(shodan?.results?.length),warn:shodan?.results?.some(r=>r.vulns?.length>0),icon:'🔌'},
+    {l:'bgpview',ok:!!bgpview?.asn,icon:'🌍'},
+    {l:'observatory',ok:!!(observatory&&!observatory.error),warn:observatory&&!observatory.error&&observatory.score<50,icon:'🦊'},
+    {l:'urlscan',ok:!!(urlscanData?.total>0),warn:urlscanData?.scans?.some(s=>s.verdict==='malicious'),icon:'🔍'},
+    {l:'abuseipdb',ok:!!(abuse?.results?.length),warn:abuse?.results?.some(r=>r.abuseScore>25),skip:!abuse,icon:'🚫'},
+    {l:'pulsedive',ok:!!(pulsedive&&!pulsedive.error),warn:pulsedive&&!pulsedive.error&&pulsedive.risk!=='none'&&pulsedive.risk!=='unknown',skip:!pulsedive,icon:'📡'},
   ];
   $('intelStrip').innerHTML=chips.map(s=>{
     if(s.skip)return`<div class="chip skip">${s.l}: no key</div>`;
@@ -911,6 +1173,12 @@ function renderAll(domain,intel){
   renderRDAP(rdap);renderDNS(dns);renderCRT(crt);
   renderThreat(urlhaus,threatfox);renderBreach(breach,domain);renderGov(gov);
   renderRansom(ransomware);renderNews(news);renderVT(vt,domain);renderOTX(otx,domain);
+  renderShodan(shodan,dns?.aRecords);
+  renderBGPView(bgpview);
+  renderObservatory(observatory,domain);
+  renderURLScan(urlscanData,domain);
+  renderAbuse(abuse);
+  renderPulsedive(pulsedive,domain);
 }
 
 function renderRDAP(rdap){
@@ -1177,6 +1445,187 @@ function renderOTX(otx,domain){
   h+=`<div class="src-footer"><span>alienvault otx</span><a href="https://otx.alienvault.com/indicator/domain/${safeText(domain)}" target="_blank">full report →</a></div>`;
   $('otxContent').innerHTML=h;
 }
+
+function renderShodan(shodan,ips){
+  if(!shodan||!shodan.results?.length)return;
+  $('shodanPanel').style.display='block';
+  let h='';
+  const hasVulns=shodan.results.some(r=>r.vulns?.length>0);
+  if(hasVulns){
+    h+=`<div style="padding:6px 10px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.25);font-size:.72rem;color:var(--red);margin-bottom:10px;">⚠ CVEs detected across IP infrastructure</div>`;
+  }
+  shodan.results.forEach(r=>{
+    if(r.error)return;
+    const vulnCol=r.vulns?.length?'var(--red)':'var(--lime)';
+    h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);margin-bottom:6px;border-left:2px solid ${vulnCol};">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:6px;">
+        <span style="font-size:.8rem;font-weight:700;color:var(--orange);">${safeText(r.ip)}</span>
+        ${r.tags?.length?`<div style="display:flex;gap:4px;">${r.tags.map(t=>`<span class="tag tag-blue">${safeText(t)}</span>`).join('')}</div>`:''}
+      </div>`;
+    if(r.ports?.length){
+      h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">open ports</div>
+      <div class="tags">${r.ports.map(p=>{
+        const risky=[21,22,23,25,3306,3389,5900,8080,8443,27017].includes(p);
+        return`<span class="tag ${risky?'tag-orange':''}">${p}</span>`;
+      }).join('')}</div>`;
+    }
+    if(r.vulns?.length){
+      h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:8px 0 4px;">cves detected</div>
+      <div class="tags">${r.vulns.map(v=>`<span class="tag tag-red">${safeText(v)}</span>`).join('')}</div>`;
+    }
+    if(r.cpes?.length){
+      h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:8px 0 4px;">software (cpe)</div>
+      <div class="tags">${r.cpes.map(c=>`<span class="tag">${safeText(c.replace('cpe:/','')).substring(0,40)}</span>`).join('')}</div>`;
+    }
+    if(r.hostnames?.length){
+      h+=`<div style="font-size:.7rem;color:var(--muted2);margin-top:6px;">hostnames: ${r.hostnames.map(h=>safeText(h)).join(', ')}</div>`;
+    }
+    h+=`</div>`;
+  });
+  h+=`<div class="src-footer"><span>shodan internetdb · updated weekly · free no-key</span><a href="https://internetdb.shodan.io" target="_blank">docs →</a></div>`;
+  $('shodanContent').innerHTML=h;
+}
+
+function renderBGPView(bgpview){
+  if(!bgpview||!bgpview.asn)return;
+  $('bgpviewPanel').style.display='block';
+  let h=`<table class="kv">
+    <tr><td>ip queried</td><td>${safeText(bgpview.ip)}</td></tr>
+    <tr><td>asn</td><td><span style="color:var(--orange);">AS${safeText(bgpview.asn)}</span></td></tr>
+    <tr><td>organisation</td><td>${safeText(bgpview.asnName||'—')}</td></tr>
+    <tr><td>description</td><td>${safeText(bgpview.asnDescription||'—')}</td></tr>
+    <tr><td>country</td><td>${safeText(bgpview.asnCountry||'—')}</td></tr>
+    <tr><td>ip prefix</td><td>${safeText(bgpview.prefix||'—')}</td></tr>
+    <tr><td>rir</td><td>${safeText(bgpview.rir||'—')}</td></tr>
+    ${bgpview.ptrRecord?`<tr><td>ptr record</td><td>${safeText(bgpview.ptrRecord)}</td></tr>`:''}
+  </table>`;
+  h+=`<div class="src-footer"><span>bgpview.io · free no-key</span><a href="https://bgpview.io/ip/${safeText(bgpview.ip)}" target="_blank">view full →</a></div>`;
+  $('bgpviewContent').innerHTML=h;
+}
+
+function renderObservatory(obs,domain){
+  if(!obs)return;
+  $('observatoryPanel').style.display='block';
+  if(obs.error){$('observatoryContent').innerHTML=`<div class="empty-msg">⚠ ${safeText(obs.error)}</div>`;return;}
+  if(obs.state==='PENDING'||obs.state==='RUNNING'){$('observatoryContent').innerHTML=`<div class="empty-msg">scan still running — check back shortly</div>`;return;}
+  const gradeCol=obs.grade?.startsWith('A')?'var(--lime)':obs.grade?.startsWith('B')?'var(--yellow)':obs.grade?.startsWith('C')?'var(--orange)':'var(--red)';
+  let h=`<div style="display:flex;align-items:center;gap:20px;padding:14px;background:var(--bg);border:1px solid var(--border);margin-bottom:12px;">
+    <div style="text-align:center;">
+      <div style="font-family:'VT323',monospace;font-size:3.5rem;color:${gradeCol};line-height:1;text-shadow:0 0 16px ${gradeCol};">${safeText(obs.grade||'?')}</div>
+      <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;">grade</div>
+    </div>
+    <div style="flex:1;">
+      <table class="kv">
+        <tr><td>score</td><td><span style="color:${gradeCol};font-weight:700;">${obs.score??'—'} / 100</span></td></tr>
+        <tr><td>tests passed</td><td><span class="ok">${obs.testsPassed??'—'}</span> / ${obs.testsQuantity??'—'}</td></tr>
+        <tr><td>tests failed</td><td><span class="${(obs.testsFailed||0)>0?'bad':'ok'}">${obs.testsFailed??'—'}</span></td></tr>
+      </table>
+    </div>
+  </div>`;
+  h+=`<div class="src-footer"><span>mozilla observatory · free no-key</span><a href="https://observatory.mozilla.org/analyze/${safeText(domain)}" target="_blank">full report →</a></div>`;
+  $('observatoryContent').innerHTML=h;
+}
+
+function renderURLScan(data,domain){
+  if(!data)return;
+  $('urlscanPanel').style.display='block';
+  let h='';
+  if(!data.total){
+    h=`<div class="empty-msg">no previous scans found for ${safeText(domain)}</div>`;
+  }else{
+    h+=`<div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">${data.total.toLocaleString()} total scans found · showing 5 most recent</div>`;
+    const malicious=data.scans.filter(s=>s.verdict==='malicious').length;
+    const suspicious=data.scans.filter(s=>s.verdict==='suspicious').length;
+    if(malicious>0||suspicious>0){
+      h+=`<div style="padding:6px 10px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.25);font-size:.72rem;color:var(--red);margin-bottom:10px;">⚠ ${malicious} malicious · ${suspicious} suspicious verdict(s) in recent scans</div>`;
+    }
+    data.scans.forEach(s=>{
+      const vCol=s.verdict==='malicious'?'var(--red)':s.verdict==='suspicious'?'var(--orange)':'var(--lime)';
+      h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${vCol};margin-bottom:5px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:5px;">
+          <span style="font-size:.72rem;font-weight:700;color:${vCol};">${s.verdict.toUpperCase()}</span>
+          <span style="font-size:.65rem;color:var(--muted);">${s.time?new Date(s.time).toLocaleDateString():''}</span>
+        </div>
+        <table class="kv">
+          ${s.ip?`<tr><td>ip</td><td>${safeText(s.ip)}</td></tr>`:''}
+          ${s.server?`<tr><td>server</td><td>${safeText(s.server)}</td></tr>`:''}
+          ${s.country?`<tr><td>country</td><td>${safeText(s.country)}</td></tr>`:''}
+          ${s.tlsIssuer?`<tr><td>tls issuer</td><td>${safeText(s.tlsIssuer)}</td></tr>`:''}
+        </table>
+        ${s.tags?.length?`<div class="tags" style="margin-top:5px;">${s.tags.map(t=>`<span class="tag tag-orange">${safeText(t)}</span>`).join('')}</div>`:''}
+        ${s.id?`<div style="margin-top:5px;"><a href="https://urlscan.io/result/${s.id}/" target="_blank" style="font-size:.67rem;color:var(--blue);">view scan →</a></div>`:''}
+      </div>`;
+    });
+  }
+  h+=`<div class="src-footer"><span>urlscan.io · free · no key for search</span><a href="https://urlscan.io/search/#domain%3A${encodeURIComponent(domain)}" target="_blank">all scans →</a></div>`;
+  $('urlscanContent').innerHTML=h;
+}
+
+function renderAbuse(abuse){
+  if(!abuse||!abuse.results?.length)return;
+  $('abusePanel').style.display='block';
+  let h='';
+  abuse.results.forEach(r=>{
+    if(r.error){h+=`<div class="empty-msg">⚠ ${safeText(r.ip)}: ${r.error}</div>`;return;}
+    const scoreCol=r.abuseScore>=75?'var(--red)':r.abuseScore>=25?'var(--orange)':r.abuseScore>0?'var(--yellow)':'var(--lime)';
+    const barW=r.abuseScore||0;
+    h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${scoreCol};margin-bottom:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+        <span style="font-size:.8rem;font-weight:700;color:var(--orange);">${safeText(r.ip)}</span>
+        <span style="font-family:'VT323',monospace;font-size:1.6rem;color:${scoreCol};text-shadow:0 0 8px ${scoreCol};">${r.abuseScore}%</span>
+      </div>
+      <div style="height:3px;background:var(--border);margin-bottom:8px;overflow:hidden;">
+        <div style="width:${barW}%;background:${scoreCol};height:100%;box-shadow:0 0 6px ${scoreCol};transition:width 1s;"></div>
+      </div>
+      <table class="kv">
+        <tr><td>abuse confidence</td><td><span style="color:${scoreCol};font-weight:600;">${r.abuseScore}%</span></td></tr>
+        <tr><td>total reports</td><td>${r.totalReports}</td></tr>
+        <tr><td>distinct reporters</td><td>${r.numDistinctUsers}</td></tr>
+        ${r.lastReported?`<tr><td>last reported</td><td>${r.lastReported.split('T')[0]}</td></tr>`:''}
+        ${r.usageType?`<tr><td>usage type</td><td>${safeText(r.usageType)}</td></tr>`:''}
+        ${r.isp?`<tr><td>isp</td><td>${safeText(r.isp)}</td></tr>`:''}
+        ${r.countryCode?`<tr><td>country</td><td>${safeText(r.countryCode)}</td></tr>`:''}
+        <tr><td>whitelisted</td><td>${r.isWhitelisted?'<span class="ok">yes</span>':'<span class="dim">no</span>'}</td></tr>
+      </table>
+    </div>`;
+  });
+  h+=`<div class="src-footer"><span>abuseipdb.com · free key required</span><a href="https://www.abuseipdb.com" target="_blank">check →</a></div>`;
+  $('abuseContent').innerHTML=h;
+}
+
+function renderPulsedive(pd,domain){
+  if(!pd)return;
+  $('pulsedivePanel').style.display='block';
+  if(pd.error){$('pulsediveContent').innerHTML=`<div class="empty-msg">⚠ ${safeText(pd.error)}</div>`;return;}
+  const riskCol=pd.risk==='critical'||pd.risk==='high'?'var(--red)':pd.risk==='medium'?'var(--orange)':pd.risk==='low'?'var(--yellow)':'var(--lime)';
+  let h=`<div style="display:flex;align-items:center;gap:16px;padding:12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${riskCol};margin-bottom:12px;">
+    <div style="text-align:center;min-width:60px;">
+      <div style="font-family:'VT323',monospace;font-size:2rem;color:${riskCol};text-transform:uppercase;text-shadow:0 0 10px ${riskCol};">${safeText(pd.risk)}</div>
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">risk level</div>
+    </div>
+    <table class="kv" style="flex:1;">
+      ${pd.stamp_seen?`<tr><td>first seen</td><td>${pd.stamp_seen.split(' ')[0]}</td></tr>`:''}
+      ${pd.stamp_updated?`<tr><td>last updated</td><td>${pd.stamp_updated.split(' ')[0]}</td></tr>`:''}
+    </table>
+  </div>`;
+  if(pd.threats?.length){
+    h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;">// linked threats</div>`;
+    pd.threats.forEach(t=>{
+      const tc=t.risk==='critical'||t.risk==='high'?'var(--red)':t.risk==='medium'?'var(--orange)':'var(--yellow)';
+      h+=`<div class="t-row ${t.risk==='critical'||t.risk==='high'?'bad':'warn'}">
+        <div><div class="t-label">${safeText(t.name)}</div>
+          <div class="t-val">${safeText(t.category||'')} · risk: <span style="color:${tc};">${safeText(t.risk)}</span></div>
+        </div></div>`;
+    });
+  }
+  if(pd.feeds?.length){
+    h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px;">// flagged in feeds</div>`;
+    h+=`<div class="tags">${pd.feeds.map(f=>`<span class="tag tag-orange">${safeText(String(f))}</span>`).join('')}</div>`;
+  }
+  h+=`<div class="src-footer"><span>pulsedive.com · 30+ feeds aggregated · free key required</span><a href="https://pulsedive.com/indicator/${encodeURIComponent(domain)}" target="_blank">full report →</a></div>`;
+  $('pulsediveContent').innerHTML=h;
+}
+
 
 function resetScan(){
   $('results').classList.remove('active');
