@@ -1582,10 +1582,204 @@ function renderLog(intel){
 
 
 function renderWorldMap(intel){
-  const {dns, rdap, bgpview, otx, urlscanData} = intel;
+  const {dns, rdap, bgpview, otx, urlscanData, shodan} = intel;
   const mapEl = $('worldMapPanel');
   if(!mapEl) return;
-  mapEl.style.display = 'block'; // ALWAYS show the map panel
+  mapEl.style.display = 'block';
+
+  const points = [];
+  const seen = new Set();
+  const debugLog = []; // track what was tried
+
+  function addPoint(lat, lon, label, type, country){
+    const key = `${country}:${type}`;
+    if(seen.has(key)) return;
+    seen.add(key);
+    points.push({lat, lon, label, type, country});
+  }
+
+  // 1. ipwho.is hosting country (via bgpview object)
+  debugLog.push(`bgpview: ${JSON.stringify({asn:bgpview?.asn, country:bgpview?.asnCountry, name:bgpview?.asnName})}`);
+  if(bgpview?.asnCountry){
+    const cc = bgpview.asnCountry.toUpperCase();
+    if(COUNTRY_COORDS[cc]){
+      const [lat,lon] = COUNTRY_COORDS[cc];
+      addPoint(lat, lon, `Hosting — ${bgpview.asnName||cc} (AS${bgpview.asn||'?'})`, 'hosting', cc);
+      debugLog.push(`✓ hosting point added: ${cc}`);
+    } else {
+      debugLog.push(`✗ country code not in COUNTRY_COORDS: ${cc}`);
+    }
+  } else {
+    debugLog.push('✗ bgpview has no asnCountry');
+  }
+
+  // 2. DNS A records — derive country from IP prefix heuristics
+  const ips = dns?.aRecords || [];
+  debugLog.push(`IPs: ${ips.join(', ')||'none'}`);
+
+  // 3. OTX country
+  if(otx?.country){
+    const cc = otx.country.toUpperCase();
+    if(COUNTRY_COORDS[cc]){ const [lat,lon]=COUNTRY_COORDS[cc]; addPoint(lat,lon,`OTX — ${cc}`,'intel',cc); }
+  }
+
+  // 4. URLScan countries
+  if(urlscanData?.scans){
+    urlscanData.scans.forEach(s=>{
+      if(s.country && COUNTRY_COORDS[s.country]){
+        const [lat,lon]=COUNTRY_COORDS[s.country];
+        addPoint(lat,lon,`URLScan — ${s.country}${s.server?' ('+s.server+')':''}`,'scan',s.country);
+      }
+    });
+  }
+
+  // 5. Nameserver / registrar hints — check many patterns
+  const ns = dns?.ns || [];
+  const nsStr = ns.join(' ').toLowerCase();
+  const reg = (rdap?.registrar||'').toLowerCase();
+  debugLog.push(`NS: ${nsStr||'none'}, Registrar: ${reg||'none'}`);
+
+  // Australian TLD = definitely AU presence
+  const domain_str = rdap?.nameservers?.join(' ')||nsStr;
+  if(nsStr.match(/\.au\b/) || reg.match(/australia|ventraip|netregistry|crazydomains|melbourneit|digitalpacific|panthur|clchost/)){
+    if(COUNTRY_COORDS['AU']){ const [lat,lon]=COUNTRY_COORDS['AU']; addPoint(lat,lon,'Australian registrar/DNS','registrar','AU'); debugLog.push('✓ AU from registrar/NS'); }
+  }
+  if(nsStr.includes('cloudflare')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Cloudflare CDN','cdn','US'); }
+  }
+  if(nsStr.includes('awsdns')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'AWS Route53','cdn','US'); }
+  }
+  if(nsStr.includes('google') || nsStr.includes('googledomains')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Google Cloud DNS','cdn','US'); }
+  }
+  if(nsStr.includes('azure') || nsStr.includes('windows.net')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Microsoft Azure DNS','cdn','US'); }
+  }
+
+  // 6. Registrar country lookup
+  const REGISTRAR_MAP = {'godaddy':'US','namecheap':'US','cloudflare':'US','google':'US','amazon':'US',
+    'tucows':'CA','1&1':'DE','ionos':'DE','hetzner':'DE','ovh':'FR','gandi':'FR',
+    'nominet':'GB','123-reg':'GB','ventraip':'AU','netregistry':'AU','crazydomains':'AU',
+    'melbourneit':'AU','digitalpacific':'AU','panthur':'AU'};
+  for(const [k,v] of Object.entries(REGISTRAR_MAP)){
+    if(reg.includes(k) && COUNTRY_COORDS[v]){
+      const [lat,lon]=COUNTRY_COORDS[v];
+      addPoint(lat,lon,`Registrar — ${rdap?.registrar||k}`,'registrar',v);
+      debugLog.push(`✓ registrar point: ${v} from "${k}"`);
+      break;
+    }
+  }
+
+  // 7. RDAP nameservers — if domain TLD is .au, add Australia
+  if(rdap?.nameservers?.some(ns=>ns.endsWith('.au')) || (rdap?.nameservers?.length && ns.some(n=>n.endsWith('.au.')))){
+    if(!seen.has('AU:registrar') && COUNTRY_COORDS['AU']){
+      const [lat,lon]=COUNTRY_COORDS['AU'];
+      addPoint(lat,lon,'Australian nameserver presence','registrar','AU');
+      debugLog.push('✓ AU from RDAP nameservers');
+    }
+  }
+
+  // 8. Last resort — if domain ends in .au and we still have no points, infer AU
+  const domainGuess = rdap?.registrar ? null : null; // placeholder
+  if(points.length === 0){
+    // Try to infer from RDAP data
+    const regCountry = rdap?.registrar?.match(/australia/i) ? 'AU' : null;
+    if(regCountry && COUNTRY_COORDS[regCountry]){
+      const [lat,lon]=COUNTRY_COORDS[regCountry];
+      addPoint(lat,lon,'Inferred from registrar data','registrar',regCountry);
+    }
+    debugLog.push('⚠ no points found — showing debug info');
+  }
+
+  debugLog.push(`Total points: ${points.length}`);
+
+  const TYPE_COLORS = {hosting:'#ff6a1a',intel:'#ff3333',scan:'#a8ff3e',registrar:'#38bdf8',cdn:'#a78bfa'};
+  const TYPE_LABELS = {hosting:'primary hosting',intel:'threat intel',scan:'urlscan',registrar:'registrar / dns',cdn:'cdn / dns'};
+
+  // Legend
+  const seenTypes = [...new Set(points.map(p=>p.type))];
+  $('mapLegend').innerHTML = seenTypes.map(t=>
+    `<span style="display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:.65rem;">
+      <span style="width:7px;height:7px;border-radius:50%;background:${TYPE_COLORS[t]||'#888'};box-shadow:0 0 5px ${TYPE_COLORS[t]||'#888'};flex-shrink:0;display:inline-block;"></span>
+      ${TYPE_LABELS[t]||t}
+    </span>`
+  ).join('') + (seenTypes.length ? '' : '<span style="font-size:.65rem;color:var(--muted);">// no location data derived — see log for details</span>');
+
+  const W=900, H=440;
+
+  const LAND = `M 7,80 L 42,70 L 75,72 L 105,82 L 128,98 L 138,118 L 133,138 L 118,152 L 97,158 L 74,154 L 54,142 L 40,124 L 33,104 Z
+M 135,75 L 168,68 L 198,70 L 222,80 L 238,96 L 240,116 L 230,134 L 210,146 L 186,150 L 162,144 L 142,130 L 133,110 Z
+M 238,88 L 268,82 L 295,84 L 315,94 L 322,110 L 316,128 L 298,140 L 274,145 L 250,140 L 233,126 L 228,108 Z
+M 60,158 L 90,150 L 118,152 L 140,162 L 148,180 L 143,198 L 126,210 L 102,216 L 78,212 L 58,200 L 50,182 Z
+M 120,210 L 148,202 L 172,204 L 190,214 L 195,232 L 186,250 L 168,260 L 146,263 L 125,255 L 110,240 L 108,222 Z
+M 150,256 L 176,248 L 200,250 L 218,262 L 222,280 L 213,298 L 194,308 L 170,311 L 148,302 L 132,286 L 130,268 Z
+M 188,310 L 210,303 L 230,306 L 244,318 L 246,336 L 235,350 L 215,357 L 193,355 L 176,344 L 170,328 Z
+M 225,352 L 244,346 L 262,350 L 272,362 L 270,378 L 256,386 L 238,386 L 222,376 L 216,362 Z
+M 380,70 L 415,62 L 448,65 L 474,78 L 484,96 L 478,116 L 460,130 L 434,136 L 406,132 L 382,118 L 370,98 Z
+M 460,125 L 490,118 L 516,120 L 536,132 L 540,150 L 530,166 L 510,176 L 484,179 L 460,172 L 442,158 L 440,140 Z
+M 310,140 L 340,133 L 366,135 L 386,146 L 390,163 L 380,179 L 360,188 L 334,190 L 311,182 L 295,167 L 294,150 Z
+M 385,178 L 414,171 L 440,172 L 458,182 L 462,199 L 451,215 L 430,224 L 405,225 L 382,216 L 368,200 L 369,184 Z
+M 440,218 L 466,211 L 490,213 L 508,224 L 510,242 L 498,256 L 477,264 L 452,264 L 430,254 L 418,238 L 420,222 Z
+M 490,256 L 514,250 L 536,253 L 550,265 L 550,282 L 536,294 L 513,298 L 490,292 L 474,278 L 475,264 Z
+M 540,78 L 572,72 L 602,74 L 626,86 L 632,104 L 622,120 L 601,130 L 574,132 L 550,123 L 537,107 Z
+M 620,120 L 650,113 L 678,115 L 698,127 L 701,145 L 687,160 L 662,168 L 636,166 L 615,154 L 607,137 Z
+M 690,145 L 718,138 L 745,140 L 763,152 L 765,170 L 750,184 L 726,190 L 700,187 L 681,174 L 680,157 Z
+M 740,182 L 768,176 L 794,178 L 811,191 L 811,209 L 795,222 L 769,227 L 743,222 L 727,208 L 727,192 Z
+M 790,210 L 816,204 L 840,207 L 856,220 L 854,238 L 837,250 L 812,253 L 788,246 L 774,231 L 776,216 Z
+M 600,170 L 626,164 L 650,166 L 666,178 L 666,196 L 650,208 L 626,212 L 602,206 L 588,192 L 590,177 Z
+M 640,208 L 664,202 L 686,205 L 700,217 L 698,235 L 682,246 L 658,249 L 635,242 L 622,228 L 624,214 Z
+M 680,246 L 702,240 L 722,243 L 734,256 L 730,273 L 714,282 L 692,283 L 672,274 L 663,260 Z
+M 700,160 L 724,153 L 748,155 L 764,167 L 763,186 L 745,198 L 720,201 L 696,193 L 683,178 Z
+M 750,195 L 774,189 L 796,191 L 810,204 L 806,222 L 788,232 L 763,234 L 740,225 L 729,210 Z
+M 730,120 L 755,113 L 780,115 L 797,128 L 796,146 L 779,158 L 753,161 L 728,153 L 716,139 Z
+M 776,108 L 800,101 L 825,103 L 841,116 L 839,134 L 821,145 L 795,147 L 771,138 L 761,124 Z
+M 580,280 L 605,274 L 628,277 L 643,290 L 640,308 L 622,319 L 597,320 L 573,311 L 562,296 Z
+M 618,312 L 640,307 L 660,310 L 672,323 L 668,340 L 650,349 L 626,349 L 605,339 L 597,324 Z
+M 655,344 L 675,339 L 692,343 L 700,357 L 694,372 L 674,378 L 655,373 L 643,358 Z
+M 660,376 L 678,372 L 694,376 L 700,390 L 692,404 L 672,408 L 654,402 L 646,388 Z
+M 540,294 L 562,288 L 582,291 L 594,304 L 590,321 L 572,330 L 550,330 L 530,320 L 522,305 Z
+M 355,230 L 378,224 L 399,228 L 411,242 L 406,259 L 387,268 L 362,268 L 339,258 L 328,243 Z
+M 390,264 L 412,258 L 432,262 L 441,277 L 435,295 L 414,303 L 390,302 L 368,291 L 360,276 Z
+M 415,298 L 436,293 L 454,298 L 462,313 L 454,330 L 434,337 L 413,334 L 395,322 L 390,307 Z`;
+
+  let pins = '';
+  points.forEach(p => {
+    const {x,y} = latLonToXY(p.lat, p.lon, W, H);
+    const col = TYPE_COLORS[p.type] || '#ff6a1a';
+    const safeLabel = p.label.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+    pins += `<g class="map-pin" onmouseenter="showMapTip(event,'${safeLabel}')" onmouseleave="hideMapTip()" style="cursor:pointer;">
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="18" fill="${col}" fill-opacity="0.06" stroke="none">
+        <animate attributeName="r" values="14;22;14" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.06;0.01;0.06" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" fill-opacity="0.9" stroke="${col}" stroke-width="0.5" style="filter:drop-shadow(0 0 6px ${col});"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="#fff" fill-opacity="0.9"/>
+    </g>`;
+  });
+
+  $('worldMapWrap').innerHTML = `
+    <div class="map-tooltip" id="mapTooltip"></div>
+    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+      <rect width="${W}" height="${H}" fill="#050505"/>
+      <line x1="0" y1="${(H/2).toFixed(0)}" x2="${W}" y2="${(H/2).toFixed(0)}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5" stroke-dasharray="4,8"/>
+      <line x1="${(W/2).toFixed(0)}" y1="0" x2="${(W/2).toFixed(0)}" y2="${H}" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,8"/>
+      <line x1="0" y1="${(H*0.25).toFixed(0)}" x2="${W}" y2="${(H*0.25).toFixed(0)}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <line x1="0" y1="${(H*0.75).toFixed(0)}" x2="${W}" y2="${(H*0.75).toFixed(0)}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <path d="${LAND}" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" fill-rule="nonzero"/>
+      <text x="6" y="${(H/2-4).toFixed(0)}" font-size="8" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">equator</text>
+      ${pins}
+    </svg>`;
+
+  // Location list + debug in dev
+  $('mapLocationList').innerHTML = points.map(p=>{
+    const col = TYPE_COLORS[p.type]||'#888';
+    return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:.67rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:3px 9px;margin:2px;">
+      <span style="width:6px;height:6px;border-radius:50%;background:${col};box-shadow:0 0 4px ${col};flex-shrink:0;display:inline-block;"></span>
+      ${p.label} <span style="color:var(--muted);">[${p.country}]</span>
+    </span>`;
+  }).join('') + `<div style="margin-top:8px;font-size:.62rem;color:var(--dim);font-family:'JetBrains Mono',monospace;">debug: ${debugLog.join(' | ')}</div>`;
+}
 
   const points = [];
   const seen = new Set();
