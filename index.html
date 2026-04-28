@@ -522,7 +522,7 @@ nav{
 .log-section-head{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:6px 0 4px;margin-top:8px;border-bottom:1px solid var(--border);}
 
 /* WORLD MAP */
-.world-map-wrap{position:relative;width:100%;height:340px;background:var(--bg);border:1px solid var(--border);overflow:hidden;}
+.world-map-wrap{position:relative;width:100%;background:var(--bg);border:1px solid var(--border);overflow:hidden;}
 .wm-svg{width:100%;height:100%;}
 .map-pin{cursor:pointer;transition:transform .2s;}
 .map-pin:hover{transform:scale(1.4);}
@@ -982,6 +982,10 @@ const COUNTRY_COORDS={
   'PK':[30,70],'BD':[23,90],'LK':[7,80],'KZ':[48,67],
 };
 
+function latLonToXY(lat, lon, W, H){
+  return {x:(lon+180)/360*W, y:(90-lat)/180*H};
+}
+
 async function fetchRDAP(domain){
   try{const r=await fetch(`https://rdap.org/domain/${domain}`,{signal:AbortSignal.timeout(8000)});
     if(!r.ok)return null;const d=await r.json();
@@ -1287,31 +1291,39 @@ async function fetchPulsedive(domain,apiKey){
 
 
 async function fetchBusinessInfo(domain){
-  // Fetch meta description + og tags via allorigins proxy
-  try{
-    const r = await proxied('https://'+domain);
-    if(!r.ok) return null;
-    const html = await r.text();
-    const getMeta = (name) => {
-      const patterns = [
-        new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["']`,'i'),
-        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${name}["']`,'i'),
-        new RegExp(`<meta[^>]+property=["']${name}["'][^>]+content=["']([^"']+)["']`,'i'),
-        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${name}["']`,'i'),
-      ];
-      for(const p of patterns){ const m = html.match(p); if(m) return m[1].trim(); }
-      return null;
-    };
-    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    return {
-      title: titleMatch?.[1]?.trim()||null,
-      description: getMeta('description')||getMeta('og:description')||null,
-      ogTitle: getMeta('og:title')||null,
-      ogSiteName: getMeta('og:site_name')||null,
-      keywords: getMeta('keywords')||null,
-      twitterDesc: getMeta('twitter:description')||null,
-    };
-  }catch{ return null; }
+  // Try fetching homepage via corsproxy, then fall back to meta scrape from Google cache
+  const tryFetch = async (url) => {
+    try{
+      const r = await fetch('https://corsproxy.io/?'+encodeURIComponent(url), {signal:AbortSignal.timeout(12000)});
+      if(r.ok) return await r.text();
+    }catch{}
+    return null;
+  };
+
+  // Try www and non-www
+  let html = await tryFetch('https://'+domain);
+  if(!html) html = await tryFetch('https://www.'+domain);
+  if(!html) return null;
+
+  const getMeta = (name) => {
+    const patterns = [
+      new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']{5,}?)["']`,'i'),
+      new RegExp(`<meta[^>]+content=["']([^"']{5,}?)["'][^>]+name=["']${name}["']`,'i'),
+      new RegExp(`<meta[^>]+property=["']${name}["'][^>]+content=["']([^"']{5,}?)["']`,'i'),
+      new RegExp(`<meta[^>]+content=["']([^"']{5,}?)["'][^>]+property=["']${name}["']`,'i'),
+    ];
+    for(const p of patterns){ const m = html.match(p); if(m) return m[1].trim(); }
+    return null;
+  };
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  return {
+    title: titleMatch?.[1]?.trim()||null,
+    description: getMeta('description')||getMeta('og:description')||null,
+    ogTitle: getMeta('og:title')||null,
+    ogSiteName: getMeta('og:site_name')||null,
+    keywords: getMeta('keywords')||null,
+    twitterDesc: getMeta('twitter:description')||null,
+  };
 }
 
 async function fetchHIBP(domain){
@@ -1544,7 +1556,7 @@ function renderLog(intel){
       <span style="font-size:.68rem;color:var(--text2);">— data found that warrants manual review or vendor follow-up</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
-      <span class="badge-clean" style="font-size:.6rem;">Clean</span>
+      <span class="badge-clean" style="font-size:.6rem;">No Issue</span>
       <span style="font-size:.68rem;color:var(--text2);">— source returned data, no concerning signals found</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
@@ -1711,7 +1723,7 @@ M 415,298 L 436,293 L 454,298 L 462,313 L 454,330 L 434,337 L 413,334 L 395,322 
 
   $('worldMapWrap').innerHTML = `
     <div class="map-tooltip" id="mapTooltip"></div>
-    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%;">
+    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
       <rect width="${W}" height="${H}" fill="#050505"/>
       <line x1="0" y1="${(H/2).toFixed(0)}" x2="${W}" y2="${(H/2).toFixed(0)}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5" stroke-dasharray="4,8"/>
       <line x1="${(W/2).toFixed(0)}" y1="0" x2="${(W/2).toFixed(0)}" y2="${H}" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,8"/>
@@ -2536,7 +2548,7 @@ function renderVendorSummary(domain, intel, bizInfo){
     </div>`;
   } else {
     bizHtml = `<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);font-size:.74rem;color:var(--muted);">
-      // no meta description found for ${safeText(domain)} — vendor website may block external fetch or use dynamic rendering.
+      // website meta data unavailable for ${safeText(domain)} — site may use dynamic rendering, strict CSP, or block external crawlers. check vendor website directly.
     </div>`;
   }
   if($('summaryBizInfo')) $('summaryBizInfo').innerHTML = bizHtml;
@@ -2596,7 +2608,7 @@ function setBadge(id, status){
   const el = $('badge-'+id);
   if(!el) return;
   if(status==='review'){el.className='badge-review';el.textContent='To be Reviewed';}
-  else if(status==='clean'){el.className='badge-clean';el.textContent='Clean';}
+  else if(status==='clean'){el.className='badge-clean';el.textContent='No Issue';}
   else if(status==='skip'){el.className='badge-skip';el.textContent='No Key';}
   else{el.className='badge-nodata';el.textContent='No Data';}
 }
