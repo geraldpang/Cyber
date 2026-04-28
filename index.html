@@ -704,23 +704,19 @@ nav{
     <div class="intel-strip" id="intelStrip"></div>
   </div>
 
-  <!-- VENDOR SUMMARY -->
+  <!-- A) VENDOR INFORMATION (About the vendor) -->
   <div class="vendor-summary" id="vendorSummary" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
-      <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">// vendor intelligence summary</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      <div style="font-size:.62rem;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;">// 01 — vendor information</div>
       <div id="summaryTs" style="font-size:.62rem;color:var(--muted);"></div>
     </div>
-    <div id="summaryHeadline" style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;"></div>
-    <div id="summarySubline" style="font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:10px;"></div>
     <div id="summaryBizInfo"></div>
-    <div class="vs-grid" id="summaryGrid"></div>
-    <div class="vs-flags" id="summaryFlags"></div>
   </div>
 
-  <!-- WORLD MAP -->
+  <!-- B) VENDOR PRESENCE (World Map) -->
   <div class="full panel" id="worldMapPanel" style="display:none;margin-bottom:14px;">
     <div class="panel-hdr">
-      <div class="panel-title"><span class="panel-icon">🌐</span>Global Presence — Infrastructure &amp; Data Locations</div>
+      <div class="panel-title"><span class="panel-icon">🌍</span>// 02 — vendor presence</div>
       <span id="badge-worldmap" class="badge-nodata">no data</span>
     </div>
     <div class="panel-body">
@@ -730,6 +726,16 @@ nav{
       </div>
       <div id="mapLocationList" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
+  </div>
+
+  <!-- C) VENDOR INTELLIGENCE SUMMARY -->
+  <div class="vendor-summary" id="intelSummary" style="display:none;border-left-color:var(--lime);margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+      <div style="font-size:.62rem;color:var(--lime);text-transform:uppercase;letter-spacing:.1em;">// 03 — vendor intelligence summary</div>
+    </div>
+    <div id="summaryHeadline" style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;"></div>
+    <div id="summarySubline" style="font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:12px;"></div>
+    <div class="vs-flags" id="summaryFlags"></div>
   </div>
 
   <!-- LOGGING -->
@@ -1380,7 +1386,7 @@ async function startScan(){
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='RUNNING';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel','vendorSummary','worldMapPanel','logSection']
+  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel','vendorSummary','worldMapPanel','intelSummary','logSection']
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
@@ -1567,137 +1573,128 @@ function renderLog(intel){
 
 
 function renderWorldMap(intel){
-  const {dns, rdap, bgpview, otx, urlscanData, shodan} = intel;
+  const {dns, rdap, bgpview, otx, urlscanData} = intel;
   const mapEl = $('worldMapPanel');
   if(!mapEl) return;
+  mapEl.style.display = 'block'; // ALWAYS show the map panel
 
   const points = [];
   const seen = new Set();
 
   function addPoint(lat, lon, label, type, country){
-    const key = country+':'+type;
+    const key = `${country}:${type}`;
     if(seen.has(key)) return;
     seen.add(key);
     points.push({lat, lon, label, type, country});
   }
 
-  // 1. BGPView — primary hosting ASN
+  // 1. ip-api.com via bgpview (primary hosting)
   if(bgpview?.asnCountry && COUNTRY_COORDS[bgpview.asnCountry]){
     const [lat,lon] = COUNTRY_COORDS[bgpview.asnCountry];
-    addPoint(lat, lon, `Hosting: AS${bgpview.asn||'?'} ${bgpview.asnName||bgpview.asnCountry}`, 'hosting', bgpview.asnCountry);
+    addPoint(lat, lon,
+      `Primary hosting — ${bgpview.asnName||bgpview.asnDescription||bgpview.asnCountry}`,
+      'hosting', bgpview.asnCountry);
   }
 
-  // 2. Shodan IPs — geolocate via ipapi.co (already fetched as part of shodan)
-  if(dns?.aRecords?.length){
-    dns.aRecords.slice(0,3).forEach(ip => {
-      // Use a simple IP-to-country heuristic from BGPView data we have
-      if(bgpview?.ip === ip && bgpview?.asnCountry){
-        const [lat,lon] = COUNTRY_COORDS[bgpview.asnCountry]||[];
-        if(lat) addPoint(lat, lon, `IP ${ip} — ${bgpview.asnName||bgpview.asnCountry}`, 'hosting', bgpview.asnCountry);
-      }
-    });
-  }
-
-  // 3. OTX country
+  // 2. OTX country
   if(otx?.country && COUNTRY_COORDS[otx.country]){
     const [lat,lon] = COUNTRY_COORDS[otx.country];
-    addPoint(lat, lon, `OTX intel — ${otx.asn||otx.country}`, 'intel', otx.country);
+    addPoint(lat, lon, `OTX intel — ${otx.country}`, 'intel', otx.country);
   }
 
-  // 4. URLScan observed countries
+  // 3. URLScan countries
   if(urlscanData?.scans){
     urlscanData.scans.forEach(s=>{
       if(s.country && COUNTRY_COORDS[s.country]){
         const [lat,lon] = COUNTRY_COORDS[s.country];
-        addPoint(lat, lon, `URLScan — ${s.country}${s.server?' ('+s.server+')':''}`, 'scan', s.country);
+        addPoint(lat, lon,
+          `URLScan — ${s.country}${s.server?' ('+s.server+')':''}`,
+          'scan', s.country);
       }
     });
   }
 
-  // 5. Registrar/nameserver region hints
+  // 4. Nameserver / registrar hints
   const ns = dns?.ns || [];
   const reg = (rdap?.registrar||'').toLowerCase();
-  if(ns.some(n=>n.endsWith('.au'))||reg.includes('australia')||reg.includes('.au'))
-    if(COUNTRY_COORDS['AU']) { const [lat,lon]=COUNTRY_COORDS['AU']; addPoint(lat,lon,'Australian DNS/Registrar','registrar','AU'); }
-  if(ns.some(n=>n.includes('cloudflare')))
-    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Cloudflare CDN (US-based)','cdn','US'); }
-  if(ns.some(n=>n.includes('awsdns')))
-    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'AWS Route53 DNS (US-based)','cdn','US'); }
-  if(ns.some(n=>n.includes('google')))
-    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Google Cloud DNS (US-based)','cdn','US'); }
+  const nsStr = ns.join(' ').toLowerCase();
 
-  // 6. RDAP registrar country from known registrars
-  const REGISTRAR_COUNTRIES = {
-    'godaddy':'US','namecheap':'US','cloudflare':'US','google':'US','aws':'US','amazon':'US',
-    'enom':'US','networksolutions':'US','tucows':'CA','registercom':'US',
-    '1&1':'DE','ionos':'DE','hetzner':'DE','strato':'DE',
-    'ovh':'FR','gandi':'FR',
-    'nominet':'GB','123-reg':'GB',
-    'crazydomains':'AU','netregistry':'AU','ventraip':'AU','melbourneit':'AU','drop.com.au':'AU',
-  };
-  for(const [k,v] of Object.entries(REGISTRAR_COUNTRIES)){
+  if(nsStr.includes('.au') || reg.includes('australia') || reg.includes('ventraip') || reg.includes('netregistry') || reg.includes('crazydomains') || reg.includes('melbourneit')){
+    if(COUNTRY_COORDS['AU']){ const [lat,lon]=COUNTRY_COORDS['AU']; addPoint(lat,lon,'Australian registrar/DNS','registrar','AU'); }
+  }
+  if(nsStr.includes('cloudflare')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Cloudflare CDN (US-headquartered)','cdn','US'); }
+  }
+  if(nsStr.includes('awsdns')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'AWS Route53 DNS','cdn','US'); }
+  }
+  if(nsStr.includes('google') || nsStr.includes('googledomains')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Google Cloud DNS','cdn','US'); }
+  }
+  if(nsStr.includes('azure') || nsStr.includes('windows.net')){
+    if(COUNTRY_COORDS['US']){ const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Microsoft Azure DNS','cdn','US'); }
+  }
+
+  // 5. Registrar country from known registrar names
+  const REGISTRAR_MAP = {'godaddy':'US','namecheap':'US','cloudflare':'US','google':'US','amazon':'US','tucows':'CA','1&1':'DE','ionos':'DE','hetzner':'DE','ovh':'FR','gandi':'FR','nominet':'GB','123-reg':'GB','ventraip':'AU','netregistry':'AU','crazydomains':'AU','melbourneit':'AU'};
+  for(const [k,v] of Object.entries(REGISTRAR_MAP)){
     if(reg.includes(k) && COUNTRY_COORDS[v]){
       const [lat,lon]=COUNTRY_COORDS[v];
-      addPoint(lat,lon,`Registrar (${rdap?.registrar||k})`, 'registrar', v);
+      addPoint(lat,lon,`Registrar: ${rdap?.registrar||k}`,'registrar',v);
       break;
     }
   }
 
-  if(!points.length){
-    // Show map anyway with a note
-    mapEl.style.display='block';
-    $('mapLocationList').innerHTML='<span style="font-size:.7rem;color:var(--muted);">// no geographic data could be derived for this domain. provide OTX or VT keys for richer coverage.</span>';
-  } else {
-    mapEl.style.display='block';
-  }
-
-  const TYPE_COLORS = {
-    hosting:'#ff6a1a', intel:'#ff3333', scan:'#a8ff3e',
-    registrar:'#38bdf8', cdn:'#a78bfa',
-  };
-  const TYPE_LABELS = {
-    hosting:'primary hosting', intel:'threat intel observation',
-    scan:'urlscan scan', registrar:'registrar / dns', cdn:'cdn / dns provider',
-  };
+  const TYPE_COLORS = {hosting:'#ff6a1a',intel:'#ff3333',scan:'#a8ff3e',registrar:'#38bdf8',cdn:'#a78bfa'};
+  const TYPE_LABELS = {hosting:'primary hosting',intel:'threat intel',scan:'urlscan observation',registrar:'registrar / dns region',cdn:'cdn / dns provider'};
 
   // Legend
   const seenTypes = [...new Set(points.map(p=>p.type))];
   $('mapLegend').innerHTML = seenTypes.map(t=>
-    `<span style="display:flex;align-items:center;gap:5px;color:var(--muted);font-size:.65rem;">
-      <span style="width:7px;height:7px;border-radius:50%;background:${TYPE_COLORS[t]||'#888'};box-shadow:0 0 4px ${TYPE_COLORS[t]||'#888'};flex-shrink:0;"></span>
+    `<span style="display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:.65rem;">
+      <span style="width:7px;height:7px;border-radius:50%;background:${TYPE_COLORS[t]||'#888'};box-shadow:0 0 5px ${TYPE_COLORS[t]||'#888'};flex-shrink:0;display:inline-block;"></span>
       ${TYPE_LABELS[t]||t}
     </span>`
   ).join('');
 
   const W=900, H=440;
 
-  // Real simplified world map paths (equirectangular)
-  // Key landmasses as SVG paths derived from Natural Earth data
+  // Simplified world landmass paths (equirectangular)
   const LAND = `
-    M125,58 L158,55 L190,58 L210,65 L228,72 L240,80 L248,95 L255,110 L252,125 L245,138 L232,148 L218,155 L200,158 L182,155 L165,148 L152,138 L140,125 L132,110 L126,95 L122,80 L123,68 Z
-    M260,75 L290,70 L320,72 L348,78 L370,88 L385,102 L392,118 L390,135 L382,150 L368,162 L350,170 L330,174 L308,172 L288,165 L270,154 L258,140 L250,124 L248,108 L252,92 L258,80 Z
-    M88,90 L108,85 L128,88 L142,98 L148,112 L146,128 L138,140 L124,148 L108,150 L92,146 L80,136 L76,122 L78,108 L84,96 Z
-    M340,150 L370,145 L398,148 L420,158 L435,172 L440,190 L436,208 L424,222 L406,232 L384,236 L362,234 L342,226 L326,212 L318,196 L318,178 L326,164 Z
-    M210,172 L238,168 L262,172 L280,182 L290,196 L290,212 L282,226 L266,236 L246,240 L226,238 L208,230 L196,216 L192,200 L196,186 Z
-    M68,110 L88,106 L105,112 L115,124 L116,138 L110,150 L97,158 L82,160 L68,154 L58,142 L56,128 L60,116 Z
-    M430,90 L462,85 L495,88 L522,98 L542,112 L550,130 L545,148 L530,162 L510,172 L486,176 L462,173 L440,164 L422,150 L412,133 L410,115 L418,100 Z
-    M495,148 L525,142 L555,145 L580,155 L598,170 L604,188 L598,206 L584,220 L564,230 L540,234 L516,230 L496,220 L480,205 L474,188 L476,170 L484,156 Z
-    M545,190 L572,185 L598,188 L618,198 L630,212 L632,228 L624,242 L608,252 L588,258 L566,256 L546,248 L530,234 L524,218 L526,202 L534,192 Z
-    M555,240 L582,236 L608,240 L628,252 L638,268 L636,285 L624,298 L604,306 L582,308 L560,302 L542,290 L532,274 L532,257 L540,245 Z
-    M128,200 L155,195 L180,198 L200,210 L210,226 L208,244 L196,258 L178,268 L156,272 L134,268 L116,256 L106,240 L106,222 L114,208 Z
-    M178,255 L205,250 L230,254 L250,266 L260,282 L258,300 L246,314 L226,322 L204,324 L182,318 L164,306 L154,290 L154,272 L162,260 Z
-    M230,310 L255,305 L278,308 L296,318 L305,332 L304,348 L294,360 L276,368 L255,370 L234,365 L217,354 L210,338 L212,322 L220,312 Z
-    M68,158 L92,154 L114,158 L130,170 L136,186 L132,202 L120,214 L102,220 L82,220 L64,212 L52,198 L50,182 L56,168 Z
-    M380,250 L405,245 L428,248 L446,258 L455,272 L452,288 L440,300 L420,308 L398,310 L376,304 L358,292 L350,276 L352,260 L362,250 Z
-    M410,295 L432,290 L452,292 L468,302 L474,316 L470,330 L458,340 L440,346 L420,346 L402,338 L390,324 L388,308 L396,298 Z
-    M628,160 L655,155 L682,158 L702,168 L712,182 L710,198 L698,210 L678,218 L656,220 L634,214 L616,202 L608,186 L610,170 L618,162 Z
-    M655,215 L678,210 L700,213 L718,222 L726,235 L722,248 L710,258 L692,264 L672,264 L654,256 L640,244 L636,230 L640,218 Z
-    M720,178 L748,173 L776,176 L796,188 L804,203 L800,220 L787,232 L767,240 L744,242 L721,235 L703,222 L696,206 L700,190 L710,180 Z
-    M745,240 L772,235 L800,237 L822,247 L832,262 L828,278 L814,290 L793,296 L770,296 L748,288 L730,274 L724,258 L728,244 Z
-    M788,208 L812,203 L836,205 L856,214 L864,228 L860,243 L847,254 L827,260 L805,260 L784,252 L768,238 L764,222 L770,210 Z
-    M172,115 L195,110 L218,112 L236,122 L244,136 L240,152 L226,164 L206,170 L184,170 L163,162 L148,148 L144,132 L150,118 L162,110 Z
-    M288,218 L312,213 L335,216 L352,226 L360,240 L356,255 L342,265 L320,270 L296,268 L274,259 L260,245 L258,229 L266,218 Z
-    M312,265 L335,260 L358,263 L376,273 L382,287 L378,302 L364,312 L342,317 L318,315 L296,306 L280,293 L278,277 L286,267 Z
+M 7,80 L 42,70 L 75,72 L 105,82 L 128,98 L 138,118 L 133,138 L 118,152 L 97,158 L 74,154 L 54,142 L 40,124 L 33,104 Z
+M 135,75 L 168,68 L 198,70 L 222,80 L 238,96 L 240,116 L 230,134 L 210,146 L 186,150 L 162,144 L 142,130 L 133,110 Z
+M 238,88 L 268,82 L 295,84 L 315,94 L 322,110 L 316,128 L 298,140 L 274,145 L 250,140 L 233,126 L 228,108 Z
+M 60,158 L 90,150 L 118,152 L 140,162 L 148,180 L 143,198 L 126,210 L 102,216 L 78,212 L 58,200 L 50,182 Z
+M 120,210 L 148,202 L 172,204 L 190,214 L 195,232 L 186,250 L 168,260 L 146,263 L 125,255 L 110,240 L 108,222 Z
+M 150,256 L 176,248 L 200,250 L 218,262 L 222,280 L 213,298 L 194,308 L 170,311 L 148,302 L 132,286 L 130,268 Z
+M 188,310 L 210,303 L 230,306 L 244,318 L 246,336 L 235,350 L 215,357 L 193,355 L 176,344 L 170,328 Z
+M 225,352 L 244,346 L 262,350 L 272,362 L 270,378 L 256,386 L 238,386 L 222,376 L 216,362 Z
+M 380,70 L 415,62 L 448,65 L 474,78 L 484,96 L 478,116 L 460,130 L 434,136 L 406,132 L 382,118 L 370,98 Z
+M 460,125 L 490,118 L 516,120 L 536,132 L 540,150 L 530,166 L 510,176 L 484,179 L 460,172 L 442,158 L 440,140 Z
+M 310,140 L 340,133 L 366,135 L 386,146 L 390,163 L 380,179 L 360,188 L 334,190 L 311,182 L 295,167 L 294,150 Z
+M 385,178 L 414,171 L 440,172 L 458,182 L 462,199 L 451,215 L 430,224 L 405,225 L 382,216 L 368,200 L 369,184 Z
+M 440,218 L 466,211 L 490,213 L 508,224 L 510,242 L 498,256 L 477,264 L 452,264 L 430,254 L 418,238 L 420,222 Z
+M 490,256 L 514,250 L 536,253 L 550,265 L 550,282 L 536,294 L 513,298 L 490,292 L 474,278 L 475,264 Z
+M 540,78 L 572,72 L 602,74 L 626,86 L 632,104 L 622,120 L 601,130 L 574,132 L 550,123 L 537,107 Z
+M 620,120 L 650,113 L 678,115 L 698,127 L 701,145 L 687,160 L 662,168 L 636,166 L 615,154 L 607,137 Z
+M 690,145 L 718,138 L 745,140 L 763,152 L 765,170 L 750,184 L 726,190 L 700,187 L 681,174 L 680,157 Z
+M 740,182 L 768,176 L 794,178 L 811,191 L 811,209 L 795,222 L 769,227 L 743,222 L 727,208 L 727,192 Z
+M 790,210 L 816,204 L 840,207 L 856,220 L 854,238 L 837,250 L 812,253 L 788,246 L 774,231 L 776,216 Z
+M 600,170 L 626,164 L 650,166 L 666,178 L 666,196 L 650,208 L 626,212 L 602,206 L 588,192 L 590,177 Z
+M 640,208 L 664,202 L 686,205 L 700,217 L 698,235 L 682,246 L 658,249 L 635,242 L 622,228 L 624,214 Z
+M 680,246 L 702,240 L 722,243 L 734,256 L 730,273 L 714,282 L 692,283 L 672,274 L 663,260 Z
+M 700,160 L 724,153 L 748,155 L 764,167 L 763,186 L 745,198 L 720,201 L 696,193 L 683,178 Z
+M 750,195 L 774,189 L 796,191 L 810,204 L 806,222 L 788,232 L 763,234 L 740,225 L 729,210 Z
+M 730,120 L 755,113 L 780,115 L 797,128 L 796,146 L 779,158 L 753,161 L 728,153 L 716,139 Z
+M 776,108 L 800,101 L 825,103 L 841,116 L 839,134 L 821,145 L 795,147 L 771,138 L 761,124 Z
+M 580,280 L 605,274 L 628,277 L 643,290 L 640,308 L 622,319 L 597,320 L 573,311 L 562,296 Z
+M 618,312 L 640,307 L 660,310 L 672,323 L 668,340 L 650,349 L 626,349 L 605,339 L 597,324 Z
+M 655,344 L 675,339 L 692,343 L 700,357 L 694,372 L 674,378 L 655,373 L 643,358 Z
+M 660,376 L 678,372 L 694,376 L 700,390 L 692,404 L 672,408 L 654,402 L 646,388 Z
+M 540,294 L 562,288 L 582,291 L 594,304 L 590,321 L 572,330 L 550,330 L 530,320 L 522,305 Z
+M 355,230 L 378,224 L 399,228 L 411,242 L 406,259 L 387,268 L 362,268 L 339,258 L 328,243 Z
+M 390,264 L 412,258 L 432,262 L 441,277 L 435,295 L 414,303 L 390,302 L 368,291 L 360,276 Z
+M 415,298 L 436,293 L 454,298 L 462,313 L 454,330 L 434,337 L 413,334 L 395,322 L 390,307 Z
   `;
 
   let pins = '';
@@ -1705,44 +1702,39 @@ function renderWorldMap(intel){
     const {x,y} = latLonToXY(p.lat, p.lon, W, H);
     const col = TYPE_COLORS[p.type] || '#ff6a1a';
     const safeLabel = p.label.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
-    pins += `<g class="map-pin" onmouseenter="showMapTip(event,'${safeLabel}')" onmouseleave="hideMapTip()">
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="14" fill="${col}" fill-opacity=".08" stroke="${col}" stroke-width="0.5" stroke-opacity=".3">
-        <animate attributeName="r" values="10;20;10" dur="2.5s" repeatCount="indefinite"/>
-        <animate attributeName="fill-opacity" values=".08;.02;.08" dur="2.5s" repeatCount="indefinite"/>
+    pins += `<g class="map-pin" onmouseenter="showMapTip(event,'${safeLabel}')" onmouseleave="hideMapTip()" style="cursor:pointer;">
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="18" fill="${col}" fill-opacity="0.06" stroke="none">
+        <animate attributeName="r" values="14;22;14" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.06;0.01;0.06" dur="2.5s" repeatCount="indefinite"/>
       </circle>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" fill-opacity=".9" style="filter:drop-shadow(0 0 5px ${col})"/>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="#fff" fill-opacity=".8"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" fill-opacity="0.9" stroke="${col}" stroke-width="0.5" style="filter:drop-shadow(0 0 6px ${col});"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="#fff" fill-opacity="0.9"/>
     </g>`;
   });
 
   $('worldMapWrap').innerHTML = `
     <div class="map-tooltip" id="mapTooltip"></div>
-    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="wm-svg" style="display:block;">
+    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%;">
       <rect width="${W}" height="${H}" fill="#050505"/>
-      <!-- Grid lines -->
-      <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3,6"/>
-      <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3,6"/>
-      <line x1="0" y1="${H*0.25}" x2="${W}" y2="${H*0.25}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
-      <line x1="0" y1="${H*0.75}" x2="${W}" y2="${H*0.75}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
-      <line x1="${W*0.25}" y1="0" x2="${W*0.25}" y2="${H}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
-      <line x1="${W*0.75}" y1="0" x2="${W*0.75}" y2="${H}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
-      <!-- Landmasses -->
-      <path d="${LAND}" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" fill-rule="evenodd"/>
-      <!-- Labels -->
-      <text x="6" y="${H/2-4}" font-size="7" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">equator</text>
-      <text x="${W*0.75+3}" y="10" font-size="7" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">180°E</text>
-      <!-- Pins -->
+      <line x1="0" y1="${(H/2).toFixed(0)}" x2="${W}" y2="${(H/2).toFixed(0)}" stroke="rgba(255,255,255,0.07)" stroke-width="0.5" stroke-dasharray="4,8"/>
+      <line x1="${(W/2).toFixed(0)}" y1="0" x2="${(W/2).toFixed(0)}" y2="${H}" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="4,8"/>
+      <line x1="0" y1="${(H*0.25).toFixed(0)}" x2="${W}" y2="${(H*0.25).toFixed(0)}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <line x1="0" y1="${(H*0.75).toFixed(0)}" x2="${W}" y2="${(H*0.75).toFixed(0)}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <path d="${LAND}" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.18)" stroke-width="0.8" fill-rule="nonzero"/>
+      <text x="6" y="${(H/2-4).toFixed(0)}" font-size="8" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">equator</text>
+      ${points.length===0 ? `<text x="${(W/2).toFixed(0)}" y="${(H/2+4).toFixed(0)}" font-size="11" fill="rgba(255,255,255,0.15)" font-family="JetBrains Mono,monospace" text-anchor="middle">// no geographic data — provide OTX or VT key for richer coverage</text>` : ''}
       ${pins}
     </svg>`;
 
-  // Location list below map
-  $('mapLocationList').innerHTML = points.map(p=>{
-    const col = TYPE_COLORS[p.type]||'#888';
-    return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:.67rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:3px 9px;margin:2px;">
-      <span style="width:6px;height:6px;border-radius:50%;background:${col};box-shadow:0 0 4px ${col};flex-shrink:0;"></span>
-      ${p.label} <span style="color:var(--muted);">[${p.country}]</span>
-    </span>`;
-  }).join('');
+  $('mapLocationList').innerHTML = points.length
+    ? points.map(p=>{
+        const col = TYPE_COLORS[p.type]||'#888';
+        return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:.67rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:3px 9px;margin:2px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:${col};box-shadow:0 0 4px ${col};flex-shrink:0;display:inline-block;"></span>
+          ${p.label} <span style="color:var(--muted);">[${p.country}]</span>
+        </span>`;
+      }).join('')
+    : '<span style="font-size:.68rem;color:var(--muted);">// geographic presence derived from available intel sources</span>';
 }
 
 function showMapTip(e, text){
@@ -2524,18 +2516,43 @@ function resetScan(){
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
   $('domainInput').value='';
-  ['vendorSummary','worldMapPanel','logSection'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
+  ['vendorSummary','worldMapPanel','intelSummary','logSection'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
 
 function renderVendorSummary(domain, intel, bizInfo){
-  const el = $('vendorSummary');
-  if(!el) return;
-  el.style.display = 'block';
-  const {rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,hibp,abuse,pulsedive} = intel;
+  // ── A) Vendor Information ─────────────────────────────────────────────────
+  const elA = $('vendorSummary');
+  if(elA) elA.style.display = 'block';
 
+  const bizDesc = bizInfo?.description || bizInfo?.twitterDesc || null;
+  const bizTitle = bizInfo?.ogSiteName || bizInfo?.ogTitle || bizInfo?.title || null;
+  const bizKw = bizInfo?.keywords ? bizInfo.keywords.split(',').slice(0,6).map(k=>k.trim()).filter(Boolean) : [];
+
+  let bizHtml = '';
+  if(bizDesc || bizTitle){
+    bizHtml = `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
+      ${bizTitle?`<div style="font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:6px;">${safeText(bizTitle)}</div>`:''}
+      ${bizDesc?`<div style="font-size:.76rem;color:var(--text2);line-height:1.7;">${safeText(bizDesc.substring(0,350))}</div>`:''}
+      ${bizKw.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
+    </div>`;
+  } else {
+    bizHtml = `<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);font-size:.74rem;color:var(--muted);">
+      // no meta description found for ${safeText(domain)} — vendor website may block external fetch or use dynamic rendering.
+    </div>`;
+  }
+  if($('summaryBizInfo')) $('summaryBizInfo').innerHTML = bizHtml;
+  if($('summaryTs')) $('summaryTs').textContent = new Date().toISOString().substring(0,10);
+
+  // ── C) Intelligence Summary ───────────────────────────────────────────────
+  const elC = $('intelSummary');
+  if(!elC) return;
+  elC.style.display = 'block';
+
+  const {rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,hibp,abuse,pulsedive} = intel;
   const flags = [];
+
   if(ransomware?.found) flags.push({l:'red',t:'ransomware gang listing found'});
   if(urlhaus?.found&&urlhaus.urlCount>0) flags.push({l:'red',t:'active malware URLs (URLhaus)'});
   if(threatfox?.found) flags.push({l:'red',t:'IOCs in ThreatFox feed'});
@@ -2553,7 +2570,7 @@ function renderVendorSummary(domain, intel, bizInfo){
   if(!dns?.spf&&!dns?.dmarc) flags.push({l:'orange',t:'no SPF or DMARC — email spoofing risk'});
   else if(!dns?.spf||!dns?.dmarc) flags.push({l:'yellow',t:'incomplete email authentication'});
   if(shodan?.results?.some(r=>r.ports?.includes(3389))) flags.push({l:'orange',t:'RDP (3389) exposed to internet'});
-  if(shodan?.results?.some(r=>r.ports?.some(p=>[21,23,5900].includes(p)))) flags.push({l:'yellow',t:'legacy ports exposed (FTP/Telnet/VNC)'});
+  if(shodan?.results?.some(r=>r.ports?.some(p=>[21,23,5900].includes(p)))) flags.push({l:'yellow',t:'legacy ports exposed'});
   const hdrScore=gov?.headers?.score??null;
   if(hdrScore!==null&&hdrScore<=2) flags.push({l:'yellow',t:`HTTP security headers: ${hdrScore}/6`});
   if(rdap?.expiry){const d=Math.floor((new Date(rdap.expiry)-Date.now())/86400000);if(d<60)flags.push({l:'orange',t:`domain expires in ${d} days`});}
@@ -2565,40 +2582,15 @@ function renderVendorSummary(domain, intel, bizInfo){
   const orangeCount=flags.filter(f=>f.l==='orange').length;
   const sourcesOk=_scanLog.filter(e=>e.status==='ok').length;
 
-  let headline,subline;
+  let headline, subline;
   if(redCount>=2){headline='🚨 Critical signals detected';subline=`${redCount} high-severity finding${redCount>1?'s':''} across ${sourcesOk} sources. Immediate review required.`;}
   else if(redCount===1||orangeCount>=2){headline='⚠ Significant findings — review required';subline='Notable security signals found. Review flagged items and request vendor clarification.';}
   else if(orangeCount>=1){headline='◆ Moderate findings — monitor';subline='Some security gaps identified. Not blocking, but should be tracked.';}
-  else{headline='✓ No critical signals detected';subline=`${sourcesOk} intelligence sources checked. No active threats or confirmed recent breaches found.`;}
+  else{headline='✓ No critical signals detected';subline=`${sourcesOk} sources checked. No active threats or confirmed recent breaches found.`;}
 
-  $('summaryHeadline').textContent=headline;
-  $('summarySubline').textContent=subline;
-  $('summaryTs').textContent=new Date().toISOString().substring(0,10);
-
-  // Business info
-  const bizDesc=bizInfo?.description||bizInfo?.twitterDesc||null;
-  const bizTitle=bizInfo?.ogSiteName||bizInfo?.ogTitle||bizInfo?.title||null;
-  const bizKw=bizInfo?.keywords?bizInfo.keywords.split(',').slice(0,5).map(k=>k.trim()).filter(Boolean):[];
-  let bizHtml='';
-  if(bizDesc||bizTitle){
-    bizHtml=`<div style="margin-bottom:12px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
-      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;">// about this vendor</div>
-      ${bizTitle?`<div style="font-size:.8rem;font-weight:700;color:var(--white);margin-bottom:4px;">${safeText(bizTitle)}</div>`:''}
-      ${bizDesc?`<div style="font-size:.74rem;color:var(--text2);line-height:1.6;">${safeText(bizDesc.substring(0,280))}</div>`:''}
-      ${bizKw.length?`<div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
-    </div>`;
-  }
-  $('summaryBizInfo').innerHTML=bizHtml;
-
-  const domainAge=rdap?.registered?Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000))+'y':'—';
-  const subdomainCount=crt?.subdomains?.length||0;
-  $('summaryGrid').innerHTML=`
-    <div class="vs-cell"><div class="vs-val" style="color:var(--orange);">${domainAge}</div><div class="vs-lbl">domain age</div></div>
-    <div class="vs-cell"><div class="vs-val" style="color:${redCount>0?'var(--red)':orangeCount>0?'var(--orange)':'var(--lime)'};">${redCount+orangeCount}</div><div class="vs-lbl">risk flags</div></div>
-    <div class="vs-cell"><div class="vs-val" style="color:var(--blue);">${subdomainCount}</div><div class="vs-lbl">subdomains</div></div>
-    <div class="vs-cell"><div class="vs-val" style="color:var(--muted);">${sourcesOk}<span style="font-size:1rem;">/19</span></div><div class="vs-lbl">sources ok</div></div>`;
-
-  $('summaryFlags').innerHTML=flags.map(f=>`<span class="vs-flag ${f.l}">${f.t}</span>`).join('');
+  $('summaryHeadline').textContent = headline;
+  $('summarySubline').textContent = subline;
+  $('summaryFlags').innerHTML = flags.map(f=>`<span class="vs-flag ${f.l}">${f.t}</span>`).join('');
 }
 
 
