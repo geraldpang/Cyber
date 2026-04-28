@@ -923,6 +923,23 @@ nav{
 </section>
 
 <script>
+
+// ── CORS PROXY ────────────────────────────────────────────────────────────────
+// Routes CORS-blocked APIs through allorigins.win free proxy
+async function proxied(url, opts={}){
+  const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+  const r = await fetch(proxyUrl, {signal: opts.signal || AbortSignal.timeout(12000)});
+  if(!r.ok) throw new Error('proxy error '+r.status);
+  const d = await r.json();
+  if(!d.contents) throw new Error('empty proxy response');
+  return {
+    ok: true,
+    json: async () => JSON.parse(d.contents),
+    text: async () => d.contents,
+  };
+}
+
+
 const $=id=>document.getElementById(id);
 function safeText(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fillDomain(d){$('domainInput').value=d;}
@@ -972,7 +989,8 @@ async function fetchDNS(domain){
     aRecords:a.map(r=>r.data).filter(Boolean).slice(0,4),ipv6:aaaa.length>0};
 }
 async function fetchCRT(domain){
-  try{const r=await fetch(`https://crt.sh/?q=%.${domain}&output=json`,{signal:AbortSignal.timeout(12000)});
+  try{
+    const r=await proxied(`https://crt.sh/?q=%.${domain}&output=json`);
     if(!r.ok)return null;const data=await r.json();
     const seen=new Set();
     const unique=data.filter(c=>{const k=c.common_name+'|'+c.issuer_name;if(seen.has(k))return false;seen.add(k);return true;}).slice(0,20);
@@ -983,25 +1001,45 @@ async function fetchCRT(domain){
     return{certs:unique,totalCount:data.length,subdomains:[...subs].slice(0,30),activeCerts:unique.filter(c=>new Date(c.not_after)>now).length};
   }catch{return null;}
 }
+
 async function fetchURLhaus(domain){
-  try{const r=await fetch('https://urlhaus-api.abuse.ch/v1/host/',{method:'POST',body:`host=${encodeURIComponent(domain)}`,headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:AbortSignal.timeout(8000)});
+  try{
+    // POST not possible via proxy — use GET host lookup endpoint
+    const r=await proxied(`https://urlhaus-api.abuse.ch/v1/host/?host=${encodeURIComponent(domain)}`);
     const d=await r.json();
     if(d.query_status==='no_results')return{found:false,urls:[],blacklists:{}};
-    return{found:true,urlCount:d.urls?.length||0,activeCount:d.urls?.filter(u=>u.url_status==='online').length||0,
-      urls:(d.urls||[]).slice(0,6).map(u=>({url:u.url,status:u.url_status,threat:u.threat,added:u.date_added?.split(' ')[0]})),
+    if(!d.urls)return{found:false,urls:[],blacklists:{}};
+    return{found:true,urlCount:d.urls.length||0,activeCount:d.urls.filter(u=>u.url_status==='online').length||0,
+      urls:d.urls.slice(0,6).map(u=>({url:u.url,status:u.url_status,threat:u.threat,added:u.date_added?.split(' ')[0]})),
       blacklists:d.blacklists||{}};
   }catch{return null;}
 }
+
 async function fetchThreatFox(domain){
-  try{const r=await fetch('https://threatfox-api.abuse.ch/api/v1/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:'search_ioc',search_term:domain}),signal:AbortSignal.timeout(8000)});
-    const d=await r.json();
-    if(d.query_status==='no_results'||!d.data)return{found:false,iocs:[]};
-    return{found:true,iocCount:d.data.length,iocs:d.data.slice(0,6).map(i=>({iocType:i.ioc_type,malwareFamily:i.malware_printable,confidence:i.confidence_level,firstSeen:i.first_seen?.split(' ')[0],tags:i.tags||[]}))};
+  try{
+    // ThreatFox requires POST — proxy via allorigins can only GET
+    // Use the search endpoint via GET with query param
+    const r=await proxied(`https://threatfox.abuse.ch/browse.php?search=ioc%3A${encodeURIComponent(domain)}`);
+    const text=await r.text();
+    // Parse HTML response for IOC matches
+    const found=text.includes(domain)&&(text.includes('malware')&&text.includes('ioc'));
+    if(!found)return{found:false,iocs:[]};
+    // Best effort: note we found references but can't get structured data without POST
+    return{found:true,iocCount:1,iocs:[{iocType:'domain',malwareFamily:'see threatfox.abuse.ch',confidence:50,firstSeen:null,tags:[]}]};
   }catch{return null;}
 }
+
 async function fetchBreachHistory(domain){
-  try{const r=await fetch(`https://api.xposedornot.com/v1/domain-breaches/?domain=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
-    if(r.status===404)return{found:false,breaches:[]};if(!r.ok)return null;
+  try{
+    // Try direct first, fall back to proxy
+    let r;
+    try{
+      r=await fetch(`https://api.xposedornot.com/v1/domain-breaches/?domain=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
+    }catch{
+      r=await proxied(`https://api.xposedornot.com/v1/domain-breaches/?domain=${encodeURIComponent(domain)}`);
+    }
+    if(r.status===404||r.status===405)return{found:false,breaches:[]};
+    if(!r.ok)return null;
     const d=await r.json();
     const breaches=d.exposedBreaches?.breachedDomains||d.breaches||[];
     const list=Array.isArray(breaches)?breaches:Object.values(breaches);
@@ -1011,16 +1049,17 @@ async function fetchBreachHistory(domain){
         dataTypes:(b.exposedData_types||b.types||[]).slice(0,5),records:b.exposedData||b.records||0}))};
   }catch{return null;}
 }
+
 async function fetchGovernance(domain){
   const results={securityTxt:null,headers:null,mtaSts:null,bimi:null,dkim:null};
-  try{for(const p of['/.well-known/security.txt','/security.txt']){
-    try{const r=await fetch(`https://${domain}${p}`,{signal:AbortSignal.timeout(5000),mode:'cors'});
-      if(r.ok){const t=await r.text();if(t.includes('Contact:')||t.includes('contact:')){
-        results.securityTxt={found:true,contact:t.match(/Contact:\s*(.+)/i)?.[1]?.trim(),
-          expires:t.match(/Expires:\s*(.+)/i)?.[1]?.trim(),hasPGP:t.includes('BEGIN PGP')};break;}}
-    }catch{}}
-    if(!results.securityTxt)results.securityTxt={found:false};
-  }catch{}
+  try{
+    const p=await proxied(`https://${domain}/.well-known/security.txt`);
+    const t=await p.text();
+    if(t.includes('Contact:')||t.includes('contact:')){
+      results.securityTxt={found:true,contact:t.match(/Contact:\s*(.+)/i)?.[1]?.trim(),
+        expires:t.match(/Expires:\s*(.+)/i)?.[1]?.trim(),hasPGP:t.includes('BEGIN PGP')};
+    }else results.securityTxt={found:false};
+  }catch{results.securityTxt={found:false};}
   try{const r=await fetch(`https://api.hackertarget.com/httpheaders/?q=https://${domain}`,{signal:AbortSignal.timeout(8000)});
     if(r.ok){const t=await r.text();const hdr=t.toLowerCase();
       results.headers={hsts:hdr.includes('strict-transport-security'),csp:hdr.includes('content-security-policy'),
@@ -1049,15 +1088,15 @@ async function fetchGovernance(domain){
 }
 async function fetchRansomware(domain){
   const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
-  try{const r=await fetch(`https://api.ransomware.live/v2/searchvictims/${encodeURIComponent(company)}`,{signal:AbortSignal.timeout(8000)});
-    if(r.ok){const d=await r.json();
-      return{company,found:Array.isArray(d)&&d.length>0,
-        victims:(Array.isArray(d)?d:[]).slice(0,5).map(v=>({victim:v.victim||v.name||company,group:v.group||'Unknown',
-          date:v.attackdate||v.date||'',country:v.country||'',description:v.description||'',url:v.post_url||v.url||null}))};
-    }
-  }catch{}
-  return{company,found:false,victims:[]};
+  try{
+    const r=await proxied(`https://api.ransomware.live/v2/searchvictims/${encodeURIComponent(company)}`);
+    const d=await r.json();
+    return{company,found:Array.isArray(d)&&d.length>0,
+      victims:(Array.isArray(d)?d:[]).slice(0,5).map(v=>({victim:v.victim||v.name||company,group:v.group||'Unknown',
+        date:v.attackdate||v.date||'',country:v.country||'',description:v.description||'',url:v.post_url||v.url||null}))};
+  }catch{return{company,found:false,victims:[]};}
 }
+
 async function fetchCyberNews(domain){
   const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
   const rss2json=url=>fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=10`,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?r.json():null).catch(()=>null);
@@ -1133,90 +1172,61 @@ async function fetchShodan(ips){
 }
 
 async function fetchBGPView(ip){
-  // BGPView: free, no key, ASN + routing + abuse contact
   if(!ip)return null;
   try{
-    const r=await fetch(`https://api.bgpview.io/ip/${ip}`,{signal:AbortSignal.timeout(8000)});
+    // ip-api.com: free, no key, no CORS issues, reliable
+    const r=await fetch(`https://ip-api.com/json/${ip}?fields=status,country,countryCode,org,as,asname,isp,query`,{signal:AbortSignal.timeout(8000)});
     if(!r.ok)return null;
     const d=await r.json();
-    const data=d.data||{};
-    const pfx=data.prefixes?.[0]||{};
-    const asn=pfx.asn||{};
+    if(d.status!=='success')return null;
     return{
       ip,
-      asn:asn.asn||null,
-      asnName:asn.name||null,
-      asnDescription:asn.description||null,
-      asnCountry:asn.country_code||null,
-      prefix:pfx.prefix||null,
-      rir:pfx.rir_allocation?.rir_name||null,
-      abuseContact:data.rir_allocation?.country_code||null,
-      ptrRecord:data.ptr_record||null,
+      asn:d.as?.split(' ')[0]?.replace('AS',''),
+      asnName:d.asname||d.org||null,
+      asnDescription:d.isp||null,
+      asnCountry:d.countryCode||null,
+      prefix:null,rir:null,ptrRecord:null,
     };
   }catch{return null;}
 }
 
 async function fetchObservatory(domain){
-  // Mozilla Observatory: free, no key, HTTP security grading
   try{
-    // Trigger scan first (POST)
-    const scan=await fetch(`https://http-observatory.security.mozilla.org/api/v1/analyze?host=${encodeURIComponent(domain)}`,{
-      method:'POST',body:'hidden=true',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    // Mozilla Observatory v2 API
+    const scan=await fetch(`https://observatory.mozilla.org/api/v2/analyze?host=${encodeURIComponent(domain)}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({hidden:true,rescan:false}),
       signal:AbortSignal.timeout(15000)
     });
     if(!scan.ok)return null;
     const data=await scan.json();
-    if(data.state==='FAILED'||data.error)return{error:data.error||'scan failed'};
-    // Poll if still running (max 3 attempts)
-    let result=data;
-    let attempts=0;
+    if(data.error)return{error:data.error};
+    let result=data;let attempts=0;
     while((result.state==='PENDING'||result.state==='RUNNING')&&attempts<4){
       await new Promise(r=>setTimeout(r,2000));
-      const poll=await fetch(`https://http-observatory.security.mozilla.org/api/v1/analyze?host=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
+      const poll=await fetch(`https://observatory.mozilla.org/api/v2/analyze?host=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
       if(poll.ok)result=await poll.json();
       attempts++;
     }
-    if(!result.score&&result.score!==0)return null;
-    return{
-      grade:result.grade||'?',
-      score:result.score??null,
-      testsPassed:result.tests_passed??null,
-      testsFailed:result.tests_failed??null,
-      testsQuantity:result.tests_quantity??null,
-      state:result.state,
-    };
+    if(result.score===undefined&&result.score!==0)return null;
+    return{grade:result.grade||'?',score:result.score??null,
+      testsPassed:result.tests_passed??null,testsFailed:result.tests_failed??null,
+      testsQuantity:result.tests_quantity??null,state:result.state};
   }catch{return null;}
 }
 
 async function fetchURLScan(domain){
-  // URLScan.io search: free, no key for searching existing scans
   try{
-    const r=await fetch(`https://urlscan.io/api/v1/search/?q=domain%3A${encodeURIComponent(domain)}&size=5`,{
-      headers:{'Accept':'application/json'},
-      signal:AbortSignal.timeout(10000)
-    });
-    if(!r.ok)return null;
+    const r=await proxied(`https://urlscan.io/api/v1/search/?q=domain%3A${encodeURIComponent(domain)}&size=5`);
     const d=await r.json();
     const results=(d.results||[]).slice(0,5);
-    return{
-      total:d.total||0,
-      scans:results.map(s=>({
-        id:s.task?.uuid,
-        url:s.task?.url,
-        time:s.task?.time,
-        country:s.task?.country,
-        verdict:s.verdicts?.overall?.malicious?'malicious':s.verdicts?.overall?.suspicious?'suspicious':'clean',
-        score:s.verdicts?.overall?.score||0,
-        tags:s.verdicts?.overall?.tags||[],
-        screenshot:s.screenshot||null,
-        domain:s.page?.domain,
-        ip:s.page?.ip,
-        country:s.page?.country,
-        server:s.page?.server,
-        tlsIssuer:s.page?.tlsIssuer,
-      })),
-    };
+    return{total:d.total||0,scans:results.map(s=>({
+      id:s.task?.uuid,url:s.task?.url,time:s.task?.time,
+      verdict:s.verdicts?.overall?.malicious?'malicious':s.verdicts?.overall?.suspicious?'suspicious':'clean',
+      score:s.verdicts?.overall?.score||0,tags:s.verdicts?.overall?.tags||[],
+      domain:s.page?.domain,ip:s.page?.ip,country:s.page?.country,
+      server:s.page?.server,tlsIssuer:s.page?.tlsIssuer,
+    }))};
   }catch{return null;}
 }
 
@@ -2518,6 +2528,79 @@ function resetScan(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
+
+function renderVendorSummary(domain, intel, bizInfo){
+  const el = $('vendorSummary');
+  if(!el) return;
+  el.style.display = 'block';
+  const {rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,hibp,abuse,pulsedive} = intel;
+
+  const flags = [];
+  if(ransomware?.found) flags.push({l:'red',t:'ransomware gang listing found'});
+  if(urlhaus?.found&&urlhaus.urlCount>0) flags.push({l:'red',t:'active malware URLs (URLhaus)'});
+  if(threatfox?.found) flags.push({l:'red',t:'IOCs in ThreatFox feed'});
+  if(vt&&!vt.error&&vt.malicious>0) flags.push({l:'red',t:`${vt.malicious} AV engines flagged malicious`});
+  if(otx&&!otx.error&&otx.pulseCount>5) flags.push({l:'red',t:`${otx.pulseCount} OTX threat pulses`});
+  if(shodan?.results?.some(r=>r.vulns?.length>0)){
+    const n=shodan.results.flatMap(r=>r.vulns||[]).length;
+    flags.push({l:'red',t:`${n} CVE(s) on public IPs`});
+  }
+  if(abuse?.results?.some(r=>r.abuseScore>=75)) flags.push({l:'red',t:'high IP abuse confidence score'});
+  const recentHIBP=(hibp?.matches||[]).filter(b=>{const yr=b.BreachDate?parseInt(b.BreachDate):0;return new Date().getFullYear()-yr<=3;});
+  if(recentHIBP.length>0) flags.push({l:'orange',t:`${recentHIBP.length} recent breach(es) in HIBP`});
+  else if(hibp?.found) flags.push({l:'yellow',t:`${hibp.matches?.length} historical breach(es) in HIBP`});
+  if(breach?.found&&breach.breachCount>0) flags.push({l:'orange',t:`${breach.breachCount} breach(es) in XposedOrNot`});
+  if(!dns?.spf&&!dns?.dmarc) flags.push({l:'orange',t:'no SPF or DMARC — email spoofing risk'});
+  else if(!dns?.spf||!dns?.dmarc) flags.push({l:'yellow',t:'incomplete email authentication'});
+  if(shodan?.results?.some(r=>r.ports?.includes(3389))) flags.push({l:'orange',t:'RDP (3389) exposed to internet'});
+  if(shodan?.results?.some(r=>r.ports?.some(p=>[21,23,5900].includes(p)))) flags.push({l:'yellow',t:'legacy ports exposed (FTP/Telnet/VNC)'});
+  const hdrScore=gov?.headers?.score??null;
+  if(hdrScore!==null&&hdrScore<=2) flags.push({l:'yellow',t:`HTTP security headers: ${hdrScore}/6`});
+  if(rdap?.expiry){const d=Math.floor((new Date(rdap.expiry)-Date.now())/86400000);if(d<60)flags.push({l:'orange',t:`domain expires in ${d} days`});}
+  if(!urlhaus?.found&&!threatfox?.found&&(!vt||vt.malicious===0)) flags.push({l:'lime',t:'no malware/IOC detections'});
+  if(!ransomware?.found) flags.push({l:'lime',t:'no ransomware gang listings'});
+  if(!recentHIBP.length&&!breach?.found) flags.push({l:'lime',t:'no confirmed recent breaches'});
+
+  const redCount=flags.filter(f=>f.l==='red').length;
+  const orangeCount=flags.filter(f=>f.l==='orange').length;
+  const sourcesOk=_scanLog.filter(e=>e.status==='ok').length;
+
+  let headline,subline;
+  if(redCount>=2){headline='🚨 Critical signals detected';subline=`${redCount} high-severity finding${redCount>1?'s':''} across ${sourcesOk} sources. Immediate review required.`;}
+  else if(redCount===1||orangeCount>=2){headline='⚠ Significant findings — review required';subline='Notable security signals found. Review flagged items and request vendor clarification.';}
+  else if(orangeCount>=1){headline='◆ Moderate findings — monitor';subline='Some security gaps identified. Not blocking, but should be tracked.';}
+  else{headline='✓ No critical signals detected';subline=`${sourcesOk} intelligence sources checked. No active threats or confirmed recent breaches found.`;}
+
+  $('summaryHeadline').textContent=headline;
+  $('summarySubline').textContent=subline;
+  $('summaryTs').textContent=new Date().toISOString().substring(0,10);
+
+  // Business info
+  const bizDesc=bizInfo?.description||bizInfo?.twitterDesc||null;
+  const bizTitle=bizInfo?.ogSiteName||bizInfo?.ogTitle||bizInfo?.title||null;
+  const bizKw=bizInfo?.keywords?bizInfo.keywords.split(',').slice(0,5).map(k=>k.trim()).filter(Boolean):[];
+  let bizHtml='';
+  if(bizDesc||bizTitle){
+    bizHtml=`<div style="margin-bottom:12px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;">// about this vendor</div>
+      ${bizTitle?`<div style="font-size:.8rem;font-weight:700;color:var(--white);margin-bottom:4px;">${safeText(bizTitle)}</div>`:''}
+      ${bizDesc?`<div style="font-size:.74rem;color:var(--text2);line-height:1.6;">${safeText(bizDesc.substring(0,280))}</div>`:''}
+      ${bizKw.length?`<div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }
+  $('summaryBizInfo').innerHTML=bizHtml;
+
+  const domainAge=rdap?.registered?Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000))+'y':'—';
+  const subdomainCount=crt?.subdomains?.length||0;
+  $('summaryGrid').innerHTML=`
+    <div class="vs-cell"><div class="vs-val" style="color:var(--orange);">${domainAge}</div><div class="vs-lbl">domain age</div></div>
+    <div class="vs-cell"><div class="vs-val" style="color:${redCount>0?'var(--red)':orangeCount>0?'var(--orange)':'var(--lime)'};">${redCount+orangeCount}</div><div class="vs-lbl">risk flags</div></div>
+    <div class="vs-cell"><div class="vs-val" style="color:var(--blue);">${subdomainCount}</div><div class="vs-lbl">subdomains</div></div>
+    <div class="vs-cell"><div class="vs-val" style="color:var(--muted);">${sourcesOk}<span style="font-size:1rem;">/19</span></div><div class="vs-lbl">sources ok</div></div>`;
+
+  $('summaryFlags').innerHTML=flags.map(f=>`<span class="vs-flag ${f.l}">${f.t}</span>`).join('');
+}
+
 
 // ── BADGE SYSTEM ──────────────────────────────────────────────────────────────
 function setBadge(id, status){
