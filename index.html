@@ -2518,9 +2518,7 @@ function resetScan(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
-</script>
-</body>
-</html>
+
 // ── BADGE SYSTEM ──────────────────────────────────────────────────────────────
 function setBadge(id, status){
   const el = $('badge-'+id);
@@ -2553,3 +2551,6 @@ function updateAllBadges(intel){
   setBadge('breachdir', breachdir?(breachdir.found&&breachdir.count>0?'review':'clean'):'nodata');
   setBadge('worldmap','clean');
 }
+</script>
+</body>
+</html>
