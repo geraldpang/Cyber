@@ -933,16 +933,9 @@ nav{
 // ── CORS PROXY ────────────────────────────────────────────────────────────────
 // Routes CORS-blocked APIs through allorigins.win free proxy
 async function proxied(url, opts={}){
-  const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-  const r = await fetch(proxyUrl, {signal: opts.signal || AbortSignal.timeout(12000)});
-  if(!r.ok) throw new Error('proxy error '+r.status);
-  const d = await r.json();
-  if(!d.contents) throw new Error('empty proxy response');
-  return {
-    ok: true,
-    json: async () => JSON.parse(d.contents),
-    text: async () => d.contents,
-  };
+  const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url), {signal: opts.signal || AbortSignal.timeout(14000)});
+  if(!r.ok) throw new Error('proxy '+r.status);
+  return r;
 }
 
 
@@ -975,6 +968,20 @@ function finishScanAnim(){
 }
 
 // ── FETCHERS ──────────────────────────────────────────────────────────────────
+const COUNTRY_COORDS={
+  'AU':[-25,133],'US':[38,-97],'GB':[55,-2],'DE':[51,10],'FR':[46,2],
+  'NL':[52,5],'SG':[1,104],'JP':[35,138],'CA':[56,-106],'SE':[60,18],
+  'CH':[47,8],'IE':[53,-8],'IN':[20,77],'CN':[35,104],'BR':[-15,-50],
+  'ZA':[-29,25],'HK':[22,114],'KR':[37,128],'NZ':[-41,174],'IT':[42,13],
+  'ES':[40,-4],'RU':[60,100],'UA':[49,32],'NO':[60,8],'FI':[64,26],
+  'PL':[52,20],'CZ':[50,15],'AT':[47,14],'BE':[50,4],'DK':[56,10],
+  'PT':[39,-8],'GR':[39,22],'TR':[39,35],'MX':[23,-102],'AR':[-38,-65],
+  'CL':[-35,-71],'CO':[4,-74],'IL':[31,35],'AE':[24,54],'SA':[24,45],
+  'MY':[4,109],'TH':[15,101],'ID':[-5,118],'PH':[13,122],'VN':[16,108],
+  'EG':[27,30],'NG':[9,8],'KE':[-1,37],'GH':[8,-2],'MA':[32,-5],
+  'PK':[30,70],'BD':[23,90],'LK':[7,80],'KZ':[48,67],
+};
+
 async function fetchRDAP(domain){
   try{const r=await fetch(`https://rdap.org/domain/${domain}`,{signal:AbortSignal.timeout(8000)});
     if(!r.ok)return null;const d=await r.json();
@@ -1180,17 +1187,17 @@ async function fetchShodan(ips){
 async function fetchBGPView(ip){
   if(!ip)return null;
   try{
-    // ip-api.com: free, no key, no CORS issues, reliable
-    const r=await fetch(`https://ip-api.com/json/${ip}?fields=status,country,countryCode,org,as,asname,isp,query`,{signal:AbortSignal.timeout(8000)});
+    // ipwho.is: free, no key, CORS enabled
+    const r=await fetch(`https://ipwho.is/${ip}`,{signal:AbortSignal.timeout(8000)});
     if(!r.ok)return null;
     const d=await r.json();
-    if(d.status!=='success')return null;
+    if(!d.success)return null;
     return{
       ip,
-      asn:d.as?.split(' ')[0]?.replace('AS',''),
-      asnName:d.asname||d.org||null,
-      asnDescription:d.isp||null,
-      asnCountry:d.countryCode||null,
+      asn:d.connection?.asn?String(d.connection.asn):null,
+      asnName:d.connection?.isp||d.connection?.org||null,
+      asnDescription:d.connection?.domain||null,
+      asnCountry:d.country_code||null,
       prefix:null,rir:null,ptrRecord:null,
     };
   }catch{return null;}
@@ -1199,25 +1206,16 @@ async function fetchBGPView(ip){
 async function fetchObservatory(domain){
   try{
     // Mozilla Observatory v2 API
-    const scan=await fetch(`https://observatory.mozilla.org/api/v2/analyze?host=${encodeURIComponent(domain)}`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({hidden:true,rescan:false}),
-      signal:AbortSignal.timeout(15000)
-    });
-    if(!scan.ok)return null;
-    const data=await scan.json();
-    if(data.error)return{error:data.error};
-    let result=data;let attempts=0;
-    while((result.state==='PENDING'||result.state==='RUNNING')&&attempts<4){
-      await new Promise(r=>setTimeout(r,2000));
-      const poll=await fetch(`https://observatory.mozilla.org/api/v2/analyze?host=${encodeURIComponent(domain)}`,{signal:AbortSignal.timeout(8000)});
-      if(poll.ok)result=await poll.json();
-      attempts++;
-    }
-    if(result.score===undefined&&result.score!==0)return null;
-    return{grade:result.grade||'?',score:result.score??null,
-      testsPassed:result.tests_passed??null,testsFailed:result.tests_failed??null,
-      testsQuantity:result.tests_quantity??null,state:result.state};
+    const r=await fetch(`https://api.hackertarget.com/httpheaders/?q=https://${domain}`,{signal:AbortSignal.timeout(10000)});
+    if(!r.ok)return null;
+    const t=await r.text();
+    if(t.includes('API count exceeded'))return null;
+    const h=t.toLowerCase();
+    const checks={hsts:h.includes('strict-transport-security'),csp:h.includes('content-security-policy'),xframe:h.includes('x-frame-options'),xcto:h.includes('x-content-type-options'),referrer:h.includes('referrer-policy'),permissions:h.includes('permissions-policy'),xss:h.includes('x-xss-protection')};
+    const passed=Object.values(checks).filter(Boolean).length;const total=Object.keys(checks).length;
+    const score=Math.round((passed/total)*100);
+    const grade=score>=85?'A':score>=70?'B':score>=50?'C':score>=25?'D':'F';
+    return{grade,score,testsPassed:passed,testsFailed:total-passed,testsQuantity:total,state:'FINISHED',source:'HackerTarget'};
   }catch{return null;}
 }
 
@@ -1291,10 +1289,9 @@ async function fetchPulsedive(domain,apiKey){
 async function fetchBusinessInfo(domain){
   // Fetch meta description + og tags via allorigins proxy
   try{
-    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+domain)}`,{signal:AbortSignal.timeout(10000)});
+    const r = await proxied('https://'+domain);
     if(!r.ok) return null;
-    const d = await r.json();
-    const html = d.contents||'';
+    const html = await r.text();
     const getMeta = (name) => {
       const patterns = [
         new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["']`,'i'),
@@ -1588,7 +1585,7 @@ function renderWorldMap(intel){
     points.push({lat, lon, label, type, country});
   }
 
-  // 1. ip-api.com via bgpview (primary hosting)
+  // 1. ipwho.is via bgpview (primary hosting)
   if(bgpview?.asnCountry && COUNTRY_COORDS[bgpview.asnCountry]){
     const [lat,lon] = COUNTRY_COORDS[bgpview.asnCountry];
     addPoint(lat, lon,
