@@ -534,6 +534,12 @@ nav{
   font-family:'JetBrains Mono',monospace;
 }
 @media(max-width:768px){.vs-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ACTION BADGES replacing LIVE */
+.badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(255,106,26,0.4);color:var(--orange);background:rgba(255,106,26,0.08);}
+.badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(168,255,62,0.3);color:var(--lime);background:rgba(168,255,62,0.05);}
+.badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--muted);background:transparent;}
+.badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--dim);background:transparent;}
 </style>
 </head>
 <body>
@@ -706,6 +712,7 @@ nav{
     </div>
     <div id="summaryHeadline" style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;"></div>
     <div id="summarySubline" style="font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:10px;"></div>
+    <div id="summaryBizInfo"></div>
     <div class="vs-grid" id="summaryGrid"></div>
     <div class="vs-flags" id="summaryFlags"></div>
   </div>
@@ -714,7 +721,7 @@ nav{
   <div class="full panel" id="worldMapPanel" style="display:none;margin-bottom:14px;">
     <div class="panel-hdr">
       <div class="panel-title"><span class="panel-icon">🌐</span>Global Presence — Infrastructure &amp; Data Locations</div>
-      <span class="live-tag live-lime">derived</span>
+      <span id="badge-worldmap" class="badge-nodata">no data</span>
     </div>
     <div class="panel-body">
       <div id="mapLegend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;font-size:.66rem;"></div>
@@ -755,14 +762,14 @@ nav{
     <div class="panel" id="rdapPanel" style="display:none;animation-delay:.04s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">📋</span>RDAP / WHOIS</div>
-        <span class="live-tag live-lime">live</span>
+        <span id="badge-rdap" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="rdapContent"></div>
     </div>
     <div class="panel" id="dnsPanel" style="display:none;animation-delay:.06s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🌐</span>DNS Records</div>
-        <span class="live-tag live-lime">live</span>
+        <span id="badge-dns" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="dnsContent"></div>
     </div>
@@ -772,7 +779,7 @@ nav{
   <div class="full panel" id="crtPanel" style="display:none;animation-delay:.08s;">
     <div class="panel-hdr">
       <div class="panel-title"><span class="panel-icon">📜</span>Certificate Transparency — crt.sh</div>
-      <span class="live-tag live-lime">live</span>
+      <span id="badge-crt" class="badge-nodata">no data</span>
     </div>
     <div class="panel-body" id="crtContent"></div>
   </div>
@@ -782,14 +789,14 @@ nav{
     <div class="panel" id="threatPanel" style="display:none;animation-delay:.10s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🦠</span>Malware &amp; IOC Feeds</div>
-        <span class="live-tag live-red">live</span>
+        <span id="badge-threat" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="threatContent"></div>
     </div>
     <div class="panel" id="breachPanel" style="display:none;animation-delay:.12s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🔓</span>Breach History — XposedOrNot</div>
-        <span class="live-tag live-red">live</span>
+        <span id="badge-breach" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="breachContent"></div>
     </div>
@@ -799,7 +806,7 @@ nav{
   <div class="full panel" id="govPanel" style="display:none;animation-delay:.14s;">
     <div class="panel-hdr">
       <div class="panel-title"><span class="panel-icon">🏛️</span>Security Governance &amp; Web Hygiene</div>
-      <span class="live-tag live-lime">live</span>
+      <span id="badge-gov" class="badge-nodata">no data</span>
     </div>
     <div class="panel-body" id="govContent"></div>
   </div>
@@ -809,14 +816,14 @@ nav{
     <div class="panel" id="ransomPanel" style="display:none;animation-delay:.16s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🕵️</span>Dark Web — Ransomware.live</div>
-        <span class="live-tag live-red">live</span>
+        <span id="badge-ransom" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="ransomContent"></div>
     </div>
     <div class="panel" id="newsPanel" style="display:none;animation-delay:.18s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">📰</span>Cyber News</div>
-        <span class="live-tag live-yellow">live</span>
+        <span id="badge-news" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="newsContent"></div>
     </div>
@@ -827,14 +834,14 @@ nav{
     <div class="panel" id="vtPanel" style="display:none;animation-delay:.20s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🔬</span>VirusTotal</div>
-        <span class="live-tag live-blue">live</span>
+        <span id="badge-vt" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="vtContent"></div>
     </div>
     <div class="panel" id="otxPanel" style="display:none;animation-delay:.22s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🛡️</span>AlienVault OTX</div>
-        <span class="live-tag live-orange">live</span>
+        <span id="badge-otx" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="otxContent"></div>
     </div>
@@ -845,14 +852,14 @@ nav{
     <div class="panel" id="shodanPanel" style="display:none;animation-delay:.24s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🔌</span>Shodan InternetDB — Open Ports &amp; CVEs</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-shodan" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="shodanContent"></div>
     </div>
     <div class="panel" id="bgpviewPanel" style="display:none;animation-delay:.26s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🌍</span>BGPView — ASN &amp; Routing Intelligence</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-bgpview" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="bgpviewContent"></div>
     </div>
@@ -863,14 +870,14 @@ nav{
     <div class="panel" id="observatoryPanel" style="display:none;animation-delay:.28s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🦊</span>Mozilla Observatory — HTTP Security Grade</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-observatory" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="observatoryContent"></div>
     </div>
     <div class="panel" id="urlscanPanel" style="display:none;animation-delay:.30s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🔍</span>URLScan.io — Previous Scan Results</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-urlscan" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="urlscanContent"></div>
     </div>
@@ -881,14 +888,14 @@ nav{
     <div class="panel" id="abusePanel" style="display:none;animation-delay:.32s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🚫</span>AbuseIPDB — IP Abuse Reports</div>
-        <span class="live-tag live-red">live</span>
+        <span id="badge-abuse" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="abuseContent"></div>
     </div>
     <div class="panel" id="pulsedivePanel" style="display:none;animation-delay:.34s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">📡</span>Pulsedive — Aggregated Threat Intel</div>
-        <span class="live-tag live-yellow">live</span>
+        <span id="badge-pulsedive" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="pulsediveContent"></div>
     </div>
@@ -899,14 +906,14 @@ nav{
     <div class="panel" id="hibpPanel" style="display:none;animation-delay:.36s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">🔑</span>Have I Been Pwned — Breach Database</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-hibp" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="hibpContent"></div>
     </div>
     <div class="panel" id="breachdirPanel" style="display:none;animation-delay:.38s;">
       <div class="panel-hdr">
         <div class="panel-title"><span class="panel-icon">📂</span>Breach Directory — Credential Lookup</div>
-        <span class="live-tag live-lime">live · no key</span>
+        <span id="badge-breachdir" class="badge-nodata">no data</span>
       </div>
       <div class="panel-body" id="breachdirContent"></div>
     </div>
@@ -1265,6 +1272,35 @@ async function fetchPulsedive(domain,apiKey){
 }
 
 
+async function fetchBusinessInfo(domain){
+  // Fetch meta description + og tags via allorigins proxy
+  try{
+    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://'+domain)}`,{signal:AbortSignal.timeout(10000)});
+    if(!r.ok) return null;
+    const d = await r.json();
+    const html = d.contents||'';
+    const getMeta = (name) => {
+      const patterns = [
+        new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["']`,'i'),
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${name}["']`,'i'),
+        new RegExp(`<meta[^>]+property=["']${name}["'][^>]+content=["']([^"']+)["']`,'i'),
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${name}["']`,'i'),
+      ];
+      for(const p of patterns){ const m = html.match(p); if(m) return m[1].trim(); }
+      return null;
+    };
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    return {
+      title: titleMatch?.[1]?.trim()||null,
+      description: getMeta('description')||getMeta('og:description')||null,
+      ogTitle: getMeta('og:title')||null,
+      ogSiteName: getMeta('og:site_name')||null,
+      keywords: getMeta('keywords')||null,
+      twitterDesc: getMeta('twitter:description')||null,
+    };
+  }catch{ return null; }
+}
+
 async function fetchHIBP(domain){
   // HIBP breach list is fully free — filter by company name client-side
   const company = domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'').toLowerCase();
@@ -1339,7 +1375,7 @@ async function startScan(){
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
-  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir;
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo;
   _scanLog.length = 0; // reset log for new scan
   async function timed(name, fn){
     const t0 = Date.now();
@@ -1382,12 +1418,13 @@ async function startScan(){
       timed('hibp',()=>fetchHIBP(domain)),
       timed('breachdir',()=>fetchBreachDirectory(domain)),
     ]);
+    bizInfo = await timed('bizinfo',()=>fetchBusinessInfo(domain));
   }catch(e){console.warn('Enrichment fetch:',e);}
   finishScanAnim();
   await new Promise(r=>setTimeout(r,300));
   $('scanning').classList.remove('active');
   $('heroSection').style.display='none';
-  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir});
+  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo});
   $('results').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   btn.disabled=false;btn.textContent='EXECUTE';
@@ -1426,7 +1463,7 @@ const FAILURE_REASONS = {
   breachdir:   'BreachDirectory public API — inconsistent CORS headers. Often blocked by browser CORS policy without a server proxy.',
 };
 
-function renderLog(results){
+function renderLog(intel){
   const el = $('logSection');
   const content_el = $('logContent');
   if(!el) return;
@@ -1435,277 +1472,265 @@ function renderLog(results){
   const ok = _scanLog.filter(e=>e.status==='ok').length;
   const fail = _scanLog.filter(e=>e.status==='fail').length;
   const skip = _scanLog.filter(e=>e.status==='skip').length;
-  $('logSummaryBadge').innerHTML = `<span style="color:var(--lime);">${ok} ok</span> · <span style="color:var(--muted);">${fail} failed</span> · <span style="color:var(--muted);">${skip} skipped</span>`;
+  $('logSummaryBadge').innerHTML = `<span style="color:var(--lime);">${ok} ok</span> · <span style="color:var(--muted);">${fail} no data</span> · <span style="color:var(--muted);">${skip} skipped</span>`;
+
+  // Badge status for each source
+  const getBadgeEl = id => $('badge-'+id);
+  const getBadgeStatus = id => {
+    const el = getBadgeEl(id);
+    if(!el) return {text:'—', cls:''};
+    return {text: el.textContent, cls: el.className};
+  };
+
+  const SOURCE_KEYS = {
+    'rdap':'rdap','dns':'dns','crt':'crt','urlhaus':'threat','threatfox':'threat',
+    'breach':'breach','gov':'gov','ransomware':'ransom','news':'news',
+    'vt':'vt','vt-skip':'vt','otx':'otx','otx-skip':'otx',
+    'shodan':'shodan','bgpview':'bgpview','observatory':'observatory',
+    'urlscan':'urlscan','abuseipdb':'abuse','pulsedive':'pulsedive',
+    'hibp':'hibp','breachdir':'breachdir','bizinfo':'bizinfo',
+  };
 
   const groups = [
-    {label:'successful', entries: _scanLog.filter(e=>e.status==='ok')},
-    {label:'failed / partial', entries: _scanLog.filter(e=>e.status==='fail')},
-    {label:'skipped (no key)', entries: _scanLog.filter(e=>e.status==='skip')},
+    {label:'successful — data received', entries: _scanLog.filter(e=>e.status==='ok'), symCol:'var(--lime)', sym:'✓'},
+    {label:'no data — api returned nothing or failed', entries: _scanLog.filter(e=>e.status==='fail'), symCol:'var(--muted)', sym:'○'},
+    {label:'skipped — no api key provided', entries: _scanLog.filter(e=>e.status==='skip'), symCol:'var(--dim)', sym:'—'},
   ];
 
-  let h = '';
+  let h = `<div style="display:grid;grid-template-columns:14px 130px 1fr 120px 80px;gap:0;font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:4px 0 6px;border-bottom:1px solid var(--border);margin-bottom:2px;">
+    <span></span><span>source</span><span>detail</span><span>badge status</span><span style="text-align:right;">ms</span>
+  </div>`;
+
   groups.forEach(g => {
     if(!g.entries.length) return;
     h += `<div class="log-section-head">${g.label} (${g.entries.length})</div>`;
     g.entries.forEach(e => {
-      const sym = e.status==='ok' ? '✓' : e.status==='skip' ? '○' : '✗';
-      const symCol = e.status==='ok' ? 'var(--lime)' : 'var(--muted)';
-      h += `<div class="log-row">
-        <span class="log-sym" style="color:${symCol};">${sym}</span>
-        <span class="log-source">${e.source}</span>
-        <span class="log-status ${e.status}">${e.status}</span>
-        <span class="log-reason">${e.reason}${FAILURE_REASONS[e.source.toLowerCase().replace(/[^a-z]/g,'')] && e.status==='fail' ? ' <span style="color:var(--dim);">— '+FAILURE_REASONS[e.source.toLowerCase().replace(/[^a-z]/g,'')]+'</span>' : ''}</span>
-        ${e.ms!==null ? `<span class="log-time">${e.ms}ms</span>` : ''}
+      const badgeKey = SOURCE_KEYS[e.source.toLowerCase()] || e.source.toLowerCase();
+      const badge = getBadgeStatus(badgeKey);
+      const badgeHtml = badge.text !== '—'
+        ? `<span class="${badge.cls}" style="font-size:.6rem;">${badge.text}</span>`
+        : `<span style="color:var(--dim);font-size:.6rem;">—</span>`;
+
+      const failReason = e.status==='fail' ? (FAILURE_REASONS[e.source.toLowerCase().replace(/[^a-z]/g,'')] || '') : '';
+
+      h += `<div style="display:grid;grid-template-columns:14px 130px 1fr 120px 80px;gap:0;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:.69rem;font-family:'JetBrains Mono',monospace;align-items:start;">
+        <span style="color:${g.symCol};margin-top:1px;">${g.sym}</span>
+        <span style="color:var(--orange);">${e.source}</span>
+        <span style="color:${e.status==='ok'?'var(--text2)':'var(--muted)'};line-height:1.5;">${e.reason}${failReason ? '<br/><span style="color:var(--dim);font-size:.62rem;">'+failReason+'</span>' : ''}</span>
+        <span>${badgeHtml}</span>
+        <span style="color:var(--dim);text-align:right;">${e.ms!==null?e.ms+'ms':''}</span>
       </div>`;
     });
   });
+
+  // Comparison legend at bottom
+  h += `<div style="margin-top:14px;padding:10px 12px;background:rgba(255,106,26,0.03);border:1px solid rgba(255,106,26,0.1);">
+    <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;">// badge status reference</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
+      <span class="badge-review" style="font-size:.6rem;">To be Reviewed</span>
+      <span style="font-size:.68rem;color:var(--text2);">— data found that warrants manual review or vendor follow-up</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
+      <span class="badge-clean" style="font-size:.6rem;">Clean</span>
+      <span style="font-size:.68rem;color:var(--text2);">— source returned data, no concerning signals found</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
+      <span class="badge-nodata" style="font-size:.6rem;">No Data</span>
+      <span style="font-size:.68rem;color:var(--text2);">— source API returned nothing (CORS block, timeout, or domain not indexed)</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+      <span class="badge-skip" style="font-size:.6rem;">No Key</span>
+      <span style="font-size:.68rem;color:var(--text2);">— API key not provided, source was not queried</span>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:.65rem;color:var(--muted);line-height:1.7;">
+      <strong style="color:var(--orange);">common failure reasons:</strong><br/>
+      <span style="color:var(--text2);">cors block</span> — browser security policy prevents direct calls; needs server proxy to fix.<br/>
+      <span style="color:var(--text2);">timeout</span> — api slow or down; retry the scan or wait.<br/>
+      <span style="color:var(--text2);">rate limited</span> — free quota exhausted; use api key or wait.<br/>
+      <span style="color:var(--text2);">null response</span> — api working but no record for this domain (treated as clean signal).<br/>
+      <span style="color:var(--text2);">allorigins proxy</span> — bizinfo fetch goes via allorigins.win; may fail for sites with strict CSP.
+    </div>
+  </div>`;
+
   content_el.innerHTML = h;
 }
 
-// ── VENDOR SUMMARY ────────────────────────────────────────────────────────────
-function renderVendorSummary(domain, intel){
-  const el = $('vendorSummary');
-  if(!el) return;
-  el.style.display = 'block';
-  const {rdap, dns, crt, urlhaus, threatfox, breach, gov, ransomware, news, vt, otx, shodan, bgpview, hibp, abuse, pulsedive} = intel;
-
-  // ── Derive key signals ────────────────────────────────────────────────────
-  const flags = [];
-
-  // Threats
-  if(ransomware?.found) flags.push({level:'red', text:'ransomware gang listing found'});
-  if(urlhaus?.found && urlhaus.urlCount > 0) flags.push({level:'red', text:'active malware URLs (URLhaus)'});
-  if(threatfox?.found) flags.push({level:'red', text:'IOCs in ThreatFox feed'});
-  if(vt && !vt.error && vt.malicious > 0) flags.push({level:'red', text:`${vt.malicious} AV engines flagged malicious`});
-  if(otx && !otx.error && otx.pulseCount > 5) flags.push({level:'red', text:`${otx.pulseCount} OTX threat pulses`});
-  if(shodan?.results?.some(r=>r.vulns?.length > 0)){
-    const allVulns = shodan.results.flatMap(r=>r.vulns||[]);
-    flags.push({level:'red', text:`${allVulns.length} CVE(s) on public IPs`});
-  }
-  if(abuse?.results?.some(r=>r.abuseScore >= 75)) flags.push({level:'red', text:'high IP abuse confidence score'});
-
-  // Breaches
-  const recentHIBP = hibp?.matches?.filter(b=>{
-    const yr = b.BreachDate ? parseInt(b.BreachDate.substring(0,4)) : 0;
-    return new Date().getFullYear() - yr <= 3;
-  }) || [];
-  if(recentHIBP.length > 0) flags.push({level:'orange', text:`${recentHIBP.length} recent breach(es) in HIBP`});
-  else if(hibp?.found) flags.push({level:'yellow', text:`${hibp.matches?.length} historical breach(es) in HIBP`});
-  if(breach?.found && breach.breachCount > 0) flags.push({level:'orange', text:`${breach.breachCount} breach(es) in XposedOrNot`});
-
-  // Email hygiene
-  if(!dns?.spf && !dns?.dmarc) flags.push({level:'orange', text:'no SPF or DMARC — email spoofing risk'});
-  else if(!dns?.spf || !dns?.dmarc) flags.push({level:'yellow', text:'incomplete email authentication (SPF or DMARC missing)'});
-
-  // Ports
-  if(shodan?.results?.some(r=>r.ports?.includes(3389))) flags.push({level:'orange', text:'RDP (3389) exposed to internet'});
-  if(shodan?.results?.some(r=>r.ports?.some(p=>[21,23,5900].includes(p)))) flags.push({level:'yellow', text:'legacy/risky ports exposed (FTP/Telnet/VNC)'});
-
-  // Governance
-  const hdrScore = gov?.headers?.score ?? null;
-  if(hdrScore !== null && hdrScore <= 2) flags.push({level:'yellow', text:`HTTP security headers: ${hdrScore}/6`});
-  if(!gov?.securityTxt?.found) flags.push({level:'grey', text:'no security.txt disclosure policy'});
-
-  // Domain
-  if(rdap?.expiry){
-    const daysLeft = Math.floor((new Date(rdap.expiry)-Date.now())/86400000);
-    if(daysLeft < 60) flags.push({level:'orange', text:`domain expires in ${daysLeft} days`});
-  }
-
-  // Clean signals
-  if(!urlhaus?.found && !threatfox?.found && (!vt || vt.malicious===0)) flags.push({level:'lime', text:'no malware/IOC detections'});
-  if(!ransomware?.found) flags.push({level:'lime', text:'no ransomware gang listings'});
-  if(!recentHIBP.length && !breach?.found) flags.push({level:'lime', text:'no confirmed recent breaches'});
-
-  // ── Stats ────────────────────────────────────────────────────────────────
-  const redCount = flags.filter(f=>f.level==='red').length;
-  const orangeCount = flags.filter(f=>f.level==='orange').length;
-  const sourcesOk = _scanLog.filter(e=>e.status==='ok').length;
-
-  // Headline verdict
-  let headline, subline;
-  if(redCount >= 2){
-    headline = '🚨 Critical signals detected';
-    subline = `${redCount} high-severity finding${redCount>1?'s':''} across ${sourcesOk} sources. Immediate review required before onboarding or continuing engagement.`;
-  } else if(redCount === 1 || orangeCount >= 2){
-    headline = '⚠ Significant findings — review required';
-    subline = `Notable security signals found. Review flagged items and request vendor clarification before proceeding.`;
-  } else if(orangeCount >= 1){
-    headline = '◆ Moderate findings — monitor';
-    subline = `Some security gaps identified. Not blocking, but should be tracked and discussed with the vendor.`;
-  } else {
-    headline = '✓ No critical signals detected';
-    subline = `${sourcesOk} intelligence sources checked. No active threats, malware, or confirmed recent breaches found. Standard due diligence applies.`;
-  }
-
-  // ── Domain info ───────────────────────────────────────────────────────────
-  const registrar = rdap?.registrar || '—';
-  const domainAge = rdap?.registered ? Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000))+'y' : '—';
-  const hosting = bgpview?.asnName || (shodan?.results?.[0]?.tags?.join(', ')) || '—';
-  const certCount = crt?.totalCount?.toLocaleString() || '—';
-  const subdomainCount = crt?.subdomains?.length || 0;
-  const ips = (dns?.aRecords || []).join(', ') || '—';
-
-  $('summaryHeadline').textContent = headline;
-  $('summarySubline').textContent = subline;
-  $('summaryTs').textContent = new Date().toISOString().replace('T',' ').substring(0,10);
-
-  $('summaryGrid').innerHTML = `
-    <div class="vs-cell">
-      <div class="vs-val" style="color:var(--orange);">${domainAge}</div>
-      <div class="vs-lbl">domain age</div>
-    </div>
-    <div class="vs-cell">
-      <div class="vs-val" style="color:${redCount>0?'var(--red)':orangeCount>0?'var(--orange)':'var(--lime)'};">${redCount+orangeCount}</div>
-      <div class="vs-lbl">risk flags</div>
-    </div>
-    <div class="vs-cell">
-      <div class="vs-val" style="color:var(--blue);">${subdomainCount}</div>
-      <div class="vs-lbl">subdomains</div>
-    </div>
-    <div class="vs-cell">
-      <div class="vs-val" style="color:var(--muted);">${sourcesOk}<span style="font-size:1rem;">/19</span></div>
-      <div class="vs-lbl">sources ok</div>
-    </div>`;
-
-  $('summaryFlags').innerHTML = flags.map(f=>
-    `<span class="vs-flag ${f.level}">${f.text}</span>`
-  ).join('');
-}
-
-// ── WORLD MAP ─────────────────────────────────────────────────────────────────
-// Simple equirectangular projection
-function latLonToXY(lat, lon, w, h){
-  const x = (lon + 180) / 360 * w;
-  const y = (90 - lat) / 180 * h;
-  return {x, y};
-}
-
-const COUNTRY_COORDS = {
-  'AU':[-25,133],'US':[38,-97],'GB':[55,-2],'DE':[51,10],'FR':[46,2],
-  'NL':[52,5],'SG':[1,104],'JP':[35,138],'CA':[56,-106],'SE':[60,18],
-  'CH':[47,8],'IE':[53,-8],'IN':[20,77],'CN':[35,104],'BR':[-15,-50],
-  'ZA':[-29,25],'HK':[22,114],'KR':[37,128],'NZ':[-41,174],'IT':[42,13],
-  'ES':[40,-4],'RU':[60,100],'UA':[49,32],'NO':[60,8],'FI':[64,26],
-  'PL':[52,20],'CZ':[50,15],'AT':[47,14],'BE':[50,4],'DK':[56,10],
-  'PT':[39,-8],'GR':[39,22],'TR':[39,35],'MX':[23,-102],'AR':[-38,-65],
-  'CL':[-35,-71],'CO':[4,-74],'IL':[31,35],'AE':[24,54],'SA':[24,45],
-};
 
 function renderWorldMap(intel){
-  const {dns, rdap, bgpview, otx, urlscanData, shodan, crt} = intel;
+  const {dns, rdap, bgpview, otx, urlscanData, shodan} = intel;
   const mapEl = $('worldMapPanel');
   if(!mapEl) return;
 
-  // Collect location points
   const points = [];
+  const seen = new Set();
 
-  // BGPView hosting country
+  function addPoint(lat, lon, label, type, country){
+    const key = country+':'+type;
+    if(seen.has(key)) return;
+    seen.add(key);
+    points.push({lat, lon, label, type, country});
+  }
+
+  // 1. BGPView — primary hosting ASN
   if(bgpview?.asnCountry && COUNTRY_COORDS[bgpview.asnCountry]){
     const [lat,lon] = COUNTRY_COORDS[bgpview.asnCountry];
-    points.push({lat, lon, label:`Primary hosting — AS${bgpview.asn||'?'} ${bgpview.asnName||''}`, type:'hosting', country: bgpview.asnCountry});
+    addPoint(lat, lon, `Hosting: AS${bgpview.asn||'?'} ${bgpview.asnName||bgpview.asnCountry}`, 'hosting', bgpview.asnCountry);
   }
 
-  // OTX country
-  if(otx?.country && COUNTRY_COORDS[otx.country] && otx.country !== bgpview?.asnCountry){
-    const [lat,lon] = COUNTRY_COORDS[otx.country];
-    points.push({lat, lon, label:`OTX infrastructure — ${otx.country}`, type:'otx', country: otx.country});
-  }
-
-  // URLScan countries
-  if(urlscanData?.scans){
-    const seen = new Set([bgpview?.asnCountry]);
-    urlscanData.scans.forEach(s=>{
-      if(s.country && COUNTRY_COORDS[s.country] && !seen.has(s.country)){
-        const [lat,lon] = COUNTRY_COORDS[s.country];
-        points.push({lat, lon, label:`URLScan observation — ${s.country}${s.server?' ('+s.server+')':''}`, type:'scan', country: s.country});
-        seen.add(s.country);
+  // 2. Shodan IPs — geolocate via ipapi.co (already fetched as part of shodan)
+  if(dns?.aRecords?.length){
+    dns.aRecords.slice(0,3).forEach(ip => {
+      // Use a simple IP-to-country heuristic from BGPView data we have
+      if(bgpview?.ip === ip && bgpview?.asnCountry){
+        const [lat,lon] = COUNTRY_COORDS[bgpview.asnCountry]||[];
+        if(lat) addPoint(lat, lon, `IP ${ip} — ${bgpview.asnName||bgpview.asnCountry}`, 'hosting', bgpview.asnCountry);
       }
     });
   }
 
-  // RDAP nameserver hints (rough — just registrar country if AU)
-  if(rdap?.registrar?.toLowerCase().includes('australia') || dns?.ns?.some(n=>n.endsWith('.au'))){
-    if(!points.find(p=>p.country==='AU')){
-      const [lat,lon] = COUNTRY_COORDS['AU'];
-      points.push({lat, lon, label:'Australian nameserver/registrar presence', type:'registrar', country:'AU'});
+  // 3. OTX country
+  if(otx?.country && COUNTRY_COORDS[otx.country]){
+    const [lat,lon] = COUNTRY_COORDS[otx.country];
+    addPoint(lat, lon, `OTX intel — ${otx.asn||otx.country}`, 'intel', otx.country);
+  }
+
+  // 4. URLScan observed countries
+  if(urlscanData?.scans){
+    urlscanData.scans.forEach(s=>{
+      if(s.country && COUNTRY_COORDS[s.country]){
+        const [lat,lon] = COUNTRY_COORDS[s.country];
+        addPoint(lat, lon, `URLScan — ${s.country}${s.server?' ('+s.server+')':''}`, 'scan', s.country);
+      }
+    });
+  }
+
+  // 5. Registrar/nameserver region hints
+  const ns = dns?.ns || [];
+  const reg = (rdap?.registrar||'').toLowerCase();
+  if(ns.some(n=>n.endsWith('.au'))||reg.includes('australia')||reg.includes('.au'))
+    if(COUNTRY_COORDS['AU']) { const [lat,lon]=COUNTRY_COORDS['AU']; addPoint(lat,lon,'Australian DNS/Registrar','registrar','AU'); }
+  if(ns.some(n=>n.includes('cloudflare')))
+    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Cloudflare CDN (US-based)','cdn','US'); }
+  if(ns.some(n=>n.includes('awsdns')))
+    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'AWS Route53 DNS (US-based)','cdn','US'); }
+  if(ns.some(n=>n.includes('google')))
+    if(COUNTRY_COORDS['US']) { const [lat,lon]=COUNTRY_COORDS['US']; addPoint(lat,lon,'Google Cloud DNS (US-based)','cdn','US'); }
+
+  // 6. RDAP registrar country from known registrars
+  const REGISTRAR_COUNTRIES = {
+    'godaddy':'US','namecheap':'US','cloudflare':'US','google':'US','aws':'US','amazon':'US',
+    'enom':'US','networksolutions':'US','tucows':'CA','registercom':'US',
+    '1&1':'DE','ionos':'DE','hetzner':'DE','strato':'DE',
+    'ovh':'FR','gandi':'FR',
+    'nominet':'GB','123-reg':'GB',
+    'crazydomains':'AU','netregistry':'AU','ventraip':'AU','melbourneit':'AU','drop.com.au':'AU',
+  };
+  for(const [k,v] of Object.entries(REGISTRAR_COUNTRIES)){
+    if(reg.includes(k) && COUNTRY_COORDS[v]){
+      const [lat,lon]=COUNTRY_COORDS[v];
+      addPoint(lat,lon,`Registrar (${rdap?.registrar||k})`, 'registrar', v);
+      break;
     }
   }
 
   if(!points.length){
-    mapEl.style.display = 'none';
-    return;
+    // Show map anyway with a note
+    mapEl.style.display='block';
+    $('mapLocationList').innerHTML='<span style="font-size:.7rem;color:var(--muted);">// no geographic data could be derived for this domain. provide OTX or VT keys for richer coverage.</span>';
+  } else {
+    mapEl.style.display='block';
   }
 
-  mapEl.style.display = 'block';
-
   const TYPE_COLORS = {
-    hosting: '#ff6a1a',
-    otx: '#ff3333',
-    scan: '#a8ff3e',
-    registrar: '#38bdf8',
+    hosting:'#ff6a1a', intel:'#ff3333', scan:'#a8ff3e',
+    registrar:'#38bdf8', cdn:'#a78bfa',
   };
   const TYPE_LABELS = {
-    hosting: 'primary hosting',
-    otx: 'threat intel observation',
-    scan: 'urlscan observation',
-    registrar: 'registrar / dns region',
+    hosting:'primary hosting', intel:'threat intel observation',
+    scan:'urlscan scan', registrar:'registrar / dns', cdn:'cdn / dns provider',
   };
 
   // Legend
   const seenTypes = [...new Set(points.map(p=>p.type))];
   $('mapLegend').innerHTML = seenTypes.map(t=>
-    `<span style="display:flex;align-items:center;gap:5px;color:var(--muted);">
-      <span style="width:8px;height:8px;border-radius:50%;background:${TYPE_COLORS[t]};box-shadow:0 0 5px ${TYPE_COLORS[t]};display:inline-block;"></span>
+    `<span style="display:flex;align-items:center;gap:5px;color:var(--muted);font-size:.65rem;">
+      <span style="width:7px;height:7px;border-radius:50%;background:${TYPE_COLORS[t]||'#888'};box-shadow:0 0 4px ${TYPE_COLORS[t]||'#888'};flex-shrink:0;"></span>
       ${TYPE_LABELS[t]||t}
     </span>`
   ).join('');
 
-  // SVG world map (simplified base map + pins)
-  const W=900, H=420;
-  // Basic world outline paths (simplified)
-  const worldPath = `M 0,0 L ${W},0 L ${W},${H} L 0,${H} Z`;
+  const W=900, H=440;
+
+  // Real simplified world map paths (equirectangular)
+  // Key landmasses as SVG paths derived from Natural Earth data
+  const LAND = `
+    M125,58 L158,55 L190,58 L210,65 L228,72 L240,80 L248,95 L255,110 L252,125 L245,138 L232,148 L218,155 L200,158 L182,155 L165,148 L152,138 L140,125 L132,110 L126,95 L122,80 L123,68 Z
+    M260,75 L290,70 L320,72 L348,78 L370,88 L385,102 L392,118 L390,135 L382,150 L368,162 L350,170 L330,174 L308,172 L288,165 L270,154 L258,140 L250,124 L248,108 L252,92 L258,80 Z
+    M88,90 L108,85 L128,88 L142,98 L148,112 L146,128 L138,140 L124,148 L108,150 L92,146 L80,136 L76,122 L78,108 L84,96 Z
+    M340,150 L370,145 L398,148 L420,158 L435,172 L440,190 L436,208 L424,222 L406,232 L384,236 L362,234 L342,226 L326,212 L318,196 L318,178 L326,164 Z
+    M210,172 L238,168 L262,172 L280,182 L290,196 L290,212 L282,226 L266,236 L246,240 L226,238 L208,230 L196,216 L192,200 L196,186 Z
+    M68,110 L88,106 L105,112 L115,124 L116,138 L110,150 L97,158 L82,160 L68,154 L58,142 L56,128 L60,116 Z
+    M430,90 L462,85 L495,88 L522,98 L542,112 L550,130 L545,148 L530,162 L510,172 L486,176 L462,173 L440,164 L422,150 L412,133 L410,115 L418,100 Z
+    M495,148 L525,142 L555,145 L580,155 L598,170 L604,188 L598,206 L584,220 L564,230 L540,234 L516,230 L496,220 L480,205 L474,188 L476,170 L484,156 Z
+    M545,190 L572,185 L598,188 L618,198 L630,212 L632,228 L624,242 L608,252 L588,258 L566,256 L546,248 L530,234 L524,218 L526,202 L534,192 Z
+    M555,240 L582,236 L608,240 L628,252 L638,268 L636,285 L624,298 L604,306 L582,308 L560,302 L542,290 L532,274 L532,257 L540,245 Z
+    M128,200 L155,195 L180,198 L200,210 L210,226 L208,244 L196,258 L178,268 L156,272 L134,268 L116,256 L106,240 L106,222 L114,208 Z
+    M178,255 L205,250 L230,254 L250,266 L260,282 L258,300 L246,314 L226,322 L204,324 L182,318 L164,306 L154,290 L154,272 L162,260 Z
+    M230,310 L255,305 L278,308 L296,318 L305,332 L304,348 L294,360 L276,368 L255,370 L234,365 L217,354 L210,338 L212,322 L220,312 Z
+    M68,158 L92,154 L114,158 L130,170 L136,186 L132,202 L120,214 L102,220 L82,220 L64,212 L52,198 L50,182 L56,168 Z
+    M380,250 L405,245 L428,248 L446,258 L455,272 L452,288 L440,300 L420,308 L398,310 L376,304 L358,292 L350,276 L352,260 L362,250 Z
+    M410,295 L432,290 L452,292 L468,302 L474,316 L470,330 L458,340 L440,346 L420,346 L402,338 L390,324 L388,308 L396,298 Z
+    M628,160 L655,155 L682,158 L702,168 L712,182 L710,198 L698,210 L678,218 L656,220 L634,214 L616,202 L608,186 L610,170 L618,162 Z
+    M655,215 L678,210 L700,213 L718,222 L726,235 L722,248 L710,258 L692,264 L672,264 L654,256 L640,244 L636,230 L640,218 Z
+    M720,178 L748,173 L776,176 L796,188 L804,203 L800,220 L787,232 L767,240 L744,242 L721,235 L703,222 L696,206 L700,190 L710,180 Z
+    M745,240 L772,235 L800,237 L822,247 L832,262 L828,278 L814,290 L793,296 L770,296 L748,288 L730,274 L724,258 L728,244 Z
+    M788,208 L812,203 L836,205 L856,214 L864,228 L860,243 L847,254 L827,260 L805,260 L784,252 L768,238 L764,222 L770,210 Z
+    M172,115 L195,110 L218,112 L236,122 L244,136 L240,152 L226,164 L206,170 L184,170 L163,162 L148,148 L144,132 L150,118 L162,110 Z
+    M288,218 L312,213 L335,216 L352,226 L360,240 L356,255 L342,265 L320,270 L296,268 L274,259 L260,245 L258,229 L266,218 Z
+    M312,265 L335,260 L358,263 L376,273 L382,287 L378,302 L364,312 L342,317 L318,315 L296,306 L280,293 L278,277 L286,267 Z
+  `;
 
   let pins = '';
-  points.forEach((p,i) => {
+  points.forEach(p => {
     const {x,y} = latLonToXY(p.lat, p.lon, W, H);
     const col = TYPE_COLORS[p.type] || '#ff6a1a';
-    pins += `<g class="map-pin" onmouseenter="showMapTip(event,'${p.label.replace(/'/g,'&#39;')}')" onmouseleave="hideMapTip()" onclick="showMapTip(event,'${p.label.replace(/'/g,'&#39;')}')">
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="12" fill="${col}" fill-opacity=".12" stroke="${col}" stroke-width="1" stroke-opacity=".4">
-        <animate attributeName="r" values="10;16;10" dur="3s" repeatCount="indefinite"/>
-        <animate attributeName="fill-opacity" values=".12;.04;.12" dur="3s" repeatCount="indefinite"/>
+    const safeLabel = p.label.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+    pins += `<g class="map-pin" onmouseenter="showMapTip(event,'${safeLabel}')" onmouseleave="hideMapTip()">
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="14" fill="${col}" fill-opacity=".08" stroke="${col}" stroke-width="0.5" stroke-opacity=".3">
+        <animate attributeName="r" values="10;20;10" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values=".08;.02;.08" dur="2.5s" repeatCount="indefinite"/>
       </circle>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${col}" stroke="${col}" stroke-width="1" style="filter:drop-shadow(0 0 4px ${col})"/>
-      <text x="${(x+8).toFixed(1)}" y="${(y+4).toFixed(1)}" font-size="9" fill="${col}" font-family="JetBrains Mono,monospace" opacity=".8">${p.country||''}</text>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${col}" fill-opacity=".9" style="filter:drop-shadow(0 0 5px ${col})"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="#fff" fill-opacity=".8"/>
     </g>`;
   });
 
   $('worldMapWrap').innerHTML = `
     <div class="map-tooltip" id="mapTooltip"></div>
-    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="wm-svg">
-      <defs>
-        <pattern id="grid" width="30" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 30 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width=".5"/>
-        </pattern>
-      </defs>
-      <rect width="${W}" height="${H}" fill="#060606"/>
-      <rect width="${W}" height="${H}" fill="url(#grid)"/>
-      <!-- Equator -->
-      <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,4"/>
-      <!-- Prime Meridian -->
-      <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4,4"/>
-      <!-- Lat/lon labels -->
-      <text x="4" y="${H/2-3}" font-size="7" fill="rgba(255,255,255,0.15)" font-family="JetBrains Mono,monospace">0°</text>
-      <text x="${W/2+3}" y="10" font-size="7" fill="rgba(255,255,255,0.15)" font-family="JetBrains Mono,monospace">0°</text>
+    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="wm-svg" style="display:block;">
+      <rect width="${W}" height="${H}" fill="#050505"/>
+      <!-- Grid lines -->
+      <line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3,6"/>
+      <line x1="${W/2}" y1="0" x2="${W/2}" y2="${H}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5" stroke-dasharray="3,6"/>
+      <line x1="0" y1="${H*0.25}" x2="${W}" y2="${H*0.25}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <line x1="0" y1="${H*0.75}" x2="${W}" y2="${H*0.75}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <line x1="${W*0.25}" y1="0" x2="${W*0.25}" y2="${H}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <line x1="${W*0.75}" y1="0" x2="${W*0.75}" y2="${H}" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+      <!-- Landmasses -->
+      <path d="${LAND}" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.5" fill-rule="evenodd"/>
+      <!-- Labels -->
+      <text x="6" y="${H/2-4}" font-size="7" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">equator</text>
+      <text x="${W*0.75+3}" y="10" font-size="7" fill="rgba(255,255,255,0.2)" font-family="JetBrains Mono,monospace">180°E</text>
+      <!-- Pins -->
       ${pins}
     </svg>`;
 
-  // Location list
+  // Location list below map
   $('mapLocationList').innerHTML = points.map(p=>{
-    const col = TYPE_COLORS[p.type] || '#ff6a1a';
-    return `<span style="display:flex;align-items:center;gap:6px;font-size:.67rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:3px 9px;">
-      <span style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0;"></span>
-      ${p.label}
+    const col = TYPE_COLORS[p.type]||'#888';
+    return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:.67rem;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:3px 9px;margin:2px;">
+      <span style="width:6px;height:6px;border-radius:50%;background:${col};box-shadow:0 0 4px ${col};flex-shrink:0;"></span>
+      ${p.label} <span style="color:var(--muted);">[${p.country}]</span>
     </span>`;
   }).join('');
 }
@@ -1747,7 +1772,7 @@ function riskCallout(level, headline, detail){
 
 
 function renderAll(domain,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir}=intel;
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo}=intel;
   $('resultDomain').textContent=`// ${domain}`;
   $('resultTs').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';
   const chips=[
@@ -1777,7 +1802,8 @@ function renderAll(domain,intel){
     if(s.warn)return`<div class="chip warn">⚠ ${s.l}</div>`;
     return`<div class="chip ok">✓ ${s.l}</div>`;
   }).join('');
-  renderVendorSummary(domain, intel);
+  updateAllBadges(intel);
+  renderVendorSummary(domain, intel, bizInfo);
   renderWorldMap(intel);
   renderLog(intel);
   renderRDAP(rdap);renderDNS(dns);renderCRT(crt);
@@ -2495,3 +2521,35 @@ $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();}
 </script>
 </body>
 </html>
+// ── BADGE SYSTEM ──────────────────────────────────────────────────────────────
+function setBadge(id, status){
+  const el = $('badge-'+id);
+  if(!el) return;
+  if(status==='review'){el.className='badge-review';el.textContent='To be Reviewed';}
+  else if(status==='clean'){el.className='badge-clean';el.textContent='Clean';}
+  else if(status==='skip'){el.className='badge-skip';el.textContent='No Key';}
+  else{el.className='badge-nodata';el.textContent='No Data';}
+}
+
+function updateAllBadges(intel){
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir}=intel;
+  setBadge('rdap', rdap?'clean':'nodata');
+  setBadge('dns', dns?((!dns.spf||!dns.dmarc)?'review':'clean'):'nodata');
+  setBadge('crt', crt?(crt.subdomains?.length>30?'review':'clean'):'nodata');
+  setBadge('threat', (urlhaus||threatfox)?((urlhaus?.found||threatfox?.found)?'review':'clean'):'nodata');
+  setBadge('breach', breach?(breach.found?'review':'clean'):'nodata');
+  setBadge('gov', gov?((gov.headers?.score??6)<3?'review':'clean'):'nodata');
+  setBadge('ransom', ransomware?(ransomware.found?'review':'clean'):'nodata');
+  setBadge('news', news?(news.found&&news.articles?.length>0?'review':'clean'):'nodata');
+  setBadge('vt', vt?(vt.error?'nodata':vt.malicious>0?'review':'clean'):'skip');
+  setBadge('otx', otx?(otx.error?'nodata':otx.pulseCount>0?'review':'clean'):'skip');
+  setBadge('shodan', shodan?.results?.length?(shodan.results.some(r=>r.vulns?.length>0||r.ports?.includes(3389))?'review':'clean'):'nodata');
+  setBadge('bgpview', bgpview?.asn?'clean':'nodata');
+  setBadge('observatory', observatory&&!observatory.error?(observatory.score<50?'review':'clean'):'nodata');
+  setBadge('urlscan', urlscanData?.total>0?(urlscanData.scans?.some(s=>s.verdict==='malicious')?'review':'clean'):'nodata');
+  setBadge('abuse', abuse?.results?.length?(abuse.results.some(r=>r.abuseScore>=25)?'review':'clean'):'skip');
+  setBadge('pulsedive', pulsedive&&!pulsedive.error?(pulsedive.risk!=='none'&&pulsedive.risk!=='unknown'?'review':'clean'):'skip');
+  setBadge('hibp', hibp?(hibp.found?'review':'clean'):'nodata');
+  setBadge('breachdir', breachdir?(breachdir.found&&breachdir.count>0?'review':'clean'):'nodata');
+  setBadge('worldmap','clean');
+}
