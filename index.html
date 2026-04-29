@@ -213,7 +213,7 @@ nav{
 .scan-bar-inner{height:100%;background:var(--orange);width:0%;transition:width .4s ease;box-shadow:0 0 8px rgba(255,106,26,0.6);}
 .scan-checks{padding:12px 20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:5px;}
 .scan-check{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--muted);transition:color .3s;}
-.scan-check.done{color:var(--lime);}
+.scan-check.done{color:var(--white);}
 .scan-check.active-check{color:var(--orange);}
 .check-sym{font-size:.68rem;width:14px;text-align:center;flex-shrink:0;}
 .loading-dots span{animation:blink 1.2s infinite both;}
@@ -252,10 +252,10 @@ nav{
   padding:2px 9px;font-size:.67rem;font-weight:500;border:1px solid;
   letter-spacing:.04em;
 }
-.chip.ok{background:rgba(168,255,62,0.06);border-color:rgba(168,255,62,0.25);color:var(--lime);}
+.chip.ok{background:transparent;border-color:rgba(238,238,238,0.2);color:#eeeeee;}
 .chip.warn{background:rgba(255,106,26,0.08);border-color:rgba(255,106,26,0.3);color:var(--orange);}
-.chip.err{background:rgba(255,51,51,0.06);border-color:rgba(255,51,51,0.2);color:var(--red);}
-.chip.skip{background:transparent;border-color:var(--dim);color:var(--muted);}
+.chip.err{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
+.chip.skip{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
 
 /* GRID */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
@@ -301,7 +301,7 @@ nav{
 .kv tr:last-child td{border-bottom:none;}
 
 /* STATUS */
-.ok{color:var(--lime);}
+.ok{color:var(--white);}
 .warn{color:var(--orange);}
 .bad{color:var(--red);}
 .dim{color:var(--muted);}
@@ -411,7 +411,7 @@ nav{
 .dns-table tr:last-child td{border-bottom:none;}
 
 /* CLEAN / EMPTY MSG */
-.clean-msg{text-align:center;padding:18px;font-size:.76rem;color:var(--lime);}
+.clean-msg{text-align:center;padding:18px;font-size:.76rem;color:var(--white);}
 .empty-msg{text-align:center;padding:18px;font-size:.76rem;color:var(--muted);}
 
 /* SRC FOOTER */
@@ -458,7 +458,7 @@ nav{
 .explain-body strong{color:var(--orange);}
 .explain-body .risk-high{color:var(--red);}
 .explain-body .risk-med{color:var(--orange);}
-.explain-body .risk-low{color:var(--lime);}
+.explain-body .risk-low{color:var(--white);}
 
 /* RISK CALLOUT */
 .risk-callout{
@@ -472,7 +472,7 @@ nav{
 .risk-callout .rc-head{font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 
 /* CHIP - failed is now grey not red */
-.chip.err{background:rgba(255,255,255,0.03);border-color:var(--dim);color:var(--muted);}
+.chip.err{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
 
 /* VENDOR SUMMARY CARD */
 .vendor-summary{
@@ -513,7 +513,7 @@ nav{
 .log-sym{width:14px;flex-shrink:0;margin-top:1px;}
 .log-source{color:var(--orange);width:130px;flex-shrink:0;}
 .log-status{width:80px;flex-shrink:0;}
-.log-status.ok{color:var(--lime);}
+.log-status.ok{color:var(--white);}
 .log-status.skip{color:var(--muted);}
 .log-status.fail{color:var(--muted);}
 .log-reason{color:var(--text2);flex:1;line-height:1.5;}
@@ -522,10 +522,10 @@ nav{
 
 
 /* ACTION BADGES */
-.badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(220,38,38,0.5);color:var(--red);background:rgba(220,38,38,0.08);}
-.badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(22,163,74,0.4);color:var(--green);background:rgba(22,163,74,0.07);}
-.badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--muted);background:transparent;}
-.badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--dim);background:transparent;}
+.badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff3333;color:#ff3333;background:rgba(255,51,51,0.06);}
+.badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #a8ff3e;color:#a8ff3e;background:rgba(168,255,62,0.06);}
+.badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff8c42;color:#ff8c42;background:rgba(255,140,66,0.06);}
+.badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff8c42;color:#ff8c42;background:rgba(255,140,66,0.06);}
 </style>
 </head>
 <body>
@@ -700,7 +700,7 @@ nav{
   <!-- C) VENDOR INTELLIGENCE SUMMARY -->
   <div class="vendor-summary" id="intelSummary" style="display:none;border-left-color:var(--lime);margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-      <div style="font-size:.62rem;color:var(--lime);text-transform:uppercase;letter-spacing:.1em;">// 03 — vendor intelligence summary</div>
+      <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">// 03 — vendor intelligence summary</div>
     </div>
     <div id="summaryHeadline" style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;"></div>
     <div id="summarySubline" style="font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:12px;"></div>
@@ -1450,7 +1450,7 @@ function renderLog(intel){
   const ok = _scanLog.filter(e=>e.status==='ok').length;
   const fail = _scanLog.filter(e=>e.status==='fail').length;
   const skip = _scanLog.filter(e=>e.status==='skip').length;
-  $('logSummaryBadge').innerHTML = `<span style="color:var(--lime);">${ok} ok</span> · <span style="color:var(--muted);">${fail} no data</span> · <span style="color:var(--muted);">${skip} skipped</span>`;
+  $('logSummaryBadge').innerHTML = `<span style="color:var(--white);">${ok} ok</span> · <span style="color:var(--muted);">${fail} no data</span> · <span style="color:var(--muted);">${skip} skipped</span>`;
 
   // Badge status for each source
   const getBadgeEl = id => $('badge-'+id);
@@ -1470,7 +1470,7 @@ function renderLog(intel){
   };
 
   const groups = [
-    {label:'successful — data received', entries: _scanLog.filter(e=>e.status==='ok'), symCol:'var(--lime)', sym:'✓'},
+    {label:'successful — data received', entries: _scanLog.filter(e=>e.status==='ok'), symCol:'var(--white)', sym:'✓'},
     {label:'no data — api returned nothing or failed', entries: _scanLog.filter(e=>e.status==='fail'), symCol:'var(--muted)', sym:'○'},
     {label:'skipped — no api key provided', entries: _scanLog.filter(e=>e.status==='skip'), symCol:'var(--dim)', sym:'—'},
   ];
@@ -1513,11 +1513,11 @@ function renderLog(intel){
       <span style="font-size:.68rem;color:var(--text2);">— source returned data, no concerning signals found</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
-      <span class="badge-nodata" style="font-size:.6rem;">No Data</span>
+      <span class="badge-nodata" style="font-size:.6rem;">Missing</span>
       <span style="font-size:.68rem;color:var(--text2);">— source API returned nothing (CORS block, timeout, or domain not indexed)</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-      <span class="badge-skip" style="font-size:.6rem;">No Key</span>
+      <span class="badge-skip" style="font-size:.6rem;">Missing</span>
       <span style="font-size:.68rem;color:var(--text2);">— API key not provided, source was not queried</span>
     </div>
     <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:.65rem;color:var(--muted);line-height:1.7;">
@@ -1583,8 +1583,8 @@ function renderAll(domain,intel){
     {l:'breachdir',ok:!!(breachdir&&!breachdir.error),warn:breachdir?.found,icon:'📂'},
   ];
   $('intelStrip').innerHTML=chips.map(s=>{
-    if(s.skip)return`<div class="chip skip">${s.l}: no key</div>`;
-    if(!s.ok)return`<div class="chip err">${s.l}: no data</div>`;
+    if(s.skip)return`<div class="chip skip">${s.l}</div>`;
+    if(!s.ok)return`<div class="chip err">${s.l}</div>`;
     if(s.warn)return`<div class="chip warn">⚠ ${s.l}</div>`;
     return`<div class="chip ok">✓ ${s.l}</div>`;
   }).join('');
@@ -1662,7 +1662,7 @@ function renderCRT(crt){
   const now=new Date();
   let h=`<div class="stat-row" style="grid-template-columns:repeat(3,1fr);">
     <div class="stat-box"><div class="stat-num" style="color:var(--orange);">${crt.totalCount.toLocaleString()}</div><div class="stat-lbl">total certs</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--lime);">${crt.activeCerts}</div><div class="stat-lbl">active</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--white);">${crt.activeCerts}</div><div class="stat-lbl">active</div></div>
     <div class="stat-box"><div class="stat-num" style="color:var(--blue);">${crt.subdomains?.length||0}</div><div class="stat-lbl">subdomains</div></div>
   </div>`;
   if(crt.subdomains?.length){
@@ -1781,7 +1781,7 @@ function renderGov(gov){
   h+=`</div>`;
   if(gov.headers){
     const hd=gov.headers;
-    const col=hd.score>=5?'var(--lime)':hd.score>=3?'var(--yellow)':'var(--red)';
+    const col=hd.score>=5?'var(--white)':hd.score>=3?'var(--yellow)':'var(--red)';
     h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
       <div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">// http security headers</div>
       <div style="font-size:.78rem;font-weight:700;color:${col};">${hd.score}<span class="dim">/6</span></div>
@@ -1792,7 +1792,7 @@ function renderGov(gov){
       ['Referrer-Policy','referrer leakage control',hd.referrer],['Permissions-Policy','browser feature access',hd.permissions]];
     h+=`<div class="hdr-grid">`;
     hdrs.forEach(([name,desc,present])=>{h+=`<div class="hdr-cell ${present?'ok':'fail'}">
-      <div class="hdr-name" style="color:${present?'var(--lime)':'var(--red)'};">${present?'✓':'✗'} ${name}</div>
+      <div class="hdr-name" style="color:${present?'var(--white)':'var(--red)'};">${present?'✓':'✗'} ${name}</div>
       <div class="hdr-desc">${desc}</div>
     </div>`;});
     h+=`</div>`;
@@ -1880,7 +1880,7 @@ function renderVT(vt,domain){
   let h=`<div class="stat-row" style="grid-template-columns:repeat(4,1fr);">
     <div class="stat-box"><div class="stat-num" style="color:var(--red);">${vt.malicious}</div><div class="stat-lbl">malicious</div></div>
     <div class="stat-box"><div class="stat-num" style="color:var(--orange);">${vt.suspicious}</div><div class="stat-lbl">suspicious</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:var(--lime);">${vt.harmless}</div><div class="stat-lbl">harmless</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:var(--white);">${vt.harmless}</div><div class="stat-lbl">harmless</div></div>
     <div class="stat-box"><div class="stat-num" style="color:var(--muted);">${vt.totalEngines}</div><div class="stat-lbl">engines</div></div>
   </div>`;
   h+=`<div class="pbar-wrap"><div style="display:flex;height:3px;background:var(--border);">
@@ -1917,8 +1917,8 @@ function renderOTX(otx,domain){
   if(!otx)return;$('otxPanel').style.display='block';
   if(otx.error){$('otxContent').innerHTML=`<div class="empty-msg">⚠ ${safeText(otx.error)}</div>`;return;}
   let h=`<div class="stat-row" style="grid-template-columns:1fr 1fr;">
-    <div class="stat-box"><div class="stat-num" style="color:${otx.pulseCount>0?'var(--red)':'var(--lime)'};">${otx.pulseCount}</div><div class="stat-lbl">threat pulses</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:${otx.malwareCount>0?'var(--red)':'var(--lime)'};">${otx.malwareCount}</div><div class="stat-lbl">malware samples</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:${otx.pulseCount>0?'var(--red)':'var(--white)'};">${otx.pulseCount}</div><div class="stat-lbl">threat pulses</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:${otx.malwareCount>0?'var(--red)':'var(--white)'};">${otx.malwareCount}</div><div class="stat-lbl">malware samples</div></div>
   </div>`;
   if(otx.pulses?.length){
     h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">// threat pulses</div>`;
@@ -1963,7 +1963,7 @@ function renderShodan(shodan,ips){
   }
   shodan.results.forEach(r=>{
     if(r.error)return;
-    const vulnCol=r.vulns?.length?'var(--red)':'var(--lime)';
+    const vulnCol=r.vulns?.length?'var(--red)':'var(--white)';
     h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);margin-bottom:6px;border-left:2px solid ${vulnCol};">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:6px;">
         <span style="font-size:.8rem;font-weight:700;color:var(--orange);">${safeText(r.ip)}</span>
@@ -2033,7 +2033,7 @@ function renderObservatory(obs,domain){
   $('observatoryPanel').style.display='block';
   if(obs.error){$('observatoryContent').innerHTML=`<div class="empty-msg">⚠ ${safeText(obs.error)}</div>`;return;}
   if(obs.state==='PENDING'||obs.state==='RUNNING'){$('observatoryContent').innerHTML=`<div class="empty-msg">scan still running — check back shortly</div>`;return;}
-  const gradeCol=obs.grade?.startsWith('A')?'var(--lime)':obs.grade?.startsWith('B')?'var(--yellow)':obs.grade?.startsWith('C')?'var(--orange)':'var(--red)';
+  const gradeCol=obs.grade?.startsWith('A')?'var(--white)':obs.grade?.startsWith('B')?'var(--yellow)':obs.grade?.startsWith('C')?'var(--orange)':'var(--red)';
   let h=`<div style="display:flex;align-items:center;gap:20px;padding:14px;background:var(--bg);border:1px solid var(--border);margin-bottom:12px;">
     <div style="text-align:center;">
       <div style="font-family:'VT323',monospace;font-size:3.5rem;color:${gradeCol};line-height:1;text-shadow:0 0 16px ${gradeCol};">${safeText(obs.grade||'?')}</div>
@@ -2075,7 +2075,7 @@ function renderURLScan(data,domain){
       h+=`<div style="padding:6px 10px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.25);font-size:.72rem;color:var(--red);margin-bottom:10px;">⚠ ${malicious} malicious · ${suspicious} suspicious verdict(s) in recent scans</div>`;
     }
     data.scans.forEach(s=>{
-      const vCol=s.verdict==='malicious'?'var(--red)':s.verdict==='suspicious'?'var(--orange)':'var(--lime)';
+      const vCol=s.verdict==='malicious'?'var(--red)':s.verdict==='suspicious'?'var(--orange)':'var(--white)';
       h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${vCol};margin-bottom:5px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:5px;">
           <span style="font-size:.72rem;font-weight:700;color:${vCol};">${s.verdict.toUpperCase()}</span>
@@ -2108,7 +2108,7 @@ function renderAbuse(abuse){
   let h='';
   abuse.results.forEach(r=>{
     if(r.error){h+=`<div class="empty-msg">⚠ ${safeText(r.ip)}: ${r.error}</div>`;return;}
-    const scoreCol=r.abuseScore>=75?'var(--red)':r.abuseScore>=25?'var(--orange)':r.abuseScore>0?'var(--yellow)':'var(--lime)';
+    const scoreCol=r.abuseScore>=75?'var(--red)':r.abuseScore>=25?'var(--orange)':r.abuseScore>0?'var(--yellow)':'var(--white)';
     const barW=r.abuseScore||0;
     h+=`<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${scoreCol};margin-bottom:6px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
@@ -2150,7 +2150,7 @@ function renderPulsedive(pd,domain){
   if(!pd)return;
   $('pulsedivePanel').style.display='block';
   if(pd.error){$('pulsediveContent').innerHTML=`<div class="empty-msg">⚠ ${safeText(pd.error)}</div>`;return;}
-  const riskCol=pd.risk==='critical'||pd.risk==='high'?'var(--red)':pd.risk==='medium'?'var(--orange)':pd.risk==='low'?'var(--yellow)':'var(--lime)';
+  const riskCol=pd.risk==='critical'||pd.risk==='high'?'var(--red)':pd.risk==='medium'?'var(--orange)':pd.risk==='low'?'var(--yellow)':'var(--white)';
   let h=`<div style="display:flex;align-items:center;gap:16px;padding:12px;background:var(--bg);border:1px solid var(--border);border-left:2px solid ${riskCol};margin-bottom:12px;">
     <div style="text-align:center;min-width:60px;">
       <div style="font-family:'VT323',monospace;font-size:2rem;color:${riskCol};text-transform:uppercase;text-shadow:0 0 10px ${riskCol};">${safeText(pd.risk)}</div>
@@ -2224,7 +2224,7 @@ function renderHIBP(hibp, domain){
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;font-size:.68rem;color:var(--muted);">
           ${b.PwnCount?`<span>📊 ${Number(b.PwnCount).toLocaleString()} accounts</span>`:''}
-          ${b.IsVerified?'<span style="color:var(--lime);">✓ verified</span>':'<span style="color:var(--muted);">unverified</span>'}
+          ${b.IsVerified?'<span style="color:var(--white);">✓ verified</span>':'<span style="color:var(--muted);">unverified</span>'}
           ${b.IsSensitive?'<span style="color:var(--orange);">⚠ sensitive</span>':''}
           ${b.IsRetired?'<span style="color:var(--muted);">retired</span>':''}
         </div>
@@ -2407,8 +2407,8 @@ function setBadge(id, status){
   if(!el) return;
   if(status==='review'){el.className='badge-review';el.textContent='To be Reviewed';}
   else if(status==='clean'){el.className='badge-clean';el.textContent='No Issue';}
-  else if(status==='skip'){el.className='badge-skip';el.textContent='No Key';}
-  else{el.className='badge-nodata';el.textContent='No Data';}
+  else if(status==='skip'){el.className='badge-skip';el.textContent='Missing';}
+  else{el.className='badge-nodata';el.textContent='Missing';}
 }
 
 function updateAllBadges(intel){
