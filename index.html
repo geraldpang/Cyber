@@ -15,7 +15,7 @@
   --border:#222222;
   --border2:#2a2a2a;
   --orange:#ff6a1a;
-  --orange2:#ff8c42;
+  --orange2:#38bdf8;
   --orange-dim:rgba(255,106,26,0.15);
   --orange-glow:rgba(255,106,26,0.06);
   --lime:#a8ff3e;
@@ -177,7 +177,7 @@ nav{
 .api-key-link:hover{color:var(--orange);}
 .badge-free{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   padding:1px 6px;white-space:nowrap;flex-shrink:0;
-  background:rgba(255,140,66,0.1);color:var(--orange2);border:1px solid rgba(255,140,66,0.25);}
+  background:rgba(255,140,66,0.1);color:#ff8c42;border:1px solid rgba(255,140,66,0.25);}
 
 /* INTEL BAR */
 .intel-bar{
@@ -284,7 +284,7 @@ nav{
   font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   padding:1px 6px;border:1px solid;
 }
-.live-lime{border-color:rgba(255,140,66,0.3);color:var(--orange2);}
+.live-lime{border-color:rgba(255,140,66,0.3);color:#ff8c42;}
 .live-orange{border-color:rgba(255,106,26,0.3);color:var(--orange);}
 .live-red{border-color:rgba(255,51,51,0.3);color:var(--red);}
 .live-blue{border-color:rgba(56,189,248,0.3);color:var(--blue);}
@@ -384,11 +384,11 @@ nav{
 }
 .article:hover{border-left-color:var(--orange);}
 .article-link{font-size:.78rem;font-weight:600;color:var(--orange);text-decoration:none;display:block;margin-bottom:5px;line-height:1.4;}
-.article-link:hover{color:var(--orange2);}
+.article-link:hover{color:#ff8c42;}
 .article-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .article-src{font-size:.64rem;color:var(--muted);border:1px solid var(--border);padding:0 5px;}
 .article-date{font-size:.64rem;color:var(--muted);}
-.article-new{font-size:.6rem;font-weight:700;padding:0 5px;background:rgba(255,140,66,0.1);color:var(--orange2);border:1px solid rgba(255,140,66,0.25);}
+.article-new{font-size:.6rem;font-weight:700;padding:0 5px;background:rgba(56,189,248,0.1);color:var(--orange2);border:1px solid rgba(56,189,248,0.25);}
 .article-snippet{font-size:.7rem;color:var(--text2);margin-top:5px;line-height:1.5;}
 
 /* RANSOM */
@@ -468,7 +468,7 @@ nav{
 .risk-callout.critical{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
 .risk-callout.high{background:rgba(255,106,26,0.07);border-color:rgba(255,106,26,0.25);color:var(--orange);}
 .risk-callout.medium{background:rgba(255,217,61,0.06);border-color:rgba(255,217,61,0.2);color:var(--yellow);}
-.risk-callout.info{background:rgba(255,140,66,0.04);border-color:rgba(255,140,66,0.15);color:var(--orange2);}
+.risk-callout.info{background:rgba(255,140,66,0.04);border-color:rgba(255,140,66,0.15);color:#ff8c42;}
 .risk-callout .rc-head{font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 
 /* CHIP - failed is now grey not red */
@@ -1828,7 +1828,7 @@ function renderGov(gov){
       ['Referrer-Policy','referrer leakage control',hd.referrer],['Permissions-Policy','browser feature access',hd.permissions]];
     h+=`<div class="hdr-grid">`;
     hdrs.forEach(([name,desc,present])=>{h+=`<div class="hdr-cell ${present?'ok':'fail'}">
-      <div class="hdr-name" style="color:${present?'var(--white)':'var(--orange2)'};">${present?'✓':'✗'} ${name}</div>
+      <div class="hdr-name" style="color:${present?'var(--white)':'#ff8c42'};">${present?'✓':'✗'} ${name}</div>
       <div class="hdr-desc">${desc}</div>
     </div>`;});
     h+=`</div>`;
