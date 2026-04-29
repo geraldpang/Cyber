@@ -59,10 +59,9 @@ nav{
 .nav-left{display:flex;align-items:center;gap:16px;}
 .nav-logo{
   font-family:'VT323',monospace;font-size:1.5rem;
-  color:var(--orange);letter-spacing:.06em;
-  text-shadow:0 0 12px rgba(255,106,26,0.5);
+  color:var(--white);letter-spacing:.06em;
 }
-.nav-logo span{color:var(--lime);text-shadow:0 0 10px rgba(168,255,62,0.5);}
+.nav-logo span{color:var(--orange);text-shadow:0 0 10px rgba(255,106,26,0.4);}
 .nav-tag{
   font-size:.65rem;color:var(--muted);
   border:1px solid var(--dim);border-radius:2px;
@@ -522,9 +521,9 @@ nav{
 .log-section-head{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:6px 0 4px;margin-top:8px;border-bottom:1px solid var(--border);}
 
 
-/* ACTION BADGES replacing LIVE */
-.badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(255,106,26,0.4);color:var(--orange);background:rgba(255,106,26,0.08);}
-.badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(168,255,62,0.3);color:var(--lime);background:rgba(168,255,62,0.05);}
+/* ACTION BADGES */
+.badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(220,38,38,0.5);color:var(--red);background:rgba(220,38,38,0.08);}
+.badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(22,163,74,0.4);color:var(--green);background:rgba(22,163,74,0.07);}
 .badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--muted);background:transparent;}
 .badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid var(--dim);color:var(--dim);background:transparent;}
 </style>
@@ -533,7 +532,7 @@ nav{
 
 <nav>
   <div class="nav-left">
-    <div class="nav-logo">third<span>party</span>_intel</div>
+    <div class="nav-logo"><span>cyber_intel</span> // third-party</div>
     <div class="nav-tag">v3.1.0</div>
   </div>
   <div class="nav-right">
@@ -545,14 +544,12 @@ nav{
 </nav>
 
 <section class="hero" id="heroSection">
-  <div style="margin-bottom:32px;animation:fadeIn .8s ease both;">
-    <div style="font-family:'VT323',monospace;font-size:clamp(2.8rem,7vw,5.5rem);color:var(--orange);line-height:1;letter-spacing:.04em;text-shadow:0 0 30px rgba(255,106,26,0.5),0 0 60px rgba(255,106,26,0.2);margin-bottom:8px;">
-      THIRD<span style="color:var(--lime);text-shadow:0 0 30px rgba(168,255,62,0.5),0 0 60px rgba(168,255,62,0.2);">PARTY</span>
+  <div style="margin-bottom:28px;animation:fadeIn .8s ease both;">
+    <div style="font-family:'VT323',monospace;font-size:clamp(1.8rem,4vw,3.2rem);line-height:1.15;letter-spacing:.06em;margin-bottom:6px;">
+      <span style="color:var(--orange);text-shadow:0 0 18px rgba(255,106,26,0.35);">Cyber Intel</span>
+      <span style="color:var(--white);"> Third-Party</span>
     </div>
-    <div style="font-family:'VT323',monospace;font-size:clamp(1.8rem,4vw,3rem);color:var(--text2);letter-spacing:.18em;text-shadow:0 0 12px rgba(200,200,200,0.15);">
-      INTELLIGENCE
-    </div>
-    <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--orange),var(--lime),transparent);margin-top:16px;opacity:.4;"></div>
+    <div style="width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);opacity:.3;"></div>
   </div>
 
   <div class="prompt-line">
@@ -2324,8 +2321,32 @@ function renderVendorSummary(domain, intel, bizInfo){
       ${bizKw.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
     </div>`;
   } else {
-    bizHtml = `<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);font-size:.74rem;color:var(--muted);">
-      // website meta data unavailable for ${safeText(domain)} — site may use dynamic rendering, strict CSP, or block external crawlers. check vendor website directly.
+    // Fallback: build from RDAP + DNS data we already have
+    const {rdap, dns, crt, bgpview} = intel;
+    const domainAge = rdap?.registered ? Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000)) : null;
+    const ns = dns?.ns?.[0] || null;
+    const ip = dns?.aRecords?.[0] || null;
+    const hosting = bgpview?.asnName || null;
+    const subCount = crt?.subdomains?.length || 0;
+    const certCount = crt?.totalCount || 0;
+
+    const rows = [
+      ['domain', safeText(domain)],
+      domainAge !== null ? ['registered', `${domainAge} years ago (${rdap.registered?.split('T')[0]})`] : null,
+      rdap?.registrar ? ['registrar', safeText(rdap.registrar)] : null,
+      rdap?.expiry ? ['expires', safeText(rdap.expiry.split('T')[0])] : null,
+      ns ? ['nameserver', safeText(ns)] : null,
+      ip ? ['ip address', safeText(ip)] : null,
+      hosting ? ['hosting org', safeText(hosting)] : null,
+      certCount ? ['certificates issued', certCount.toLocaleString()] : null,
+      subCount ? ['subdomains found', subCount] : null,
+    ].filter(Boolean);
+
+    bizHtml = `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;">// website meta unavailable — showing infrastructure data from intel sources</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.74rem;">
+        ${rows.map(([k,v])=>`<tr><td style="color:var(--muted);padding:3px 10px 3px 0;white-space:nowrap;font-size:.7rem;width:36%;">${k}</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.71rem;">${v}</td></tr>`).join('')}
+      </table>
     </div>`;
   }
   if($('summaryBizInfo')) $('summaryBizInfo').innerHTML = bizHtml;
