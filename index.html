@@ -356,8 +356,8 @@ nav{
   display:flex;align-items:flex-start;gap:10px;
   padding:9px 10px;border:1px solid;
 }
-.gov-row.ok{background:rgba(168,255,62,0.03);border-color:rgba(168,255,62,0.15);}
-.gov-row.fail{background:rgba(255,51,51,0.03);border-color:rgba(255,51,51,0.1);}
+.gov-row.ok{background:rgba(238,238,238,0.02);border-color:rgba(238,238,238,0.1);}
+.gov-row.fail{background:transparent;border-color:var(--border);}
 .gov-pill{
   font-size:.6rem;font-weight:700;padding:1px 6px;border:1px solid;
   white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;
@@ -370,8 +370,8 @@ nav{
 /* HDR GRID */
 .hdr-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px;}
 .hdr-cell{padding:7px 9px;border:1px solid;}
-.hdr-cell.ok{background:rgba(168,255,62,0.03);border-color:rgba(168,255,62,0.15);}
-.hdr-cell.fail{background:rgba(255,51,51,0.03);border-color:rgba(255,51,51,0.1);}
+.hdr-cell.ok{background:rgba(238,238,238,0.03);border-color:rgba(238,238,238,0.1);}
+.hdr-cell.fail{background:transparent;border-color:var(--border);}
 .hdr-name{font-size:.7rem;font-weight:600;margin-bottom:1px;font-family:'JetBrains Mono',monospace;}
 .hdr-desc{font-size:.64rem;color:var(--muted);}
 
@@ -402,7 +402,7 @@ nav{
 .vt-engine-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:5px;margin-top:8px;}
 .vt-engine{padding:6px 8px;background:var(--bg);border:1px solid var(--border);}
 .vt-eng-name{font-size:.72rem;font-weight:600;color:var(--white);margin-bottom:1px;}
-.vt-eng-result{font-size:.66rem;color:var(--red);}
+.vt-eng-result{font-size:.66rem;color:var(--orange2);}
 
 /* DNS TABLE */
 .dns-table{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:8px;}
@@ -456,7 +456,7 @@ nav{
 }
 .explain-body.open{display:block;}
 .explain-body strong{color:var(--orange);}
-.explain-body .risk-high{color:var(--red);}
+.explain-body .risk-high{color:var(--orange);}
 .explain-body .risk-med{color:var(--orange);}
 .explain-body .risk-low{color:var(--white);}
 
@@ -1309,6 +1309,40 @@ async function fetchHIBP(domain){
   }catch{return null;}
 }
 
+async function fetchWikipedia(company){
+  try{
+    const r=await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(company)}&limit=1&format=json&origin=*`,{signal:AbortSignal.timeout(8000)});
+    if(!r.ok)return null;
+    const [,titles]=await r.json();
+    if(!titles.length)return null;
+    const slug=titles[0].replace(/ /g,'_');
+    const s=await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(slug)}`,{signal:AbortSignal.timeout(8000)});
+    if(!s.ok)return null;
+    const d=await s.json();
+    if(d.type==='disambiguation')return null;
+    return{title:d.title||null,description:d.description||null,extract:d.extract||null,url:d.content_urls?.desktop?.page||null};
+  }catch{return null;}
+}
+
+async function fetchWikidata(company){
+  try{
+    const r=await fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(company)}&language=en&limit=1&format=json&origin=*`,{signal:AbortSignal.timeout(8000)});
+    if(!r.ok)return null;
+    const sd=await r.json();
+    const entity=sd.search?.[0];
+    if(!entity)return null;
+    const r2=await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entity.id}&props=claims|labels|descriptions&languages=en&format=json&origin=*`,{signal:AbortSignal.timeout(8000)});
+    if(!r2.ok)return null;
+    const dd=await r2.json();
+    const e=dd.entities?.[entity.id];
+    if(!e)return null;
+    const ct=(prop)=>{const v=e.claims?.[prop]?.[0]?.mainsnak?.datavalue?.value;return v?.time?v.time.substring(1,5):null;};
+    const ca=(prop)=>{const v=e.claims?.[prop]?.[0]?.mainsnak?.datavalue?.value;return v?.amount?parseInt(v.amount).toLocaleString():null;};
+    return{label:e.labels?.en?.value||entity.label,description:e.descriptions?.en?.value||entity.description,founded:ct('P571'),employees:ca('P1128'),url:`https://www.wikidata.org/wiki/${entity.id}`};
+  }catch{return null;}
+}
+
+
 async function fetchBreachDirectory(domain){
   // BreachDirectory free API — returns breach hits by domain
   const company = domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'').toLowerCase();
@@ -1353,7 +1387,7 @@ async function startScan(){
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
-  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo;
+  let rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo,wiki,wikidata;
   _scanLog.length = 0; // reset log for new scan
   async function timed(name, fn){
     const t0 = Date.now();
@@ -1396,13 +1430,15 @@ async function startScan(){
       timed('hibp',()=>fetchHIBP(domain)),
       timed('breachdir',()=>fetchBreachDirectory(domain)),
     ]);
-    bizInfo = await timed('bizinfo',()=>fetchBusinessInfo(domain));
+    bizInfo=await timed('bizinfo',()=>fetchBusinessInfo(domain));
+    const _co=domain.replace(/\.(?:com|au|co\.uk|org|net|gov|edu|io|com\.au).*/,'').replace(/^www\./,'');
+    [wiki,wikidata]=await Promise.all([timed('wikipedia',()=>fetchWikipedia(_co)),timed('wikidata',()=>fetchWikidata(_co))]);
   }catch(e){console.warn('Enrichment fetch:',e);}
   finishScanAnim();
   await new Promise(r=>setTimeout(r,300));
   $('scanning').classList.remove('active');
   $('heroSection').style.display='none';
-  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo});
+  renderAll(domain,{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo,wiki,wikidata});
   $('results').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   btn.disabled=false;btn.textContent='EXECUTE';
@@ -1558,7 +1594,7 @@ function riskCallout(level, headline, detail){
 
 
 function renderAll(domain,intel){
-  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo}=intel;
+  const{rdap,dns,crt,urlhaus,threatfox,breach,gov,ransomware,news,vt,otx,shodan,bgpview,observatory,urlscanData,abuse,pulsedive,hibp,breachdir,bizInfo,wiki,wikidata}=intel;
   $('resultDomain').textContent=`// ${domain}`;
   $('resultTs').textContent=new Date().toISOString().replace('T',' ').substring(0,19)+' UTC';
   const chips=[
@@ -1589,7 +1625,7 @@ function renderAll(domain,intel){
     return`<div class="chip ok">✓ ${s.l}</div>`;
   }).join('');
   updateAllBadges(intel);
-  renderVendorSummary(domain, intel, bizInfo);
+  renderVendorSummary(domain, intel, bizInfo, wiki, wikidata);
   renderLog(intel);
   renderRDAP(rdap);renderDNS(dns);renderCRT(crt);
   renderThreat(urlhaus,threatfox);renderBreach(breach,domain);renderGov(gov);
@@ -1792,7 +1828,7 @@ function renderGov(gov){
       ['Referrer-Policy','referrer leakage control',hd.referrer],['Permissions-Policy','browser feature access',hd.permissions]];
     h+=`<div class="hdr-grid">`;
     hdrs.forEach(([name,desc,present])=>{h+=`<div class="hdr-cell ${present?'ok':'fail'}">
-      <div class="hdr-name" style="color:${present?'var(--white)':'var(--red)'};">${present?'✓':'✗'} ${name}</div>
+      <div class="hdr-name" style="color:${present?'var(--white)':'var(--orange2)'};">${present?'✓':'✗'} ${name}</div>
       <div class="hdr-desc">${desc}</div>
     </div>`;});
     h+=`</div>`;
@@ -2304,52 +2340,67 @@ function resetScan(){
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
 
-function renderVendorSummary(domain, intel, bizInfo){
+function renderVendorSummary(domain, intel, bizInfo, wiki, wikidata){
   // ── A) Vendor Information ─────────────────────────────────────────────────
   const elA = $('vendorSummary');
   if(elA) elA.style.display = 'block';
 
-  const bizDesc = bizInfo?.description || bizInfo?.twitterDesc || null;
-  const bizTitle = bizInfo?.ogSiteName || bizInfo?.ogTitle || bizInfo?.title || null;
-  const bizKw = bizInfo?.keywords ? bizInfo.keywords.split(',').slice(0,6).map(k=>k.trim()).filter(Boolean) : [];
-
-  let bizHtml = '';
-  if(bizDesc || bizTitle){
-    bizHtml = `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
-      ${bizTitle?`<div style="font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:6px;">${safeText(bizTitle)}</div>`:''}
-      ${bizDesc?`<div style="font-size:.76rem;color:var(--text2);line-height:1.7;">${safeText(bizDesc.substring(0,350))}</div>`:''}
-      ${bizKw.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
+  // Wikipedia > Wikidata > meta > RDAP
+  let bizHtml='';
+  if(wiki?.extract){
+    const wf=[];if(wikidata?.founded)wf.push(['founded',wikidata.founded]);if(wikidata?.employees)wf.push(['employees',wikidata.employees]);
+    bizHtml=`<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--orange);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-size:.88rem;font-weight:700;color:var(--white);">${safeText(wiki.title)}</div>
+        ${wiki.description?`<div style="font-size:.72rem;color:var(--muted);">${safeText(wiki.description)}</div>`:''}
+        <a href="${wiki.url||'#'}" target="_blank" rel="noopener" style="font-size:.65rem;color:var(--orange);text-decoration:none;margin-left:auto;">Wikipedia →</a>
+      </div>
+      <div style="font-size:.76rem;color:var(--text2);line-height:1.7;margin-bottom:${wf.length?'10px':'0'};">${safeText(wiki.extract.substring(0,400))}${wiki.extract.length>400?'…':''}</div>
+      ${wf.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;">${wf.map(([k,v])=>`<span style="font-size:.68rem;padding:2px 9px;border:1px solid var(--border);color:var(--muted);"><span style="color:var(--text2);">${k}:</span> ${v}</span>`).join('')}</div>`:''}
+    </div>`;
+  } else if(wikidata?.description||wikidata?.label){
+    const wf=[];if(wikidata?.founded)wf.push(['founded',wikidata.founded]);if(wikidata?.employees)wf.push(['employees',wikidata.employees]);
+    bizHtml=`<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--border2);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        ${wikidata.label?`<div style="font-size:.88rem;font-weight:700;color:var(--white);">${safeText(wikidata.label)}</div>`:''}
+        <a href="${wikidata.url||'#'}" target="_blank" rel="noopener" style="font-size:.65rem;color:var(--orange);text-decoration:none;margin-left:auto;">Wikidata →</a>
+      </div>
+      ${wikidata.description?`<div style="font-size:.76rem;color:var(--text2);line-height:1.7;">${safeText(wikidata.description)}</div>`:''}
     </div>`;
   } else {
-    // Fallback: build from RDAP + DNS data we already have
-    const {rdap, dns, crt, bgpview} = intel;
-    const domainAge = rdap?.registered ? Math.floor((Date.now()-new Date(rdap.registered))/(365.25*86400000)) : null;
-    const ns = dns?.ns?.[0] || null;
-    const ip = dns?.aRecords?.[0] || null;
-    const hosting = bgpview?.asnName || null;
-    const subCount = crt?.subdomains?.length || 0;
-    const certCount = crt?.totalCount || 0;
-
-    const rows = [
-      ['domain', safeText(domain)],
-      domainAge !== null ? ['registered', `${domainAge} years ago (${rdap.registered?.split('T')[0]})`] : null,
-      rdap?.registrar ? ['registrar', safeText(rdap.registrar)] : null,
-      rdap?.expiry ? ['expires', safeText(rdap.expiry.split('T')[0])] : null,
-      ns ? ['nameserver', safeText(ns)] : null,
-      ip ? ['ip address', safeText(ip)] : null,
-      hosting ? ['hosting org', safeText(hosting)] : null,
-      certCount ? ['certificates issued', certCount.toLocaleString()] : null,
-      subCount ? ['subdomains found', subCount] : null,
-    ].filter(Boolean);
-
-    bizHtml = `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--muted);">
-      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;">// website meta unavailable — showing infrastructure data from intel sources</div>
-      <table style="width:100%;border-collapse:collapse;font-size:.74rem;">
-        ${rows.map(([k,v])=>`<tr><td style="color:var(--muted);padding:3px 10px 3px 0;white-space:nowrap;font-size:.7rem;width:36%;">${k}</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.71rem;">${v}</td></tr>`).join('')}
-      </table>
-    </div>`;
+    // meta scrape or RDAP fallback
+    const bizDesc=bizInfo?.description||bizInfo?.twitterDesc||null;
+    const bizTitle=bizInfo?.ogSiteName||bizInfo?.ogTitle||bizInfo?.title||null;
+    const bizKw=bizInfo?.keywords?bizInfo.keywords.split(',').slice(0,6).map(k=>k.trim()).filter(Boolean):[];
+    if(bizDesc||bizTitle){
+      bizHtml=`<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--border2);">
+        ${bizTitle?`<div style="font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:6px;">${safeText(bizTitle)}</div>`:''}
+        ${bizDesc?`<div style="font-size:.76rem;color:var(--text2);line-height:1.7;">${safeText(bizDesc.substring(0,350))}</div>`:''}
+        ${bizKw.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">${bizKw.map(k=>`<span style="font-size:.63rem;padding:1px 7px;border:1px solid var(--dim);color:var(--muted);">${safeText(k)}</span>`).join('')}</div>`:''}
+      </div>`;
+    } else {
+      const {rdap:r2,dns:d2,crt:c2,bgpview:b2}=intel;
+      const dAge=r2?.registered?Math.floor((Date.now()-new Date(r2.registered))/(365.25*86400000)):null;
+      const rows=[
+        ['domain',safeText(domain)],
+        dAge!==null?['registered',`${dAge}y (${r2.registered?.split('T')[0]})`]:null,
+        r2?.registrar?['registrar',safeText(r2.registrar)]:null,
+        r2?.expiry?['expires',safeText(r2.expiry.split('T')[0])]:null,
+        d2?.ns?.[0]?['nameserver',safeText(d2.ns[0])]:null,
+        d2?.aRecords?.[0]?['ip',safeText(d2.aRecords[0])]:null,
+        b2?.asnName?['hosting',safeText(b2.asnName)]:null,
+        c2?.totalCount?['certs issued',c2.totalCount.toLocaleString()]:null,
+        c2?.subdomains?.length?['subdomains',c2.subdomains.length]:null,
+      ].filter(Boolean);
+      bizHtml=`<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--border2);">
+        <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;">// no public profile — infrastructure data</div>
+        <table style="width:100%;border-collapse:collapse;font-size:.74rem;">
+          ${rows.map(([k,v])=>`<tr><td style="color:var(--muted);padding:3px 10px 3px 0;font-size:.7rem;width:36%;">${k}</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:.71rem;">${v}</td></tr>`).join('')}
+        </table>
+      </div>`;
+    }
   }
-  if($('summaryBizInfo')) $('summaryBizInfo').innerHTML = bizHtml;
+    if($('summaryBizInfo')) $('summaryBizInfo').innerHTML = bizHtml;
   if($('summaryTs')) $('summaryTs').textContent = new Date().toISOString().substring(0,10);
 
   // ── C) Intelligence Summary ───────────────────────────────────────────────
