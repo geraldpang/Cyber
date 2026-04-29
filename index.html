@@ -136,7 +136,7 @@ nav{
   cursor:pointer;transition:background .15s,box-shadow .15s;white-space:nowrap;flex-shrink:0;
   letter-spacing:.05em;text-transform:uppercase;
 }
-.search-btn:hover:not(:disabled){background:var(--orange2);box-shadow:0 0 16px rgba(255,106,26,0.4);}
+.search-btn:hover:not(:disabled){background:#ff8040;box-shadow:0 0 16px rgba(255,106,26,0.4);}
 .search-btn:disabled{opacity:.5;cursor:not-allowed;}
 .search-examples{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
 .ex-chip{
@@ -177,7 +177,7 @@ nav{
 .api-key-link:hover{color:var(--orange);}
 .badge-free{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   padding:1px 6px;white-space:nowrap;flex-shrink:0;
-  background:rgba(255,140,66,0.1);color:#ff8c42;border:1px solid rgba(255,140,66,0.25);}
+  background:rgba(255,106,26,0.1);color:#ff6a1a;border:1px solid rgba(255,106,26,0.25);}
 
 /* INTEL BAR */
 .intel-bar{
@@ -284,7 +284,7 @@ nav{
   font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   padding:1px 6px;border:1px solid;
 }
-.live-lime{border-color:rgba(255,140,66,0.3);color:#ff8c42;}
+.live-lime{border-color:rgba(255,106,26,0.3);color:#ff6a1a;}
 .live-orange{border-color:rgba(255,106,26,0.3);color:var(--orange);}
 .live-red{border-color:rgba(255,51,51,0.3);color:var(--red);}
 .live-blue{border-color:rgba(56,189,248,0.3);color:var(--blue);}
@@ -363,7 +363,7 @@ nav{
   white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;
 }
 .gov-pill.ok{border-color:rgba(238,238,238,0.3);color:var(--white);}
-.gov-pill.fail{border-color:rgba(255,51,51,0.3);color:var(--red);}
+.gov-pill.fail{border-color:rgba(255,106,26,0.4);color:var(--orange);}
 .gov-lbl{font-size:.74rem;font-weight:600;color:var(--white);margin-bottom:2px;}
 .gov-detail{font-size:.68rem;color:var(--muted);line-height:1.5;}
 
@@ -384,7 +384,7 @@ nav{
 }
 .article:hover{border-left-color:var(--orange);}
 .article-link{font-size:.78rem;font-weight:600;color:var(--orange);text-decoration:none;display:block;margin-bottom:5px;line-height:1.4;}
-.article-link:hover{color:#ff8c42;}
+.article-link:hover{color:#ff6a1a;}
 .article-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .article-src{font-size:.64rem;color:var(--muted);border:1px solid var(--border);padding:0 5px;}
 .article-date{font-size:.64rem;color:var(--muted);}
@@ -468,7 +468,7 @@ nav{
 .risk-callout.critical{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
 .risk-callout.high{background:rgba(255,106,26,0.07);border-color:rgba(255,106,26,0.25);color:var(--orange);}
 .risk-callout.medium{background:rgba(255,217,61,0.06);border-color:rgba(255,217,61,0.2);color:var(--yellow);}
-.risk-callout.info{background:rgba(255,140,66,0.04);border-color:rgba(255,140,66,0.15);color:#ff8c42;}
+.risk-callout.info{background:rgba(255,106,26,0.04);border-color:rgba(255,106,26,0.15);color:#ff6a1a;}
 .risk-callout .rc-head{font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 
 /* CHIP - failed is now grey not red */
@@ -479,6 +479,7 @@ nav{
   background:var(--bg2);border:1px solid var(--border2);
   padding:22px 24px;margin-bottom:14px;
   border-left:3px solid var(--orange);
+  overflow:visible;
 }
 .vs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
 .vs-cell{background:var(--bg);border:1px solid var(--border);padding:10px 12px;text-align:center;}
@@ -524,8 +525,8 @@ nav{
 /* ACTION BADGES */
 .badge-review{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff3333;color:#ff3333;background:rgba(255,51,51,0.06);}
 .badge-clean{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #a8ff3e;color:#a8ff3e;background:rgba(168,255,62,0.06);}
-.badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff8c42;color:#ff8c42;background:rgba(255,140,66,0.06);}
-.badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff8c42;color:#ff8c42;background:rgba(255,140,66,0.06);}
+.badge-nodata{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff6a1a;color:#ff6a1a;background:rgba(255,106,26,0.06);}
+.badge-skip{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border:1px solid #ff6a1a;color:#ff6a1a;background:rgba(255,106,26,0.06);}
 </style>
 </head>
 <body>
@@ -1828,7 +1829,7 @@ function renderGov(gov){
       ['Referrer-Policy','referrer leakage control',hd.referrer],['Permissions-Policy','browser feature access',hd.permissions]];
     h+=`<div class="hdr-grid">`;
     hdrs.forEach(([name,desc,present])=>{h+=`<div class="hdr-cell ${present?'ok':'fail'}">
-      <div class="hdr-name" style="color:${present?'var(--white)':'#ff8c42'};">${present?'✓':'✗'} ${name}</div>
+      <div class="hdr-name" style="color:${present?'var(--white)':'#ff6a1a'};">${present?'✓':'✗'} ${name}</div>
       <div class="hdr-desc">${desc}</div>
     </div>`;});
     h+=`</div>`;
@@ -2355,7 +2356,7 @@ function renderVendorSummary(domain, intel, bizInfo, wiki, wikidata){
         ${wiki.description?`<div style="font-size:.72rem;color:var(--muted);">${safeText(wiki.description)}</div>`:''}
         <a href="${wiki.url||'#'}" target="_blank" rel="noopener" style="font-size:.65rem;color:var(--orange);text-decoration:none;margin-left:auto;">Wikipedia →</a>
       </div>
-      <div style="font-size:.76rem;color:var(--text2);line-height:1.7;margin-bottom:${wf.length?'10px':'0'};">${safeText(wiki.extract.substring(0,400))}${wiki.extract.length>400?'…':''}</div>
+      <div style="font-size:.76rem;color:var(--text2);line-height:1.7;margin-bottom:${wf.length?'10px':'0'};">${safeText(wiki.extract.substring(0,700))}${wiki.extract.length>700?'…':''}</div>
       ${wf.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;">${wf.map(([k,v])=>`<span style="font-size:.68rem;padding:2px 9px;border:1px solid var(--border);color:var(--muted);"><span style="color:var(--text2);">${k}:</span> ${v}</span>`).join('')}</div>`:''}
     </div>`;
   } else if(wikidata?.description||wikidata?.label){
