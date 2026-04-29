@@ -177,7 +177,7 @@ nav{
 .api-key-link:hover{color:var(--orange);}
 .badge-free{font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   padding:1px 6px;white-space:nowrap;flex-shrink:0;
-  background:var(--lime-dim);color:var(--lime);border:1px solid rgba(168,255,62,0.2);}
+  background:rgba(255,140,66,0.1);color:var(--orange2);border:1px solid rgba(255,140,66,0.25);}
 
 /* INTEL BAR */
 .intel-bar{
@@ -254,8 +254,8 @@ nav{
 }
 .chip.ok{background:transparent;border-color:rgba(238,238,238,0.2);color:#eeeeee;}
 .chip.warn{background:rgba(255,106,26,0.08);border-color:rgba(255,106,26,0.3);color:var(--orange);}
-.chip.err{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
-.chip.skip{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
+.chip.err{background:transparent;border-color:var(--dim);color:var(--muted);}
+.chip.skip{background:transparent;border-color:var(--dim);color:var(--muted);}
 
 /* GRID */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
@@ -284,7 +284,7 @@ nav{
   font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   padding:1px 6px;border:1px solid;
 }
-.live-lime{border-color:rgba(168,255,62,0.3);color:var(--lime);}
+.live-lime{border-color:rgba(255,140,66,0.3);color:var(--orange2);}
 .live-orange{border-color:rgba(255,106,26,0.3);color:var(--orange);}
 .live-red{border-color:rgba(255,51,51,0.3);color:var(--red);}
 .live-blue{border-color:rgba(56,189,248,0.3);color:var(--blue);}
@@ -312,7 +312,7 @@ nav{
   border:1px solid var(--dim);padding:0 6px;
   font-size:.64rem;color:var(--text2);
 }
-.tag-lime{border-color:rgba(168,255,62,0.3);color:var(--lime);}
+.tag-lime{border-color:var(--dim);color:var(--text);}
 .tag-orange{border-color:rgba(255,106,26,0.3);color:var(--orange);}
 .tag-red{border-color:rgba(255,51,51,0.3);color:var(--red);}
 .tag-blue{border-color:rgba(56,189,248,0.3);color:var(--blue);}
@@ -338,7 +338,7 @@ nav{
 }
 .t-row.bad{border-left-color:var(--red);}
 .t-row.warn{border-left-color:var(--orange);}
-.t-row.ok{border-left-color:var(--lime);}
+.t-row.ok{border-left-color:var(--border2);}
 .t-label{font-size:.76rem;font-weight:600;color:var(--white);margin-bottom:2px;}
 .t-val{font-size:.7rem;color:var(--text2);word-break:break-all;line-height:1.5;}
 
@@ -362,7 +362,7 @@ nav{
   font-size:.6rem;font-weight:700;padding:1px 6px;border:1px solid;
   white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase;margin-top:1px;
 }
-.gov-pill.ok{border-color:rgba(168,255,62,0.3);color:var(--lime);}
+.gov-pill.ok{border-color:rgba(238,238,238,0.3);color:var(--white);}
 .gov-pill.fail{border-color:rgba(255,51,51,0.3);color:var(--red);}
 .gov-lbl{font-size:.74rem;font-weight:600;color:var(--white);margin-bottom:2px;}
 .gov-detail{font-size:.68rem;color:var(--muted);line-height:1.5;}
@@ -388,7 +388,7 @@ nav{
 .article-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .article-src{font-size:.64rem;color:var(--muted);border:1px solid var(--border);padding:0 5px;}
 .article-date{font-size:.64rem;color:var(--muted);}
-.article-new{font-size:.6rem;font-weight:700;padding:0 5px;background:var(--lime-dim);color:var(--lime);border:1px solid rgba(168,255,62,0.2);}
+.article-new{font-size:.6rem;font-weight:700;padding:0 5px;background:rgba(255,140,66,0.1);color:var(--orange2);border:1px solid rgba(255,140,66,0.25);}
 .article-snippet{font-size:.7rem;color:var(--text2);margin-top:5px;line-height:1.5;}
 
 /* RANSOM */
@@ -468,11 +468,11 @@ nav{
 .risk-callout.critical{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
 .risk-callout.high{background:rgba(255,106,26,0.07);border-color:rgba(255,106,26,0.25);color:var(--orange);}
 .risk-callout.medium{background:rgba(255,217,61,0.06);border-color:rgba(255,217,61,0.2);color:var(--yellow);}
-.risk-callout.info{background:rgba(168,255,62,0.04);border-color:rgba(168,255,62,0.15);color:var(--lime);}
+.risk-callout.info{background:rgba(255,140,66,0.04);border-color:rgba(255,140,66,0.15);color:var(--orange2);}
 .risk-callout .rc-head{font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 
 /* CHIP - failed is now grey not red */
-.chip.err{background:transparent;border-color:rgba(168,255,62,0.25);color:#a8ff3e;}
+.chip.err{background:transparent;border-color:var(--dim);color:var(--muted);}
 
 /* VENDOR SUMMARY CARD */
 .vendor-summary{
@@ -489,7 +489,7 @@ nav{
 .vs-flag.red{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
 .vs-flag.orange{background:rgba(255,106,26,0.07);border-color:rgba(255,106,26,0.25);color:var(--orange);}
 .vs-flag.yellow{background:rgba(255,217,61,0.06);border-color:rgba(255,217,61,0.2);color:var(--yellow);}
-.vs-flag.lime{background:rgba(168,255,62,0.05);border-color:rgba(168,255,62,0.2);color:var(--lime);}
+.vs-flag.lime{background:rgba(238,238,238,0.04);border-color:rgba(238,238,238,0.15);color:var(--white);}
 .vs-flag.grey{background:transparent;border-color:var(--dim);color:var(--muted);}
 
 /* LOG SECTION */
@@ -620,25 +620,25 @@ nav{
   </div>
 
   <div class="intel-bar">
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>rdap</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>dns/doh</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>crt.sh</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>urlhaus</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>threatfox</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>xposedornot</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>governance</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>ransomware.live</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>google news</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>rdap</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>dns/doh</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>crt.sh</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>urlhaus</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>threatfox</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>xposedornot</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>governance</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>ransomware.live</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>google news</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>virustotal*</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>otx*</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>shodan internetdb</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>bgpview</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>mozilla observatory</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>urlscan.io</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>shodan internetdb</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>bgpview</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>mozilla observatory</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>urlscan.io</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>abuseipdb*</div>
     <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>pulsedive*</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>haveibeenpwned</div>
-    <div class="intel-src"><div class="intel-src-dot" style="background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>breachdirectory</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>haveibeenpwned</div>
+    <div class="intel-src"><div class="intel-src-dot" style="background:var(--orange);box-shadow:0 0 4px var(--orange);"></div>breachdirectory</div>
   </div>
 
   <!-- SCAN PROGRESS -->
@@ -698,7 +698,7 @@ nav{
   </div>
 
   <!-- C) VENDOR INTELLIGENCE SUMMARY -->
-  <div class="vendor-summary" id="intelSummary" style="display:none;border-left-color:var(--lime);margin-bottom:14px;">
+  <div class="vendor-summary" id="intelSummary" style="display:none;border-left-color:var(--orange);margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
       <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">// 03 — vendor intelligence summary</div>
     </div>
@@ -1885,7 +1885,7 @@ function renderVT(vt,domain){
   </div>`;
   h+=`<div class="pbar-wrap"><div style="display:flex;height:3px;background:var(--border);">
     <div style="width:${malPct}%;background:var(--red);box-shadow:0 0 6px var(--red);"></div>
-    <div style="width:${okPct}%;background:var(--lime);box-shadow:0 0 4px var(--lime);"></div>
+    <div style="width:${okPct}%;background:var(--white);opacity:.6;"></div>
   </div></div>`;
   if(vt.malEngines?.length){
     h+=`<div style="font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">// flagged by</div>
