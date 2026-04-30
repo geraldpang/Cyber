@@ -902,8 +902,10 @@ nav{
 
 // ── CORS PROXY ────────────────────────────────────────────────────────────────
 // Routes CORS-blocked APIs through allorigins.win free proxy
+const PROXY = 'https://proxy.colaboree.com';
+
 async function proxied(url, opts={}){
-  const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url), {signal: opts.signal || AbortSignal.timeout(14000)});
+  const r = await fetch(PROXY+'/corsproxy?url=' + encodeURIComponent(url), {signal: opts.signal || AbortSignal.timeout(14000)});
   if(!r.ok) throw new Error('proxy '+r.status);
   return r;
 }
@@ -1060,12 +1062,46 @@ async function fetchGovernance(domain){
 async function fetchRansomware(domain){
   const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
   try{
-    const r=await proxied(`https://api.ransomware.live/v2/searchvictims/${encodeURIComponent(company)}`);
-    const d=await r.json();
-    return{company,found:Array.isArray(d)&&d.length>0,
-      victims:(Array.isArray(d)?d:[]).slice(0,5).map(v=>({victim:v.victim||v.name||company,group:v.group||'Unknown',
-        date:v.attackdate||v.date||'',country:v.country||'',description:v.description||'',url:v.post_url||v.url||null}))};
-  }catch{return{company,found:false,victims:[]};}
+    // ── Victim search via authenticated Worker ────────────────────────────────
+    const [victimResp, sectorResp] = await Promise.all([
+      fetch(`${PROXY}/ransomware/searchvictims/${encodeURIComponent(company)}`, {signal:AbortSignal.timeout(12000)}),
+      fetch(`${PROXY}/ransomware/recentvictims`, {signal:AbortSignal.timeout(12000)}),
+    ]);
+
+    const victims_raw = victimResp.ok ? await victimResp.json() : [];
+    const victims = (Array.isArray(victims_raw)?victims_raw:[]).slice(0,5).map(v=>({
+      victim:v.victim||v.name||company,
+      group:v.group||'Unknown',
+      date:v.attackdate||v.date||'',
+      country:v.country||'',
+      activity:v.activity||'',
+      infostealer:v.infostealer||null,
+      description:v.description||'',
+      url:v.post_url||v.url||null,
+    }));
+
+    // ── Fetch group profiles for each unique group found ─────────────────────
+    const groups = {};
+    const uniqueGroups = [...new Set(victims.map(v=>v.group).filter(g=>g&&g!=='Unknown'))];
+    await Promise.all(uniqueGroups.slice(0,3).map(async g => {
+      try{
+        const gr = await fetch(`${PROXY}/ransomware/group/${encodeURIComponent(g.toLowerCase())}`, {signal:AbortSignal.timeout(8000)});
+        if(gr.ok) groups[g] = await gr.json();
+      }catch{}
+    }));
+
+    // ── Recent AU victims for sector context ──────────────────────────────────
+    let auRecentCount = 0;
+    if(sectorResp.ok){
+      try{
+        const recent = await sectorResp.json();
+        const auVictims = (Array.isArray(recent)?recent:[]).filter(v=>v.country==='AU');
+        auRecentCount = auVictims.length;
+      }catch{}
+    }
+
+    return{company, found:victims.length>0, victims, groups, auRecentCount};
+  }catch(e){return{company,found:false,victims:[],groups:{},auRecentCount:0};}
 }
 
 async function fetchCyberNews(domain){
@@ -1248,7 +1284,7 @@ async function fetchBusinessInfo(domain){
   // Try fetching homepage via corsproxy, then fall back to meta scrape from Google cache
   const tryFetch = async (url) => {
     try{
-      const r = await fetch('https://corsproxy.io/?'+encodeURIComponent(url), {signal:AbortSignal.timeout(12000)});
+      const r = await fetch(PROXY+'/corsproxy?url='+encodeURIComponent(url), {signal:AbortSignal.timeout(12000)});
       if(r.ok) return await r.text();
     }catch{}
     return null;
@@ -1848,12 +1884,22 @@ function renderGov(gov){
 function renderRansom(ransomware){
   if(!ransomware)return;$('ransomPanel').style.display='block';
   let h='';
+
   if(!ransomware.found||!ransomware.victims?.length){
     h=`<div class="clean-msg">✓ no victim listings for ${safeText(ransomware.company)}</div>`;
-  }else{
+    // Still show AU context if we have it
+    if(ransomware.auRecentCount>0){
+      h+=`<div style="margin-top:10px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);font-size:.72rem;color:var(--muted);">
+        <span style="color:var(--orange);">${ransomware.auRecentCount}</span> Australian organisations appeared in recent ransomware listings — monitor sector trends.
+      </div>`;
+    }
+  } else {
     ransomware.victims.forEach(v=>{
       const yr=v.date?v.date.substring(0,4):'';
       const age=yr?new Date().getFullYear()-parseInt(yr):null;
+      const group=ransomware.groups?.[v.group];
+      const hasInfostealer = v.infostealer && Object.keys(v.infostealer).length>0;
+
       h+=`<div class="ransom-card">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;">
           <span style="font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 8px;background:rgba(255,51,51,0.18);color:var(--red);border:1px solid rgba(255,51,51,0.3);">ransomware hit</span>
@@ -1861,14 +1907,35 @@ function renderRansom(ransomware){
           ${v.date?`<span class="dim">${v.date.substring(0,10)}</span>`:''}
           ${age!==null&&age<=1?'<span class="bad" style="font-size:.66rem;">[within last year]</span>':''}
           ${v.country?`<span class="dim">${safeText(v.country)}</span>`:''}
+          ${hasInfostealer?`<span style="font-size:.63rem;padding:1px 7px;border:1px solid rgba(255,217,61,0.4);color:var(--yellow);background:rgba(255,217,61,0.06);">⚠ infostealer data</span>`:''}
         </div>
         <div style="font-size:.8rem;font-weight:600;color:var(--white);margin-bottom:4px;">${safeText(v.victim)}</div>
         ${v.description?`<div style="font-size:.7rem;color:var(--muted);line-height:1.5;">${safeText(v.description.substring(0,220))}</div>`:''}
+        ${hasInfostealer?`<div style="margin-top:6px;font-size:.68rem;color:var(--yellow);padding:5px 8px;background:rgba(255,217,61,0.05);border:1px solid rgba(255,217,61,0.15);">
+          Credential data found in infostealer logs — ${Object.entries(v.infostealer).map(([k,val])=>`${k}: ${val}`).join(' · ')}
+        </div>`:''}
+        ${group?`<div style="margin-top:8px;padding:7px 10px;background:var(--bg);border:1px solid var(--border);font-size:.68rem;">
+          <div style="color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-size:.6rem;margin-bottom:5px;">// ${safeText(v.group)} — group profile</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            ${group.victims?`<span><span style="color:var(--muted);">total victims:</span> <span style="color:var(--white);">${group.victims}</span></span>`:''}
+            ${group.firstseen?`<span><span style="color:var(--muted);">active since:</span> <span style="color:var(--white);">${group.firstseen?.substring(0,7)||''}</span></span>`:''}
+            ${group.lastseen?`<span><span style="color:var(--muted);">last seen:</span> <span style="color:var(--white);">${group.lastseen?.substring(0,7)||''}</span></span>`:''}
+          </div>
+          ${group.description?`<div style="color:var(--text2);margin-top:5px;line-height:1.5;">${safeText((group.description||'').substring(0,200))}</div>`:''}
+        </div>`:''}
         ${v.url?`<a href="${v.url}" target="_blank" rel="noopener" style="font-size:.68rem;color:var(--blue);margin-top:5px;display:inline-block;">view original post →</a>`:''}
       </div>`;
     });
+
+    // AU context footer
+    if(ransomware.auRecentCount>0){
+      h+=`<div style="margin-top:8px;padding:7px 12px;background:var(--bg);border:1px solid var(--border);font-size:.7rem;color:var(--muted);">
+        <span style="color:var(--orange);">${ransomware.auRecentCount}</span> Australian organisations in recent ransomware listings across all groups.
+      </div>`;
+    }
   }
-  h+=`<div class="src-footer"><span>ransomware.live</span><a href="https://ransomware.live/search?s=${encodeURIComponent(ransomware.company||'')}" target="_blank">search →</a></div>`;
+
+  h+=`<div class="src-footer"><span>ransomware.live · pro api</span><a href="https://ransomware.live/search?s=${encodeURIComponent(ransomware.company||'')}" target="_blank">search →</a></div>`;
   const ransomExplain = explainer(
     'Ransomware.live monitors the leak blogs and dark web sites operated by ransomware gangs. When gangs successfully compromise a company, they list the victim publicly to pressure payment — threatening to publish stolen data. This tool searches those listings by company name.',
     'A listing here means the vendor was hit by ransomware and the gang is publicly claiming it. Check the date — recent listings (within 12 months) may still have active negotiations or ongoing data leak risk. Check the group — some gangs (LockBit, ALPHV, Cl0p) target specific industries.',
@@ -1877,7 +1944,6 @@ function renderRansom(ransomware){
   h += ransomExplain;
   $('ransomContent').innerHTML=h;
 }
-
 function renderNews(news){
   if(!news)return;$('newsPanel').style.display='block';
   let h='';
