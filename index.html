@@ -1035,13 +1035,18 @@ async function fetchGovernance(domain){
   }catch{results.securityTxt={found:false};}
   try{const r=await fetch(`https://api.hackertarget.com/httpheaders/?q=https://${domain}`,{signal:AbortSignal.timeout(8000)});
     if(r.ok){const t=await r.text();const hdr=t.toLowerCase();
-      results.headers={hsts:hdr.includes('strict-transport-security'),csp:hdr.includes('content-security-policy'),
-        xframe:hdr.includes('x-frame-options'),xcto:hdr.includes('x-content-type-options'),
-        referrer:hdr.includes('referrer-policy'),permissions:hdr.includes('permissions-policy'),
-        server:t.match(/server:\s*([^\r\n]+)/i)?.[1]?.trim()||null,
-        poweredBy:t.match(/x-powered-by:\s*([^\r\n]+)/i)?.[1]?.trim()||null};
-      results.headers.score=[results.headers.hsts,results.headers.csp,results.headers.xframe,results.headers.xcto,results.headers.referrer,results.headers.permissions].filter(Boolean).length;}
-  }catch{}
+      if(t.includes('API count exceeded')){results.headers=null;}
+      else{
+        results.headers={hsts:hdr.includes('strict-transport-security'),csp:hdr.includes('content-security-policy'),
+          xframe:hdr.includes('x-frame-options'),xcto:hdr.includes('x-content-type-options'),
+          referrer:hdr.includes('referrer-policy'),permissions:hdr.includes('permissions-policy'),
+          server:t.match(/server:\s*([^\r\n]+)/i)?.[1]?.trim()||null,
+          poweredBy:t.match(/x-powered-by:\s*([^\r\n]+)/i)?.[1]?.trim()||null,
+          failed:false};
+        results.headers.score=[results.headers.hsts,results.headers.csp,results.headers.xframe,results.headers.xcto,results.headers.referrer,results.headers.permissions].filter(Boolean).length;
+      }
+    }else{results.headers=null;}
+  }catch{results.headers=null;}
   try{const r=await fetch(`https://cloudflare-dns.com/dns-query?name=_mta-sts.${domain}&type=TXT`,{headers:{'Accept':'application/dns-json'},signal:AbortSignal.timeout(5000)});
     const d=await r.json();const rec=d.Answer?.find(a=>a.data?.includes('v=STSv1'));
     results.mtaSts=rec?{found:true}:{found:false};
@@ -1101,7 +1106,7 @@ async function fetchRansomware(domain){
     }
 
     return{company, found:victims.length>0, victims, groups, auRecentCount};
-  }catch(e){return{company,found:false,victims:[],groups:{},auRecentCount:0};}
+  }catch(e){return null;}
 }
 
 async function fetchCyberNews(domain){
@@ -1117,6 +1122,7 @@ async function fetchCyberNews(domain){
     rss2json(gNews(`"${company}" cyberattack OR "security incident" OR "data breach"`)),
     rss2json(gNews(`"${company}" malware OR phishing OR "cyber incident"`)),
   ]);
+  if(!r1&&!r2&&!r3)return null; // all feeds failed — don't show as clean
   const seen=new Set();const allArticles=[];
   [r1,r2,r3].forEach(d=>{if(d?.status!=='ok')return;
     (d.items||[]).forEach(a=>{
@@ -2534,9 +2540,9 @@ function updateAllBadges(intel){
   setBadge('rdap', rdap?'clean':'nodata');
   setBadge('dns', dns?((!dns.spf||!dns.dmarc)?'review':'clean'):'nodata');
   setBadge('crt', crt?(crt.subdomains?.length>30?'review':'clean'):'nodata');
-  setBadge('threat', (urlhaus||threatfox)?((urlhaus?.found||threatfox?.found)?'review':'clean'):'nodata');
+  setBadge('threat', (!urlhaus&&!threatfox)?'nodata':((urlhaus?.found||threatfox?.found)?'review':'clean'));
   setBadge('breach', breach?(breach.found?'review':'clean'):'nodata');
-  setBadge('gov', gov?((gov.headers?.score??6)<3?'review':'clean'):'nodata');
+  setBadge('gov', !gov?'nodata':gov.headers===null?'nodata':(gov.headers.score<3?'review':'clean'));
   setBadge('ransom', ransomware?(ransomware.found?'review':'clean'):'nodata');
   setBadge('news', news?(news.found&&news.articles?.length>0?'review':'clean'):'nodata');
   setBadge('vt', vt?(vt.error?'nodata':vt.malicious>0?'review':'clean'):'skip');
