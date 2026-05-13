@@ -1066,14 +1066,29 @@ async function fetchGovernance(domain){
 }
 async function fetchRansomware(domain){
   const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
+  // v2 API base — v1 is deprecated
+  const RLv2 = 'https://api.ransomware.live/v2';
+  async function rlFetch(path){
+    // Try direct first (v2 API has CORS enabled), fall back to proxy
+    try{
+      const r=await fetch(`${RLv2}${path}`,{signal:AbortSignal.timeout(12000)});
+      if(r.ok)return r;
+    }catch{}
+    try{
+      const r=await proxied(`${RLv2}${path}`,{signal:AbortSignal.timeout(14000)});
+      if(r.ok)return r;
+    }catch{}
+    return null;
+  }
   try{
-    // ── Victim search via authenticated Worker ────────────────────────────────
     const [victimResp, sectorResp] = await Promise.all([
-      fetch(`${PROXY}/ransomware/searchvictims/${encodeURIComponent(company)}`, {signal:AbortSignal.timeout(12000)}),
-      fetch(`${PROXY}/ransomware/recentvictims`, {signal:AbortSignal.timeout(12000)}),
+      rlFetch(`/searchvictims/${encodeURIComponent(company)}`),
+      rlFetch(`/recentvictims`),
     ]);
 
-    const victims_raw = victimResp.ok ? await victimResp.json() : [];
+    if(!victimResp) return null; // API unreachable — show Missing, not No Issue
+
+    const victims_raw = await victimResp.json().catch(()=>[]);
     const victims = (Array.isArray(victims_raw)?victims_raw:[]).slice(0,5).map(v=>({
       victim:v.victim||v.name||company,
       group:v.group||'Unknown',
@@ -1090,14 +1105,14 @@ async function fetchRansomware(domain){
     const uniqueGroups = [...new Set(victims.map(v=>v.group).filter(g=>g&&g!=='Unknown'))];
     await Promise.all(uniqueGroups.slice(0,3).map(async g => {
       try{
-        const gr = await fetch(`${PROXY}/ransomware/group/${encodeURIComponent(g.toLowerCase())}`, {signal:AbortSignal.timeout(8000)});
-        if(gr.ok) groups[g] = await gr.json();
+        const gr = await rlFetch(`/group/${encodeURIComponent(g.toLowerCase())}`);
+        if(gr) groups[g] = await gr.json();
       }catch{}
     }));
 
     // ── Recent AU victims for sector context ──────────────────────────────────
     let auRecentCount = 0;
-    if(sectorResp.ok){
+    if(sectorResp){
       try{
         const recent = await sectorResp.json();
         const auVictims = (Array.isArray(recent)?recent:[]).filter(v=>v.country==='AU');
@@ -1106,7 +1121,7 @@ async function fetchRansomware(domain){
     }
 
     return{company, found:victims.length>0, victims, groups, auRecentCount};
-  }catch(e){return null;}
+  }catch(e){return null;} // null = Missing badge, not a false No Issue
 }
 
 async function fetchCyberNews(domain){
