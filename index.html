@@ -272,7 +272,13 @@ nav{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 16px;border-bottom:1px solid var(--border);
   background:rgba(255,255,255,0.01);
+  cursor:pointer;user-select:none;transition:background .15s;
 }
+.panel-hdr:hover{background:rgba(255,255,255,0.03);}
+.panel-chevron{font-size:.6rem;color:var(--muted);margin-left:8px;transition:transform .2s;flex-shrink:0;}
+.panel.collapsed .panel-chevron{transform:rotate(-90deg);}
+.panel.collapsed .panel-body{display:none;}
+.panel.collapsed .panel-hdr{border-bottom:none;}
 .panel-title{
   display:flex;align-items:center;gap:8px;
   font-size:.72rem;font-weight:700;color:var(--white);
@@ -1194,9 +1200,9 @@ async function fetchCyberNews(domain){
   const searchTerm=company.charAt(0).toUpperCase()+company.slice(1);
   const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
   const [r1,r2,r3]=await Promise.all([
-    rss2json(gNews(`"${searchTerm}" "data breach" OR ransomware OR "cyber attack" OR "data leak"`)),
-    rss2json(gNews(`"${searchTerm}" cyberattack OR "security incident" OR hacked OR "data stolen"`)),
-    rss2json(gNews(`"${searchTerm}" malware OR phishing OR "cyber incident" OR deepfake`)),
+    rss2json(gNews(`${domain} breach hack cyberattack`)),
+    rss2json(gNews(`${domain} ransomware data breach security incident`)),
+    rss2json(gNews(`${domain} malware phishing deepfake fraud`)),
   ]);
   if(!r1&&!r2&&!r3)return null;
   const seen=new Set();const allArticles=[];
@@ -1511,6 +1517,7 @@ async function startScan(){
   ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','shodanFullPanel','shodanDnsPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel','vendorSummary','intelSummary','logSection']
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   document.querySelectorAll('#results .grid-2, #results .grid-3').forEach(g=>g.style.display='');
+  document.querySelectorAll('#results .panel').forEach(p=>p.classList.remove('collapsed'));
   window.scrollTo({top:0,behavior:'smooth'});
   animateScan(domain);
   // First pass: DNS needed to get IPs for Shodan/BGPView/AbuseIPDB
@@ -1776,6 +1783,35 @@ function renderAll(domain,intel){
   renderHIBP(hibp,domain);
   renderBreachDir(breachdir,domain);
   cleanupEmptyGrids();
+  autoCollapseCleanPanels();
+}
+
+function togglePanel(panel){
+  panel.classList.toggle('collapsed');
+}
+
+function autoCollapseCleanPanels(){
+  document.querySelectorAll('#results .panel').forEach(panel=>{
+    if(panel.style.display==='none') return;
+    const badge=panel.querySelector('[class^="badge-"],[class*=" badge-"]');
+    const hdr=panel.querySelector('.panel-hdr');
+    if(!hdr) return;
+    // Add chevron arrow if not already present
+    if(!hdr.querySelector('.panel-chevron')){
+      const chev=document.createElement('span');
+      chev.className='panel-chevron';
+      chev.textContent='▾';
+      hdr.appendChild(chev);
+      hdr.addEventListener('click',()=>togglePanel(panel));
+    }
+    // Auto-collapse everything except "To be Reviewed"
+    const isReview=badge&&badge.classList.contains('badge-review');
+    if(isReview){
+      panel.classList.remove('collapsed');
+    } else {
+      panel.classList.add('collapsed');
+    }
+  });
 }
 
 function cleanupEmptyGrids(){
