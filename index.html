@@ -258,8 +258,8 @@ nav{
 .chip.skip{background:transparent;border-color:var(--dim);color:var(--muted);}
 
 /* GRID */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.grid-2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;}
+.grid-3{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;}
 .full{margin-bottom:12px;}
 @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 
@@ -1211,7 +1211,14 @@ async function fetchCyberNews(domain){
     });
   });
   allArticles.sort((a,b)=>b.pubDate-a.pubDate);
-  return{company,domain,searchTerm,articles:allArticles.slice(0,12),found:allArticles.length>0};
+  // Post-filter: only keep articles that actually mention the company in title or snippet
+  // This removes false positives from RSS feeds returning loosely related results
+  const companyLower=searchTerm.toLowerCase();
+  const filtered=allArticles.filter(a=>
+    a.title.toLowerCase().includes(companyLower)||
+    a.snippet.toLowerCase().includes(companyLower)
+  );
+  return{company,domain,searchTerm,articles:filtered.slice(0,12),found:filtered.length>0};
 }
 async function fetchVirusTotal(domain,apiKey){
   if(!apiKey)return null;
