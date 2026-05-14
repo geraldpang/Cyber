@@ -275,6 +275,10 @@ nav{
   cursor:pointer;user-select:none;transition:background .15s;
 }
 .panel-hdr:hover{background:#0d0d0d;}
+.panel-hdr.hdr-clean{background:#0a1a0a;}
+.panel-hdr.hdr-clean:hover{background:#0d200d;}
+.panel-hdr.hdr-review{background:#1a0808;}
+.panel-hdr.hdr-review:hover{background:#200d0d;}
 .panel-hdr-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
 .panel-chevron{font-size:.6rem;color:var(--muted);transition:transform .2s;flex-shrink:0;}
 .panel.collapsed .panel-chevron{transform:rotate(-90deg);}
@@ -1812,6 +1816,12 @@ function autoCollapseCleanPanels(){
     }
     // Auto-collapse everything except "To be Reviewed"
     const isReview=badge&&badge.classList.contains('badge-review');
+    const isClean=badge&&badge.classList.contains('badge-clean');
+    // Colour the header
+    hdr.classList.remove('hdr-clean','hdr-review');
+    if(isReview) hdr.classList.add('hdr-review');
+    else if(isClean) hdr.classList.add('hdr-clean');
+    // Collapse state
     if(isReview){
       panel.classList.remove('collapsed');
     } else {
