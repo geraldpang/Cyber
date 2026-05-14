@@ -269,13 +269,14 @@ nav{
   padding:0;animation:fadeUp .4s ease both;
 }
 .panel-hdr{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;
   padding:10px 16px;border-bottom:1px solid var(--border);
-  background:var(--bg);
+  background:#080808;
   cursor:pointer;user-select:none;transition:background .15s;
 }
-.panel-hdr:hover{background:rgba(255,106,26,0.04);}
-.panel-chevron{font-size:.6rem;color:var(--muted);margin-left:8px;transition:transform .2s;flex-shrink:0;}
+.panel-hdr:hover{background:#0d0d0d;}
+.panel-hdr-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.panel-chevron{font-size:.6rem;color:var(--muted);transition:transform .2s;flex-shrink:0;}
 .panel.collapsed .panel-chevron{transform:rotate(-90deg);}
 .panel.collapsed .panel-body{display:none;}
 .panel.collapsed .panel-hdr{border-bottom:none;}
@@ -285,7 +286,7 @@ nav{
   letter-spacing:.05em;text-transform:uppercase;
 }
 .panel-icon{font-size:.78rem;}
-.panel-body{padding:14px 16px;background:var(--bg2);}
+.panel-body{padding:14px 16px;background:#161616;}
 .live-tag{
   font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   padding:1px 6px;border:1px solid;
@@ -1796,12 +1797,17 @@ function autoCollapseCleanPanels(){
     const badge=panel.querySelector('[class^="badge-"],[class*=" badge-"]');
     const hdr=panel.querySelector('.panel-hdr');
     if(!hdr) return;
-    // Add chevron arrow if not already present
-    if(!hdr.querySelector('.panel-chevron')){
+    // Add right-side wrapper (badge + chevron) if not already present
+    if(!hdr.querySelector('.panel-hdr-right')){
+      const badge=panel.querySelector('[id^="badge-"]');
+      const right=document.createElement('div');
+      right.className='panel-hdr-right';
       const chev=document.createElement('span');
       chev.className='panel-chevron';
       chev.textContent='▾';
-      hdr.appendChild(chev);
+      if(badge){right.appendChild(badge);} 
+      right.appendChild(chev);
+      hdr.appendChild(right);
       hdr.addEventListener('click',()=>togglePanel(panel));
     }
     // Auto-collapse everything except "To be Reviewed"
