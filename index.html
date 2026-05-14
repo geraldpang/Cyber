@@ -1128,7 +1128,7 @@ async function fetchCyberNews(domain){
     });
   });
   allArticles.sort((a,b)=>b.pubDate-a.pubDate);
-  return{company,articles:allArticles.slice(0,12),found:allArticles.length>0};
+  return{company,domain,articles:allArticles.slice(0,12),found:allArticles.length>0};
 }
 async function fetchVirusTotal(domain,apiKey){
   if(!apiKey)return null;
@@ -1946,14 +1946,14 @@ function renderRansom(ransomware){
 function renderNews(news){
   if(!news)return;$('newsPanel').style.display='block';
   let h='';
-  if(!news.found||!news.articles?.length){h=`<div class="empty-msg">no cyber news found for ${safeText(news.company)}</div>`;}
+  if(!news.found||!news.articles?.length){h=`<div class="empty-msg">no cyber news found for ${safeText(news.domain||news.company)}</div>`;}
   else{
     const recent=news.articles.filter(a=>a.isRecent);
     const older=news.articles.filter(a=>!a.isRecent);
     if(recent.length){h+=`<div style="font-size:.63rem;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;">// recent (past 2y)</div>`;recent.forEach(a=>h+=artCard(a));}
     if(older.length){h+=`<div style="font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:10px 0 7px;">// older</div>`;older.slice(0,4).forEach(a=>h+=artCard(a));}
   }
-  h+=`<div class="src-footer"><span>google news rss · 3 searches</span><a href="https://news.google.com/search?q=${encodeURIComponent((news.company||'')+' breach hack cyberattack')}" target="_blank">more →</a></div>`;
+  h+=`<div class="src-footer"><span>google news rss · 3 searches</span><a href="https://news.google.com/search?q=${encodeURIComponent((news.domain||news.company||'')+' breach hack cyberattack')}" target="_blank">more →</a></div>`;
   const newsExplain = explainer(
     'This panel searches Google News RSS feeds for cybersecurity-related articles mentioning the vendor — breaches, ransomware attacks, regulatory fines, security incidents, and cyber-related legal actions.',
     'News coverage is a lagging indicator — incidents are usually reported after they occur. Look for: confirmed data breaches, regulatory actions (OAIC, GDPR fines), class action lawsuits following incidents, repeated security failures. Filter by recency — articles older than 3 years are lower relevance.',
