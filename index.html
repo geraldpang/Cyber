@@ -1066,18 +1066,10 @@ async function fetchGovernance(domain){
 }
 async function fetchRansomware(domain){
   const company=domain.replace(/\.(com|au|co\.uk|org|net|gov|edu|io|com\.au).*$/,'').replace(/^www\./,'');
-  // v2 API base — v1 is deprecated
   const RLv2 = 'https://api.ransomware.live/v2';
   async function rlFetch(path){
-    // Try direct first (v2 API has CORS enabled), fall back to proxy
-    try{
-      const r=await fetch(`${RLv2}${path}`,{signal:AbortSignal.timeout(12000)});
-      if(r.ok)return r;
-    }catch{}
-    try{
-      const r=await proxied(`${RLv2}${path}`,{signal:AbortSignal.timeout(14000)});
-      if(r.ok)return r;
-    }catch{}
+    try{const r=await fetch(`${RLv2}${path}`,{signal:AbortSignal.timeout(12000)});if(r.ok)return r;}catch{}
+    try{const r=await proxied(`${RLv2}${path}`,{signal:AbortSignal.timeout(14000)});if(r.ok)return r;}catch{}
     return null;
   }
   try{
@@ -1085,9 +1077,7 @@ async function fetchRansomware(domain){
       rlFetch(`/searchvictims/${encodeURIComponent(company)}`),
       rlFetch(`/recentvictims`),
     ]);
-
-    if(!victimResp) return null; // API unreachable — show Missing, not No Issue
-
+    if(!victimResp) return null;
     const victims_raw = await victimResp.json().catch(()=>[]);
     const victims = (Array.isArray(victims_raw)?victims_raw:[]).slice(0,5).map(v=>({
       victim:v.victim||v.name||company,
@@ -1099,29 +1089,17 @@ async function fetchRansomware(domain){
       description:v.description||'',
       url:v.post_url||v.url||null,
     }));
-
-    // ── Fetch group profiles for each unique group found ─────────────────────
     const groups = {};
     const uniqueGroups = [...new Set(victims.map(v=>v.group).filter(g=>g&&g!=='Unknown'))];
     await Promise.all(uniqueGroups.slice(0,3).map(async g => {
-      try{
-        const gr = await rlFetch(`/group/${encodeURIComponent(g.toLowerCase())}`);
-        if(gr) groups[g] = await gr.json();
-      }catch{}
+      try{const gr=await rlFetch(`/group/${encodeURIComponent(g.toLowerCase())}`);if(gr)groups[g]=await gr.json();}catch{}
     }));
-
-    // ── Recent AU victims for sector context ──────────────────────────────────
     let auRecentCount = 0;
     if(sectorResp){
-      try{
-        const recent = await sectorResp.json();
-        const auVictims = (Array.isArray(recent)?recent:[]).filter(v=>v.country==='AU');
-        auRecentCount = auVictims.length;
-      }catch{}
+      try{const recent=await sectorResp.json();auRecentCount=(Array.isArray(recent)?recent:[]).filter(v=>v.country==='AU').length;}catch{}
     }
-
     return{company, found:victims.length>0, victims, groups, auRecentCount};
-  }catch(e){return null;} // null = Missing badge, not a false No Issue
+  }catch(e){return null;}
 }
 
 async function fetchCyberNews(domain){
@@ -1133,11 +1111,11 @@ async function fetchCyberNews(domain){
   const enc=s=>encodeURIComponent(s);
   const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
   const [r1,r2,r3]=await Promise.all([
-    rss2json(gNews(`"${company}" breach OR hack OR ransomware OR "data leak"`)),
-    rss2json(gNews(`"${company}" cyberattack OR "security incident" OR "data breach"`)),
-    rss2json(gNews(`"${company}" malware OR phishing OR "cyber incident"`)),
+    rss2json(gNews(`"${domain}" breach OR hack OR ransomware OR "data leak"`)),
+    rss2json(gNews(`"${domain}" cyberattack OR "security incident" OR "data breach"`)),
+    rss2json(gNews(`"${domain}" malware OR phishing OR "cyber incident"`)),
   ]);
-  if(!r1&&!r2&&!r3)return null; // all feeds failed — don't show as clean
+  if(!r1&&!r2&&!r3)return null;
   const seen=new Set();const allArticles=[];
   [r1,r2,r3].forEach(d=>{if(d?.status!=='ok')return;
     (d.items||[]).forEach(a=>{
