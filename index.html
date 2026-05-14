@@ -486,16 +486,39 @@ nav{
 .chip.err{background:transparent;border-color:var(--dim);color:var(--muted);}
 
 /* VENDOR SUMMARY CARD */
-.vendor-summary{
-  background:var(--bg2);border:1px solid var(--border2);
-  padding:22px 24px;margin-bottom:14px;
-  border-left:3px solid var(--orange);
-  overflow:visible;
+/* VENDOR SUMMARY CARD */
+.vs-card{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-top:2px solid var(--orange);
+  overflow:hidden;
 }
+.vs-card-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:#080808;
+  border-bottom:1px solid var(--border);
+}
+.vs-card-hdr-left{display:flex;align-items:center;gap:14px;}
+.vs-card-label{
+  font-family:'VT323',monospace;font-size:1.15rem;
+  color:var(--orange);letter-spacing:.1em;
+  text-shadow:0 0 10px rgba(255,106,26,0.35);
+}
+.vs-card-ts{font-size:.65rem;color:var(--muted);}
+.vs-card-body{padding:20px 24px;}
+.vs-biz-section{margin-bottom:4px;}
+.vs-divider{height:1px;background:var(--border);margin:16px 0;}
+.vs-headline{font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.4;}
+.vs-subline{font-size:.76rem;color:#888;line-height:1.7;margin-bottom:14px;}
 .vs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
 .vs-cell{background:var(--bg);border:1px solid var(--border);padding:10px 12px;text-align:center;}
 .vs-val{font-family:'VT323',monospace;font-size:1.9rem;line-height:1;margin-bottom:2px;}
 .vs-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.vs-hdr-badge{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 12px;border:1px solid;}
+.vs-hdr-badge-red{border-color:rgba(255,51,51,0.5);color:var(--red);background:rgba(255,51,51,0.08);}
+.vs-hdr-badge-orange{border-color:rgba(255,106,26,0.5);color:var(--orange);background:rgba(255,106,26,0.08);}
+.vs-hdr-badge-clean{border-color:rgba(168,255,62,0.4);color:var(--lime);background:rgba(168,255,62,0.06);}
 .vs-flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
 .vs-flag{font-size:.68rem;padding:3px 10px;border:1px solid;letter-spacing:.04em;}
 .vs-flag.red{background:rgba(255,51,51,0.07);border-color:rgba(255,51,51,0.3);color:var(--red);}
@@ -704,23 +727,26 @@ nav{
     <div class="intel-strip" id="intelStrip"></div>
   </div>
 
-  <!-- A) VENDOR INFORMATION (About the vendor) -->
-  <div class="vendor-summary" id="vendorSummary" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-      <div style="font-size:.62rem;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;">// 01 — vendor information</div>
-      <div id="summaryTs" style="font-size:.62rem;color:var(--muted);"></div>
+  <!-- VENDOR SUMMARY — unified block -->
+  <div id="vendorSummaryWrapper" style="display:none;margin-bottom:16px;">
+    <div class="vs-card">
+      <div class="vs-card-hdr">
+        <div class="vs-card-hdr-left">
+          <span class="vs-card-label">VENDOR SUMMARY</span>
+          <span id="summaryTs" class="vs-card-ts"></span>
+        </div>
+        <div id="summaryHeadlineBadge"></div>
+      </div>
+      <div class="vs-card-body">
+        <div id="summaryBizInfo" class="vs-biz-section"></div>
+        <div id="intelSummaryInner" style="display:none;">
+          <div class="vs-divider"></div>
+          <div id="summaryHeadline" class="vs-headline"></div>
+          <div id="summarySubline" class="vs-subline"></div>
+          <div class="vs-flags" id="summaryFlags"></div>
+        </div>
+      </div>
     </div>
-    <div id="summaryBizInfo"></div>
-  </div>
-
-  <!-- C) VENDOR INTELLIGENCE SUMMARY -->
-  <div class="vendor-summary" id="intelSummary" style="display:none;border-left-color:var(--orange);margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-      <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">// 03 — vendor intelligence summary</div>
-    </div>
-    <div id="summaryHeadline" style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;"></div>
-    <div id="summarySubline" style="font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:12px;"></div>
-    <div class="vs-flags" id="summaryFlags"></div>
   </div>
 
   <!-- LOGGING -->
@@ -1519,7 +1545,7 @@ async function startScan(){
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='RUNNING';
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
-  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','shodanFullPanel','shodanDnsPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel','vendorSummary','intelSummary','logSection']
+  ['rdapPanel','dnsPanel','crtPanel','threatPanel','breachPanel','govPanel','ransomPanel','newsPanel','vtPanel','otxPanel','shodanPanel','bgpviewPanel','shodanFullPanel','shodanDnsPanel','observatoryPanel','urlscanPanel','abusePanel','pulsedivePanel','hibpPanel','breachdirPanel','vendorSummaryWrapper','logSection']
     .forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   document.querySelectorAll('#results .grid-2, #results .grid-3').forEach(g=>g.style.display='');
   document.querySelectorAll('#results .panel').forEach(p=>p.classList.remove('collapsed'));
@@ -2682,15 +2708,15 @@ function resetScan(){
   $('results').classList.remove('active');
   $('heroSection').style.display='flex';
   $('domainInput').value='';
-  ['vendorSummary','intelSummary','logSection'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
+  ['vendorSummaryWrapper','logSection'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 $('domainInput').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
 
 function renderVendorSummary(domain, intel, bizInfo, wiki, wikidata){
-  // ── A) Vendor Information ─────────────────────────────────────────────────
-  const elA = $('vendorSummary');
-  if(elA) elA.style.display = 'block';
+  // Show the unified wrapper
+  const wrapper = $('vendorSummaryWrapper');
+  if(wrapper) wrapper.style.display = 'block';
 
   // Wikipedia > Wikidata > meta > RDAP
   let bizHtml='';
@@ -2751,7 +2777,7 @@ function renderVendorSummary(domain, intel, bizInfo, wiki, wikidata){
   if($('summaryTs')) $('summaryTs').textContent = new Date().toISOString().substring(0,10);
 
   // ── C) Intelligence Summary ───────────────────────────────────────────────
-  const elC = $('intelSummary');
+  const elC = $('intelSummaryInner');
   if(!elC) return;
   elC.style.display = 'block';
 
@@ -2787,15 +2813,24 @@ function renderVendorSummary(domain, intel, bizInfo, wiki, wikidata){
   const orangeCount=flags.filter(f=>f.l==='orange').length;
   const sourcesOk=_scanLog.filter(e=>e.status==='ok').length;
 
-  let headline, subline;
-  if(redCount>=2){headline='🚨 Critical signals detected';subline=`${redCount} high-severity finding${redCount>1?'s':''} across ${sourcesOk} sources. Immediate review required.`;}
-  else if(redCount===1||orangeCount>=2){headline='⚠ Significant findings — review required';subline='Notable security signals found. Review flagged items and request vendor clarification.';}
-  else if(orangeCount>=1){headline='◆ Moderate findings — monitor';subline='Some security gaps identified. Not blocking, but should be tracked.';}
-  else{headline='✓ No critical signals detected';subline=`${sourcesOk} sources checked. No active threats or confirmed recent breaches found.`;}
+  let headline, subline, headlineCol;
+  if(redCount>=2){headline='🚨 Critical signals detected';subline=`${redCount} high-severity finding${redCount>1?'s':''} across ${sourcesOk} sources. Immediate review required.`;headlineCol='var(--red)';}
+  else if(redCount===1||orangeCount>=2){headline='⚠ Significant findings — review required';subline='Notable security signals found. Review flagged items and request vendor clarification.';headlineCol='var(--orange)';}
+  else if(orangeCount>=1){headline='◆ Moderate findings — monitor';subline='Some security gaps identified. Not blocking, but should be tracked.';headlineCol='var(--yellow)';}
+  else{headline='✓ No critical signals detected';subline=`${sourcesOk} sources checked. No active threats or confirmed recent breaches found.`;headlineCol='var(--lime)';}
 
-  $('summaryHeadline').textContent = headline;
+  const hlEl=$('summaryHeadline');
+  if(hlEl){hlEl.textContent=headline;hlEl.style.color=headlineCol;}
   $('summarySubline').textContent = subline;
   $('summaryFlags').innerHTML = flags.map(f=>`<span class="vs-flag ${f.l}">${f.t}</span>`).join('');
+
+  // Show status badge in card header
+  const hdrBadge=$('summaryHeadlineBadge');
+  if(hdrBadge){
+    const sevCls=redCount>=1?'vs-hdr-badge-red':orangeCount>=1?'vs-hdr-badge-orange':'vs-hdr-badge-clean';
+    const sevTxt=redCount>=2?'CRITICAL':redCount===1||orangeCount>=2?'REVIEW REQUIRED':orangeCount>=1?'MONITOR':'CLEAR';
+    hdrBadge.innerHTML=`<span class="vs-hdr-badge ${sevCls}">${sevTxt}</span>`;
+  }
 }
 
 
