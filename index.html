@@ -1111,9 +1111,9 @@ async function fetchCyberNews(domain){
   const enc=s=>encodeURIComponent(s);
   const gNews=q=>`https://news.google.com/rss/search?q=${enc(q)}&hl=en&gl=AU&ceid=AU:en`;
   const [r1,r2,r3]=await Promise.all([
-    rss2json(gNews(`"${domain}" breach OR hack OR ransomware OR "data leak"`)),
-    rss2json(gNews(`"${domain}" cyberattack OR "security incident" OR "data breach"`)),
-    rss2json(gNews(`"${domain}" malware OR phishing OR "cyber incident"`)),
+    rss2json(gNews(`${domain} breach OR hack OR ransomware OR "data leak"`)),
+    rss2json(gNews(`${domain} cyberattack OR "security incident" OR "data breach"`)),
+    rss2json(gNews(`${domain} malware OR phishing OR "cyber incident"`)),
   ]);
   if(!r1&&!r2&&!r3)return null;
   const seen=new Set();const allArticles=[];
