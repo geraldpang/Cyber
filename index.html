@@ -945,8 +945,8 @@ function fillDomain(d){$('domainInput').value=d;}
 function toggleKeys(){$('keysBody').classList.toggle('open');$('keysToggle').classList.toggle('open');}
 
 // ── SCAN ANIMATION ────────────────────────────────────────────────────────────
-const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','shodan','bgpview','observatory','urlscan','abuseipdb','pulsedive','hibp','breachdir'];
-const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…','shodan internetdb…','bgpview asn lookup…','mozilla observatory…','urlscan.io search…','abuseipdb check…','pulsedive lookup…','haveibeenpwned…','breachdirectory…'];
+const CHECKS=['rdap','dns','crt','urlhaus','threatfox','breach','gov','news','vt','otx','shodan','shodanfull','shodandns','bgpview','observatory','urlscan','abuseipdb','pulsedive','hibp','breachdir'];
+const STATUSES=['querying rdap…','fetching dns records…','checking crt.sh…','scanning urlhaus…','querying threatfox…','checking breaches…','checking governance…','scanning cyber news…','contacting virustotal…','pulling alienvault otx…','shodan internetdb…','shodan full api…','shodan dns…','bgpview asn lookup…','mozilla observatory…','urlscan.io search…','abuseipdb check…','pulsedive lookup…','haveibeenpwned…','breachdirectory…'];
 let scanTimer=null;
 function animateScan(domain){
   $('scanning').classList.add('active');
