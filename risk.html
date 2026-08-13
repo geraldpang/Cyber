@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIL Threat Prioritisation</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --text:#172033;
+      --muted:#667085;
+      --line:#dce3ee;
+      --blue:#075985;
+      --blue2:#0b73b8;
+      --soft:#eaf5fb;
+      --danger:#b42318;
+      --shadow:0 10px 30px rgba(20,40,70,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:white;
+      padding:28px 32px;
+    }
+    header .wrap{max-width:1280px;margin:auto}
+    h1{margin:0 0 6px;font-size:28px}
+    header p{margin:0;opacity:.88}
+    main{max-width:1280px;margin:24px auto 48px;padding:0 20px}
+    .grid{display:grid;grid-template-columns:380px 1fr;gap:20px}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+    .card h2{font-size:18px;margin:0 0 8px}
+    .sub{color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.45}
+    .bil-row{
+      display:grid;
+      grid-template-columns:1fr 90px;
+      align-items:center;
+      gap:12px;
+      padding:11px 0;
+      border-bottom:1px solid #eef2f7;
+    }
+    .bil-row:last-of-type{border-bottom:none}
+    select, button{
+      font:inherit;
+    }
+    select{
+      width:100%;
+      border:1px solid #cfd8e6;
+      border-radius:10px;
+      padding:9px 10px;
+      background:white;
+    }
+    .summary{
+      margin-top:20px;
+      background:var(--soft);
+      border:1px solid #cce8f7;
+      border-radius:12px;
+      padding:16px;
+    }
+    .summary-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .metric span{display:block;color:var(--muted);font-size:12px}
+    .metric strong{display:block;font-size:24px;margin-top:3px}
+    .driver{font-size:18px!important}
+    .toolbar{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:6px 10px;
+      background:#eef2f7;
+      font-size:12px;
+      font-weight:600;
+      color:#344054;
+    }
+    button{
+      border:0;
+      border-radius:10px;
+      padding:9px 13px;
+      cursor:pointer;
+      font-weight:650;
+    }
+    .primary{background:var(--blue);color:white}
+    .secondary{background:#eef2f7;color:#344054}
+    .danger{background:#fff0ee;color:var(--danger)}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    th{
+      text-align:left;
+      color:#475467;
+      font-size:12px;
+      letter-spacing:.02em;
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      background:#fafbfc;
+      position:sticky;
+      top:0;
+    }
+    td{
+      padding:12px 8px;
+      border-bottom:1px solid #edf1f6;
+      vertical-align:middle;
+    }
+    tr:last-child td{border-bottom:none}
+    .rank{
+      display:inline-grid;
+      place-items:center;
+      width:30px;height:30px;
+      border-radius:50%;
+      background:#eef6fb;
+      color:var(--blue);
+      font-weight:800;
+    }
+    .score{
+      font-weight:800;
+      font-variant-numeric:tabular-nums;
+    }
+    .bar{
+      width:120px;height:8px;
+      background:#eef2f7;
+      border-radius:99px;
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;height:100%;
+      background:linear-gradient(90deg,var(--blue2),var(--blue));
+      border-radius:99px;
+    }
+    .empty{
+      padding:30px;text-align:center;color:var(--muted)
+    }
+    details{
+      margin-top:20px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding:18px 22px;
+      font-weight:750;
+      list-style:none;
+    }
+    summary::-webkit-details-marker{display:none}
+    .config-wrap{padding:0 22px 22px;overflow:auto}
+    .config-note{
+      color:var(--muted);font-size:13px;line-height:1.45;margin:0 0 14px
+    }
+    .small-select{min-width:92px}
+    footer{
+      max-width:1280px;margin:0 auto 30px;padding:0 20px;color:var(--muted);font-size:12px
+    }
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr}
+      .bar{width:80px}
+      header{padding:22px 20px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>BIL-Driven Threat Prioritisation</h1>
+    <p>Phase 1 illustration — Business Impact Level → CIA driver → prioritised cyber threats</p>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>1. Asset Business Impact Level</h2>
+      <div class="sub">Select the OVIC-aligned BIL rating for Confidentiality, Integrity and Availability.</div>
+
+      <div class="bil-row">
+        <label for="bilC"><strong>Confidentiality</strong><br><small>BIL-C</small></label>
+        <select id="bilC"></select>
+      </div>
+      <div class="bil-row">
+        <label for="bilI"><strong>Integrity</strong><br><small>BIL-I</small></label>
+        <select id="bilI"></select>
+      </div>
+      <div class="bil-row">
+        <label for="bilA"><strong>Availability</strong><br><small>BIL-A</small></label>
+        <select id="bilA"></select>
+      </div>
+
+      <div class="summary">
+        <div class="summary-grid">
+          <div class="metric">
+            <span>BIL-V</span>
+            <strong id="bilV">0</strong>
+          </div>
+          <div class="metric">
+            <span>BIL Driver(s)</span>
+            <strong class="driver" id="driver">None</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub" style="margin:16px 0 0">
+        BIL determines potential business impact. It does not change the probability that a threat occurs.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">2. Relevant Threats</h2>
+          <div class="sub" style="margin:4px 0 0">Automatically ranked from highest to lowest impact for this asset.</div>
+        </div>
+        <span class="pill" id="threatCount">0 relevant threats</span>
+      </div>
+
+      <div style="overflow:auto;max-height:620px">
+        <table>
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Threat</th>
+              <th>Primary CIA Driver</th>
+              <th>Threat Impact</th>
+              <th>Relative Score</th>
+            </tr>
+          </thead>
+          <tbody id="results"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <details>
+    <summary>⚙ Threat-to-CIA Matrix Configurator</summary>
+    <div class="config-wrap">
+      <p class="config-note">
+        Configure how strongly each threat affects Confidentiality, Integrity and Availability.
+        Values: 0 = no material relationship, 1 = secondary, 2 = significant, 3 = primary.
+        Changes are saved in this browser and immediately affect threat ranking.
+      </p>
+      <div class="toolbar">
+        <div class="pill">Configuration scale: 0–3</div>
+        <button class="danger" id="resetBtn">Reset default matrix</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Threat</th>
+            <th>Confidentiality</th>
+            <th>Integrity</th>
+            <th>Availability</th>
+          </tr>
+        </thead>
+        <tbody id="configBody"></tbody>
+      </table>
+    </div>
+  </details>
+</main>
+
+<footer>
+  Prototype methodology only. Default Threat-to-CIA mappings are illustrative and should be formally reviewed and approved before operational use.
+</footer>
+
+<script>
+const BIL_LABELS = ["N/A","Minor","Limited","Major","Serious","Exceptional"];
+
+const defaultThreats = [
+  {id:"T01", name:"Data Corruption", c:0, i:3, a:2},
+  {id:"T02", name:"Unauthorised access to Data", c:3, i:2, a:1},
+  {id:"T03", name:"Unauthorised modification of data", c:0, i:3, a:1},
+  {id:"T04", name:"Unauthorised disclosure of data", c:3, i:0, a:0},
+  {id:"T05", name:"Denial of Service", c:0, i:0, a:3},
+  {id:"T06", name:"Social engineering", c:2, i:2, a:1},
+  {id:"T07", name:"Ransomware", c:1, i:2, a:3},
+  {id:"T08", name:"Bespoke software", c:1, i:2, a:2},
+  {id:"T09", name:"Supply chain compromise", c:2, i:3, a:2},
+  {id:"T10", name:"Repudiation", c:0, i:3, a:0},
+  {id:"T11", name:"External access", c:3, i:2, a:1},
+  {id:"T12", name:"Insecure credentials", c:3, i:2, a:1},
+  {id:"T13", name:"Removable media exploits", c:2, i:2, a:2},
+  {id:"T14", name:"Unauthorised service enumeration and discovery", c:2, i:1, a:0}
+];
+
+let threats = loadMatrix();
+
+function loadMatrix(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilThreatMatrixV1"));
+    if(Array.isArray(saved) && saved.length) return saved;
+  }catch(e){}
+  return structuredClone(defaultThreats);
+}
+
+function saveMatrix(){
+  localStorage.setItem("bilThreatMatrixV1", JSON.stringify(threats));
+}
+
+function setupBILSelect(id, defaultValue){
+  const el=document.getElementById(id);
+  for(let n=0;n<=5;n++){
+    const o=document.createElement("option");
+    o.value=n;
+    o.textContent=`${n} – ${BIL_LABELS[n]}`;
+    if(n===defaultValue) o.selected=true;
+    el.appendChild(o);
+  }
+  el.addEventListener("change", render);
+}
+
+setupBILSelect("bilC",2);
+setupBILSelect("bilI",4);
+setupBILSelect("bilA",5);
+
+function ciaName(k){
+  return k==="c" ? "Confidentiality" : k==="i" ? "Integrity" : "Availability";
+}
+
+function scoreThreat(t, bil){
+  // 0–3 CIA relationship is normalised against the asset's corresponding 0–5 BIL.
+  // MAX preserves the strongest relevant CIA impact rather than averaging it away.
+  const parts = [
+    {key:"c", raw:bil.c * (t.c/3)},
+    {key:"i", raw:bil.i * (t.i/3)},
+    {key:"a", raw:bil.a * (t.a/3)}
+  ];
+  const max = Math.max(...parts.map(p=>p.raw));
+  const drivers = parts.filter(p => p.raw === max && max > 0).map(p=>ciaName(p.key));
+  return {score:max, impact:Math.min(5, Math.round(max)), drivers};
+}
+
+function render(){
+  const bil={
+    c:+document.getElementById("bilC").value,
+    i:+document.getElementById("bilI").value,
+    a:+document.getElementById("bilA").value
+  };
+
+  const bilV=Math.max(bil.c,bil.i,bil.a);
+  document.getElementById("bilV").textContent = `${bilV} – ${BIL_LABELS[bilV]}`;
+
+  const driver=[];
+  if(bilV>0){
+    if(bil.c===bilV) driver.push("C");
+    if(bil.i===bilV) driver.push("I");
+    if(bil.a===bilV) driver.push("A");
+  }
+  document.getElementById("driver").textContent = driver.length ? driver.join(" + ") : "None";
+
+  const ranked=threats
+    .map(t=>({...t,...scoreThreat(t,bil)}))
+    .filter(t=>t.score>0)
+    .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
+
+  const tbody=document.getElementById("results");
+  tbody.innerHTML="";
+  if(!ranked.length){
+    tbody.innerHTML='<tr><td colspan="5" class="empty">Select a BIL rating above 0 to identify relevant threats.</td></tr>';
+  }else{
+    ranked.forEach((t,idx)=>{
+      const tr=document.createElement("tr");
+      const pct=(t.score/5)*100;
+      tr.innerHTML=`
+        <td><span class="rank">${idx+1}</span></td>
+        <td><strong>${t.id}</strong> – ${t.name}</td>
+        <td>${t.drivers.join(" / ")}</td>
+        <td><span class="score">${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="bar"><i style="width:${pct}%"></i></div>
+            <span class="score">${t.score.toFixed(2)}</span>
+          </div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  document.getElementById("threatCount").textContent=`${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
+}
+
+function makeScaleSelect(value,onChange){
+  const s=document.createElement("select");
+  s.className="small-select";
+  ["0 – None","1 – Secondary","2 – Significant","3 – Primary"].forEach((label,n)=>{
+    const o=document.createElement("option");
+    o.value=n;o.textContent=label;
+    if(n===value)o.selected=true;
+    s.appendChild(o);
+  });
+  s.addEventListener("change",()=>onChange(+s.value));
+  return s;
+}
+
+function renderConfig(){
+  const body=document.getElementById("configBody");
+  body.innerHTML="";
+  threats.forEach((t,idx)=>{
+    const tr=document.createElement("tr");
+    const tdThreat=document.createElement("td");
+    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+    tr.appendChild(tdThreat);
+
+    ["c","i","a"].forEach(k=>{
+      const td=document.createElement("td");
+      td.appendChild(makeScaleSelect(t[k], value=>{
+        threats[idx][k]=value;
+        saveMatrix();
+        render();
+      }));
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  threats=structuredClone(defaultThreats);
+  saveMatrix();
+  renderConfig();
+  render();
+});
+
+renderConfig();
+render();
+</script>
+</body>
+</html>
