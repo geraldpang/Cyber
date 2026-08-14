@@ -255,6 +255,11 @@
       text-decoration:underline;
       text-underline-offset:2px;
     }
+    .risk-statement{
+      font-size:13px;
+      line-height:1.45;
+      font-weight:700;
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
       .bar{width:80px}
@@ -937,8 +942,8 @@ function renderInherentRisk(){
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
         <td>
-          <strong>${buildRiskStatement(t)}</strong>
-          <br><span class="muted-small">${t.id} – ${t.name}</span>
+          <div class="risk-statement">${buildRiskStatement(t)}</div>
+          <span class="muted-small">${t.id} – ${t.name}</span>
         </td>
         <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
         <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}</td>
