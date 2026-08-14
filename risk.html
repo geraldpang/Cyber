@@ -118,6 +118,88 @@
       gap:10px;
       margin-top:18px;
     }
+    .report-paper{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:26px;
+    }
+    .report-header{
+      border-bottom:2px solid #e4e7ec;
+      padding-bottom:14px;
+      margin-bottom:18px;
+    }
+    .report-header h1{
+      margin:0 0 5px;
+      font-size:24px;
+    }
+    .report-section{
+      margin:20px 0;
+    }
+    .report-section h3{
+      margin:0 0 10px;
+      font-size:16px;
+    }
+    .report-summary-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .report-summary-box{
+      border:1px solid #e4e7ec;
+      border-radius:10px;
+      padding:10px;
+      background:#fafbfc;
+    }
+    .report-summary-box span{
+      display:block;
+      font-size:11px;
+      color:#667085;
+    }
+    .report-summary-box strong{
+      display:block;
+      margin-top:3px;
+      font-size:16px;
+    }
+    .report-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    .report-table th,.report-table td{
+      border:1px solid #e4e7ec;
+      padding:7px;
+      vertical-align:top;
+    }
+    .report-table th{
+      background:#f2f4f7;
+      position:static;
+    }
+    .recommendation-box{
+      width:100%;
+      min-height:150px;
+      resize:vertical;
+      border:1px solid #cfd8e6;
+      border-radius:10px;
+      padding:12px;
+      font:inherit;
+    }
+    @media print{
+      body *{visibility:hidden!important}
+      #reportPrintable,#reportPrintable *{visibility:visible!important}
+      #reportPrintable{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        border:none;
+        box-shadow:none;
+      }
+      .recommendation-box{
+        border:1px solid #aaa;
+      }
+    }
     .step-config{display:none}
     .step-config.active-config{display:block}
     .grid{display:grid;grid-template-columns:380px 1fr;gap:20px}
@@ -385,82 +467,77 @@
       max-width:100%;
       padding:8px 0;
     }
+    .matrix-axis-title{
+      text-align:center;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:6px;
+      color:#344054;
+    }
     .risk-matrix-config-table{
       border-collapse:collapse;
-      width:auto;
+      width:100%;
       min-width:760px;
-      margin:auto;
       table-layout:fixed;
       background:#fff;
     }
-    .risk-matrix-config-table th,
-    .risk-matrix-config-table td{
-      border:1px solid #fff;
-      text-align:center;
-      padding:0;
-      height:58px;
-      min-width:88px;
-    }
     .risk-matrix-config-table th{
+      border:1px solid #fff;
       background:#d9d9d9;
       color:#111;
       font-size:12px;
       font-weight:700;
+      padding:9px 6px;
+      text-align:center;
       position:static;
     }
-    .risk-matrix-config-table .impact-title{
-      background:#d9d9d9;
-      font-size:13px;
-    }
-    .risk-matrix-config-table .likelihood-title{
-      width:160px;
-      min-width:160px;
+    .risk-matrix-config-table .axis-corner{
+      width:150px;
       line-height:1.25;
     }
-    .risk-matrix-config-table .likelihood-spacer{
-      width:58px;
-      min-width:58px;
+    .risk-matrix-config-table td{
+      border:1px solid #fff;
+      padding:0;
+      height:66px;
+      text-align:center;
     }
     .risk-row-label{
       background:#d9d9d9!important;
       color:#111!important;
       font-weight:700!important;
-      width:58px;
-      min-width:58px!important;
+      width:150px;
+      padding:8px!important;
     }
     .risk-cell-editor{
-      position:relative;
       width:100%;
       height:100%;
-      display:flex;
+      display:grid;
+      grid-template-rows:1fr auto;
       align-items:center;
-      justify-content:center;
-      border:1px solid rgba(255,255,255,.7);
-      overflow:hidden;
+      justify-items:center;
+      gap:2px;
+      padding:5px;
     }
     .risk-cell-value{
-      width:46px!important;
-      border:none!important;
-      background:transparent!important;
+      width:58px!important;
+      border:1px solid rgba(0,0,0,.15)!important;
+      background:rgba(255,255,255,.72)!important;
+      border-radius:6px!important;
       text-align:center!important;
       font-weight:800!important;
       font-size:14px!important;
-      padding:0!important;
+      padding:5px!important;
       outline:none;
     }
     .risk-cell-color{
-      position:absolute;
-      right:4px;
-      bottom:4px;
-      width:18px!important;
-      height:18px;
-      min-width:18px!important;
-      padding:0!important;
-      border:1px solid rgba(0,0,0,.2)!important;
-      border-radius:4px!important;
-      opacity:.85;
+      width:86px!important;
+      min-width:86px!important;
+      padding:3px 4px!important;
+      border:1px solid rgba(0,0,0,.15)!important;
+      border-radius:5px!important;
+      background:rgba(255,255,255,.82)!important;
+      font-size:11px!important;
       cursor:pointer;
-      font-size:0!important;
     }
     .inline-config{
       box-shadow:none;
@@ -501,6 +578,8 @@
     <button class="step" data-target="step-checklist"><span>6</span><small>Checklist</small></button>
     <div class="step-line"></div>
     <button class="step" data-target="step-residual"><span>7</span><small>Residual Risk</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-report"><span>8</span><small>Report</small></button>
   </div>
 </div>
 
@@ -687,14 +766,11 @@
           <button class="danger risk-matrix-reset">Reset risk matrix</button>
         </div>
         <div class="risk-matrix-wrap">
+          <div class="matrix-axis-title">Severity / Consequence →</div>
           <table class="risk-matrix-config-table">
             <thead>
               <tr>
-                <th rowspan="2" class="likelihood-title">Frequency / Likelihood</th>
-                <th rowspan="2" class="likelihood-spacer"></th>
-                <th colspan="6" class="impact-title">Severity / Consequence</th>
-              </tr>
-              <tr>
+                <th class="axis-corner">Frequency / Likelihood ↓</th>
                 <th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
               </tr>
             </thead>
@@ -810,36 +886,9 @@
         <tbody id="residualRiskBody"></tbody>
       </table>
     </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><span></span></div>
-    <details class="inline-config" style="margin-top:18px">
-      <summary>⚙ Risk Matrix Configurator</summary>
-      <div class="config-wrap">
-        <p class="config-note">
-          Configure the risk value and colour for each Likelihood × Impact combination.
-          This shared matrix is used by both Inherent Risk and Residual Risk.
-        </p>
-        <div class="toolbar">
-          <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
-          <button class="danger risk-matrix-reset">Reset risk matrix</button>
-        </div>
-        <div class="risk-matrix-wrap">
-          <table class="risk-matrix-config-table">
-            <thead>
-              <tr>
-                <th rowspan="2" class="likelihood-title">Frequency / Likelihood</th>
-                <th rowspan="2" class="likelihood-spacer"></th>
-                <th colspan="6" class="impact-title">Severity / Consequence</th>
-              </tr>
-              <tr>
-                <th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
-              </tr>
-            </thead>
-            <tbody class="riskMatrixConfigBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </details>
-</section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><button class="primary screen-nav" data-step-index="7">Next →</button></div>
+  </section>
+
 
 
 </main>
@@ -1001,6 +1050,7 @@ function render(){
       if(typeof renderControls === "function") renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
   });
 
@@ -1296,6 +1346,7 @@ function renderExposureLikelihoodConfig(){
       renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
     tdBase.appendChild(baseSel);
     tr.appendChild(tdBase);
@@ -1422,6 +1473,7 @@ function renderInherentRisk(){
       renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
   });
 
@@ -1683,6 +1735,7 @@ function renderControlConfigurator(){
       saveControlConfig(); renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
 
     const typeHost=head.querySelector(".type-checks");
@@ -1708,6 +1761,7 @@ function renderControlConfigurator(){
       renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
 
     const area=document.createElement("div");
@@ -1775,6 +1829,7 @@ function renderControlConfigurator(){
       renderControls();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
     area.appendChild(add);
     card.appendChild(area);
@@ -1876,20 +1931,12 @@ function renderRiskMatrixConfigurators(){
   document.querySelectorAll(".riskMatrixConfigBody").forEach(body=>{
     body.innerHTML="";
 
-    [5,4,3,2,1].forEach((likelihood,rowIndex)=>{
+    [5,4,3,2,1].forEach(likelihood=>{
       const tr=document.createElement("tr");
-
-      if(rowIndex===0){
-        const leftTitle=document.createElement("th");
-        leftTitle.className="likelihood-title";
-        leftTitle.rowSpan=5;
-        leftTitle.textContent="Frequency / Likelihood";
-        tr.appendChild(leftTitle);
-      }
 
       const rowLabel=document.createElement("th");
       rowLabel.className="risk-row-label";
-      rowLabel.textContent=`F${likelihood}`;
+      rowLabel.textContent=`F${likelihood} – ${LIKELIHOOD_LABELS[likelihood]}`;
       tr.appendChild(rowLabel);
 
       [0,1,2,3,4,5].forEach(impact=>{
@@ -1908,7 +1955,6 @@ function renderRiskMatrixConfigurators(){
         valueInput.min="0";
         valueInput.step="1";
         valueInput.value=cell.value;
-        valueInput.style.color=color.fg;
         valueInput.title=`F${likelihood} / S${impact} risk value`;
 
         const colorSelect=document.createElement("select");
@@ -1921,7 +1967,6 @@ function renderRiskMatrixConfigurators(){
           if(cell.color===c.id) o.selected=true;
           colorSelect.appendChild(o);
         });
-        colorSelect.style.background=color.bg;
 
         function commit(){
           riskMatrix[String(likelihood)] = riskMatrix[String(likelihood)] || {};
@@ -1935,6 +1980,7 @@ function renderRiskMatrixConfigurators(){
           renderResidualRisk();
           renderControls();
           renderControlChecklist();
+          if(typeof renderReport==="function") renderReport();
         }
 
         valueInput.addEventListener("change",commit);
@@ -1959,6 +2005,7 @@ function renderRiskMatrixConfigurators(){
       renderResidualRisk();
       renderControls();
       renderControlChecklist();
+      if(typeof renderReport==="function") renderReport();
     };
   });
 }
@@ -2099,6 +2146,7 @@ function renderControlChecklist(){
       saveControlAssessments();
       renderControlChecklist();
       renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     });
   });
 
@@ -2307,6 +2355,186 @@ document.querySelectorAll(".screen-nav").forEach(btn=>{
     showStep(+btn.dataset.stepIndex);
   });
 });
+
+
+function escHtml(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+function selectedThreatObjectsForReport(){
+  return currentRankedThreats().map(t=>{
+    const s=suggestedLikelihood(t.id);
+    const a=assessedLikelihood(t.id);
+    const cell=getRiskMatrixCell(a,t.impact);
+    return {...t,suggested:s,assessed:a,inherentRiskScore:+cell.value};
+  }).sort((a,b)=>b.inherentRiskScore-a.inherentRiskScore);
+}
+
+function renderReport(){
+  const host=document.getElementById("reportContent");
+  if(!host) return;
+
+  const bilC=+document.getElementById("bilC").value;
+  const bilI=+document.getElementById("bilI").value;
+  const bilA=+document.getElementById("bilA").value;
+  const bilV=Math.max(bilC,bilI,bilA);
+  const drivers=[];
+  if(bilC===bilV) drivers.push("C");
+  if(bilI===bilV) drivers.push("I");
+  if(bilA===bilV) drivers.push("A");
+
+  const threats=selectedThreatObjectsForReport();
+  const controls=getPrioritisedControlData();
+  const residuals=currentApplicableRiskThreats()
+    .map(t=>({...t,...residualForThreat(t)}))
+    .sort((a,b)=>b.residualRiskScore-a.residualRiskScore);
+
+  const exposureList=exposureQuestionDefs.map(q=>{
+    let answer;
+    if(q.type==="boolean") answer=exposureAnswers[q.id] ? "Yes" : "No";
+    else answer=(exposureAnswers[q.id]||"low").replace(/^./,x=>x.toUpperCase());
+    return `<tr><td>${escHtml(q.label)}</td><td>${escHtml(answer)}</td></tr>`;
+  }).join("");
+
+  const threatRows=threats.map(t=>`
+    <tr>
+      <td>${buildRiskStatement(t)}</td>
+      <td>${t.impact}</td>
+      <td>${t.assessed} - ${LIKELIHOOD_LABELS[t.assessed]}</td>
+      <td>${riskBadgeHtml(t.assessed,t.impact)}</td>
+      <td>${escHtml(inherentRiskNotes[t.id]||"")}</td>
+    </tr>`).join("");
+
+  const controlRows=controls.map((c,idx)=>{
+    const status=controlAssessments[c.id]||"Not Sure";
+    return `<tr>
+      <td>${idx+1}</td>
+      <td>${escHtml(c.id)} - ${escHtml(c.name)}</td>
+      <td>${escHtml((c.types||[]).join(" / "))}</td>
+      <td>${c.bestEffectiveness} - ${effectivenessLabel(c.bestEffectiveness)}</td>
+      <td>${escHtml(status)}</td>
+      <td>${escHtml(controlComments[c.id]||"")}</td>
+    </tr>`;
+  }).join("");
+
+  const residualRows=residuals.map(t=>`
+    <tr>
+      <td>${buildRiskStatement(t)}</td>
+      <td>${riskBadgeHtml(t.assessed,t.impact)}</td>
+      <td>${(t.preventiveCoverage*100).toFixed(0)}%</td>
+      <td>${t.residualLikelihood}</td>
+      <td>${(t.impactMitigation*100).toFixed(0)}%</td>
+      <td>${t.residualImpact}</td>
+      <td>${riskBadgeHtml(t.residualLikelihood,t.residualImpact)}</td>
+      <td>${escHtml(residualRiskNotes[t.id]||"")}</td>
+    </tr>`).join("");
+
+  host.innerHTML=`
+    <div class="report-section">
+      <h3>Executive Summary</h3>
+      <div class="report-summary-grid">
+        <div class="report-summary-box"><span>BIL-C</span><strong>${bilC}</strong></div>
+        <div class="report-summary-box"><span>BIL-I</span><strong>${bilI}</strong></div>
+        <div class="report-summary-box"><span>BIL-A</span><strong>${bilA}</strong></div>
+        <div class="report-summary-box"><span>BIL-V</span><strong>${bilV}</strong></div>
+        <div class="report-summary-box"><span>BIL Driver</span><strong>${drivers.join(" + ")}</strong></div>
+        <div class="report-summary-box"><span>Applicable Threats</span><strong>${threats.length}</strong></div>
+      </div>
+    </div>
+
+    <div class="report-section">
+      <h3>Asset Exposure</h3>
+      <table class="report-table"><thead><tr><th>Exposure Question</th><th>Response</th></tr></thead><tbody>${exposureList}</tbody></table>
+    </div>
+
+    <div class="report-section">
+      <h3>Inherent Risk</h3>
+      <table class="report-table">
+        <thead><tr><th>Risk Statement</th><th>Impact</th><th>Likelihood</th><th>Risk</th><th>Notes</th></tr></thead>
+        <tbody>${threatRows || '<tr><td colspan="5">No applicable threats selected.</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    <div class="report-section">
+      <h3>Control Assessment</h3>
+      <table class="report-table">
+        <thead><tr><th>#</th><th>Control</th><th>Type</th><th>Effectiveness</th><th>Status</th><th>Comments</th></tr></thead>
+        <tbody>${controlRows || '<tr><td colspan="6">No applicable controls.</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    <div class="report-section">
+      <h3>Residual Risk</h3>
+      <table class="report-table">
+        <thead><tr><th>Risk Statement</th><th>Inherent Risk</th><th>Likelihood Mitigation</th><th>Residual Likelihood</th><th>Impact Mitigation</th><th>Residual Impact</th><th>Residual Risk</th><th>Notes</th></tr></thead>
+        <tbody>${residualRows || '<tr><td colspan="8">No residual risks available.</td></tr>'}</tbody>
+      </table>
+    </div>`;
+}
+
+function loadReportRecommendation(){
+  try{return localStorage.getItem("bilReportRecommendationV1")||""}catch(e){return""}
+}
+function saveReportRecommendation(v){
+  localStorage.setItem("bilReportRecommendationV1",v);
+}
+
+const recBox=document.getElementById("reportRecommendation");
+if(recBox){
+  recBox.value=loadReportRecommendation();
+  recBox.addEventListener("input",()=>saveReportRecommendation(recBox.value));
+}
+
+function reportHtmlDocument(){
+  renderReport();
+  const recommendation=escHtml(document.getElementById("reportRecommendation")?.value||"").replaceAll("\n","<br>");
+  const reportClone=document.getElementById("reportPrintable").cloneNode(true);
+  const ta=reportClone.querySelector("textarea");
+  if(ta){
+    const div=document.createElement("div");
+    div.style.whiteSpace="pre-wrap";
+    div.style.border="1px solid #ccc";
+    div.style.padding="10px";
+    div.textContent=document.getElementById("reportRecommendation")?.value||"";
+    ta.replaceWith(div);
+  }
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Cybersecurity Risk Assessment Report</title>
+  <style>
+  body{font-family:Arial,sans-serif;color:#172033;font-size:11pt;margin:30px}
+  h1{font-size:20pt} h3{font-size:13pt;margin-top:18px}
+  table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:15px}
+  th,td{border:1px solid #bbb;padding:6px;vertical-align:top} th{background:#eee}
+  .report-summary-grid{display:table;width:100%;margin-bottom:15px}
+  .report-summary-box{display:inline-block;border:1px solid #ccc;padding:8px;margin:3px;min-width:100px}
+  .risk-value-badge{display:inline-block;padding:4px 7px;border-radius:5px;font-weight:bold}
+  .risk-event,.risk-hazard,.risk-cause{font-weight:normal;color:inherit;background:none;text-decoration:none;padding:0}
+  </style></head><body>${reportClone.innerHTML}</body></html>`;
+}
+
+document.getElementById("downloadWordBtn")?.addEventListener("click",()=>{
+  const blob=new Blob([reportHtmlDocument()],{type:"application/msword"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="Cybersecurity_Risk_Assessment_Report.doc";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),500);
+});
+
+document.getElementById("downloadPdfBtn")?.addEventListener("click",()=>{
+  renderReport();
+  window.print();
+});
+
+const originalShowStep=showStep;
+showStep=function(index){
+  originalShowStep(index);
+  if(index===7) renderReport();
+};
 
 // Start on the first screen.
 showStep(0);
