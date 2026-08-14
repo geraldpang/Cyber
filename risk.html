@@ -287,7 +287,7 @@
         <table>
           <thead>
             <tr>
-              <th>Use</th>
+              <th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="selectAllThreats" aria-label="Select all threats"> Select All</label></th>
               <th>Priority</th>
               <th>Threat</th>
               <th>Primary CIA Driver</th>
@@ -517,11 +517,43 @@ function render(){
     cb.addEventListener("change",()=>{
       threatSelections[cb.dataset.threatId] = cb.checked;
       saveThreatSelections();
+
+      const selectAll = document.getElementById("selectAllThreats");
+      const allBoxes = [...tbody.querySelectorAll(".threat-use")];
+      const checkedCount = allBoxes.filter(x=>x.checked).length;
+      if(selectAll){
+        selectAll.checked = allBoxes.length > 0 && checkedCount === allBoxes.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < allBoxes.length;
+      }
+
+      const selectedCountNow = ranked.filter(t=>isThreatSelected(t.id)).length;
+      document.getElementById("threatCount").textContent =
+        `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
+
       if(typeof renderControls === "function") renderControls();
     });
   });
 
   const selectedCount = ranked.filter(t=>isThreatSelected(t.id)).length;
+  const selectAll = document.getElementById("selectAllThreats");
+  if(selectAll){
+    selectAll.checked = ranked.length > 0 && selectedCount === ranked.length;
+    selectAll.indeterminate = selectedCount > 0 && selectedCount < ranked.length;
+
+    selectAll.onchange = ()=>{
+      ranked.forEach(t=>{ threatSelections[t.id] = selectAll.checked; });
+      saveThreatSelections();
+      tbody.querySelectorAll(".threat-use").forEach(cb=>{ cb.checked = selectAll.checked; });
+      selectAll.indeterminate = false;
+
+      const selectedCountNow = ranked.filter(t=>isThreatSelected(t.id)).length;
+      document.getElementById("threatCount").textContent =
+        `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
+
+      if(typeof renderControls === "function") renderControls();
+    };
+  }
+
   document.getElementById("threatCount").textContent =
     `${selectedCount} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
 }
