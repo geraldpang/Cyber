@@ -271,6 +271,12 @@
     .risk-statement .risk-cause{
       font-weight:700;
     }
+    .control-risk-summary{
+      font-size:12px;
+      line-height:1.4;
+      font-weight:400;
+      color:#475467;
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
       .bar{width:80px}
@@ -1185,7 +1191,7 @@ function currentApplicableRiskThreats(){
 
 function buildShortRiskStatement(t){
   const event = riskEventPhrase(t);
-  return `Risk of <span class="risk-event">${event}</span> by <span class="risk-hazard">${t.name}</span>`;
+  return `Risk of ${event} by ${t.name}`;
 }
 
 function renderControls(){
@@ -1251,7 +1257,7 @@ function renderControls(){
         <td><strong>${c.id}</strong> – ${c.name}</td>
         <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
         <td>
-          <div class="risk-statement">${buildShortRiskStatement(c.bestThreat)}</div>
+          <div class="control-risk-summary">${buildShortRiskStatement(c.bestThreat)}</div>
           <span class="muted-small">${c.bestThreat.id} – ${c.bestThreat.name}</span>
         </td>
         <td>
