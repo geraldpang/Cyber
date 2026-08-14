@@ -233,6 +233,28 @@
       font:inherit;
     }
     .override-input.hidden{display:none}
+    .risk-event{
+      display:inline-block;
+      background:#ff6b00;
+      color:#fff;
+      padding:2px 8px;
+      border-radius:999px;
+      font-weight:800;
+    }
+    .risk-hazard{
+      display:inline-block;
+      background:#ffc400;
+      color:#172033;
+      padding:2px 7px;
+      border-radius:2px;
+      font-weight:800;
+    }
+    .risk-cause{
+      color:#1f6f9f;
+      font-weight:800;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
       .bar{width:80px}
@@ -372,7 +394,7 @@
         <thead>
           <tr>
             <th>Priority</th>
-            <th>Threat</th>
+            <th>Risk Statement</th>
             <th>Threat Impact</th>
             <th>Suggested Likelihood</th>
             <th>Assessed Likelihood</th>
@@ -675,60 +697,70 @@ const exposureQuestionDefs = [
   {
     id:"internetFacing",
     label:"Is the asset internet-facing?",
+    shortLabel:"internet exposure",
     type:"boolean",
     effects:{"T02":0.5,"T04":0.5,"T05":0.5,"T07":0.5,"T11":0.5,"T12":0.5,"T14":0.5}
   },
   {
     id:"remoteAccess",
     label:"Is remote access permitted?",
+    shortLabel:"remote access",
     type:"boolean",
     effects:{"T02":0.5,"T06":0.25,"T07":0.5,"T11":0.5,"T12":0.5}
   },
   {
     id:"thirdParty",
     label:"Does the asset connect to third parties or suppliers?",
+    shortLabel:"third-party or supplier connectivity",
     type:"boolean",
     effects:{"T02":0.25,"T09":0.75,"T11":0.25,"T12":0.25}
   },
   {
     id:"sensitiveData",
     label:"Does the asset process sensitive or privileged information?",
+    shortLabel:"sensitive or privileged information",
     type:"boolean",
     effects:{"T02":0.5,"T03":0.25,"T04":0.75,"T10":0.25,"T12":0.25}
   },
   {
     id:"removableMedia",
     label:"Is removable media permitted?",
+    shortLabel:"removable media use",
     type:"boolean",
     effects:{"T01":0.25,"T07":0.25,"T13":1.0}
   },
   {
     id:"legacyTech",
     label:"Is the technology legacy or unsupported?",
+    shortLabel:"legacy or unsupported technology",
     type:"boolean",
     effects:{"T01":0.25,"T05":0.25,"T07":0.75,"T08":0.5,"T14":0.25}
   },
   {
     id:"bespokeSoftware",
     label:"Does the asset use bespoke or custom-developed software?",
+    shortLabel:"bespoke or custom-developed software",
     type:"boolean",
     effects:{"T03":0.25,"T07":0.25,"T08":1.0,"T14":0.25}
   },
   {
     id:"emailWeb",
     label:"Is email or web access available from the environment?",
+    shortLabel:"email or web access",
     type:"boolean",
     effects:{"T06":0.75,"T07":0.5,"T12":0.25}
   },
   {
     id:"interconnectivity",
     label:"How interconnected is the asset with other systems?",
+    shortLabel:"system interconnectivity",
     type:"level",
     effects:{"T01":0.2,"T02":0.2,"T05":0.4,"T07":0.5,"T09":0.3,"T11":0.3,"T14":0.2}
   },
   {
     id:"privilegedAccess",
     label:"Is privileged access required to operate or administer the asset?",
+    shortLabel:"privileged access",
     type:"boolean",
     effects:{"T02":0.5,"T03":0.5,"T10":0.25,"T12":0.5}
   }
@@ -839,6 +871,50 @@ function renderExposureQuestions(){
   });
 }
 
+
+function riskEventPhrase(t){
+  const d = t.drivers || [];
+  if(!d.length) return "cybersecurity impact";
+  if(d.length===1){
+    const x=d[0].toLowerCase();
+    return x==="availability" ? "loss of availability" :
+           x==="integrity" ? "loss of integrity" :
+           x==="confidentiality" ? "loss of confidentiality" :
+           `loss of ${x}`;
+  }
+  return "compromise of " + d.join(" and ");
+}
+
+function activePrecursorsForThreat(threatId){
+  const items=[];
+  for(const q of exposureQuestionDefs){
+    if(!(q.effects && q.effects[threatId])) continue;
+
+    if(q.type==="boolean" && exposureAnswers[q.id]===true){
+      items.push(q.shortLabel || q.label);
+    }else if(q.type==="level"){
+      const level=exposureAnswers[q.id] || "low";
+      if(level==="medium" || level==="high"){
+        items.push(`${level} ${q.shortLabel || q.label}`.toLowerCase());
+      }
+    }
+  }
+  return items;
+}
+
+function buildRiskStatement(t){
+  const event = riskEventPhrase(t);
+  const hazard = t.name;
+  const precursors = activePrecursorsForThreat(t.id);
+
+  let cause = "the asset's inherent exposure";
+  if(precursors.length===1) cause = precursors[0];
+  else if(precursors.length===2) cause = `${precursors[0]} and ${precursors[1]}`;
+  else if(precursors.length>2) cause = `${precursors.slice(0,-1).join(", ")} and ${precursors[precursors.length-1]}`;
+
+  return `Risk of <span class="risk-event">${event}</span> by <span class="risk-hazard">${hazard}</span> caused by <span class="risk-cause">${cause}</span>.`;
+}
+
 function renderInherentRisk(){
   const applicable = currentRankedThreats().map(t=>{
     const suggested = suggestedLikelihood(t.id);
@@ -860,7 +936,10 @@ function renderInherentRisk(){
       const isOverridden = override && +override.value && +override.value !== t.suggested;
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
-        <td><strong>${t.id}</strong> – ${t.name}</td>
+        <td>
+          <strong>${buildRiskStatement(t)}</strong>
+          <br><span class="muted-small">${t.id} – ${t.name}</span>
+        </td>
         <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
         <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}</td>
         <td>
