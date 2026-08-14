@@ -1175,7 +1175,7 @@ function activePrecursorsForThreat(threatId){
 
 function buildRiskStatement(t){
   const event = riskEventPhrase(t);
-  const hazard = t.name;
+  const hazard = `${t.name} (${t.id})`;
   const precursors = activePrecursorsForThreat(t.id);
 
   let cause = "the asset's inherent exposure";
@@ -1210,7 +1210,6 @@ function renderInherentRisk(){
         <td><span class="rank">${idx+1}</span></td>
         <td>
           <div class="risk-statement">${buildRiskStatement(t)}</div>
-          <span class="muted-small">${t.id} – ${t.name}</span>
         </td>
         <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
         <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}<br><span class="muted-small">Raw ${t.suggestedRaw.toFixed(2)}</span></td>
@@ -1440,7 +1439,13 @@ function renderControls(){
           <span class="score">${c.bestThreat.inherentRiskScore.toFixed(2)}</span>
           <br><span class="muted-small">Impact ${c.bestThreat.score.toFixed(2)} × Likelihood ${c.bestThreat.assessed}</span>
         </td>
-        <td>${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</td>
+        <td>
+          <select class="priority-effectiveness"
+                  data-control-id="${c.id}"
+                  data-threat-id="${c.bestThreat.id}">
+            ${[1,2,3,4].map(n=>`<option value="${n}" ${c.bestEffectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
+          </select>
+        </td>
         <td>
           <span class="score">${c.bestScore.toFixed(2)}</span>
           <br><span class="muted-small">${c.bestThreat.inherentRiskScore.toFixed(2)} × ${c.bestEffectiveness}</span>
@@ -1449,6 +1454,21 @@ function renderControls(){
       tbody.appendChild(tr);
     });
   }
+  tbody.querySelectorAll(".priority-effectiveness").forEach(sel=>{
+    sel.addEventListener("change",()=>{
+      const controlId=sel.dataset.controlId;
+      const threatId=sel.dataset.threatId;
+      const mapping=controlMappings.find(m=>m.controlId===controlId && m.threatId===threatId);
+      if(mapping){
+        mapping.effectiveness=+sel.value;
+        saveControlConfig();
+        renderControls();
+        renderControlChecklist();
+        renderResidualRisk();
+      }
+    });
+  });
+
   document.getElementById("controlCount").textContent =
     `${rankedControls.length} prioritised control${rankedControls.length===1?"":"s"}`;
 }
@@ -1818,8 +1838,7 @@ function renderResidualRisk(){
       const tr=document.createElement("tr");
       tr.innerHTML=`
         <td>
-          <div class="control-risk-summary">${buildShortRiskStatement(t)}</div>
-          <span class="muted-small">${t.id} – ${t.name}</span>
+          <div class="risk-statement">${buildRiskStatement(t)}</div>
         </td>
         <td>
           <span class="score">${t.inherentRiskScore.toFixed(2)}</span>
