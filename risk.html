@@ -369,6 +369,46 @@
       font-size:12px;
       color:#475467;
     }
+    .risk-value-badge{
+      display:inline-flex;
+      min-width:46px;
+      min-height:30px;
+      align-items:center;
+      justify-content:center;
+      padding:5px 9px;
+      border-radius:8px;
+      font-weight:800;
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .risk-matrix-wrap{overflow:auto;max-width:100%}
+    .risk-matrix-config-table th,
+    .risk-matrix-config-table td{
+      text-align:center;
+      min-width:110px;
+    }
+    .risk-cell-editor{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:stretch;
+    }
+    .risk-cell-editor input{
+      width:100%;
+      border:1px solid #cfd8e6;
+      border-radius:8px;
+      padding:6px;
+      text-align:center;
+      font:inherit;
+    }
+    .risk-cell-editor select{
+      width:100%;
+      padding:6px;
+      font-size:12px;
+    }
+    .inline-config{
+      box-shadow:none;
+      margin-top:18px;
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
       .bar{width:80px}
@@ -577,7 +617,32 @@
         <tbody id="riskResults"></tbody>
       </table>
     </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div></section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
+    <details class="inline-config" style="margin-top:18px">
+      <summary>⚙ Risk Matrix Configurator</summary>
+      <div class="config-wrap">
+        <p class="config-note">
+          Configure the risk value and colour for each Likelihood × Impact combination.
+          This shared matrix is used by both Inherent Risk and Residual Risk.
+        </p>
+        <div class="toolbar">
+          <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
+          <button class="danger risk-matrix-reset">Reset risk matrix</button>
+        </div>
+        <div class="risk-matrix-wrap">
+          <table class="risk-matrix-config-table">
+            <thead>
+              <tr>
+                <th>Likelihood \\ Impact</th>
+                <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+              </tr>
+            </thead>
+            <tbody class="riskMatrixConfigBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+</section>
 
   <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
     <div class="toolbar">
@@ -684,7 +749,32 @@
         <tbody id="residualRiskBody"></tbody>
       </table>
     </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><span></span></div></section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><span></span></div>
+    <details class="inline-config" style="margin-top:18px">
+      <summary>⚙ Risk Matrix Configurator</summary>
+      <div class="config-wrap">
+        <p class="config-note">
+          Configure the risk value and colour for each Likelihood × Impact combination.
+          This shared matrix is used by both Inherent Risk and Residual Risk.
+        </p>
+        <div class="toolbar">
+          <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
+          <button class="danger risk-matrix-reset">Reset risk matrix</button>
+        </div>
+        <div class="risk-matrix-wrap">
+          <table class="risk-matrix-config-table">
+            <thead>
+              <tr>
+                <th>Likelihood \\ Impact</th>
+                <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+              </tr>
+            </thead>
+            <tbody class="riskMatrixConfigBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+</section>
 
 
 </main>
@@ -1211,8 +1301,9 @@ function renderInherentRisk(){
     const suggested = suggestedLikelihood(t.id);
     const suggestedRaw = suggestedLikelihoodRaw(t.id);
     const assessed = assessedLikelihood(t.id);
-    const riskScore = t.score * assessed;
-    return {...t, suggested, suggestedRaw, assessed, riskScore, riskLevel:riskLevel(riskScore)};
+    const matrixCell = getRiskMatrixCell(assessed, t.impact);
+    const riskScore = +matrixCell.value;
+    return {...t, suggested, suggestedRaw, assessed, riskScore, riskColor:matrixCell.color};
   }).sort((a,b)=>b.riskScore-a.riskScore || b.score-a.score || a.id.localeCompare(b.id));
 
   const tbody = document.getElementById("riskResults");
@@ -1236,8 +1327,11 @@ function renderInherentRisk(){
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
           </select>
         </td>
-        <td><span class="score">${t.riskScore.toFixed(2)}</span><br><span class="muted-small">${t.score.toFixed(2)} × ${t.assessed}</span></td>
-        <td><span class="pill">${t.riskLevel}</span></td>
+        <td>
+          ${riskBadgeHtml(t.assessed,t.impact)}
+          <br><span class="muted-small">L${t.assessed} × I${t.impact}</span>
+        </td>
+        <td><span class="muted-small">${riskColorDef(t.riskColor).label}</span></td>
         <td>
           <input class="notes-input inherent-note" data-note-for="${t.id}"
                  type="text" placeholder="Add notes"
@@ -1364,13 +1458,14 @@ function currentApplicableRiskThreats(){
   return currentRankedThreats().map(t=>{
     const suggested = suggestedLikelihood(t.id);
     const assessed = assessedLikelihood(t.id);
-    const inherentRiskScore = t.score * assessed;
+    const matrixCell = getRiskMatrixCell(assessed, t.impact);
+    const inherentRiskScore = +matrixCell.value;
     return {
       ...t,
       suggested,
       assessed,
       inherentRiskScore,
-      riskLevel:riskLevel(inherentRiskScore)
+      inherentRiskColor:matrixCell.color
     };
   });
 }
@@ -1649,6 +1744,140 @@ render = function(){
 };
 
 
+
+const RISK_COLOR_OPTIONS = [
+  {id:"green", label:"Green", bg:"#92D050", fg:"#172033"},
+  {id:"blue", label:"Blue", bg:"#9DC3E6", fg:"#172033"},
+  {id:"yellow", label:"Yellow", bg:"#FFF200", fg:"#172033"},
+  {id:"orange", label:"Orange", bg:"#F79646", fg:"#172033"},
+  {id:"red", label:"Red", bg:"#FF1F1F", fg:"#ffffff"}
+];
+
+// Default matrix mirrors the supplied example concept.
+// Rows are likelihood 1..5, columns are impact 0..5.
+const defaultRiskMatrix = {
+  "1": {
+    "0":{value:1,color:"green"}, "1":{value:1,color:"green"}, "2":{value:2,color:"green"},
+    "3":{value:3,color:"green"}, "4":{value:4,color:"blue"}, "5":{value:5,color:"yellow"}
+  },
+  "2": {
+    "0":{value:1,color:"green"}, "1":{value:2,color:"green"}, "2":{value:4,color:"blue"},
+    "3":{value:6,color:"yellow"}, "4":{value:8,color:"yellow"}, "5":{value:10,color:"orange"}
+  },
+  "3": {
+    "0":{value:2,color:"green"}, "1":{value:3,color:"green"}, "2":{value:6,color:"yellow"},
+    "3":{value:9,color:"yellow"}, "4":{value:12,color:"orange"}, "5":{value:15,color:"red"}
+  },
+  "4": {
+    "0":{value:3,color:"green"}, "1":{value:4,color:"blue"}, "2":{value:8,color:"yellow"},
+    "3":{value:12,color:"orange"}, "4":{value:16,color:"red"}, "5":{value:20,color:"red"}
+  },
+  "5": {
+    "0":{value:4,color:"blue"}, "1":{value:5,color:"yellow"}, "2":{value:10,color:"orange"},
+    "3":{value:15,color:"red"}, "4":{value:20,color:"red"}, "5":{value:25,color:"red"}
+  }
+};
+
+function loadRiskMatrix(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("bilRiskMatrixV1"));
+    if(saved && typeof saved==="object") return saved;
+  }catch(e){}
+  return structuredClone(defaultRiskMatrix);
+}
+let riskMatrix=loadRiskMatrix();
+
+function saveRiskMatrix(){
+  localStorage.setItem("bilRiskMatrixV1",JSON.stringify(riskMatrix));
+}
+
+function getRiskMatrixCell(likelihood, impact){
+  const l=Math.max(1,Math.min(5,Math.round(+likelihood||1)));
+  const i=Math.max(0,Math.min(5,Math.round(+impact||0)));
+  return riskMatrix[String(l)]?.[String(i)] || {value:l*i,color:"yellow"};
+}
+
+function riskColorDef(colorId){
+  return RISK_COLOR_OPTIONS.find(c=>c.id===colorId) || RISK_COLOR_OPTIONS[2];
+}
+
+function riskBadgeHtml(likelihood, impact){
+  const cell=getRiskMatrixCell(likelihood,impact);
+  const color=riskColorDef(cell.color);
+  return `<span class="risk-value-badge" style="background:${color.bg};color:${color.fg}">${cell.value}</span>`;
+}
+
+function renderRiskMatrixConfigurators(){
+  document.querySelectorAll(".riskMatrixConfigBody").forEach(body=>{
+    body.innerHTML="";
+    [5,4,3,2,1].forEach(likelihood=>{
+      const tr=document.createElement("tr");
+      const th=document.createElement("th");
+      th.textContent=`L${likelihood} – ${LIKELIHOOD_LABELS[likelihood]}`;
+      tr.appendChild(th);
+
+      [0,1,2,3,4,5].forEach(impact=>{
+        const td=document.createElement("td");
+        const cell=getRiskMatrixCell(likelihood,impact);
+        const editor=document.createElement("div");
+        editor.className="risk-cell-editor";
+
+        const valueInput=document.createElement("input");
+        valueInput.type="number";
+        valueInput.min="0";
+        valueInput.step="1";
+        valueInput.value=cell.value;
+        valueInput.title=`Likelihood ${likelihood}, Impact ${impact} risk value`;
+
+        const colorSelect=document.createElement("select");
+        RISK_COLOR_OPTIONS.forEach(c=>{
+          const o=document.createElement("option");
+          o.value=c.id;
+          o.textContent=c.label;
+          if(cell.color===c.id) o.selected=true;
+          colorSelect.appendChild(o);
+        });
+
+        function commit(){
+          riskMatrix[String(likelihood)] = riskMatrix[String(likelihood)] || {};
+          riskMatrix[String(likelihood)][String(impact)] = {
+            value:+valueInput.value || 0,
+            color:colorSelect.value
+          };
+          saveRiskMatrix();
+          renderInherentRisk();
+          renderResidualRisk();
+          renderControls();
+          renderControlChecklist();
+          renderRiskMatrixConfigurators();
+        }
+
+        valueInput.addEventListener("change",commit);
+        colorSelect.addEventListener("change",commit);
+
+        editor.appendChild(valueInput);
+        editor.appendChild(colorSelect);
+        td.appendChild(editor);
+        tr.appendChild(td);
+      });
+
+      body.appendChild(tr);
+    });
+  });
+
+  document.querySelectorAll(".risk-matrix-reset").forEach(btn=>{
+    btn.onclick=()=>{
+      riskMatrix=structuredClone(defaultRiskMatrix);
+      saveRiskMatrix();
+      renderRiskMatrixConfigurators();
+      renderInherentRisk();
+      renderResidualRisk();
+      renderControls();
+      renderControlChecklist();
+    };
+  });
+}
+
 const ASSESSMENT_FACTORS = {
   "Implemented":1.0,
   "Partially Implemented":0.5,
@@ -1858,7 +2087,8 @@ function residualForThreat(t){
   const residualImpactRaw = Math.max(1, t.score * impactResidualFactor);
   const residualImpact = Math.max(1, Math.min(5, Math.round(residualImpactRaw)));
 
-  const residualRiskScore = residualLikelihood * residualImpact;
+  const matrixCell = getRiskMatrixCell(residualLikelihood, residualImpact);
+  const residualRiskScore = +matrixCell.value;
 
   return {
     preventiveCoverage,
@@ -1868,7 +2098,7 @@ function residualForThreat(t){
     residualImpactRaw,
     residualImpact,
     residualRiskScore,
-    residualRiskLevel:riskLevel(residualRiskScore)
+    residualRiskColor:matrixCell.color
   };
 }
 
@@ -1891,8 +2121,8 @@ function renderResidualRisk(){
           <div class="risk-statement">${buildRiskStatement(t)}</div>
         </td>
         <td>
-          <span class="score">${t.inherentRiskScore.toFixed(2)}</span>
-          <br><span class="muted-small">${riskLevel(t.inherentRiskScore)}</span>
+          ${riskBadgeHtml(t.assessed,t.impact)}
+          <br><span class="muted-small">${riskColorDef(t.inherentRiskColor).label}</span>
         </td>
         <td>
           <span class="score">${(t.preventiveCoverage*100).toFixed(0)}%</span>
@@ -1909,9 +2139,9 @@ function renderResidualRisk(){
           <br><span class="muted-small">Raw ${t.residualImpactRaw.toFixed(2)}</span>
         </td>
         <td>
-          <span class="score">${t.residualRiskScore.toFixed(2)}</span>
-          <br><span class="muted-small">${t.residualRiskLevel}</span>
-          <div class="risk-movement">${t.inherentRiskScore.toFixed(1)} → ${t.residualRiskScore.toFixed(1)}</div>
+          ${riskBadgeHtml(t.residualLikelihood,t.residualImpact)}
+          <br><span class="muted-small">${riskColorDef(t.residualRiskColor).label}</span>
+          <div class="risk-movement">${t.inherentRiskScore} → ${t.residualRiskScore}</div>
         </td>
         <td>
           <input class="notes-input residual-note" data-residual-note-for="${t.id}"
