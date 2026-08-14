@@ -891,6 +891,41 @@
 
 
 
+  <section class="card step-screen" id="step-report" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">8. Report</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Review the consolidated assessment report, add recommendations, and download a copy.
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="secondary" id="downloadWordBtn">Download Word</button>
+        <button class="primary" id="downloadPdfBtn">Download PDF</button>
+      </div>
+    </div>
+
+    <div id="reportPrintable" class="report-paper">
+      <div class="report-header">
+        <h1>Cybersecurity Risk Assessment Report</h1>
+        <div class="muted-small">Generated from the BIL-driven cybersecurity risk assessment prototype.</div>
+      </div>
+
+      <div id="reportContent"></div>
+
+      <div class="report-section">
+        <h3>Recommendations</h3>
+        <textarea id="reportRecommendation" class="recommendation-box"
+          placeholder="Enter recommendations, treatment actions or assessor conclusions..."></textarea>
+      </div>
+    </div>
+
+    <div class="screen-actions">
+      <button class="secondary screen-nav" data-step-index="6">← Previous</button>
+      <span></span>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -2314,17 +2349,16 @@ render();
 const stepButtons = [...document.querySelectorAll("#progressStepper .step")];
 const stepLines = [...document.querySelectorAll("#progressStepper .step-line")];
 const stepSections = stepButtons
-  .map(btn=>document.getElementById(btn.dataset.target))
-  .filter(Boolean);
+  .map(btn=>document.getElementById(btn.dataset.target));
 
 let activeStepIndex = 0;
 
 function showStep(index){
-  index = Math.max(0, Math.min(stepSections.length - 1, index));
+  index = Math.max(0, Math.min(stepButtons.length - 1, index));
   activeStepIndex = index;
 
   stepSections.forEach((section,i)=>{
-    section.classList.toggle("active-screen", i===index);
+    if(section) section.classList.toggle("active-screen", i===index);
   });
 
   stepButtons.forEach((btn,i)=>{
