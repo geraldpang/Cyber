@@ -256,8 +256,14 @@
       text-underline-offset:2px;
     }
     .risk-statement{
-      font-size:13px;
-      line-height:1.45;
+      font-size:12px;
+      line-height:1.4;
+      font-weight:500;
+      color:#344054;
+    }
+    .risk-statement .risk-event,
+    .risk-statement .risk-hazard,
+    .risk-statement .risk-cause{
       font-weight:700;
     }
     @media(max-width:900px){
@@ -1097,6 +1103,12 @@ function currentApplicableRiskThreats(){
   });
 }
 
+
+function buildShortRiskStatement(t){
+  const event = riskEventPhrase(t);
+  return `Risk of <span class="risk-event">${event}</span> by <span class="risk-hazard">${t.name}</span>`;
+}
+
 function renderControls(){
   const riskThreats = currentApplicableRiskThreats();
   const threatById = Object.fromEntries(riskThreats.map(t=>[t.id,t]));
@@ -1160,8 +1172,8 @@ function renderControls(){
         <td><strong>${c.id}</strong> – ${c.name}</td>
         <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
         <td>
-          <strong>${buildRiskStatement(c.bestThreat)}</strong>
-          <br><span class="muted-small">${c.bestThreat.id} – ${c.bestThreat.name}</span>
+          <div class="risk-statement">${buildShortRiskStatement(c.bestThreat)}</div>
+          <span class="muted-small">${c.bestThreat.id} – ${c.bestThreat.name}</span>
         </td>
         <td>
           <span class="score">${c.bestThreat.inherentRiskScore.toFixed(2)}</span>
