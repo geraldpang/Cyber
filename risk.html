@@ -280,11 +280,69 @@
         <tbody id="configBody"></tbody>
       </table>
     </div>
+
+  </details>
+
+  <section class="card" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">3. Prioritised Controls</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Public/generic prototype controls ranked by their potential to reduce the highest-impact threats.
+        </div>
+      </div>
+      <span class="pill" id="controlCount">0 controls</span>
+    </div>
+
+    <div style="overflow:auto;max-height:650px">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Control</th>
+            <th>Highest Relevant Threat</th>
+            <th>Threat Impact</th>
+            <th>Effectiveness</th>
+            <th>Control Type</th>
+            <th>Priority Score</th>
+          </tr>
+        </thead>
+        <tbody id="controlResults"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details>
+    <summary>⚙ Threat-to-Control Mapping Configurator</summary>
+    <div class="config-wrap">
+      <p class="config-note">
+        Maintain how strongly each public/generic prototype control mitigates each threat.
+        Effectiveness: 0 = none, 1 = low, 2 = moderate, 3 = high, 4 = very high.
+        Changes are saved in this browser and immediately affect control prioritisation.
+      </p>
+      <div class="toolbar">
+        <div class="pill">Effectiveness scale: 0–4</div>
+        <button class="danger" id="resetControlMapBtn">Reset control mappings</button>
+      </div>
+      <div style="overflow:auto;max-height:720px">
+        <table>
+          <thead>
+            <tr>
+              <th>Threat</th>
+              <th>Control</th>
+              <th>Effectiveness</th>
+              <th>Control Type</th>
+            </tr>
+          </thead>
+          <tbody id="controlConfigBody"></tbody>
+        </table>
+      </div>
+    </div>
   </details>
 </main>
 
 <footer>
-  Prototype methodology only. Default Threat-to-CIA mappings are illustrative and should be formally reviewed and approved before operational use.
+  Prototype methodology only. Threat-to-CIA and Threat-to-Control mappings are illustrative and should be formally reviewed and approved before operational use.
 </footer>
 
 <script>
@@ -444,7 +502,196 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   render();
 });
 
+
+const prototypeControls = [
+  {id:"PC-01", name:"Multi-Factor Authentication", type:"Preventive"},
+  {id:"PC-02", name:"Privileged Access Management", type:"Preventive"},
+  {id:"PC-03", name:"Secure Configuration Management", type:"Preventive"},
+  {id:"PC-04", name:"Vulnerability and Patch Management", type:"Preventive"},
+  {id:"PC-05", name:"Endpoint Malware Protection", type:"Preventive / Detective"},
+  {id:"PC-06", name:"Application Control", type:"Preventive"},
+  {id:"PC-07", name:"Network Segmentation", type:"Preventive"},
+  {id:"PC-08", name:"Security Logging and Monitoring", type:"Detective"},
+  {id:"PC-09", name:"Data Encryption", type:"Preventive"},
+  {id:"PC-10", name:"Backup and Recovery", type:"Recovery"},
+  {id:"PC-11", name:"Email and Web Protection", type:"Preventive / Detective"},
+  {id:"PC-12", name:"Security Awareness Training", type:"Preventive"},
+  {id:"PC-13", name:"Supplier Security Management", type:"Preventive"},
+  {id:"PC-14", name:"Incident Response Capability", type:"Corrective / Recovery"},
+  {id:"PC-15", name:"Access Control Review", type:"Preventive"},
+  {id:"PC-16", name:"Network Resilience and Capacity Protection", type:"Preventive / Recovery"}
+];
+
+const defaultControlMappings = [
+  ["T01","PC-03",3],["T01","PC-04",2],["T01","PC-10",4],["T01","PC-14",2],
+  ["T02","PC-01",4],["T02","PC-02",4],["T02","PC-15",3],["T02","PC-08",2],
+  ["T03","PC-02",4],["T03","PC-15",3],["T03","PC-08",3],["T03","PC-03",2],
+  ["T04","PC-09",4],["T04","PC-01",3],["T04","PC-15",3],["T04","PC-08",2],
+  ["T05","PC-16",4],["T05","PC-07",3],["T05","PC-08",2],["T05","PC-14",2],
+  ["T06","PC-12",4],["T06","PC-11",4],["T06","PC-01",3],["T06","PC-08",2],
+  ["T07","PC-06",4],["T07","PC-05",4],["T07","PC-04",3],["T07","PC-07",3],["T07","PC-10",4],["T07","PC-14",3],
+  ["T08","PC-03",3],["T08","PC-04",3],["T08","PC-06",2],["T08","PC-08",2],
+  ["T09","PC-13",4],["T09","PC-08",3],["T09","PC-07",2],["T09","PC-14",3],
+  ["T10","PC-08",4],["T10","PC-02",3],["T10","PC-15",2],
+  ["T11","PC-01",4],["T11","PC-07",3],["T11","PC-15",3],["T11","PC-08",2],
+  ["T12","PC-01",4],["T12","PC-02",3],["T12","PC-15",3],["T12","PC-12",2],
+  ["T13","PC-05",4],["T13","PC-06",4],["T13","PC-12",2],["T13","PC-08",2],
+  ["T14","PC-07",3],["T14","PC-08",3],["T14","PC-03",2]
+].map(([threatId,controlId,effectiveness])=>({threatId,controlId,effectiveness}));
+
+let controlMappings = loadControlMappings();
+
+function loadControlMappings(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilThreatControlMapV1"));
+    if(Array.isArray(saved) && saved.length) return saved;
+  }catch(e){}
+  return structuredClone(defaultControlMappings);
+}
+
+function saveControlMappings(){
+  localStorage.setItem("bilThreatControlMapV1", JSON.stringify(controlMappings));
+}
+
+function effectivenessLabel(n){
+  return ["None","Low","Moderate","High","Very High"][n] || "None";
+}
+
+function currentRankedThreats(){
+  const bil={
+    c:+document.getElementById("bilC").value,
+    i:+document.getElementById("bilI").value,
+    a:+document.getElementById("bilA").value
+  };
+  return threats
+    .map(t=>({...t,...scoreThreat(t,bil)}))
+    .filter(t=>t.score>0)
+    .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
+}
+
+function renderControls(){
+  const rankedThreats = currentRankedThreats();
+  const threatById = Object.fromEntries(rankedThreats.map(t=>[t.id,t]));
+  const controlById = Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
+
+  const controlAgg = {};
+  for(const m of controlMappings){
+    const t = threatById[m.threatId];
+    const c = controlById[m.controlId];
+    if(!t || !c || m.effectiveness<=0) continue;
+
+    const score = t.score * m.effectiveness;
+    if(!controlAgg[c.id]){
+      controlAgg[c.id] = {
+        ...c,
+        bestScore: score,
+        bestThreat: t,
+        bestEffectiveness: m.effectiveness,
+        relevantThreats: [{threat:t,effectiveness:m.effectiveness,score}]
+      };
+    }else{
+      controlAgg[c.id].relevantThreats.push({threat:t,effectiveness:m.effectiveness,score});
+      if(score > controlAgg[c.id].bestScore){
+        controlAgg[c.id].bestScore = score;
+        controlAgg[c.id].bestThreat = t;
+        controlAgg[c.id].bestEffectiveness = m.effectiveness;
+      }
+    }
+  }
+
+  const rankedControls = Object.values(controlAgg).sort((a,b)=>{
+    if(b.bestScore !== a.bestScore) return b.bestScore-a.bestScore;
+    const aHigh = a.relevantThreats.filter(x=>x.threat.impact>=4).length;
+    const bHigh = b.relevantThreats.filter(x=>x.threat.impact>=4).length;
+    if(bHigh !== aHigh) return bHigh-aHigh;
+    if(b.bestEffectiveness !== a.bestEffectiveness) return b.bestEffectiveness-a.bestEffectiveness;
+    return b.relevantThreats.length-a.relevantThreats.length;
+  });
+
+  const tbody=document.getElementById("controlResults");
+  tbody.innerHTML="";
+  if(!rankedControls.length){
+    tbody.innerHTML='<tr><td colspan="7" class="empty">Select BIL ratings above 0 to identify prioritised controls.</td></tr>';
+  }else{
+    rankedControls.forEach((c,idx)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td><span class="rank">${idx+1}</span></td>
+        <td><strong>${c.id}</strong> – ${c.name}</td>
+        <td><strong>${c.bestThreat.id}</strong> – ${c.bestThreat.name}</td>
+        <td><span class="score">${c.bestThreat.impact} – ${BIL_LABELS[c.bestThreat.impact]}</span></td>
+        <td>${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</td>
+        <td>${c.type}</td>
+        <td><span class="score">${c.bestScore.toFixed(2)}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  document.getElementById("controlCount").textContent =
+    `${rankedControls.length} prioritised control${rankedControls.length===1?"":"s"}`;
+}
+
+function renderControlConfig(){
+  const body=document.getElementById("controlConfigBody");
+  body.innerHTML="";
+  const threatMap = Object.fromEntries(threats.map(t=>[t.id,t]));
+  const controlMap = Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
+
+  controlMappings
+    .slice()
+    .sort((a,b)=>a.threatId.localeCompare(b.threatId) || a.controlId.localeCompare(b.controlId))
+    .forEach((m)=>{
+      const t=threatMap[m.threatId], c=controlMap[m.controlId];
+      if(!t || !c) return;
+      const tr=document.createElement("tr");
+      const tdThreat=document.createElement("td");
+      tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+      tr.appendChild(tdThreat);
+
+      const tdControl=document.createElement("td");
+      tdControl.innerHTML=`<strong>${c.id}</strong> – ${c.name}`;
+      tr.appendChild(tdControl);
+
+      const tdEff=document.createElement("td");
+      const sel=document.createElement("select");
+      sel.className="small-select";
+      ["0 – None","1 – Low","2 – Moderate","3 – High","4 – Very High"].forEach((label,n)=>{
+        const o=document.createElement("option");
+        o.value=n; o.textContent=label; if(n===m.effectiveness)o.selected=true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change",()=>{
+        const target=controlMappings.find(x=>x.threatId===m.threatId && x.controlId===m.controlId);
+        target.effectiveness=+sel.value;
+        saveControlMappings();
+        renderControls();
+      });
+      tdEff.appendChild(sel);
+      tr.appendChild(tdEff);
+
+      const tdType=document.createElement("td");
+      tdType.textContent=c.type;
+      tr.appendChild(tdType);
+
+      body.appendChild(tr);
+    });
+}
+
+document.getElementById("resetControlMapBtn").addEventListener("click",()=>{
+  controlMappings=structuredClone(defaultControlMappings);
+  saveControlMappings();
+  renderControlConfig();
+  renderControls();
+});
+
+// Re-render controls whenever Phase 1 recalculates.
+const originalRender = render;
+render = function(){
+  originalRender();
+  if(document.getElementById("controlResults")) renderControls();
+};
+
 renderConfig();
+renderControlConfig();
 render();
 </script>
 </body>
