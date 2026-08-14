@@ -277,6 +277,13 @@
       font-weight:400;
       color:#475467;
     }
+    .assessment-select{
+      min-width:170px;
+    }
+    .risk-movement{
+      font-size:12px;
+      color:#475467;
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
       .bar{width:80px}
@@ -498,6 +505,63 @@
     </div>
   </section>
 
+
+  <section class="card" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">6. Control Checklist</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Assess the implementation status of each prioritised control. This assessment is used to calculate residual likelihood and residual consequence.
+        </div>
+      </div>
+      <span class="pill" id="controlAssessmentCount">0 controls assessed</span>
+    </div>
+
+    <div style="overflow:auto;max-height:720px">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Control</th>
+            <th>Control Type</th>
+            <th>Relevant Threats</th>
+            <th>Effectiveness</th>
+            <th>Assessment</th>
+          </tr>
+        </thead>
+        <tbody id="controlChecklistBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">7. Residual Risk</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Residual risk is calculated after considering the implementation and effectiveness of applicable controls.
+        </div>
+      </div>
+      <span class="pill" id="residualRiskCount">0 risks calculated</span>
+    </div>
+
+    <div style="overflow:auto;max-height:760px">
+      <table>
+        <thead>
+          <tr>
+            <th>Risk Statement</th>
+            <th>Inherent Risk</th>
+            <th>Preventive Coverage</th>
+            <th>Residual Likelihood</th>
+            <th>Residual Consequence</th>
+            <th>Residual Risk</th>
+          </tr>
+        </thead>
+        <tbody id="residualRiskBody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <details>
     <summary>⚙ Control Library & Threat Mapping Configurator</summary>
     <div class="config-wrap">
@@ -672,6 +736,8 @@ function render(){
 
       if(typeof renderInherentRisk === "function") renderInherentRisk();
       if(typeof renderControls === "function") renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
   });
 
@@ -947,6 +1013,8 @@ function renderExposureLikelihoodConfig(){
       saveLikelihoodConfig();
       renderInherentRisk();
       renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
     tdBase.appendChild(baseSel);
     tr.appendChild(tdBase);
@@ -1073,6 +1141,8 @@ function renderInherentRisk(){
       saveLikelihoodOverrides();
       renderInherentRisk();
       renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
   });
 
@@ -1313,6 +1383,8 @@ function renderControlConfigurator(){
     nameInput.addEventListener("change",()=>{
       control.name=nameInput.value.trim() || control.name;
       saveControlConfig(); renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
 
     const typeHost=head.querySelector(".type-checks");
@@ -1336,6 +1408,8 @@ function renderControlConfigurator(){
       saveControlConfig();
       renderControlConfigurator();
       renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
 
     const area=document.createElement("div");
@@ -1401,6 +1475,8 @@ function renderControlConfigurator(){
       saveControlConfig();
       renderControlConfigurator();
       renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
     });
     area.appendChild(add);
     card.appendChild(area);
@@ -1430,7 +1506,231 @@ render = function(){
   originalRender();
   if(document.getElementById("riskResults")) renderInherentRisk();
   if(document.getElementById("controlResults")) renderControls();
+  if(document.getElementById("controlChecklistBody")) renderControlChecklist();
+  if(document.getElementById("residualRiskBody")) renderResidualRisk();
 };
+
+
+const ASSESSMENT_FACTORS = {
+  "Implemented":1.0,
+  "Partially Implemented":0.5,
+  "Not Implemented":0.0,
+  "Not Sure":0.0,
+  "Not Applicable":null
+};
+
+const EFFECTIVENESS_REDUCTION = {
+  1:0.10,
+  2:0.20,
+  3:0.30,
+  4:0.40
+};
+
+function loadControlAssessments(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilControlAssessmentsV1"));
+    if(saved && typeof saved==="object") return saved;
+  }catch(e){}
+  return {};
+}
+let controlAssessments = loadControlAssessments();
+
+function saveControlAssessments(){
+  localStorage.setItem("bilControlAssessmentsV1", JSON.stringify(controlAssessments));
+}
+
+function getPrioritisedControlData(){
+  const riskThreats = currentApplicableRiskThreats();
+  const threatById = Object.fromEntries(riskThreats.map(t=>[t.id,t]));
+  const controlById = Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
+  const controlAgg = {};
+
+  for(const m of controlMappings){
+    const t = threatById[m.threatId];
+    const c = controlById[m.controlId];
+    if(!t || !c || +m.effectiveness<=0) continue;
+
+    const score = t.inherentRiskScore * (+m.effectiveness);
+
+    if(!controlAgg[c.id]){
+      controlAgg[c.id] = {
+        ...c,
+        bestScore:score,
+        bestThreat:t,
+        bestEffectiveness:+m.effectiveness,
+        relevantThreats:[{threat:t,effectiveness:+m.effectiveness,score}]
+      };
+    }else{
+      controlAgg[c.id].relevantThreats.push({threat:t,effectiveness:+m.effectiveness,score});
+      if(score > controlAgg[c.id].bestScore){
+        controlAgg[c.id].bestScore=score;
+        controlAgg[c.id].bestThreat=t;
+        controlAgg[c.id].bestEffectiveness=+m.effectiveness;
+      }
+    }
+  }
+
+  return Object.values(controlAgg).sort((a,b)=>{
+    if(b.bestScore!==a.bestScore) return b.bestScore-a.bestScore;
+    return b.relevantThreats.length-a.relevantThreats.length;
+  });
+}
+
+function renderControlChecklist(){
+  const controls = getPrioritisedControlData();
+  const tbody=document.getElementById("controlChecklistBody");
+  if(!tbody) return;
+  tbody.innerHTML="";
+
+  if(!controls.length){
+    tbody.innerHTML='<tr><td colspan="6" class="empty">No controls are currently applicable.</td></tr>';
+  }else{
+    controls.forEach((c,idx)=>{
+      const assessment = controlAssessments[c.id] || "Not Sure";
+      const relevant = c.relevantThreats
+        .slice()
+        .sort((a,b)=>b.score-a.score)
+        .map(x=>`${x.threat.id} (${x.effectiveness})`)
+        .join(", ");
+
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td><span class="rank">${idx+1}</span></td>
+        <td><strong>${c.id}</strong> – ${c.name}</td>
+        <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
+        <td><span class="muted-small">${relevant}</span></td>
+        <td>${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</td>
+        <td>
+          <select class="assessment-select" data-control-id="${c.id}">
+            ${["Implemented","Partially Implemented","Not Implemented","Not Sure","Not Applicable"]
+              .map(v=>`<option value="${v}" ${assessment===v?"selected":""}>${v}</option>`).join("")}
+          </select>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  tbody.querySelectorAll(".assessment-select").forEach(sel=>{
+    sel.addEventListener("change",()=>{
+      controlAssessments[sel.dataset.controlId]=sel.value;
+      saveControlAssessments();
+      renderControlChecklist();
+      renderResidualRisk();
+    });
+  });
+
+  const assessed = controls.filter(c=>{
+    const v=controlAssessments[c.id];
+    return v && v!=="Not Sure";
+  }).length;
+  const count=document.getElementById("controlAssessmentCount");
+  if(count) count.textContent=`${assessed} / ${controls.length} controls assessed`;
+}
+
+function controlContribution(effectiveness, implementationFactor){
+  if(implementationFactor===null) return null;
+  const base = EFFECTIVENESS_REDUCTION[+effectiveness] || 0;
+  return base * implementationFactor;
+}
+
+function residualForThreat(t){
+  const mappings = controlMappings.filter(m=>m.threatId===t.id && +m.effectiveness>0);
+  let likelihoodResidualFactor = 1.0;
+  let consequenceResidualFactor = 1.0;
+
+  for(const m of mappings){
+    const control = prototypeControls.find(c=>c.id===m.controlId);
+    if(!control) continue;
+
+    const status = controlAssessments[control.id] || "Not Sure";
+    const implementationFactor = ASSESSMENT_FACTORS[status];
+    const contribution = controlContribution(+m.effectiveness, implementationFactor);
+    if(contribution===null) continue;
+
+    const types = control.types || [];
+
+    // Preventive controls reduce likelihood.
+    if(types.includes("Preventive")){
+      likelihoodResidualFactor *= (1 - contribution);
+    }
+
+    // Corrective / Recovery controls reduce consequence.
+    // Detective is not directly credited here in the prototype.
+    if(types.includes("Corrective") || types.includes("Recovery")){
+      consequenceResidualFactor *= (1 - contribution);
+    }
+  }
+
+  const preventiveCoverage = 1 - likelihoodResidualFactor;
+  const consequenceCoverage = 1 - consequenceResidualFactor;
+
+  const residualLikelihoodRaw = Math.max(1, t.assessed * likelihoodResidualFactor);
+  const residualLikelihood = Math.max(1, Math.min(5, Math.round(residualLikelihoodRaw)));
+
+  // Preserve BIL as the underlying business impact; residual consequence is a separate realised-impact value.
+  const residualConsequenceRaw = Math.max(1, t.score * consequenceResidualFactor);
+  const residualConsequence = Math.max(1, Math.min(5, Math.round(residualConsequenceRaw)));
+
+  const residualRiskScore = residualLikelihood * residualConsequence;
+
+  return {
+    preventiveCoverage,
+    consequenceCoverage,
+    residualLikelihoodRaw,
+    residualLikelihood,
+    residualConsequenceRaw,
+    residualConsequence,
+    residualRiskScore,
+    residualRiskLevel:riskLevel(residualRiskScore)
+  };
+}
+
+function renderResidualRisk(){
+  const threats = currentApplicableRiskThreats()
+    .map(t=>({...t,...residualForThreat(t)}))
+    .sort((a,b)=>b.residualRiskScore-a.residualRiskScore);
+
+  const tbody=document.getElementById("residualRiskBody");
+  if(!tbody) return;
+  tbody.innerHTML="";
+
+  if(!threats.length){
+    tbody.innerHTML='<tr><td colspan="6" class="empty">No applicable risks available.</td></tr>';
+  }else{
+    threats.forEach(t=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>
+          <div class="control-risk-summary">${buildShortRiskStatement(t)}</div>
+          <span class="muted-small">${t.id} – ${t.name}</span>
+        </td>
+        <td>
+          <span class="score">${t.inherentRiskScore.toFixed(2)}</span>
+          <br><span class="muted-small">${riskLevel(t.inherentRiskScore)}</span>
+        </td>
+        <td>
+          <span class="score">${(t.preventiveCoverage*100).toFixed(0)}%</span>
+        </td>
+        <td>
+          <span class="score">${t.residualLikelihood}</span> – ${LIKELIHOOD_LABELS[t.residualLikelihood]}
+          <br><span class="muted-small">Raw ${t.residualLikelihoodRaw.toFixed(2)}</span>
+        </td>
+        <td>
+          <span class="score">${t.residualConsequence}</span>
+          <br><span class="muted-small">Raw ${t.residualConsequenceRaw.toFixed(2)}</span>
+        </td>
+        <td>
+          <span class="score">${t.residualRiskScore.toFixed(2)}</span>
+          <br><span class="muted-small">${t.residualRiskLevel}</span>
+          <div class="risk-movement">${t.inherentRiskScore.toFixed(1)} → ${t.residualRiskScore.toFixed(1)}</div>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  const count=document.getElementById("residualRiskCount");
+  if(count) count.textContent=`${threats.length} risk${threats.length===1?"":"s"} calculated`;
+}
 
 document.getElementById("resetExposureLikelihoodBtn").addEventListener("click",()=>{
   likelihoodConfig=structuredClone(defaultLikelihoodConfig);
@@ -1444,6 +1744,8 @@ renderConfig();
 renderExposureQuestions();
 renderExposureLikelihoodConfig();
 renderControlConfigurator();
+renderControlChecklist();
+renderResidualRisk();
 render();
 </script>
 </body>
