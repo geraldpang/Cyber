@@ -331,7 +331,60 @@
   <section class="card" style="margin-top:20px">
     <div class="toolbar">
       <div>
-        <h2 style="margin:0">3. Prioritised Controls</h2>
+        <h2 style="margin:0">3. Inherent Risk</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Inherent risk is calculated before considering cybersecurity controls.
+          Only threats selected as applicable are included.
+        </div>
+      </div>
+      <span class="pill" id="riskCount">0 threats assessed</span>
+    </div>
+
+    <div style="overflow:auto;max-height:650px">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Threat</th>
+            <th>Threat Impact</th>
+            <th>Inherent Likelihood</th>
+            <th>Inherent Risk Score</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody id="riskResults"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details>
+    <summary>⚙ Threat Inherent Likelihood Configurator</summary>
+    <div class="config-wrap">
+      <p class="config-note">
+        Configure the default inherent likelihood for each threat before considering any cybersecurity controls.
+        This value is applied automatically to applicable threats.
+      </p>
+      <div class="toolbar">
+        <div class="pill">Likelihood scale: 1 Rare · 2 Unlikely · 3 Possible · 4 Likely · 5 Almost Certain</div>
+        <button class="danger" id="resetLikelihoodBtn">Reset likelihoods</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Threat</th>
+            <th>Default Inherent Likelihood</th>
+          </tr>
+        </thead>
+        <tbody id="likelihoodConfigBody"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <section class="card" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">4. Prioritised Controls</h2>
         <div class="sub" style="margin:4px 0 0">
           Only selected threats are considered. Controls are ranked by the highest <strong>Threat Impact Score × Control Effectiveness</strong> relationship for this asset.
         </div>
@@ -530,6 +583,7 @@ function render(){
       document.getElementById("threatCount").textContent =
         `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
 
+      if(typeof renderInherentRisk === "function") renderInherentRisk();
       if(typeof renderControls === "function") renderControls();
     });
   });
@@ -550,6 +604,7 @@ function render(){
       document.getElementById("threatCount").textContent =
         `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
 
+      if(typeof renderInherentRisk === "function") renderInherentRisk();
       if(typeof renderControls === "function") renderControls();
     };
   }
@@ -600,6 +655,108 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   render();
 });
 
+
+
+const LIKELIHOOD_LABELS = ["","Rare","Unlikely","Possible","Likely","Almost Certain"];
+
+const defaultThreatLikelihoods = {
+  "T01":3,
+  "T02":4,
+  "T03":3,
+  "T04":3,
+  "T05":3,
+  "T06":4,
+  "T07":4,
+  "T08":3,
+  "T09":3,
+  "T10":2,
+  "T11":4,
+  "T12":4,
+  "T13":3,
+  "T14":3
+};
+
+function loadThreatLikelihoods(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilThreatLikelihoodsV1"));
+    if(saved && typeof saved === "object") return {...defaultThreatLikelihoods,...saved};
+  }catch(e){}
+  return structuredClone(defaultThreatLikelihoods);
+}
+
+let threatLikelihoods = loadThreatLikelihoods();
+
+function saveThreatLikelihoods(){
+  localStorage.setItem("bilThreatLikelihoodsV1", JSON.stringify(threatLikelihoods));
+}
+
+function riskLevel(score){
+  if(score >= 20) return "Extreme";
+  if(score >= 12) return "High";
+  if(score >= 6) return "Medium";
+  return "Low";
+}
+
+function renderInherentRisk(){
+  const applicable = currentRankedThreats().map(t=>{
+    const likelihood = +threatLikelihoods[t.id] || 1;
+    const riskScore = t.score * likelihood;
+    return {...t, likelihood, riskScore, riskLevel:riskLevel(riskScore)};
+  }).sort((a,b)=>b.riskScore-a.riskScore || b.score-a.score || a.id.localeCompare(b.id));
+
+  const tbody = document.getElementById("riskResults");
+  if(!tbody) return;
+  tbody.innerHTML = "";
+
+  if(!applicable.length){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
+  }else{
+    applicable.forEach((t,idx)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td><span class="rank">${idx+1}</span></td>
+        <td><strong>${t.id}</strong> – ${t.name}</td>
+        <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
+        <td><span class="score">${t.likelihood}</span> – ${LIKELIHOOD_LABELS[t.likelihood]}</td>
+        <td><span class="score">${t.riskScore.toFixed(2)}</span><br><span class="muted-small">${t.score.toFixed(2)} × ${t.likelihood}</span></td>
+        <td><span class="pill">${t.riskLevel}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  const count = document.getElementById("riskCount");
+  if(count) count.textContent = `${applicable.length} threat${applicable.length===1?"":"s"} assessed`;
+}
+
+function renderLikelihoodConfig(){
+  const body=document.getElementById("likelihoodConfigBody");
+  if(!body) return;
+  body.innerHTML="";
+  threats.forEach(t=>{
+    const tr=document.createElement("tr");
+    const tdThreat=document.createElement("td");
+    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+    tr.appendChild(tdThreat);
+
+    const tdLikelihood=document.createElement("td");
+    const sel=document.createElement("select");
+    [1,2,3,4,5].forEach(n=>{
+      const o=document.createElement("option");
+      o.value=n;
+      o.textContent=`${n} – ${LIKELIHOOD_LABELS[n]}`;
+      if((+threatLikelihoods[t.id]||1)===n) o.selected=true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change",()=>{
+      threatLikelihoods[t.id]=+sel.value;
+      saveThreatLikelihoods();
+      renderInherentRisk();
+    });
+    tdLikelihood.appendChild(sel);
+    tr.appendChild(tdLikelihood);
+    body.appendChild(tr);
+  });
+}
 
 const CONTROL_TYPES = ["Preventive","Detective","Corrective","Recovery"];
 
@@ -909,10 +1066,19 @@ document.getElementById("resetControlMapBtn").addEventListener("click",()=>{
 const originalRender = render;
 render = function(){
   originalRender();
+  if(document.getElementById("riskResults")) renderInherentRisk();
   if(document.getElementById("controlResults")) renderControls();
 };
 
+document.getElementById("resetLikelihoodBtn").addEventListener("click",()=>{
+  threatLikelihoods=structuredClone(defaultThreatLikelihoods);
+  saveThreatLikelihoods();
+  renderLikelihoodConfig();
+  renderInherentRisk();
+});
+
 renderConfig();
+renderLikelihoodConfig();
 renderControlConfigurator();
 render();
 </script>
