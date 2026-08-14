@@ -506,12 +506,30 @@
   </section>
 
 
+  <details>
+    <summary>⚙ Control Library & Threat Mapping Configurator</summary>
+    <div class="config-wrap">
+      <p class="config-note">
+        Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
+        effectiveness rating for each Control-to-Threat relationship.
+      </p>
+      <div class="toolbar">
+        <div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
+        <div style="display:flex;gap:8px">
+          <button class="primary" id="addControlBtn">+ Add Control</button>
+          <button class="danger" id="resetControlMapBtn">Reset prototype controls</button>
+        </div>
+      </div>
+      <div id="controlConfigurator"></div>
+    </div>
+  </details>
+
   <section class="card" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">6. Control Checklist</h2>
         <div class="sub" style="margin:4px 0 0">
-          Assess the implementation status of each prioritised control. This assessment is used to calculate residual likelihood and residual consequence.
+          Assess the implementation status of each prioritised control. Preventive controls reduce likelihood, while Detective, Corrective and Recovery controls reduce residual impact.
         </div>
       </div>
       <span class="pill" id="controlAssessmentCount">0 controls assessed</span>
@@ -539,7 +557,7 @@
       <div>
         <h2 style="margin:0">7. Residual Risk</h2>
         <div class="sub" style="margin:4px 0 0">
-          Residual risk is calculated after considering the implementation and effectiveness of applicable controls.
+          Residual risk is calculated after considering how implemented controls reduce likelihood and impact.
         </div>
       </div>
       <span class="pill" id="residualRiskCount">0 risks calculated</span>
@@ -551,9 +569,9 @@
           <tr>
             <th>Risk Statement</th>
             <th>Inherent Risk</th>
-            <th>Preventive Coverage</th>
+            <th>Likelihood Mitigation</th>
             <th>Residual Likelihood</th>
-            <th>Residual Consequence</th>
+            <th>Residual Impact</th>
             <th>Residual Risk</th>
           </tr>
         </thead>
@@ -562,23 +580,7 @@
     </div>
   </section>
 
-  <details>
-    <summary>⚙ Control Library & Threat Mapping Configurator</summary>
-    <div class="config-wrap">
-      <p class="config-note">
-        Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
-        effectiveness rating for each Control-to-Threat relationship.
-      </p>
-      <div class="toolbar">
-        <div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
-        <div style="display:flex;gap:8px">
-          <button class="primary" id="addControlBtn">+ Add Control</button>
-          <button class="danger" id="resetControlMapBtn">Reset prototype controls</button>
-        </div>
-      </div>
-      <div id="controlConfigurator"></div>
-    </div>
-  </details>
+
 </main>
 
 <footer>
@@ -1520,10 +1522,10 @@ const ASSESSMENT_FACTORS = {
 };
 
 const EFFECTIVENESS_REDUCTION = {
-  1:0.10,
-  2:0.20,
-  3:0.30,
-  4:0.40
+  1:0.20,
+  2:0.40,
+  3:0.60,
+  4:0.80
 };
 
 function loadControlAssessments(){
@@ -1636,7 +1638,7 @@ function controlContribution(effectiveness, implementationFactor){
 function residualForThreat(t){
   const mappings = controlMappings.filter(m=>m.threatId===t.id && +m.effectiveness>0);
   let likelihoodResidualFactor = 1.0;
-  let consequenceResidualFactor = 1.0;
+  let impactResidualFactor = 1.0;
 
   for(const m of mappings){
     const control = prototypeControls.find(c=>c.id===m.controlId);
@@ -1648,38 +1650,49 @@ function residualForThreat(t){
     if(contribution===null) continue;
 
     const types = control.types || [];
+    const applicableTypes = types.filter(t => ["Preventive","Detective","Corrective","Recovery"].includes(t));
+    const typeCount = Math.max(1, applicableTypes.length);
+
+    // For multi-type controls, split the configured effectiveness equally
+    // across the selected control types to avoid double counting.
+    const allocatedContribution = contribution / typeCount;
 
     // Preventive controls reduce likelihood.
     if(types.includes("Preventive")){
-      likelihoodResidualFactor *= (1 - contribution);
+      likelihoodResidualFactor *= (1 - allocatedContribution);
     }
 
-    // Corrective / Recovery controls reduce consequence.
-    // Detective is not directly credited here in the prototype.
-    if(types.includes("Corrective") || types.includes("Recovery")){
-      consequenceResidualFactor *= (1 - contribution);
+    // Detective, Corrective and Recovery controls reduce realised impact.
+    if(types.includes("Detective")){
+      impactResidualFactor *= (1 - allocatedContribution);
+    }
+    if(types.includes("Corrective")){
+      impactResidualFactor *= (1 - allocatedContribution);
+    }
+    if(types.includes("Recovery")){
+      impactResidualFactor *= (1 - allocatedContribution);
     }
   }
 
   const preventiveCoverage = 1 - likelihoodResidualFactor;
-  const consequenceCoverage = 1 - consequenceResidualFactor;
+  const impactMitigation = 1 - impactResidualFactor;
 
   const residualLikelihoodRaw = Math.max(1, t.assessed * likelihoodResidualFactor);
   const residualLikelihood = Math.max(1, Math.min(5, Math.round(residualLikelihoodRaw)));
 
-  // Preserve BIL as the underlying business impact; residual consequence is a separate realised-impact value.
-  const residualConsequenceRaw = Math.max(1, t.score * consequenceResidualFactor);
-  const residualConsequence = Math.max(1, Math.min(5, Math.round(residualConsequenceRaw)));
+  // Preserve BIL as the underlying business impact; residual impact is a separate realised-impact value.
+  const residualImpactRaw = Math.max(1, t.score * impactResidualFactor);
+  const residualImpact = Math.max(1, Math.min(5, Math.round(residualImpactRaw)));
 
-  const residualRiskScore = residualLikelihood * residualConsequence;
+  const residualRiskScore = residualLikelihood * residualImpact;
 
   return {
     preventiveCoverage,
-    consequenceCoverage,
+    impactMitigation,
     residualLikelihoodRaw,
     residualLikelihood,
-    residualConsequenceRaw,
-    residualConsequence,
+    residualImpactRaw,
+    residualImpact,
     residualRiskScore,
     residualRiskLevel:riskLevel(residualRiskScore)
   };
@@ -1716,8 +1729,8 @@ function renderResidualRisk(){
           <br><span class="muted-small">Raw ${t.residualLikelihoodRaw.toFixed(2)}</span>
         </td>
         <td>
-          <span class="score">${t.residualConsequence}</span>
-          <br><span class="muted-small">Raw ${t.residualConsequenceRaw.toFixed(2)}</span>
+          <span class="score">${t.residualImpact}</span>
+          <br><span class="muted-small">Raw ${t.residualImpactRaw.toFixed(2)}</span>
         </td>
         <td>
           <span class="score">${t.residualRiskScore.toFixed(2)}</span>
