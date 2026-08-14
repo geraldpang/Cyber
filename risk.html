@@ -311,14 +311,13 @@
       padding:12px;
     }
     .exposure-q label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
-    .override-input{
+    .notes-input{
       width:220px;
       border:1px solid #cfd8e6;
       border-radius:8px;
       padding:7px 8px;
       font:inherit;
     }
-    .override-input.hidden{display:none}
     .tiny-select{
       min-width:78px;
       padding:6px 7px;
@@ -570,9 +569,9 @@
             <th>Threat Impact</th>
             <th>Suggested Likelihood</th>
             <th>Assessed Likelihood</th>
-            <th>Override Reason</th>
             <th>Inherent Risk Score</th>
             <th>Risk Level</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody id="riskResults"></tbody>
@@ -649,6 +648,7 @@
             <th>Relevant Threats</th>
             <th>Effectiveness</th>
             <th>Assessment</th>
+            <th>Comments</th>
           </tr>
         </thead>
         <tbody id="controlChecklistBody"></tbody>
@@ -675,8 +675,10 @@
             <th>Inherent Risk</th>
             <th>Likelihood Mitigation</th>
             <th>Residual Likelihood</th>
+            <th>Impact Mitigation</th>
             <th>Residual Impact</th>
             <th>Residual Risk</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody id="residualRiskBody"></tbody>
@@ -996,6 +998,24 @@ function saveLikelihoodOverrides(){
   localStorage.setItem("bilLikelihoodOverridesV1", JSON.stringify(likelihoodOverrides));
 }
 
+function loadInherentRiskNotes(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilInherentRiskNotesV1"));
+    if(saved && typeof saved==="object") return saved;
+  }catch(e){}
+  // Migrate any old override reasons into notes.
+  const migrated = {};
+  for(const [tid, data] of Object.entries(likelihoodOverrides)){
+    if(data && data.reason) migrated[tid] = data.reason;
+  }
+  return migrated;
+}
+let inherentRiskNotes = loadInherentRiskNotes();
+
+function saveInherentRiskNotes(){
+  localStorage.setItem("bilInherentRiskNotesV1", JSON.stringify(inherentRiskNotes));
+}
+
 function suggestedLikelihoodRaw(threatId){
   const cfg = likelihoodConfig[threatId] || {base:3};
   let score = +cfg.base || 3;
@@ -1203,8 +1223,6 @@ function renderInherentRisk(){
     tbody.innerHTML = '<tr><td colspan="8" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
   }else{
     applicable.forEach((t,idx)=>{
-      const override = likelihoodOverrides[t.id];
-      const isOverridden = override && +override.value && +override.value !== t.suggested;
       tr=document.createElement("tr");
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
@@ -1218,13 +1236,13 @@ function renderInherentRisk(){
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
           </select>
         </td>
-        <td>
-          <input class="override-input ${isOverridden?"":"hidden"}" data-reason-for="${t.id}"
-                 type="text" placeholder="Reason for override"
-                 value="${(override?.reason||"").replaceAll('"','&quot;')}">
-        </td>
         <td><span class="score">${t.riskScore.toFixed(2)}</span><br><span class="muted-small">${t.score.toFixed(2)} × ${t.assessed}</span></td>
-        <td><span class="pill">${t.riskLevel}</span></td>`;
+        <td><span class="pill">${t.riskLevel}</span></td>
+        <td>
+          <input class="notes-input inherent-note" data-note-for="${t.id}"
+                 type="text" placeholder="Add notes"
+                 value="${(inherentRiskNotes[t.id]||"").replaceAll('"','&quot;')}">
+        </td>`;
       tbody.appendChild(tr);
     });
   }
@@ -1238,10 +1256,7 @@ function renderInherentRisk(){
       if(value===suggested){
         delete likelihoodOverrides[threatId];
       }else{
-        likelihoodOverrides[threatId]={
-          value,
-          reason:likelihoodOverrides[threatId]?.reason || ""
-        };
+        likelihoodOverrides[threatId]={ value };
       }
       saveLikelihoodOverrides();
       renderInherentRisk();
@@ -1251,13 +1266,10 @@ function renderInherentRisk(){
     });
   });
 
-  tbody.querySelectorAll(".override-input").forEach(input=>{
+  tbody.querySelectorAll(".inherent-note").forEach(input=>{
     input.addEventListener("change",()=>{
-      const threatId=input.dataset.reasonFor;
-      if(likelihoodOverrides[threatId]){
-        likelihoodOverrides[threatId].reason=input.value.trim();
-        saveLikelihoodOverrides();
-      }
+      inherentRiskNotes[input.dataset.noteFor] = input.value.trim();
+      saveInherentRiskNotes();
     });
   });
 
@@ -1665,6 +1677,32 @@ function saveControlAssessments(){
   localStorage.setItem("bilControlAssessmentsV1", JSON.stringify(controlAssessments));
 }
 
+function loadControlComments(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilControlCommentsV1"));
+    if(saved && typeof saved==="object") return saved;
+  }catch(e){}
+  return {};
+}
+let controlComments = loadControlComments();
+
+function saveControlComments(){
+  localStorage.setItem("bilControlCommentsV1", JSON.stringify(controlComments));
+}
+
+function loadResidualRiskNotes(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilResidualRiskNotesV1"));
+    if(saved && typeof saved==="object") return saved;
+  }catch(e){}
+  return {};
+}
+let residualRiskNotes = loadResidualRiskNotes();
+
+function saveResidualRiskNotes(){
+  localStorage.setItem("bilResidualRiskNotesV1", JSON.stringify(residualRiskNotes));
+}
+
 function getPrioritisedControlData(){
   const riskThreats = currentApplicableRiskThreats();
   const threatById = Object.fromEntries(riskThreats.map(t=>[t.id,t]));
@@ -1709,7 +1747,7 @@ function renderControlChecklist(){
   tbody.innerHTML="";
 
   if(!controls.length){
-    tbody.innerHTML='<tr><td colspan="6" class="empty">No controls are currently applicable.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" class="empty">No controls are currently applicable.</td></tr>';
   }else{
     controls.forEach((c,idx)=>{
       const assessment = controlAssessments[c.id] || "Not Sure";
@@ -1731,6 +1769,11 @@ function renderControlChecklist(){
             ${["Implemented","Partially Implemented","Not Implemented","Not Sure","Not Applicable"]
               .map(v=>`<option value="${v}" ${assessment===v?"selected":""}>${v}</option>`).join("")}
           </select>
+        </td>
+        <td>
+          <input class="notes-input control-comment" data-comment-for="${c.id}"
+                 type="text" placeholder="Add comments"
+                 value="${(controlComments[c.id]||"").replaceAll('"','&quot;')}">
         </td>`;
       tbody.appendChild(tr);
     });
@@ -1742,6 +1785,13 @@ function renderControlChecklist(){
       saveControlAssessments();
       renderControlChecklist();
       renderResidualRisk();
+    });
+  });
+
+  tbody.querySelectorAll(".control-comment").forEach(input=>{
+    input.addEventListener("change",()=>{
+      controlComments[input.dataset.commentFor] = input.value.trim();
+      saveControlComments();
     });
   });
 
@@ -1832,7 +1882,7 @@ function renderResidualRisk(){
   tbody.innerHTML="";
 
   if(!threats.length){
-    tbody.innerHTML='<tr><td colspan="6" class="empty">No applicable risks available.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" class="empty">No applicable risks available.</td></tr>';
   }else{
     threats.forEach(t=>{
       const tr=document.createElement("tr");
@@ -1852,6 +1902,9 @@ function renderResidualRisk(){
           <br><span class="muted-small">Raw ${t.residualLikelihoodRaw.toFixed(2)}</span>
         </td>
         <td>
+          <span class="score">${(t.impactMitigation*100).toFixed(0)}%</span>
+        </td>
+        <td>
           <span class="score">${t.residualImpact}</span>
           <br><span class="muted-small">Raw ${t.residualImpactRaw.toFixed(2)}</span>
         </td>
@@ -1859,10 +1912,22 @@ function renderResidualRisk(){
           <span class="score">${t.residualRiskScore.toFixed(2)}</span>
           <br><span class="muted-small">${t.residualRiskLevel}</span>
           <div class="risk-movement">${t.inherentRiskScore.toFixed(1)} → ${t.residualRiskScore.toFixed(1)}</div>
+        </td>
+        <td>
+          <input class="notes-input residual-note" data-residual-note-for="${t.id}"
+                 type="text" placeholder="Add notes"
+                 value="${(residualRiskNotes[t.id]||"").replaceAll('"','&quot;')}">
         </td>`;
       tbody.appendChild(tr);
     });
   }
+
+  tbody.querySelectorAll(".residual-note").forEach(input=>{
+    input.addEventListener("change",()=>{
+      residualRiskNotes[input.dataset.residualNoteFor] = input.value.trim();
+      saveResidualRiskNotes();
+    });
+  });
 
   const count=document.getElementById("residualRiskCount");
   if(count) count.textContent=`${threats.length} risk${threats.length===1?"":"s"} calculated`;
