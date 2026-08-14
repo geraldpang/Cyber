@@ -233,6 +233,11 @@
       font:inherit;
     }
     .override-input.hidden{display:none}
+    .tiny-select{
+      min-width:78px;
+      padding:6px 7px;
+      font-size:12px;
+    }
     .risk-event{
       display:inline-block;
       background:#ff6b00;
@@ -388,6 +393,44 @@
 
     <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
   </section>
+
+  <details>
+    <summary>⚙ Exposure-to-Likelihood Configurator</summary>
+    <div class="config-wrap">
+      <p class="config-note">
+        Configure the default inherent likelihood for each threat and how strongly each asset exposure factor changes that likelihood.
+        The suggested likelihood is calculated as:
+        <strong>Base Likelihood + applicable Exposure Adjustments</strong>, capped between 1 and 5.
+      </p>
+
+      <div class="toolbar">
+        <div class="pill">Adjustment scale: 0 = no effect · 0.25 = small · 0.5 = moderate · 0.75 = strong · 1.0 = very strong</div>
+        <button class="danger" id="resetExposureLikelihoodBtn">Reset likelihood configuration</button>
+      </div>
+
+      <div style="overflow:auto;max-height:780px">
+        <table>
+          <thead>
+            <tr>
+              <th>Threat</th>
+              <th>Base Likelihood</th>
+              <th>Internet-facing</th>
+              <th>Remote Access</th>
+              <th>Third Party</th>
+              <th>Sensitive Data</th>
+              <th>Removable Media</th>
+              <th>Legacy Tech</th>
+              <th>Bespoke Software</th>
+              <th>Email/Web</th>
+              <th>Interconnectivity</th>
+              <th>Privileged Access</th>
+            </tr>
+          </thead>
+          <tbody id="exposureLikelihoodConfigBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </details>
 
   <section class="card" style="margin-top:20px">
     <div class="toolbar">
@@ -697,85 +740,53 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 
 const LIKELIHOOD_LABELS = ["","Rare","Unlikely","Possible","Likely","Almost Certain"];
 
-// Base likelihood is the neutral starting point before asset-specific exposure adjustments.
-// These values are illustrative for the prototype.
-const defaultThreatLikelihoods = {
-  "T01":3,"T02":3,"T03":3,"T04":3,"T05":3,"T06":3,"T07":3,
-  "T08":3,"T09":3,"T10":2,"T11":3,"T12":3,"T13":2,"T14":3
+// Default configuration for the prototype. All values are editable in the configurator.
+const defaultLikelihoodConfig = {
+  "T01": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0},
+  "T02": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.5, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0.5},
+  "T03": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0, privilegedAccess:0.5},
+  "T04": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0.75, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T05": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.4, privilegedAccess:0},
+  "T06": {base:3, internetFacing:0, remoteAccess:0.25, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.75, interconnectivity:0, privilegedAccess:0},
+  "T07": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.75, bespokeSoftware:0.25, emailWeb:0.5, interconnectivity:0.5, privilegedAccess:0},
+  "T08": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.5, bespokeSoftware:1.0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T09": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0.75, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
+  "T10": {base:2, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0.25},
+  "T11": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
+  "T12": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.25, interconnectivity:0, privilegedAccess:0.5},
+  "T13": {base:2, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:1.0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T14": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0.2, privilegedAccess:0}
 };
 
 const exposureQuestionDefs = [
-  {
-    id:"internetFacing",
-    label:"Is the asset internet-facing?",
-    shortLabel:"internet exposure",
-    type:"boolean",
-    effects:{"T02":0.5,"T04":0.5,"T05":0.5,"T07":0.5,"T11":0.5,"T12":0.5,"T14":0.5}
-  },
-  {
-    id:"remoteAccess",
-    label:"Is remote access permitted?",
-    shortLabel:"remote access",
-    type:"boolean",
-    effects:{"T02":0.5,"T06":0.25,"T07":0.5,"T11":0.5,"T12":0.5}
-  },
-  {
-    id:"thirdParty",
-    label:"Does the asset connect to third parties or suppliers?",
-    shortLabel:"third-party or supplier connectivity",
-    type:"boolean",
-    effects:{"T02":0.25,"T09":0.75,"T11":0.25,"T12":0.25}
-  },
-  {
-    id:"sensitiveData",
-    label:"Does the asset process sensitive or privileged information?",
-    shortLabel:"sensitive or privileged information",
-    type:"boolean",
-    effects:{"T02":0.5,"T03":0.25,"T04":0.75,"T10":0.25,"T12":0.25}
-  },
-  {
-    id:"removableMedia",
-    label:"Is removable media permitted?",
-    shortLabel:"removable media use",
-    type:"boolean",
-    effects:{"T01":0.25,"T07":0.25,"T13":1.0}
-  },
-  {
-    id:"legacyTech",
-    label:"Is the technology legacy or unsupported?",
-    shortLabel:"legacy or unsupported technology",
-    type:"boolean",
-    effects:{"T01":0.25,"T05":0.25,"T07":0.75,"T08":0.5,"T14":0.25}
-  },
-  {
-    id:"bespokeSoftware",
-    label:"Does the asset use bespoke or custom-developed software?",
-    shortLabel:"bespoke or custom-developed software",
-    type:"boolean",
-    effects:{"T03":0.25,"T07":0.25,"T08":1.0,"T14":0.25}
-  },
-  {
-    id:"emailWeb",
-    label:"Is email or web access available from the environment?",
-    shortLabel:"email or web access",
-    type:"boolean",
-    effects:{"T06":0.75,"T07":0.5,"T12":0.25}
-  },
-  {
-    id:"interconnectivity",
-    label:"How interconnected is the asset with other systems?",
-    shortLabel:"system interconnectivity",
-    type:"level",
-    effects:{"T01":0.2,"T02":0.2,"T05":0.4,"T07":0.5,"T09":0.3,"T11":0.3,"T14":0.2}
-  },
-  {
-    id:"privilegedAccess",
-    label:"Is privileged access required to operate or administer the asset?",
-    shortLabel:"privileged access",
-    type:"boolean",
-    effects:{"T02":0.5,"T03":0.5,"T10":0.25,"T12":0.5}
-  }
+  {id:"internetFacing", label:"Is the asset internet-facing?", shortLabel:"internet exposure", type:"boolean"},
+  {id:"remoteAccess", label:"Is remote access permitted?", shortLabel:"remote access", type:"boolean"},
+  {id:"thirdParty", label:"Does the asset connect to third parties or suppliers?", shortLabel:"third-party or supplier connectivity", type:"boolean"},
+  {id:"sensitiveData", label:"Does the asset process sensitive or privileged information?", shortLabel:"sensitive or privileged information", type:"boolean"},
+  {id:"removableMedia", label:"Is removable media permitted?", shortLabel:"removable media use", type:"boolean"},
+  {id:"legacyTech", label:"Is the technology legacy or unsupported?", shortLabel:"legacy or unsupported technology", type:"boolean"},
+  {id:"bespokeSoftware", label:"Does the asset use bespoke or custom-developed software?", shortLabel:"bespoke or custom-developed software", type:"boolean"},
+  {id:"emailWeb", label:"Is email or web access available from the environment?", shortLabel:"email or web access", type:"boolean"},
+  {id:"interconnectivity", label:"How interconnected is the asset with other systems?", shortLabel:"system interconnectivity", type:"level"},
+  {id:"privilegedAccess", label:"Is privileged access required to operate or administer the asset?", shortLabel:"privileged access", type:"boolean"}
 ];
+
+function loadLikelihoodConfig(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilLikelihoodConfigV2"));
+    if(saved && typeof saved==="object"){
+      return Object.fromEntries(Object.entries(defaultLikelihoodConfig).map(([tid, cfg])=>[
+        tid, {...cfg, ...(saved[tid]||{})}
+      ]));
+    }
+  }catch(e){}
+  return structuredClone(defaultLikelihoodConfig);
+}
+let likelihoodConfig = loadLikelihoodConfig();
+
+function saveLikelihoodConfig(){
+  localStorage.setItem("bilLikelihoodConfigV2", JSON.stringify(likelihoodConfig));
+}
 
 function loadExposureAnswers(){
   try{
@@ -807,11 +818,12 @@ function saveLikelihoodOverrides(){
   localStorage.setItem("bilLikelihoodOverridesV1", JSON.stringify(likelihoodOverrides));
 }
 
-function suggestedLikelihood(threatId){
-  let score = +defaultThreatLikelihoods[threatId] || 3;
+function suggestedLikelihoodRaw(threatId){
+  const cfg = likelihoodConfig[threatId] || {base:3};
+  let score = +cfg.base || 3;
 
   for(const q of exposureQuestionDefs){
-    const effect = +(q.effects[threatId] || 0);
+    const effect = +(cfg[q.id] || 0);
     if(!effect) continue;
 
     if(q.type==="boolean" && exposureAnswers[q.id]===true){
@@ -823,7 +835,11 @@ function suggestedLikelihood(threatId){
     }
   }
 
-  return Math.max(1, Math.min(5, Math.round(score)));
+  return Math.max(1, Math.min(5, score));
+}
+
+function suggestedLikelihood(threatId){
+  return Math.max(1, Math.min(5, Math.round(suggestedLikelihoodRaw(threatId))));
 }
 
 function assessedLikelihood(threatId){
@@ -884,6 +900,67 @@ function renderExposureQuestions(){
   });
 }
 
+function makeAdjustmentSelect(value){
+  const sel=document.createElement("select");
+  sel.className="tiny-select";
+  [0,0.25,0.5,0.75,1.0].forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v;
+    o.textContent=v===0 ? "0" : `+${v}`;
+    if(Math.abs((+value||0)-v)<0.001) o.selected=true;
+    sel.appendChild(o);
+  });
+  return sel;
+}
+
+function renderExposureLikelihoodConfig(){
+  const body=document.getElementById("exposureLikelihoodConfigBody");
+  if(!body) return;
+  body.innerHTML="";
+
+  threats.forEach(t=>{
+    const cfg=likelihoodConfig[t.id] || {base:3};
+    const tr=document.createElement("tr");
+
+    const tdThreat=document.createElement("td");
+    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+    tr.appendChild(tdThreat);
+
+    const tdBase=document.createElement("td");
+    const baseSel=document.createElement("select");
+    baseSel.className="tiny-select";
+    [1,2,3,4,5].forEach(n=>{
+      const o=document.createElement("option");
+      o.value=n;
+      o.textContent=`${n} – ${LIKELIHOOD_LABELS[n]}`;
+      if((+cfg.base||3)===n) o.selected=true;
+      baseSel.appendChild(o);
+    });
+    baseSel.addEventListener("change",()=>{
+      likelihoodConfig[t.id].base=+baseSel.value;
+      saveLikelihoodConfig();
+      renderInherentRisk();
+      renderControls();
+    });
+    tdBase.appendChild(baseSel);
+    tr.appendChild(tdBase);
+
+    exposureQuestionDefs.forEach(q=>{
+      const td=document.createElement("td");
+      const sel=makeAdjustmentSelect(cfg[q.id]||0);
+      sel.addEventListener("change",()=>{
+        likelihoodConfig[t.id][q.id]=+sel.value;
+        saveLikelihoodConfig();
+        renderInherentRisk();
+        renderControls();
+      });
+      td.appendChild(sel);
+      tr.appendChild(td);
+    });
+
+    body.appendChild(tr);
+  });
+}
 
 function riskEventPhrase(t){
   const d = t.drivers || [];
@@ -900,8 +977,9 @@ function riskEventPhrase(t){
 
 function activePrecursorsForThreat(threatId){
   const items=[];
+  const cfg = likelihoodConfig[threatId] || {};
   for(const q of exposureQuestionDefs){
-    if(!(q.effects && q.effects[threatId])) continue;
+    if(!(+cfg[q.id]||0)) continue;
 
     if(q.type==="boolean" && exposureAnswers[q.id]===true){
       items.push(q.shortLabel || q.label);
@@ -931,9 +1009,10 @@ function buildRiskStatement(t){
 function renderInherentRisk(){
   const applicable = currentRankedThreats().map(t=>{
     const suggested = suggestedLikelihood(t.id);
+    const suggestedRaw = suggestedLikelihoodRaw(t.id);
     const assessed = assessedLikelihood(t.id);
     const riskScore = t.score * assessed;
-    return {...t, suggested, assessed, riskScore, riskLevel:riskLevel(riskScore)};
+    return {...t, suggested, suggestedRaw, assessed, riskScore, riskLevel:riskLevel(riskScore)};
   }).sort((a,b)=>b.riskScore-a.riskScore || b.score-a.score || a.id.localeCompare(b.id));
 
   const tbody = document.getElementById("riskResults");
@@ -944,9 +1023,9 @@ function renderInherentRisk(){
     tbody.innerHTML = '<tr><td colspan="8" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
   }else{
     applicable.forEach((t,idx)=>{
-      const tr=document.createElement("tr");
       const override = likelihoodOverrides[t.id];
       const isOverridden = override && +override.value && +override.value !== t.suggested;
+      tr=document.createElement("tr");
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
         <td>
@@ -954,7 +1033,7 @@ function renderInherentRisk(){
           <span class="muted-small">${t.id} – ${t.name}</span>
         </td>
         <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
-        <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}</td>
+        <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}<br><span class="muted-small">Raw ${t.suggestedRaw.toFixed(2)}</span></td>
         <td>
           <select class="assessed-likelihood" data-threat-id="${t.id}">
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
@@ -1347,8 +1426,17 @@ render = function(){
   if(document.getElementById("controlResults")) renderControls();
 };
 
+document.getElementById("resetExposureLikelihoodBtn").addEventListener("click",()=>{
+  likelihoodConfig=structuredClone(defaultLikelihoodConfig);
+  saveLikelihoodConfig();
+  renderExposureLikelihoodConfig();
+  renderInherentRisk();
+  renderControls();
+});
+
 renderConfig();
 renderExposureQuestions();
+renderExposureLikelihoodConfig();
 renderControlConfigurator();
 render();
 </script>
