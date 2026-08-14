@@ -346,19 +346,25 @@
   <section class="card" style="margin-top:20px">
     <div class="toolbar">
       <div>
-        <h2 style="margin:0">3. Inherent Risk</h2>
+        <h2 style="margin:0">3. Asset Exposure</h2>
         <div class="sub" style="margin:4px 0 0">
-          The system suggests inherent likelihood from asset exposure characteristics. The assessor can override the suggested value where justified.
+          Describe the asset's exposure characteristics. These answers are used to calculate the suggested inherent likelihood for applicable threats.
+        </div>
+      </div>
+    </div>
+
+    <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
+  </section>
+
+  <section class="card" style="margin-top:20px">
+    <div class="toolbar">
+      <div>
+        <h2 style="margin:0">4. Inherent Risk</h2>
+        <div class="sub" style="margin:4px 0 0">
+          Suggested inherent likelihood is derived from the Asset Exposure assessment. The assessor can override the suggested value where justified.
         </div>
       </div>
       <span class="pill" id="riskCount">0 threats assessed</span>
-    </div>
-
-    <div class="card" style="box-shadow:none;margin-bottom:18px;background:#fafbfc">
-      <h2 style="font-size:16px">Asset Exposure Questionnaire</h2>
-      <div class="sub">These answers influence the suggested inherent likelihood for applicable threats. Controls are not considered at this stage.</div>
-
-      <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
     </div>
 
     <div style="overflow:auto;max-height:760px">
@@ -383,7 +389,7 @@
   <section class="card" style="margin-top:20px">
     <div class="toolbar">
       <div>
-        <h2 style="margin:0">4. Prioritised Controls</h2>
+        <h2 style="margin:0">5. Prioritised Controls</h2>
         <div class="sub" style="margin:4px 0 0">
           Only selected threats are considered. Controls are ranked by the highest <strong>Threat Impact Score × Control Effectiveness</strong> relationship for this asset.
         </div>
