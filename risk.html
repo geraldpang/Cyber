@@ -34,6 +34,92 @@
     h1{margin:0 0 6px;font-size:28px}
     header p{margin:0;opacity:.88}
     main{max-width:1280px;margin:24px auto 48px;padding:0 20px}
+    .stepper-shell{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(245,247,251,.96);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);
+    }
+    .stepper{
+      max-width:1280px;
+      margin:auto;
+      padding:14px 20px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      gap:8px;
+      overflow-x:auto;
+    }
+    .step{
+      background:transparent;
+      padding:0;
+      border-radius:0;
+      color:#667085;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:5px;
+      min-width:72px;
+      cursor:pointer;
+    }
+    .step span{
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      border:2px solid #cfd8e6;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      font-size:12px;
+      font-weight:800;
+    }
+    .step small{
+      font-size:11px;
+      font-weight:650;
+      white-space:nowrap;
+    }
+    .step.active,
+    .step.complete{color:var(--blue)}
+    .step.active span{
+      background:var(--blue);
+      color:#fff;
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px #dff1fb;
+    }
+    .step.complete span{
+      background:#eaf5fb;
+      color:var(--blue);
+      border-color:var(--blue);
+    }
+    .step-line{
+      flex:1 1 55px;
+      min-width:28px;
+      height:2px;
+      background:#dce3ee;
+      margin-top:15px;
+    }
+    .step-line.complete{background:var(--blue)}
+    .step-screen{
+      display:none;
+      margin-top:20px;
+    }
+    .step-screen.active-screen{
+      display:block;
+    }
+    #step-bil.active-screen,
+    #step-threats.active-screen{
+      margin-top:0;
+    }
+    .screen-actions{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:18px;
+    }
+    .step-config{display:none}
+    .step-config.active-config{display:block}
     .grid{display:grid;grid-template-columns:380px 1fr;gap:20px}
     .card{
       background:var(--panel);
@@ -290,6 +376,9 @@
       header{padding:22px 20px}
       .control-config-head{grid-template-columns:1fr}
       .mapping-row{grid-template-columns:1fr}
+      .stepper{justify-content:flex-start}
+      .step{min-width:64px}
+      .step-line{min-width:20px}
     }
   </style>
 </head>
@@ -301,9 +390,27 @@
   </div>
 </header>
 
+<div class="stepper-shell">
+  <div class="stepper" id="progressStepper">
+    <button class="step active" data-target="step-bil"><span>1</span><small>BIL</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-threats"><span>2</span><small>Threats</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-exposure"><span>3</span><small>Exposure</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-inherent"><span>4</span><small>Inherent Risk</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-prioritised"><span>5</span><small>Controls</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-checklist"><span>6</span><small>Checklist</small></button>
+    <div class="step-line"></div>
+    <button class="step" data-target="step-residual"><span>7</span><small>Residual Risk</small></button>
+  </div>
+</div>
+
 <main>
-  <div class="grid">
-    <section class="card">
+  <div class="grid" style="display:block">
+    <section class="card step-screen" id="step-bil">
       <h2>1. Asset Business Impact Level</h2>
       <div class="sub">Select the OVIC-aligned BIL rating for Confidentiality, Integrity and Availability.</div>
 
@@ -336,9 +443,9 @@
       <div class="sub" style="margin:16px 0 0">
         BIL determines potential business impact. It does not change the probability that a threat occurs.
       </div>
-    </section>
+    <div class="screen-actions"><span></span><button class="primary screen-nav" data-step-index="1">Next →</button></div></section>
 
-    <section class="card">
+    <section class="card step-screen" id="step-threats">
       <div class="toolbar">
         <div>
           <h2 style="margin:0">2. Relevant Threats</h2>
@@ -364,11 +471,10 @@
           <tbody id="results"></tbody>
         </table>
       </div>
-    </section>
+    <div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous</button><button class="primary screen-nav" data-step-index="2">Next →</button></div></section>
   </div>
 
-  <details>
-    <summary>⚙ Threat-to-CIA Matrix Configurator</summary>
+  <details class="step-config" id="config-threat-cia"><summary>⚙ Threat-to-CIA Matrix Configurator</summary>
     <div class="config-wrap">
       <p class="config-note">
         Configure how strongly each threat affects Confidentiality, Integrity and Availability.
@@ -394,7 +500,7 @@
 
   </details>
 
-  <section class="card" style="margin-top:20px">
+  <section class="card step-screen" id="step-exposure" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">3. Asset Exposure</h2>
@@ -405,10 +511,9 @@
     </div>
 
     <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
-  </section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous</button><button class="primary screen-nav" data-step-index="3">Next →</button></div></section>
 
-  <details>
-    <summary>⚙ Exposure-to-Likelihood Configurator</summary>
+  <details class="step-config" id="config-exposure-likelihood"><summary>⚙ Exposure-to-Likelihood Configurator</summary>
     <div class="config-wrap">
       <p class="config-note">
         Configure the default inherent likelihood for each threat and how strongly each asset exposure factor changes that likelihood.
@@ -445,7 +550,7 @@
     </div>
   </details>
 
-  <section class="card" style="margin-top:20px">
+  <section class="card step-screen" id="step-inherent" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">4. Inherent Risk</h2>
@@ -473,9 +578,9 @@
         <tbody id="riskResults"></tbody>
       </table>
     </div>
-  </section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div></section>
 
-  <section class="card" style="margin-top:20px">
+  <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">5. Prioritised Controls</h2>
@@ -503,11 +608,10 @@
         <tbody id="controlResults"></tbody>
       </table>
     </div>
-  </section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="3">← Previous</button><button class="primary screen-nav" data-step-index="5">Next →</button></div></section>
 
 
-  <details>
-    <summary>⚙ Control Library & Threat Mapping Configurator</summary>
+  <details class="step-config" id="config-control-library"><summary>⚙ Control Library & Threat Mapping Configurator</summary>
     <div class="config-wrap">
       <p class="config-note">
         Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
@@ -524,7 +628,7 @@
     </div>
   </details>
 
-  <section class="card" style="margin-top:20px">
+  <section class="card step-screen" id="step-checklist" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">6. Control Checklist</h2>
@@ -550,9 +654,9 @@
         <tbody id="controlChecklistBody"></tbody>
       </table>
     </div>
-  </section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="4">← Previous</button><button class="primary screen-nav" data-step-index="6">Next →</button></div></section>
 
-  <section class="card" style="margin-top:20px">
+  <section class="card step-screen" id="step-residual" style="margin-top:20px">
     <div class="toolbar">
       <div>
         <h2 style="margin:0">7. Residual Risk</h2>
@@ -578,7 +682,7 @@
         <tbody id="residualRiskBody"></tbody>
       </table>
     </div>
-  </section>
+  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><span></span></div></section>
 
 
 </main>
@@ -1759,7 +1863,56 @@ renderExposureLikelihoodConfig();
 renderControlConfigurator();
 renderControlChecklist();
 renderResidualRisk();
+
 render();
+
+const stepButtons = [...document.querySelectorAll("#progressStepper .step")];
+const stepLines = [...document.querySelectorAll("#progressStepper .step-line")];
+const stepSections = stepButtons
+  .map(btn=>document.getElementById(btn.dataset.target))
+  .filter(Boolean);
+
+let activeStepIndex = 0;
+
+function showStep(index){
+  index = Math.max(0, Math.min(stepSections.length - 1, index));
+  activeStepIndex = index;
+
+  stepSections.forEach((section,i)=>{
+    section.classList.toggle("active-screen", i===index);
+  });
+
+  stepButtons.forEach((btn,i)=>{
+    btn.classList.toggle("active", i===index);
+    btn.classList.toggle("complete", i<index);
+  });
+
+  stepLines.forEach((line,i)=>{
+    line.classList.toggle("complete", i<index);
+  });
+
+  document.querySelectorAll(".step-config").forEach(x=>x.classList.remove("active-config"));
+  if(index===1) document.getElementById("config-threat-cia")?.classList.add("active-config");
+  if(index===2) document.getElementById("config-exposure-likelihood")?.classList.add("active-config");
+  if(index===4) document.getElementById("config-control-library")?.classList.add("active-config");
+
+  // Keep the active step visible on small screens.
+  stepButtons[index]?.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+stepButtons.forEach((btn,i)=>{
+  btn.addEventListener("click",()=>showStep(i));
+});
+
+document.querySelectorAll(".screen-nav").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    showStep(+btn.dataset.stepIndex);
+  });
+});
+
+// Start on the first screen.
+showStep(0);
 </script>
 </body>
 </html>
