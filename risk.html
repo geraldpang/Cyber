@@ -276,7 +276,9 @@
       <div class="toolbar">
         <div>
           <h2 style="margin:0">2. Relevant Threats</h2>
-          <div class="sub" style="margin:4px 0 0">Automatically ranked from highest to lowest impact for this asset.</div>
+          <div class="sub" style="margin:4px 0 0">
+            Automatically ranked from highest to lowest impact. Select only the threats that are applicable to this asset.
+          </div>
         </div>
         <span class="pill" id="threatCount">0 relevant threats</span>
       </div>
@@ -285,6 +287,7 @@
         <table>
           <thead>
             <tr>
+              <th>Use</th>
               <th>Priority</th>
               <th>Threat</th>
               <th>Primary CIA Driver</th>
@@ -330,7 +333,7 @@
       <div>
         <h2 style="margin:0">3. Prioritised Controls</h2>
         <div class="sub" style="margin:4px 0 0">
-          Controls are ranked by the highest <strong>Threat Impact Score × Control Effectiveness</strong> relationship for this asset.
+          Only selected threats are considered. Controls are ranked by the highest <strong>Threat Impact Score × Control Effectiveness</strong> relationship for this asset.
         </div>
       </div>
       <span class="pill" id="controlCount">0 controls</span>
@@ -432,6 +435,25 @@ function ciaName(k){
   return k==="c" ? "Confidentiality" : k==="i" ? "Integrity" : "Availability";
 }
 
+function loadThreatSelections(){
+  try{
+    const saved = JSON.parse(localStorage.getItem("bilThreatSelectionsV1"));
+    if(saved && typeof saved === "object") return saved;
+  }catch(e){}
+  return {};
+}
+
+let threatSelections = loadThreatSelections();
+
+function saveThreatSelections(){
+  localStorage.setItem("bilThreatSelectionsV1", JSON.stringify(threatSelections));
+}
+
+function isThreatSelected(threatId){
+  // Default newly encountered threats to selected.
+  return threatSelections[threatId] !== false;
+}
+
 function scoreThreat(t, bil){
   // 0–3 CIA relationship is normalised against the asset's corresponding 0–5 BIL.
   // MAX preserves the strongest relevant CIA impact rather than averaging it away.
@@ -471,12 +493,13 @@ function render(){
   const tbody=document.getElementById("results");
   tbody.innerHTML="";
   if(!ranked.length){
-    tbody.innerHTML='<tr><td colspan="5" class="empty">Select a BIL rating above 0 to identify relevant threats.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="6" class="empty">Select a BIL rating above 0 to identify relevant threats.</td></tr>';
   }else{
     ranked.forEach((t,idx)=>{
       const tr=document.createElement("tr");
       const pct=(t.score/5)*100;
       tr.innerHTML=`
+        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Use ${t.id}"></td>
         <td><span class="rank">${idx+1}</span></td>
         <td><strong>${t.id}</strong> – ${t.name}</td>
         <td>${t.drivers.join(" / ")}</td>
@@ -490,7 +513,17 @@ function render(){
       tbody.appendChild(tr);
     });
   }
-  document.getElementById("threatCount").textContent=`${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
+  tbody.querySelectorAll(".threat-use").forEach(cb=>{
+    cb.addEventListener("change",()=>{
+      threatSelections[cb.dataset.threatId] = cb.checked;
+      saveThreatSelections();
+      if(typeof renderControls === "function") renderControls();
+    });
+  });
+
+  const selectedCount = ranked.filter(t=>isThreatSelected(t.id)).length;
+  document.getElementById("threatCount").textContent =
+    `${selectedCount} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
 }
 
 function makeScaleSelect(value,onChange){
@@ -615,7 +648,7 @@ function currentRankedThreats(){
   };
   return threats
     .map(t=>({...t,...scoreThreat(t,bil)}))
-    .filter(t=>t.score>0)
+    .filter(t=>t.score>0 && isThreatSelected(t.id))
     .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
 }
 
