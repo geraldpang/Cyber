@@ -749,7 +749,43 @@
       .step{min-width:64px}
       .step-line{min-width:20px}
     }
-  </style>
+  
+    .section-help{
+      margin:12px 0 16px;
+      border:1px solid #d9e4ef;
+      border-radius:10px;
+      background:#f8fbfe;
+    }
+    .section-help summary{
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      color:#0b5ea8;
+    }
+    .section-help-body{
+      padding:0 14px 14px;
+      color:#475467;
+      font-size:13px;
+      line-height:1.55;
+    }
+    .section-help-body p{
+      margin:10px 0;
+    }
+    .section-help-body ul{
+      margin:8px 0 10px;
+      padding-left:20px;
+    }
+    .formula-box,
+    .worked-example{
+      margin:10px 0;
+      padding:11px 12px;
+      border:1px solid #cfe0ef;
+      border-radius:9px;
+      background:#fff;
+    }
+
+</style>
 </head>
 <body>
 <header>
@@ -858,6 +894,51 @@
 <div class="sub" style="margin:4px 0 0">
             Automatically ranked from highest to lowest impact. Select only the threats that are applicable to this asset.
           </div>
+      <details class="section-help threat-score-help">
+        <summary>Help: How the Relative Score is calculated</summary>
+        <div class="section-help-body">
+          <p>
+            The <strong>Relative Score</strong> is used to rank threats according to how strongly each threat could affect
+            the asset's assessed Confidentiality, Integrity and Availability impact.
+          </p>
+
+          <div class="formula-box">
+            <strong>Relative Score = MAX(BIL-C × C Weight, BIL-I × I Weight, BIL-A × A Weight)</strong>
+          </div>
+
+          <p>
+            Threat-to-CIA weights are configured on a 0–3 scale and are normalised before calculation:
+          </p>
+          <ul>
+            <li><strong>0 – None:</strong> no meaningful relationship to that CIA dimension.</li>
+            <li><strong>1 – Secondary:</strong> limited relationship.</li>
+            <li><strong>2 – Significant:</strong> meaningful relationship.</li>
+            <li><strong>3 – Primary:</strong> strongest relationship.</li>
+          </ul>
+
+          <p>
+            The normalised weights are therefore 0, 0.33, 0.67 and 1.00. The calculation uses the
+            <strong>highest resulting CIA value</strong>, because the threat is prioritised according to its strongest
+            business-impact pathway.
+          </p>
+
+          <div class="worked-example">
+            <strong>Example</strong><br>
+            Assume the asset is assessed as <strong>C2 / I4 / A5</strong> and a threat is mapped as
+            <strong>C1 / I2 / A3</strong>.<br><br>
+            Confidentiality = 2 × 0.33 = 0.66<br>
+            Integrity = 4 × 0.67 = 2.68<br>
+            Availability = 5 × 1.00 = 5.00<br><br>
+            <strong>Relative Score = 5.00</strong>
+          </div>
+
+          <p>
+            <strong>Important:</strong> Relative Score represents <em>potential impact relevance</em>, not likelihood.
+            Likelihood is assessed later using Asset Exposure and the inherent-likelihood model.
+          </p>
+        </div>
+      </details>
+
 </div>
 <span class="pill" id="threatCount">0 relevant threats</span>
 </div>
