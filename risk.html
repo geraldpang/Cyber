@@ -459,7 +459,113 @@
       padding:6px 7px;
       font-size:12px;
     }
-    .exposure-config-section{
+    .config-help{
+      margin:10px 0 16px;
+      border:1px solid #d9e4ef;
+      border-radius:10px;
+      background:#f8fbfe;
+      box-shadow:none;
+    }
+    .config-help summary{
+      padding:10px 12px;
+      font-size:13px;
+      font-weight:700;
+      color:#0b5ea8;
+    }
+    .config-help-body{
+      padding:0 14px 12px;
+      color:#475467;
+      font-size:12px;
+      line-height:1.5;
+    }
+    .config-help-body ul{
+      margin:0;
+      padding-left:18px;
+    }
+    .config-help-body li{
+      margin:5px 0;
+    }
+    
+    .exposure-score-scale{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(110px,1fr));
+      gap:8px;
+      margin:12px 0 16px;
+    }
+    .exposure-score-scale>div{
+      border:1px solid #d7e2ec;
+      border-radius:10px;
+      background:#f8fbfe;
+      padding:10px 12px;
+      text-align:center;
+    }
+    .exposure-score-scale strong{
+      display:block;
+      font-size:13px;
+      color:#344054;
+      margin-bottom:3px;
+    }
+    .exposure-score-scale span{
+      font-size:13px;
+      font-weight:800;
+      color:#0b5ea8;
+    }
+    .toolbar-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .exposure-question-card{
+      border:1px solid #d9e2ec;
+      border-radius:12px;
+      padding:14px;
+      margin:10px 0;
+      background:#fff;
+    }
+    .exposure-question-card-head{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:start;
+    }
+    .exposure-question-card input[type="text"]{
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid #cfd8e6;
+      border-radius:9px;
+      padding:9px 10px;
+      font:inherit;
+    }
+    .exposure-question-meta{
+      margin-top:10px;
+      font-size:12px;
+      color:#667085;
+    }
+    .threat-chip-grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:6px;
+    }
+    .threat-chip{
+      display:flex;
+      align-items:flex-start;
+      gap:7px;
+      border:1px solid #e2e8f0;
+      border-radius:8px;
+      padding:7px 8px;
+      font-size:12px;
+      background:#fafcfe;
+    }
+    .threat-chip input{margin-top:2px}
+    .remove-exposure-question{
+      white-space:nowrap;
+    }
+    @media(max-width:760px){
+      .exposure-score-scale{grid-template-columns:1fr}
+      .exposure-question-card-head{grid-template-columns:1fr}
+    }
+.exposure-config-section{
       margin-top:18px;
       border:1px solid var(--line);
       border-radius:12px;
@@ -789,6 +895,13 @@
         Values: 0 = no material relationship, 1 = secondary, 2 = significant, 3 = primary.
         Changes are saved in this browser and immediately affect threat ranking.
       </p>
+      <details class="config-help">
+        <summary>Help: Threat-to-CIA Configurator</summary>
+        <div class="config-help-body">
+          <ul><li><strong>Purpose:</strong> Defines which CIA dimensions each threat can affect.</li><li><strong>Scale:</strong> 0 = none, 1 = secondary, 2 = significant, 3 = primary.</li><li><strong>Effect:</strong> The mapping is combined with BIL-C, BIL-I and BIL-A to calculate the threat impact for the asset.</li><li><strong>Guideline:</strong> Use the strongest reasonably expected business effect of the threat, not the likelihood of occurrence.</li><li><strong>Example:</strong> Denial of Service would normally have a strong Availability relationship and little or no Confidentiality relationship.</li></ul>
+        </div>
+      </details>
+
       <div class="toolbar">
         <div class="pill">Configuration scale: 0–3</div>
         <button class="danger" id="resetBtn">Reset default matrix</button>
@@ -824,10 +937,57 @@
   <details class="step-config" id="config-exposure-likelihood"><summary>⚙ Exposure-to-Likelihood Configurator</summary>
     <div class="config-wrap">
       <p class="config-note">
-        Configure the baseline likelihood for each threat, then configure how each response to an Asset Exposure question
-        adjusts the likelihood of that threat. Suggested likelihood is calculated as
-        <strong>Base Likelihood + selected response adjustment</strong>, capped between 1 and 5.
+        Configure the exposure questions used in the assessment and identify which threats each question can influence.
+        Every exposure question uses the same five-level scoring scale.
       </p>
+
+      <details class="config-help">
+        <summary>Help: Exposure-to-Likelihood Configurator</summary>
+        <div class="config-help-body">
+          <ul>
+            <li><strong>Purpose:</strong> Defines the asset exposure questions that influence suggested inherent likelihood.</li>
+            <li><strong>Standard scoring:</strong> None = +0, Low = +0.25, Medium = +0.50, High = +0.75, Very High = +1.00.</li>
+            <li><strong>Threat mapping:</strong> Each exposure question is mapped only to the threats that it can reasonably influence.</li>
+            <li><strong>Calculation:</strong> Base Threat Likelihood + scores from applicable exposure questions, capped at 5.</li>
+            <li><strong>Example:</strong> If Internet Exposure is High (+0.75) and Remote Access is Medium (+0.50), a mapped threat receives +1.25 in total.</li>
+            <li><strong>Question management:</strong> You can rename questions, add new questions, remove questions, and change their relevant-threat mappings.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="exposure-score-scale">
+        <div><strong>None</strong><span>+0.00</span></div>
+        <div><strong>Low</strong><span>+0.25</span></div>
+        <div><strong>Medium</strong><span>+0.50</span></div>
+        <div><strong>High</strong><span>+0.75</span></div>
+        <div><strong>Very High</strong><span>+1.00</span></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="pill">Questions are configurable and stored in this browser.</div>
+        <div class="toolbar-actions">
+          <button class="primary" id="addExposureQuestionBtn">+ Add Exposure Question</button>
+          <button class="danger" id="resetExposureLikelihoodBtn">Reset Exposure Configuration</button>
+        </div>
+      </div>
+
+      <div class="exposure-config-section">
+        <h3>Base Threat Likelihood</h3>
+        <div style="overflow:auto;max-height:360px">
+          <table>
+            <thead><tr><th>Threat</th><th>Base Likelihood</th></tr></thead>
+            <tbody id="baseLikelihoodConfigBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="exposure-config-section">
+        <h3>Exposure Questions & Threat Mapping</h3>
+        <div id="exposureQuestionConfigList"></div>
+      </div>
+    </div>
+  </details>
+
 
       <div class="toolbar">
         <div class="pill">Response-specific adjustments make the likelihood model transparent and configurable.</div>
@@ -857,6 +1017,7 @@
           </div>
         </div>
         <div class="config-note" id="exposureConfigExplanation"></div>
+        
         <div style="overflow:auto;max-height:460px">
           <table>
             <thead><tr><th>Threat</th><th>Likelihood Adjustment</th></tr></thead>
@@ -903,6 +1064,13 @@
           Configure the risk value and colour for each Likelihood × Impact combination.
           This shared matrix is used by both Inherent Risk and Residual Risk.
         </p>
+      <details class="config-help">
+        <summary>Help: Risk Matrix Configurator</summary>
+        <div class="config-help-body">
+          <ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
+        </div>
+      </details>
+
         <div class="toolbar">
           <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
           <button class="danger risk-matrix-reset">Reset risk matrix</button>
@@ -960,6 +1128,13 @@
         Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
         effectiveness rating for each Control-to-Threat relationship.
       </p>
+      <details class="config-help">
+        <summary>Help: Control Library & Threat Mapping Configurator</summary>
+        <div class="config-help-body">
+          <ul><li><strong>Purpose:</strong> Defines which threats each control mitigates and how effective that control is against each threat.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
+        </div>
+      </details>
+
       <div class="toolbar">
         <div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
         <div style="display:flex;gap:8px">
@@ -1349,132 +1524,54 @@ const defaultLikelihoodConfig = {
   "T14": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0.2, privilegedAccess:0}
 };
 
-const exposureQuestionDefs = [
-  {
-    id:"internetFacing",
-    label:"What level of external or internet exposure does the asset have?",
-    shortLabel:"external exposure",
-    options:[
-      {value:"none",label:"None",multiplier:0},
-      {value:"indirect",label:"Indirect / protected external exposure",multiplier:0.5},
-      {value:"direct",label:"Direct internet exposure",multiplier:1}
-    ],
-    defaultValue:"none"
-  },
-  {
-    id:"remoteAccess",
-    label:"What type of remote access is permitted?",
-    shortLabel:"remote access",
-    options:[
-      {value:"none",label:"None",multiplier:0},
-      {value:"internal",label:"Internal network only",multiplier:0.25},
-      {value:"trustedThirdParty",label:"Trusted third-party remote access",multiplier:0.6},
-      {value:"internetBased",label:"Internet-based remote access",multiplier:1}
-    ],
-    defaultValue:"none"
-  },
-  {
-    id:"thirdParty",
-    label:"What level of third-party or supplier connectivity exists?",
-    shortLabel:"third-party connectivity",
-    options:[
-      {value:"none",label:"None",multiplier:0},
-      {value:"dataExchange",label:"Data exchange only",multiplier:0.3},
-      {value:"userAccess",label:"Third-party user access",multiplier:0.6},
-      {value:"privilegedAdmin",label:"Privileged / administrative access",multiplier:1}
-    ],
-    defaultValue:"none"
-  },
-  {
-    id:"sensitiveData",
-    label:"What level of sensitive or privileged information is processed?",
-    shortLabel:"sensitive information",
-    options:[
-      {value:"none",label:"None",multiplier:0},
-      {value:"internal",label:"Internal business information",multiplier:0.25},
-      {value:"sensitive",label:"Sensitive information",multiplier:0.6},
-      {value:"highlySensitive",label:"Highly sensitive / privileged information",multiplier:1}
-    ],
-    defaultValue:"none"
-  },
-  {
-    id:"removableMedia",
-    label:"Is removable media permitted?",
-    shortLabel:"removable media use",
-    options:[
-      {value:"no",label:"No",multiplier:0},
-      {value:"yes",label:"Yes",multiplier:1}
-    ],
-    defaultValue:"no"
-  },
-  {
-    id:"legacyTech",
-    label:"What is the support status of the technology?",
-    shortLabel:"technology support status",
-    options:[
-      {value:"supported",label:"Fully supported",multiplier:0},
-      {value:"extended",label:"Extended / limited support",multiplier:0.5},
-      {value:"eol",label:"End-of-life / unsupported",multiplier:1}
-    ],
-    defaultValue:"supported"
-  },
-  {
-    id:"bespokeSoftware",
-    label:"Does the asset use bespoke or custom-developed software?",
-    shortLabel:"bespoke or custom-developed software",
-    options:[
-      {value:"no",label:"No",multiplier:0},
-      {value:"yes",label:"Yes",multiplier:1}
-    ],
-    defaultValue:"no"
-  },
-  {
-    id:"emailWeb",
-    label:"Is email or web access available from the environment?",
-    shortLabel:"email or web access",
-    options:[
-      {value:"no",label:"No",multiplier:0},
-      {value:"yes",label:"Yes",multiplier:1}
-    ],
-    defaultValue:"no"
-  },
-  {
-    id:"interconnectivity",
-    label:"How interconnected is the asset with other systems?",
-    shortLabel:"system interconnectivity",
-    options:[
-      {value:"isolated",label:"Isolated",multiplier:0},
-      {value:"limited",label:"Limited",multiplier:0.25},
-      {value:"moderate",label:"Moderate",multiplier:0.5},
-      {value:"high",label:"High",multiplier:1}
-    ],
-    defaultValue:"limited"
-  },
-  {
-    id:"privilegedAccess",
-    label:"What level of privileged access is required?",
-    shortLabel:"privileged access",
-    options:[
-      {value:"none",label:"None",multiplier:0},
-      {value:"operational",label:"Operational elevated access",multiplier:0.4},
-      {value:"admin",label:"Administrative access",multiplier:0.7},
-      {value:"highlyPrivileged",label:"Highly privileged / system-level access",multiplier:1}
-    ],
-    defaultValue:"none"
-  }
+const EXPOSURE_LEVELS = [
+  {value:"none", label:"None", score:0},
+  {value:"low", label:"Low", score:0.25},
+  {value:"medium", label:"Medium", score:0.50},
+  {value:"high", label:"High", score:0.75},
+  {value:"veryHigh", label:"Very High", score:1.00}
 ];
+
+const defaultExposureQuestionDefs = [
+  {id:"internetFacing", label:"How exposed is the asset to the internet or external networks?", threats:["T02","T05","T07","T11","T12","T14"]},
+  {id:"remoteAccess", label:"What is the level of remote access exposure?", threats:["T02","T07","T09","T11","T12"]},
+  {id:"thirdParty", label:"What is the level of third-party or supplier connectivity?", threats:["T02","T03","T04","T09","T11","T12"]},
+  {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", threats:["T02","T03","T04","T10","T12"]},
+  {id:"removableMedia", label:"What is the level of exposure from removable media?", threats:["T01","T07","T13"]},
+  {id:"legacyTech", label:"What is the level of exposure from legacy or unsupported technology?", threats:["T01","T05","T07","T08","T14"]},
+  {id:"bespokeSoftware", label:"What is the level of exposure from bespoke or custom-developed software?", threats:["T03","T07","T08","T14"]},
+  {id:"emailWeb", label:"What is the level of exposure from email or web access?", threats:["T06","T07","T12"]},
+  {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", threats:["T01","T02","T05","T07","T09","T11","T14"]},
+  {id:"privilegedAccess", label:"What is the level of exposure associated with privileged access?", threats:["T02","T03","T10","T12"]}
+];
+
+function loadExposureQuestionDefs(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("bilExposureQuestionDefsV1"));
+    if(Array.isArray(saved) && saved.length) return saved;
+  }catch(e){}
+  return structuredClone(defaultExposureQuestionDefs);
+}
+let exposureQuestionDefs=loadExposureQuestionDefs();
+
+function saveExposureQuestionDefs(){
+  localStorage.setItem("bilExposureQuestionDefsV1",JSON.stringify(exposureQuestionDefs));
+}
 
 function questionDef(questionId){
   return exposureQuestionDefs.find(q=>q.id===questionId);
 }
 
-function optionDef(questionId, value){
-  const q=questionDef(questionId);
-  return q?.options.find(o=>o.value===value);
+function exposureLevel(value){
+  return EXPOSURE_LEVELS.find(x=>x.value===value) || EXPOSURE_LEVELS[0];
 }
 
-function exposureAnswerLabel(questionId, value){
-  return optionDef(questionId,value)?.label || String(value ?? "");
+function exposureAnswerLabel(questionId,value){
+  return exposureLevel(value).label;
+}
+
+function exposureScore(value){
+  return exposureLevel(value).score;
 }
 
 // Base likelihood remains threat-specific.
@@ -1495,82 +1592,29 @@ function saveLikelihoodConfig(){
   localStorage.setItem("bilLikelihoodConfigV2",JSON.stringify(likelihoodConfig));
 }
 
-// Build response-specific defaults from the existing maximum exposure effects.
-function buildDefaultExposureAdjustments(){
-  const model={};
-  exposureQuestionDefs.forEach(q=>{
-    model[q.id]={};
-    q.options.forEach(opt=>{
-      model[q.id][opt.value]={};
-      threats.forEach(t=>{
-        const maxEffect=+(defaultLikelihoodConfig[t.id]?.[q.id]||0);
-        model[q.id][opt.value][t.id]=+(maxEffect*(opt.multiplier||0)).toFixed(2);
-      });
-    });
-  });
-  return model;
-}
-const defaultExposureAdjustments=buildDefaultExposureAdjustments();
-
-function loadExposureAdjustments(){
-  try{
-    const saved=JSON.parse(localStorage.getItem("bilExposureResponseAdjustmentsV1"));
-    if(saved && typeof saved==="object"){
-      const merged=structuredClone(defaultExposureAdjustments);
-      for(const [qid,responses] of Object.entries(saved)){
-        merged[qid]=merged[qid]||{};
-        for(const [response,threatMap] of Object.entries(responses||{})){
-          merged[qid][response]={...(merged[qid][response]||{}),...(threatMap||{})};
-        }
-      }
-      return merged;
-    }
-  }catch(e){}
-  return structuredClone(defaultExposureAdjustments);
-}
-let exposureAdjustments=loadExposureAdjustments();
-
-function saveExposureAdjustments(){
-  localStorage.setItem("bilExposureResponseAdjustmentsV1",JSON.stringify(exposureAdjustments));
-}
-
 function normalizeLegacyExposureAnswers(saved){
   const result={};
-  exposureQuestionDefs.forEach(q=>result[q.id]=q.defaultValue);
-
+  exposureQuestionDefs.forEach(q=>result[q.id]="none");
   if(!saved || typeof saved!=="object") return result;
 
-  // Preserve already-upgraded option values.
   exposureQuestionDefs.forEach(q=>{
     const val=saved[q.id];
-    if(q.options.some(o=>o.value===val)) result[q.id]=val;
+    if(EXPOSURE_LEVELS.some(x=>x.value===val)) result[q.id]=val;
+    else if(typeof val==="boolean") result[q.id]=val ? "high" : "none";
+    else if(val==="direct" || val==="internetBased" || val==="privilegedAdmin" || val==="highlySensitive" || val==="eol" || val==="yes" || val==="high" || val==="highlyPrivileged") result[q.id]="high";
+    else if(val==="indirect" || val==="trustedThirdParty" || val==="userAccess" || val==="sensitive" || val==="extended" || val==="moderate" || val==="admin") result[q.id]="medium";
+    else if(val==="internal" || val==="dataExchange" || val==="limited" || val==="operational") result[q.id]="low";
   });
-
-  // Migrate the previous boolean / low-medium-high model.
-  const boolMap={
-    internetFacing:["none","direct"],
-    remoteAccess:["none","internetBased"],
-    thirdParty:["none","privilegedAdmin"],
-    sensitiveData:["none","highlySensitive"],
-    removableMedia:["no","yes"],
-    legacyTech:["supported","eol"],
-    bespokeSoftware:["no","yes"],
-    emailWeb:["no","yes"],
-    privilegedAccess:["none","highlyPrivileged"]
-  };
-  for(const [qid,[noVal,yesVal]] of Object.entries(boolMap)){
-    if(typeof saved[qid]==="boolean") result[qid]=saved[qid]?yesVal:noVal;
-  }
-  if(saved.interconnectivity==="low") result.interconnectivity="limited";
-  if(saved.interconnectivity==="medium") result.interconnectivity="moderate";
-  if(saved.interconnectivity==="high") result.interconnectivity="high";
-
   return result;
 }
 
 function loadExposureAnswers(){
   try{
-    const saved=JSON.parse(localStorage.getItem("bilExposureAnswersV2") || localStorage.getItem("bilExposureAnswersV1"));
+    const saved=JSON.parse(
+      localStorage.getItem("bilExposureAnswersV3") ||
+      localStorage.getItem("bilExposureAnswersV2") ||
+      localStorage.getItem("bilExposureAnswersV1")
+    );
     return normalizeLegacyExposureAnswers(saved);
   }catch(e){}
   return normalizeLegacyExposureAnswers({});
@@ -1578,7 +1622,7 @@ function loadExposureAnswers(){
 let exposureAnswers=loadExposureAnswers();
 
 function saveExposureAnswers(){
-  localStorage.setItem("bilExposureAnswersV2",JSON.stringify(exposureAnswers));
+  localStorage.setItem("bilExposureAnswersV3",JSON.stringify(exposureAnswers));
 }
 
 function loadLikelihoodOverrides(){
@@ -1611,8 +1655,8 @@ function saveInherentRiskNotes(){
   localStorage.setItem("bilInherentRiskNotesV1", JSON.stringify(inherentRiskNotes));
 }
 
-function selectedExposureAdjustment(questionId,responseValue,threatId){
-  return +(exposureAdjustments?.[questionId]?.[responseValue]?.[threatId]||0);
+function questionAppliesToThreat(q,threatId){
+  return Array.isArray(q.threats) && q.threats.includes(threatId);
 }
 
 function suggestedLikelihoodRaw(threatId){
@@ -1620,8 +1664,9 @@ function suggestedLikelihoodRaw(threatId){
   let score=+cfg.base||3;
 
   exposureQuestionDefs.forEach(q=>{
-    const response=exposureAnswers[q.id] ?? q.defaultValue;
-    score += selectedExposureAdjustment(q.id,response,threatId);
+    if(questionAppliesToThreat(q,threatId)){
+      score += exposureScore(exposureAnswers[q.id] || "none");
+    }
   });
 
   return Math.max(1,Math.min(5,score));
@@ -1649,6 +1694,8 @@ function renderExposureQuestions(){
   host.innerHTML="";
 
   exposureQuestionDefs.forEach(q=>{
+    if(!EXPOSURE_LEVELS.some(x=>x.value===exposureAnswers[q.id])) exposureAnswers[q.id]="none";
+
     const box=document.createElement("div");
     box.className="exposure-q";
 
@@ -1657,13 +1704,14 @@ function renderExposureQuestions(){
     box.appendChild(label);
 
     const sel=document.createElement("select");
-    q.options.forEach(opt=>{
+    EXPOSURE_LEVELS.forEach(level=>{
       const o=document.createElement("option");
-      o.value=opt.value;
-      o.textContent=opt.label;
-      if((exposureAnswers[q.id]??q.defaultValue)===opt.value) o.selected=true;
+      o.value=level.value;
+      o.textContent=level.label;
+      if(exposureAnswers[q.id]===level.value) o.selected=true;
       sel.appendChild(o);
     });
+
     sel.addEventListener("change",()=>{
       exposureAnswers[q.id]=sel.value;
       saveExposureAnswers();
@@ -1703,11 +1751,7 @@ function renderBaseLikelihoodConfig(){
     sel.addEventListener("change",()=>{
       likelihoodConfig[t.id].base=+sel.value;
       saveLikelihoodConfig();
-      renderInherentRisk();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
+      refreshExposureDependentViews();
     });
 
     tdBase.appendChild(sel);
@@ -1717,101 +1761,117 @@ function renderBaseLikelihoodConfig(){
   });
 }
 
-function renderExposureConfigSelectors(){
-  const factorSel=document.getElementById("exposureFactorConfigSelect");
-  const responseSel=document.getElementById("exposureResponseConfigSelect");
-  if(!factorSel || !responseSel) return;
-
-  const previousFactor=factorSel.value;
-  factorSel.innerHTML="";
-  exposureQuestionDefs.forEach(q=>{
-    const o=document.createElement("option");
-    o.value=q.id;
-    o.textContent=q.label;
-    factorSel.appendChild(o);
-  });
-  if(exposureQuestionDefs.some(q=>q.id===previousFactor)) factorSel.value=previousFactor;
-
-  function fillResponses(){
-    const q=questionDef(factorSel.value)||exposureQuestionDefs[0];
-    const previousResponse=responseSel.value;
-    responseSel.innerHTML="";
-    q.options.forEach(opt=>{
-      const o=document.createElement("option");
-      o.value=opt.value;
-      o.textContent=opt.label;
-      responseSel.appendChild(o);
-    });
-    if(q.options.some(o=>o.value===previousResponse)) responseSel.value=previousResponse;
-    renderExposureResponseThreatConfig();
-  }
-
-  factorSel.onchange=fillResponses;
-  responseSel.onchange=renderExposureResponseThreatConfig;
-  fillResponses();
+function refreshExposureDependentViews(){
+  saveExposureQuestionDefs();
+  saveExposureAnswers();
+  renderExposureQuestions();
+  renderInherentRisk();
+  renderControls();
+  if(typeof renderControlChecklist==="function") renderControlChecklist();
+  if(typeof renderResidualRisk==="function") renderResidualRisk();
+  if(typeof renderReport==="function") renderReport();
 }
 
-function renderExposureResponseThreatConfig(){
-  const factorSel=document.getElementById("exposureFactorConfigSelect");
-  const responseSel=document.getElementById("exposureResponseConfigSelect");
-  const body=document.getElementById("exposureResponseThreatConfigBody");
-  const explanation=document.getElementById("exposureConfigExplanation");
-  if(!factorSel || !responseSel || !body) return;
+function nextExposureQuestionId(){
+  let i=1;
+  while(exposureQuestionDefs.some(q=>q.id===`customExposure${i}`)) i++;
+  return `customExposure${i}`;
+}
 
-  const q=questionDef(factorSel.value);
-  const opt=optionDef(q.id,responseSel.value);
-  if(explanation){
-    explanation.textContent=`When "${opt?.label||responseSel.value}" is selected for "${q.label}", configure the likelihood adjustment applied to each threat.`;
-  }
+function renderExposureQuestionConfig(){
+  const host=document.getElementById("exposureQuestionConfigList");
+  if(!host) return;
+  host.innerHTML="";
 
-  body.innerHTML="";
-  threats.forEach(t=>{
-    const tr=document.createElement("tr");
-    const tdThreat=document.createElement("td");
-    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+  exposureQuestionDefs.forEach((q,index)=>{
+    const card=document.createElement("div");
+    card.className="exposure-question-card";
 
-    const tdAdj=document.createElement("td");
+    const head=document.createElement("div");
+    head.className="exposure-question-card-head";
+
+    const left=document.createElement("div");
+    const label=document.createElement("label");
+    label.textContent=`Exposure Question ${index+1}`;
+    label.style.display="block";
+    label.style.fontSize="12px";
+    label.style.fontWeight="700";
+    label.style.marginBottom="5px";
+
     const input=document.createElement("input");
-    input.className="exposure-adjustment-input";
-    input.type="number";
-    input.step="0.05";
-    input.min="-2";
-    input.max="2";
-    input.value=selectedExposureAdjustment(q.id,opt.value,t.id);
-    input.title="Positive values increase likelihood; negative values reduce likelihood.";
-
+    input.type="text";
+    input.value=q.label;
     input.addEventListener("change",()=>{
-      exposureAdjustments[q.id]=exposureAdjustments[q.id]||{};
-      exposureAdjustments[q.id][opt.value]=exposureAdjustments[q.id][opt.value]||{};
-      exposureAdjustments[q.id][opt.value][t.id]=+input.value||0;
-      saveExposureAdjustments();
-      renderInherentRisk();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
+      q.label=input.value.trim() || `Exposure Question ${index+1}`;
+      saveExposureQuestionDefs();
+      refreshExposureDependentViews();
     });
 
-    tdAdj.appendChild(input);
-    tr.appendChild(tdThreat);
-    tr.appendChild(tdAdj);
-    body.appendChild(tr);
+    left.appendChild(label);
+    left.appendChild(input);
+
+    const remove=document.createElement("button");
+    remove.className="danger remove-exposure-question";
+    remove.textContent="Remove";
+    remove.disabled=exposureQuestionDefs.length<=1;
+    remove.addEventListener("click",()=>{
+      if(!confirm(`Remove "${q.label}"?`)) return;
+      exposureQuestionDefs=exposureQuestionDefs.filter(x=>x.id!==q.id);
+      delete exposureAnswers[q.id];
+      saveExposureQuestionDefs();
+      saveExposureAnswers();
+      renderExposureQuestionConfig();
+      refreshExposureDependentViews();
+    });
+
+    head.appendChild(left);
+    head.appendChild(remove);
+    card.appendChild(head);
+
+    const meta=document.createElement("div");
+    meta.className="exposure-question-meta";
+    meta.innerHTML=`<strong>Standard scale:</strong> None +0 · Low +0.25 · Medium +0.50 · High +0.75 · Very High +1.00<br><strong>Relevant threats:</strong> Select the threats whose likelihood this exposure question can influence.`;
+    card.appendChild(meta);
+
+    const grid=document.createElement("div");
+    grid.className="threat-chip-grid";
+    threats.forEach(t=>{
+      const chip=document.createElement("label");
+      chip.className="threat-chip";
+      const cb=document.createElement("input");
+      cb.type="checkbox";
+      cb.checked=questionAppliesToThreat(q,t.id);
+      cb.addEventListener("change",()=>{
+        q.threats=Array.isArray(q.threats)?q.threats:[];
+        if(cb.checked && !q.threats.includes(t.id)) q.threats.push(t.id);
+        if(!cb.checked) q.threats=q.threats.filter(id=>id!==t.id);
+        saveExposureQuestionDefs();
+        refreshExposureDependentViews();
+      });
+      const span=document.createElement("span");
+      span.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+      chip.appendChild(cb);
+      chip.appendChild(span);
+      grid.appendChild(chip);
+    });
+    card.appendChild(grid);
+    host.appendChild(card);
   });
 }
 
 function renderExposureLikelihoodConfig(){
   renderBaseLikelihoodConfig();
-  renderExposureConfigSelectors();
+  renderExposureQuestionConfig();
 }
 
 function activePrecursorsForThreat(threatId){
   const items=[];
   exposureQuestionDefs.forEach(q=>{
-    const response=exposureAnswers[q.id]??q.defaultValue;
-    const adjustment=selectedExposureAdjustment(q.id,response,threatId);
-    if(adjustment>0){
-      const answer=exposureAnswerLabel(q.id,response);
-      items.push(`${answer.toLowerCase()} ${q.shortLabel}`);
+    if(questionAppliesToThreat(q,threatId)){
+      const level=exposureLevel(exposureAnswers[q.id] || "none");
+      if(level.score>0){
+        items.push(`${q.label.replace(/\?$/,"")} – ${level.label}`);
+      }
     }
   });
   return items;
@@ -2744,16 +2804,30 @@ function renderResidualRisk(){
 }
 
 document.getElementById("resetExposureLikelihoodBtn").addEventListener("click",()=>{
+  if(!confirm("Reset the exposure questions, threat mappings and base likelihood configuration to prototype defaults?")) return;
+  exposureQuestionDefs=structuredClone(defaultExposureQuestionDefs);
+  exposureAnswers={};
+  exposureQuestionDefs.forEach(q=>exposureAnswers[q.id]="none");
   likelihoodConfig=structuredClone(defaultLikelihoodConfig);
-  exposureAdjustments=structuredClone(defaultExposureAdjustments);
+  saveExposureQuestionDefs();
+  saveExposureAnswers();
   saveLikelihoodConfig();
-  saveExposureAdjustments();
   renderExposureLikelihoodConfig();
-  renderInherentRisk();
-  renderControls();
-  renderControlChecklist();
-  renderResidualRisk();
-  if(typeof renderReport==="function") renderReport();
+  refreshExposureDependentViews();
+});
+
+document.getElementById("addExposureQuestionBtn").addEventListener("click",()=>{
+  const id=nextExposureQuestionId();
+  exposureQuestionDefs.push({
+    id,
+    label:"New Exposure Question",
+    threats:[]
+  });
+  exposureAnswers[id]="none";
+  saveExposureQuestionDefs();
+  saveExposureAnswers();
+  renderExposureQuestionConfig();
+  renderExposureQuestions();
 });
 
 renderConfig();
@@ -2847,8 +2921,9 @@ function renderReport(){
     .sort((a,b)=>b.residualRiskScore-a.residualRiskScore);
 
   const exposureList=exposureQuestionDefs.map(q=>{
-    const value=exposureAnswers[q.id]??q.defaultValue;
-    const answer=exposureAnswerLabel(q.id,value);
+    const value=exposureAnswers[q.id] || "none";
+    const level=exposureLevel(value);
+    const answer=`${level.label} (+${level.score.toFixed(2)})`;
     return `<tr><td>${escHtml(q.label)}</td><td>${escHtml(answer)}</td></tr>`;
   }).join("");
 
