@@ -779,7 +779,7 @@
 </div>
 <main>
 
-<section class="card step-screen bil-screen" id="step-bil">
+<section class="card step-screen bil-screen active-screen" id="step-bil">
 <div class="bil-title-row">
 <div class="bil-heading-wrap">
 <div class="bil-icon">▥</div>
@@ -905,7 +905,7 @@
 <tbody id="configBody"></tbody>
 </table>
 </div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous: BIL</button><button class="primary screen-nav" data-step-index="2">Next: Exposure →</button></div></section>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous</button><button class="primary screen-nav" data-step-index="2">Next →</button></div></section>
 
 
 <section class="card step-screen" id="step-exposure" style="margin-top:20px">
@@ -937,13 +937,35 @@
 </ul>
 </div>
 </details>
-</div></details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous: Threats</button><button class="primary screen-nav" data-step-index="3">Next: Inherent Risk →</button></div>
-</section>
-
-
-
-
-
+<div class="exposure-score-scale">
+<div><strong>None</strong><span>+0.00</span></div>
+<div><strong>Low</strong><span>+0.25</span></div>
+<div><strong>Medium</strong><span>+0.50</span></div>
+<div><strong>High</strong><span>+0.75</span></div>
+<div><strong>Very High</strong><span>+1.00</span></div>
+</div>
+<div class="toolbar">
+<div class="pill">Questions are configurable and stored in this browser.</div>
+<div class="toolbar-actions">
+<button class="primary" id="addExposureQuestionBtn">+ Add Exposure Question</button>
+<button class="danger" id="resetExposureLikelihoodBtn">Reset Exposure Configuration</button>
+</div>
+</div>
+<div class="exposure-config-section">
+<h3>Base Threat Likelihood</h3>
+<div style="overflow:auto;max-height:360px">
+<table>
+<thead><tr><th>Threat</th><th>Base Likelihood</th></tr></thead>
+<tbody id="baseLikelihoodConfigBody"></tbody>
+</table>
+</div>
+</div>
+<div class="exposure-config-section">
+<h3>Exposure Questions &amp; Threat Mapping</h3>
+<div id="exposureQuestionConfigList"></div>
+</div>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous</button><button class="primary screen-nav" data-step-index="3">Next →</button></div></section>
 
 
 
@@ -977,6 +999,7 @@
 <tbody id="riskResults"></tbody>
 </table>
 </div>
+<div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
 <details class="inline-config" style="margin-top:18px">
 <summary>⚙ Risk Matrix Configurator</summary>
 <div class="config-wrap">
@@ -1007,8 +1030,7 @@
 </table>
 </div>
 </div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous: Exposure</button><button class="primary screen-nav" data-step-index="4">Next: Controls →</button></div>
-
+</details>
 </section>
 <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
 <div class="toolbar">
@@ -1058,7 +1080,7 @@
 </div>
 <div id="controlConfigurator"></div>
 </div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="3">← Previous: Inherent Risk</button><button class="primary screen-nav" data-step-index="5">Next: Checklist →</button></div></section>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="3">← Previous</button><button class="primary screen-nav" data-step-index="5">Next →</button></div></section>
 
 <section class="card step-screen" id="step-checklist" style="margin-top:20px">
 <div class="toolbar">
@@ -1086,7 +1108,7 @@
 <tbody id="controlChecklistBody"></tbody>
 </table>
 </div>
-<div class="screen-actions"><button class="secondary screen-nav" data-step-index="4">← Previous: Controls</button><button class="primary screen-nav" data-step-index="6">Next: Residual Risk →</button></div></section>
+<div class="screen-actions"><button class="secondary screen-nav" data-step-index="4">← Previous</button><button class="primary screen-nav" data-step-index="6">Next →</button></div></section>
 <section class="card step-screen" id="step-residual" style="margin-top:20px">
 <div class="toolbar">
 <div>
@@ -1144,7 +1166,7 @@
 </table>
 </div>
 </div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous: Checklist</button><button class="primary screen-nav" data-step-index="7">Next: Report →</button></div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><button class="primary screen-nav" data-step-index="7">Next →</button></div>
 </section>
 <section class="card step-screen" id="step-report" style="margin-top:20px">
 <div class="toolbar">
@@ -1171,7 +1193,7 @@
 </div>
 </div>
 <div class="screen-actions">
-<button class="secondary screen-nav" data-step-index="6">← Previous: Residual Risk</button>
+<button class="secondary screen-nav" data-step-index="6">← Previous</button>
 <span></span>
 </div>
 </section>
