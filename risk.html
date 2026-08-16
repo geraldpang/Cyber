@@ -105,6 +105,60 @@
       display:none;
       margin-top:20px;
     }
+
+    .bil-screen{padding:0;overflow:hidden;border-radius:18px}
+    .bil-title-row{padding:28px 28px 18px}
+    .bil-heading-wrap{display:flex;align-items:flex-start;gap:18px}
+    .bil-icon{width:56px;height:56px;border-radius:50%;background:#e9f3ff;color:#0b5ea8;display:grid;place-items:center;font-size:30px;font-weight:800;flex:0 0 auto}
+    .bil-screen h2{margin:0 0 6px;font-size:25px;line-height:1.2}
+    .bil-intro{margin:0;font-size:15px}
+    .bil-assessment-table{margin:0 20px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .bil-table-head,.bil-assessment-row{display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1.25fr) minmax(300px,1.1fr);align-items:center}
+    .bil-table-head{background:#fafbfc;border-bottom:1px solid var(--line);color:#344054;font-size:13px;font-weight:750;padding:13px 16px}
+    .bil-assessment-row{min-height:94px;padding:14px 16px;border-bottom:1px solid #e9edf3}
+    .bil-assessment-row:last-child{border-bottom:none}
+    .bil-dimension{display:flex;align-items:center;gap:14px}
+    .bil-dimension strong{display:block;font-size:18px;margin-bottom:3px}
+    .bil-dimension span{display:block;font-size:13px;font-weight:700}
+    .cia-icon{width:48px;height:48px;border-radius:11px;display:grid;place-items:center;font-size:19px;font-weight:850;border:1px solid}
+    .cia-c{background:#edf5ff;border-color:#cfe1f8;color:#0b5ea8}
+    .cia-i{background:#eef8ed;border-color:#cfe9cb;color:#2f7d32}
+    .cia-a{background:#fff4ea;border-color:#f6dbc1;color:#e56b00}
+    .bil-description{color:#475467;font-size:14px;line-height:1.45;padding-right:22px}
+    .bil-select-wrap{display:flex;justify-content:flex-start}
+    .bil-select{width:100%;max-width:340px;min-width:220px;padding:13px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px;background:#fff;color:#172033}
+    .bil-result-panel{margin:18px 20px 0;padding:18px 20px;border:1px solid #add5f6;border-radius:13px;background:linear-gradient(180deg,#f8fcff,#eef8ff);display:grid;grid-template-columns:1.1fr 1px .75fr 1px 1.1fr;gap:22px;align-items:center}
+    .bil-result-divider{width:1px;height:96px;background:#bddcf4}
+    .bil-result-block>span{display:block;font-size:12px;color:#667085;margin-bottom:6px}
+    .bil-result-block>strong{display:block;font-size:28px;color:#0b4f96;line-height:1.15}
+    .bil-basis-pill{display:inline-block;margin-top:10px;padding:6px 10px;border-radius:999px;background:#0b5ea8;color:#fff;font-size:12px;font-weight:700}
+    .driver-block>strong{color:#172033;font-size:22px}
+    .driver-sub{margin-top:6px;font-size:13px;color:#667085;font-weight:650}
+    .cia-basis-cards{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+    .cia-mini-card{min-width:82px;padding:9px 8px;border-radius:9px;border:1px solid;text-align:center}
+    .cia-mini-card small{display:block;font-weight:800;margin-bottom:3px}
+    .cia-mini-card strong{display:block;font-size:22px;line-height:1;margin-bottom:4px}
+    .cia-mini-card span{display:block;font-size:11px}
+    .cia-mini-c{background:#f0f6ff;border-color:#cddff5;color:#0b5ea8}
+    .cia-mini-i{background:#f1f8ee;border-color:#cfe6c8;color:#347638}
+    .cia-mini-a{background:#fff4ea;border-color:#f3d2b3;color:#df6800}
+    .cia-mini-card.is-driver{box-shadow:0 0 0 2px currentColor inset;transform:translateY(-1px)}
+    .bil-info-note{margin:14px 20px 0;padding:13px 15px;border:1px solid #b9dcf7;border-radius:10px;background:#fbfdff;display:flex;align-items:center;gap:10px;color:#344054;font-size:13px}
+    .info-dot{width:24px;height:24px;border-radius:50%;border:2px solid #0b5ea8;color:#0b5ea8;display:grid;place-items:center;font-size:13px;font-weight:800;flex:0 0 auto}
+    .bil-screen .screen-actions{padding:16px 20px 20px}
+    .bil-next{padding:11px 18px;font-size:14px}
+    @media(max-width:900px){
+      .bil-table-head{display:none}
+      .bil-assessment-table{margin:0 12px}
+      .bil-assessment-row{grid-template-columns:1fr;gap:10px}
+      .bil-description{padding-right:0}
+      .bil-select{max-width:none}
+      .bil-result-panel{margin:14px 12px 0;grid-template-columns:1fr;gap:14px}
+      .bil-result-divider{display:none}
+      .bil-title-row{padding:22px 16px 16px}
+      .bil-info-note{margin:12px 12px 0}
+      .bil-screen .screen-actions{padding:14px 12px 18px}
+    }
     .step-screen.active-screen{
       display:block;
     }
@@ -585,40 +639,85 @@
 
 <main>
   <div class="grid" style="display:block">
-    <section class="card step-screen" id="step-bil">
-      <h2>1. Asset Business Impact Level</h2>
-      <div class="sub">Select the OVIC-aligned BIL rating for Confidentiality, Integrity and Availability.</div>
-
-      <div class="bil-row">
-        <label for="bilC"><strong>Confidentiality</strong><br><small>BIL-C</small></label>
-        <select id="bilC"></select>
-      </div>
-      <div class="bil-row">
-        <label for="bilI"><strong>Integrity</strong><br><small>BIL-I</small></label>
-        <select id="bilI"></select>
-      </div>
-      <div class="bil-row">
-        <label for="bilA"><strong>Availability</strong><br><small>BIL-A</small></label>
-        <select id="bilA"></select>
-      </div>
-
-      <div class="summary">
-        <div class="summary-grid">
-          <div class="metric">
-            <span>BIL-V</span>
-            <strong id="bilV">0</strong>
-          </div>
-          <div class="metric">
-            <span>BIL Driver(s)</span>
-            <strong class="driver" id="driver">None</strong>
+    <section class="card step-screen bil-screen" id="step-bil">
+      <div class="bil-title-row">
+        <div class="bil-heading-wrap">
+          <div class="bil-icon">▥</div>
+          <div>
+            <h2>1. Assess Asset Business Impact</h2>
+            <div class="sub bil-intro">Select the OVIC-aligned Business Impact Level for Confidentiality, Integrity and Availability.</div>
           </div>
         </div>
       </div>
 
-      <div class="sub" style="margin:16px 0 0">
-        BIL determines potential business impact. It does not change the probability that a threat occurs.
+      <div class="bil-assessment-table">
+        <div class="bil-table-head">
+          <div>Dimension</div>
+          <div>Description</div>
+          <div>Business Impact Level (OVIC)</div>
+        </div>
+
+        <div class="bil-assessment-row">
+          <div class="bil-dimension">
+            <div class="cia-icon cia-c">C</div>
+            <div><strong>Confidentiality</strong><span>BIL-C</span></div>
+          </div>
+          <div class="bil-description">The impact to the confidentiality of information.</div>
+          <div class="bil-select-wrap"><select id="bilC" class="bil-select"></select></div>
+        </div>
+
+        <div class="bil-assessment-row">
+          <div class="bil-dimension">
+            <div class="cia-icon cia-i">I</div>
+            <div><strong>Integrity</strong><span>BIL-I</span></div>
+          </div>
+          <div class="bil-description">The impact to the accuracy and trustworthiness of information.</div>
+          <div class="bil-select-wrap"><select id="bilI" class="bil-select"></select></div>
+        </div>
+
+        <div class="bil-assessment-row">
+          <div class="bil-dimension">
+            <div class="cia-icon cia-a">A</div>
+            <div><strong>Availability</strong><span>BIL-A</span></div>
+          </div>
+          <div class="bil-description">The impact to the availability of systems and information.</div>
+          <div class="bil-select-wrap"><select id="bilA" class="bil-select"></select></div>
+        </div>
       </div>
-    <div class="screen-actions"><span></span><button class="primary screen-nav" data-step-index="1">Next →</button></div></section>
+
+      <div class="bil-result-panel">
+        <div class="bil-result-block">
+          <span>Overall BIL (BIL-V)</span>
+          <strong id="bilV">0</strong>
+          <div class="bil-basis-pill" id="bilBasisText">Highest of C0 / I0 / A0</div>
+        </div>
+        <div class="bil-result-divider"></div>
+        <div class="bil-result-block driver-block">
+          <span>Primary Driver</span>
+          <strong id="driverFull">None</strong>
+          <div class="driver-sub" id="driverDetail">—</div>
+        </div>
+        <div class="bil-result-divider"></div>
+        <div class="bil-result-block cia-basis-block">
+          <span>Assessment Basis (CIA)</span>
+          <div class="cia-basis-cards">
+            <div class="cia-mini-card cia-mini-c"><small>C</small><strong id="ciaBasisC">0</strong><span id="ciaBasisCLabel">N/A</span></div>
+            <div class="cia-mini-card cia-mini-i"><small>I</small><strong id="ciaBasisI">0</strong><span id="ciaBasisILabel">N/A</span></div>
+            <div class="cia-mini-card cia-mini-a"><small>A</small><strong id="ciaBasisA">0</strong><span id="ciaBasisALabel">N/A</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bil-info-note">
+        <span class="info-dot">i</span>
+        <span><strong>BIL represents potential business impact.</strong> It does not determine how likely a cyber threat is to occur.</span>
+      </div>
+
+      <div class="screen-actions">
+        <span></span>
+        <button class="primary screen-nav bil-next" data-step-index="1">Next: Threats →</button>
+      </div>
+    </section>
 
     <section class="card step-screen" id="step-threats">
       <div class="toolbar">
@@ -1034,7 +1133,36 @@ function render(){
     if(bil.i===bilV) driver.push("I");
     if(bil.a===bilV) driver.push("A");
   }
-  document.getElementById("driver").textContent = driver.length ? driver.join(" + ") : "None";
+
+  const driverNames = driver.map(x => x==="C" ? "Confidentiality" : x==="I" ? "Integrity" : "Availability");
+  const driverFull = document.getElementById("driverFull");
+  if(driverFull) driverFull.textContent = driverNames.length ? driverNames.join(" + ") : "None";
+
+  const driverDetail = document.getElementById("driverDetail");
+  if(driverDetail){
+    driverDetail.textContent = driver.length
+      ? driver.map(x => `BIL-${x} = ${bil[x.toLowerCase()]}`).join(" · ")
+      : "—";
+  }
+
+  const basisText = document.getElementById("bilBasisText");
+  if(basisText) basisText.textContent = `Highest of C${bil.c} / I${bil.i} / A${bil.a}`;
+
+  [
+    ["C", bil.c, "ciaBasisC", "ciaBasisCLabel"],
+    ["I", bil.i, "ciaBasisI", "ciaBasisILabel"],
+    ["A", bil.a, "ciaBasisA", "ciaBasisALabel"]
+  ].forEach(([key,val,valueId,labelId])=>{
+    const v=document.getElementById(valueId);
+    const l=document.getElementById(labelId);
+    if(v) v.textContent=val;
+    if(l) l.textContent=BIL_LABELS[val];
+  });
+
+  document.querySelectorAll(".cia-mini-card").forEach(card=>card.classList.remove("is-driver"));
+  if(driver.includes("C")) document.querySelector(".cia-mini-c")?.classList.add("is-driver");
+  if(driver.includes("I")) document.querySelector(".cia-mini-i")?.classList.add("is-driver");
+  if(driver.includes("A")) document.querySelector(".cia-mini-a")?.classList.add("is-driver");
 
   const ranked=threats
     .map(t=>({...t,...scoreThreat(t,bil)}))
