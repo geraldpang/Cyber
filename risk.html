@@ -901,6 +901,24 @@
       .exposure-impact-help{min-width:0;width:100%}
     }
 
+
+    .inherent-risk-help ol{
+      margin:10px 0;
+      padding-left:22px;
+    }
+    .inherent-risk-help li{
+      margin:10px 0 14px;
+    }
+    .mini-formula{
+      margin-top:7px;
+      padding:8px 10px;
+      border-left:3px solid #0b5ea8;
+      background:#f7fbff;
+      color:#344054;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:12px;
+    }
+
 </style>
 </head>
 <body>
@@ -1236,6 +1254,60 @@
 <div class="sub" style="margin:4px 0 0">
           Suggested inherent likelihood is derived from the Asset Exposure assessment. The assessor can override the suggested value where justified.
         </div>
+      <details class="section-help inherent-risk-help" open>
+        <summary>How Inherent Risk is derived</summary>
+        <div class="section-help-body">
+          <p>
+            <strong>Inherent Risk</strong> is the level of cyber risk before considering the effectiveness of the
+            controls assessed later in the process.
+          </p>
+
+          <div class="formula-box">
+            <strong>Inherent Risk = Assessed Inherent Likelihood × Threat Impact</strong>
+          </div>
+
+          <p>The two inputs are derived as follows:</p>
+
+          <ol>
+            <li>
+              <strong>Threat Impact</strong><br>
+              The asset's BIL-C, BIL-I and BIL-A values are combined with the configured Threat-to-CIA relationship.
+              The strongest CIA result becomes the threat's impact.
+              <div class="mini-formula">
+                Threat Impact = MAX(BIL-C × C Weight, BIL-I × I Weight, BIL-A × A Weight)
+              </div>
+            </li>
+            <li>
+              <strong>Assessed Inherent Likelihood</strong><br>
+              Each threat starts with a configurable Base Likelihood. Asset Exposure can increase that likelihood
+              where an exposure question is mapped to the threat.
+              <div class="mini-formula">
+                Suggested Likelihood = Base Likelihood + applicable Exposure Uplifts, capped at 5
+              </div>
+              The assessor may override the suggested likelihood if there is a justified reason.
+            </li>
+            <li>
+              <strong>Risk Matrix</strong><br>
+              The assessed likelihood and threat impact are then looked up against the configured Likelihood × Impact
+              risk matrix to produce the Inherent Risk value and colour.
+            </li>
+          </ol>
+
+          <div class="worked-example">
+            <strong>Example</strong><br>
+            Threat Impact = 4<br>
+            Assessed Inherent Likelihood = 3<br>
+            The system looks up <strong>Likelihood 3 × Impact 4</strong> in the risk matrix and returns the configured
+            Inherent Risk value.
+          </div>
+
+          <p>
+            <strong>Important:</strong> Controls are not used when calculating Inherent Risk. Their effect is assessed
+            later and is reflected in Residual Risk.
+          </p>
+        </div>
+      </details>
+
 </div>
 <span class="pill" id="riskCount">0 threats assessed</span>
 </div>
@@ -1257,19 +1329,7 @@
 </table>
 </div>
 <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
-<details class="inline-config" style="margin-top:18px">
-<summary>⚙ Risk Matrix Configurator</summary>
-<div class="config-wrap">
-<p class="config-note">
-          Configure the risk value and colour for each Likelihood × Impact combination.
-          This shared matrix is used by both Inherent Risk and Residual Risk.
-        </p>
-<details class="config-help">
-<summary>Help: Risk Matrix Configurator</summary>
-<div class="config-help-body">
-<ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
-</div>
-</details>
+
 <div class="toolbar">
 <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
 <button class="danger risk-matrix-reset">Reset risk matrix</button>
