@@ -1207,6 +1207,9 @@
 </div>
 <div class="exposure-config-section">
 <h3>Base Threat Likelihood</h3>
+        <div class="config-note">
+          Prototype default: <strong>1 – Rare</strong> for all threats. Exposure can increase the suggested likelihood from this baseline.
+        </div>
 <div style="overflow:auto;max-height:360px">
 <table>
 <thead><tr><th>Threat</th><th>Base Likelihood</th></tr></thead>
@@ -1714,20 +1717,20 @@ const LIKELIHOOD_LABELS = ["","Rare","Unlikely","Possible","Likely","Almost Cert
 
 // Default configuration for the prototype. All values are editable in the configurator.
 const defaultLikelihoodConfig = {
-  "T01": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0},
-  "T02": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.5, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0.5},
-  "T03": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0, privilegedAccess:0.5},
-  "T04": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0.75, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
-  "T05": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.4, privilegedAccess:0},
-  "T06": {base:3, internetFacing:0, remoteAccess:0.25, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.75, interconnectivity:0, privilegedAccess:0},
-  "T07": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.75, bespokeSoftware:0.25, emailWeb:0.5, interconnectivity:0.5, privilegedAccess:0},
-  "T08": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.5, bespokeSoftware:1.0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
-  "T09": {base:3, internetFacing:0, remoteAccess:0, thirdParty:0.75, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
-  "T10": {base:2, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0.25},
-  "T11": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
-  "T12": {base:3, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.25, interconnectivity:0, privilegedAccess:0.5},
-  "T13": {base:2, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:1.0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
-  "T14": {base:3, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0.2, privilegedAccess:0}
+  "T01": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0},
+  "T02": {base:1, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.5, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.2, privilegedAccess:0.5},
+  "T03": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0, privilegedAccess:0.5},
+  "T04": {base:1, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0.75, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T05": {base:1, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0, emailWeb:0, interconnectivity:0.4, privilegedAccess:0},
+  "T06": {base:1, internetFacing:0, remoteAccess:0.25, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.75, interconnectivity:0, privilegedAccess:0},
+  "T07": {base:1, internetFacing:0.5, remoteAccess:0.5, thirdParty:0, sensitiveData:0, removableMedia:0.25, legacyTech:0.75, bespokeSoftware:0.25, emailWeb:0.5, interconnectivity:0.5, privilegedAccess:0},
+  "T08": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.5, bespokeSoftware:1.0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T09": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0.75, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
+  "T10": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0.25},
+  "T11": {base:1, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0.3, privilegedAccess:0},
+  "T12": {base:1, internetFacing:0.5, remoteAccess:0.5, thirdParty:0.25, sensitiveData:0.25, removableMedia:0, legacyTech:0, bespokeSoftware:0, emailWeb:0.25, interconnectivity:0, privilegedAccess:0.5},
+  "T13": {base:1, internetFacing:0, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:1.0, legacyTech:0, bespokeSoftware:0, emailWeb:0, interconnectivity:0, privilegedAccess:0},
+  "T14": {base:1, internetFacing:0.5, remoteAccess:0, thirdParty:0, sensitiveData:0, removableMedia:0, legacyTech:0.25, bespokeSoftware:0.25, emailWeb:0, interconnectivity:0.2, privilegedAccess:0}
 };
 
 const EXPOSURE_LEVELS = [
@@ -1783,7 +1786,7 @@ function exposureScore(value){
 // Base likelihood remains threat-specific.
 function loadLikelihoodConfig(){
   try{
-    const saved = JSON.parse(localStorage.getItem("bilLikelihoodConfigV2"));
+    const saved = JSON.parse(localStorage.getItem("bilLikelihoodConfigV3"));
     if(saved && typeof saved==="object"){
       return Object.fromEntries(Object.entries(defaultLikelihoodConfig).map(([tid,cfg])=>[
         tid,{...cfg,...(saved[tid]||{})}
@@ -1795,7 +1798,7 @@ function loadLikelihoodConfig(){
 let likelihoodConfig=loadLikelihoodConfig();
 
 function saveLikelihoodConfig(){
-  localStorage.setItem("bilLikelihoodConfigV2",JSON.stringify(likelihoodConfig));
+  localStorage.setItem("bilLikelihoodConfigV3",JSON.stringify(likelihoodConfig));
 }
 
 function normalizeLegacyExposureAnswers(saved){
@@ -2104,7 +2107,7 @@ function renderExposureThreatImpact(){
   let unchanged=0;
   let totalUplift=0;
 
-  const relevantThreats = threats.filter(t=>selectedThreats.has(t.id));
+  const relevantThreats = threats.filter(t=>isThreatSelected(t.id));
 
   relevantThreats.forEach(t=>{
     const cfg=likelihoodConfig[t.id]||{base:3};
@@ -3148,7 +3151,7 @@ document.getElementById("addExposureQuestionBtn").addEventListener("click",()=>{
 
 renderConfig();
 renderExposureQuestions();
-renderExposureThreatImpact();
+try { renderExposureThreatImpact(); } catch(e) { console.error("Exposure impact panel:", e); }
 renderExposureLikelihoodConfig();
 renderControlConfigurator();
 renderControlChecklist();
