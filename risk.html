@@ -785,6 +785,122 @@
       background:#fff;
     }
 
+
+    .exposure-impact-panel{
+      margin:18px 0 0;
+      border:1px solid #cfddeb;
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+    }
+    .exposure-impact-head{
+      padding:16px 18px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      background:#f8fbfe;
+      border-bottom:1px solid #e4ebf2;
+    }
+    .exposure-impact-head h3{
+      margin:0 0 5px;
+      font-size:16px;
+    }
+    .exposure-impact-head p{
+      margin:0;
+      color:#667085;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .exposure-impact-help{
+      min-width:300px;
+      margin:0;
+    }
+    .exposure-impact-summary{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      padding:12px 18px;
+      border-bottom:1px solid #edf1f5;
+      background:#fcfdff;
+    }
+    .impact-summary-pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid #dbe6ef;
+      background:#fff;
+      color:#475467;
+      font-size:12px;
+      font-weight:650;
+    }
+    .exposure-impact-table-wrap{
+      overflow:auto;
+      max-height:460px;
+    }
+    .exposure-impact-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    .exposure-impact-table th{
+      position:sticky;
+      top:0;
+      z-index:1;
+      background:#f8fafc;
+      border-bottom:1px solid #dde5ed;
+      padding:9px 10px;
+      text-align:left;
+      white-space:nowrap;
+    }
+    .exposure-impact-table td{
+      border-bottom:1px solid #edf1f5;
+      padding:9px 10px;
+      vertical-align:top;
+    }
+    .exposure-impact-table tr:last-child td{
+      border-bottom:none;
+    }
+    .likelihood-badge{
+      display:inline-block;
+      min-width:26px;
+      text-align:center;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#edf5ff;
+      border:1px solid #cfe1f8;
+      color:#0b5ea8;
+      font-weight:800;
+    }
+    .uplift-positive{
+      color:#9a4f00;
+      font-weight:800;
+    }
+    .uplift-zero{
+      color:#98a2b3;
+    }
+    .exposure-driver-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+    }
+    .exposure-driver-chip{
+      display:inline-block;
+      padding:3px 6px;
+      border-radius:6px;
+      background:#f2f4f7;
+      color:#475467;
+      font-size:11px;
+    }
+    .exposure-driver-chip.active{
+      background:#eef6ff;
+      color:#0b5ea8;
+      border:1px solid #d1e5f8;
+    }
+    @media(max-width:900px){
+      .exposure-impact-head{flex-direction:column}
+      .exposure-impact-help{min-width:0;width:100%}
+    }
+
 </style>
 </head>
 <body>
@@ -999,6 +1115,63 @@
 </div>
 </div>
 <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
+
+      <div class="exposure-impact-panel" id="exposureThreatImpactPanel">
+        <div class="exposure-impact-head">
+          <div>
+            <h3>Exposure Impact on Threat Likelihood</h3>
+            <p>
+              Exposure does not change the asset's BIL. It changes the <strong>suggested inherent likelihood</strong>
+              for threats that are mapped to the selected exposure factors.
+            </p>
+          </div>
+          <details class="section-help exposure-impact-help">
+            <summary>Help: How exposure affects threat likelihood</summary>
+            <div class="section-help-body">
+              <p>
+                Each exposure question is mapped to one or more relevant threats. The selected exposure level contributes
+                the same standard uplift to those mapped threats:
+              </p>
+              <ul>
+                <li><strong>None</strong> = +0.00</li>
+                <li><strong>Low</strong> = +0.25</li>
+                <li><strong>Medium</strong> = +0.50</li>
+                <li><strong>High</strong> = +0.75</li>
+                <li><strong>Very High</strong> = +1.00</li>
+              </ul>
+              <div class="formula-box">
+                <strong>Suggested Likelihood = Base Threat Likelihood + applicable exposure uplifts, capped at 5</strong>
+              </div>
+              <p>
+                If several exposure questions affect the same threat, their uplifts are added together. Only exposure
+                questions mapped to that threat are included.
+              </p>
+              <p>
+                The panel below updates immediately whenever an exposure selection changes, so the assessor can see
+                which threats are being influenced and why.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="exposure-impact-summary" id="exposureImpactSummary"></div>
+
+        <div class="exposure-impact-table-wrap">
+          <table class="exposure-impact-table">
+            <thead>
+              <tr>
+                <th>Threat</th>
+                <th>Base Likelihood</th>
+                <th>Exposure Uplift</th>
+                <th>Suggested Likelihood</th>
+                <th>Exposure Drivers</th>
+              </tr>
+            </thead>
+            <tbody id="exposureThreatImpactBody"></tbody>
+          </table>
+        </div>
+      </div>
+
 <details class="step-config" id="config-exposure-likelihood"><summary>⚙ Exposure-to-Likelihood Configurator</summary>
 <div class="config-wrap">
 <p class="config-note">
@@ -1748,6 +1921,7 @@ function renderExposureQuestions(){
     sel.addEventListener("change",()=>{
       exposureAnswers[q.id]=sel.value;
       saveExposureAnswers();
+      renderExposureThreatImpact();
       renderInherentRisk();
       renderControls();
       if(typeof renderControlChecklist==="function") renderControlChecklist();
@@ -1798,6 +1972,7 @@ function refreshExposureDependentViews(){
   saveExposureQuestionDefs();
   saveExposureAnswers();
   renderExposureQuestions();
+  renderExposureThreatImpact();
   renderInherentRisk();
   renderControls();
   if(typeof renderControlChecklist==="function") renderControlChecklist();
@@ -1895,6 +2070,114 @@ function renderExposureQuestionConfig(){
 function renderExposureLikelihoodConfig(){
   renderBaseLikelihoodConfig();
   renderExposureQuestionConfig();
+}
+
+
+function exposureUpliftForThreat(threatId){
+  let total=0;
+  const drivers=[];
+
+  exposureQuestionDefs.forEach(q=>{
+    if(!questionAppliesToThreat(q,threatId)) return;
+    const value=exposureAnswers[q.id] || "none";
+    const level=exposureLevel(value);
+    if(level.score>0){
+      total += level.score;
+      drivers.push({
+        question:q.label,
+        level:level.label,
+        score:level.score
+      });
+    }
+  });
+
+  return {total,drivers};
+}
+
+function renderExposureThreatImpact(){
+  const body=document.getElementById("exposureThreatImpactBody");
+  const summary=document.getElementById("exposureImpactSummary");
+  if(!body || !summary) return;
+
+  body.innerHTML="";
+  let affected=0;
+  let unchanged=0;
+  let totalUplift=0;
+
+  const relevantThreats = threats.filter(t=>selectedThreats.has(t.id));
+
+  relevantThreats.forEach(t=>{
+    const cfg=likelihoodConfig[t.id]||{base:3};
+    const base=+cfg.base||3;
+    const impact=exposureUpliftForThreat(t.id);
+    const raw=Math.max(1,Math.min(5,base+impact.total));
+    const suggested=Math.max(1,Math.min(5,Math.round(raw)));
+
+    if(impact.total>0){
+      affected++;
+      totalUplift += impact.total;
+    } else {
+      unchanged++;
+    }
+
+    const tr=document.createElement("tr");
+
+    const tdThreat=document.createElement("td");
+    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
+
+    const tdBase=document.createElement("td");
+    tdBase.innerHTML=`<span class="likelihood-badge">${base}</span> <span>${LIKELIHOOD_LABELS[Math.round(base)]||""}</span>`;
+
+    const tdUplift=document.createElement("td");
+    tdUplift.innerHTML=impact.total>0
+      ? `<span class="uplift-positive">+${impact.total.toFixed(2)}</span>`
+      : `<span class="uplift-zero">+0.00</span>`;
+
+    const tdSuggested=document.createElement("td");
+    tdSuggested.innerHTML=`<span class="likelihood-badge">${suggested}</span> <span>${LIKELIHOOD_LABELS[suggested]}</span>`;
+
+    const tdDrivers=document.createElement("td");
+    if(impact.drivers.length){
+      const wrap=document.createElement("div");
+      wrap.className="exposure-driver-list";
+      impact.drivers.forEach(d=>{
+        const chip=document.createElement("span");
+        chip.className="exposure-driver-chip active";
+        chip.textContent=`${d.level}: ${d.question.replace(/\?$/,"")}`;
+        chip.title=`+${d.score.toFixed(2)} likelihood uplift`;
+        wrap.appendChild(chip);
+      });
+      tdDrivers.appendChild(wrap);
+    }else{
+      tdDrivers.innerHTML='<span class="uplift-zero">No selected exposure currently affects this threat</span>';
+    }
+
+    tr.append(tdThreat,tdBase,tdUplift,tdSuggested,tdDrivers);
+    body.appendChild(tr);
+  });
+
+  summary.innerHTML="";
+  [
+    `${affected} threat${affected===1?"":"s"} affected`,
+    `${unchanged} unchanged`,
+    `Total mapped uplift across selected threats: +${totalUplift.toFixed(2)}`
+  ].forEach(text=>{
+    const pill=document.createElement("span");
+    pill.className="impact-summary-pill";
+    pill.textContent=text;
+    summary.appendChild(pill);
+  });
+
+  if(!relevantThreats.length){
+    const tr=document.createElement("tr");
+    const td=document.createElement("td");
+    td.colSpan=5;
+    td.textContent="No threats are currently selected in Step 2.";
+    td.style.color="#667085";
+    td.style.textAlign="center";
+    tr.appendChild(td);
+    body.appendChild(tr);
+  }
 }
 
 function activePrecursorsForThreat(threatId){
@@ -2865,6 +3148,7 @@ document.getElementById("addExposureQuestionBtn").addEventListener("click",()=>{
 
 renderConfig();
 renderExposureQuestions();
+renderExposureThreatImpact();
 renderExposureLikelihoodConfig();
 renderControlConfigurator();
 renderControlChecklist();
