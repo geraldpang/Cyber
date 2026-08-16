@@ -1,10 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BIL Threat Prioritisation</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>BIL Threat Prioritisation</title>
+<style>
     :root{
       --bg:#f5f7fb;
       --panel:#ffffff;
@@ -751,504 +753,432 @@
 </head>
 <body>
 <header>
-  <div class="wrap">
-    <h1>Cybersecurity Threat Risk Assessment Process</h1>
-    <p>Prototype for BIL-Driven Cyber Risk Assessment</p>
-  </div>
-</header>
-
-<div class="stepper-shell">
-  <div class="stepper" id="progressStepper">
-    <button class="step active" data-target="step-bil"><span>1</span><small>BIL</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-threats"><span>2</span><small>Threats</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-exposure"><span>3</span><small>Exposure</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-inherent"><span>4</span><small>Inherent Risk</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-prioritised"><span>5</span><small>Controls</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-checklist"><span>6</span><small>Checklist</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-residual"><span>7</span><small>Residual Risk</small></button>
-    <div class="step-line"></div>
-    <button class="step" data-target="step-report"><span>8</span><small>Report</small></button>
-  </div>
+<div class="wrap">
+<h1>Cybersecurity Threat Risk Assessment Process</h1>
+<p>Prototype for BIL-Driven Cyber Risk Assessment</p>
 </div>
-
+</header>
+<div class="stepper-shell">
+<div class="stepper" id="progressStepper">
+<button class="step active" data-target="step-bil"><span>1</span><small>BIL</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-threats"><span>2</span><small>Threats</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-exposure"><span>3</span><small>Exposure</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-inherent"><span>4</span><small>Inherent Risk</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-prioritised"><span>5</span><small>Controls</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-checklist"><span>6</span><small>Checklist</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-residual"><span>7</span><small>Residual Risk</small></button>
+<div class="step-line"></div>
+<button class="step" data-target="step-report"><span>8</span><small>Report</small></button>
+</div>
+</div>
 <main>
-  <div class="grid" style="display:block">
-    <section class="card step-screen bil-screen" id="step-bil">
-      <div class="bil-title-row">
-        <div class="bil-heading-wrap">
-          <div class="bil-icon">▥</div>
-          <div>
-            <h2>1. Assess Asset Business Impact</h2>
-            <div class="sub bil-intro">Select the OVIC-aligned Business Impact Level for Confidentiality, Integrity and Availability.</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="bil-assessment-table">
-        <div class="bil-table-head">
-          <div>Dimension</div>
-          <div>Description</div>
-          <div>Business Impact Level (OVIC)</div>
-        </div>
-
-        <div class="bil-assessment-row">
-          <div class="bil-dimension">
-            <div class="cia-icon cia-c">C</div>
-            <div><strong>Confidentiality</strong><span>BIL-C</span></div>
-          </div>
-          <div class="bil-description">The impact to the confidentiality of information.</div>
-          <div class="bil-select-wrap"><select id="bilC" class="bil-select"></select></div>
-        </div>
-
-        <div class="bil-assessment-row">
-          <div class="bil-dimension">
-            <div class="cia-icon cia-i">I</div>
-            <div><strong>Integrity</strong><span>BIL-I</span></div>
-          </div>
-          <div class="bil-description">The impact to the accuracy and trustworthiness of information.</div>
-          <div class="bil-select-wrap"><select id="bilI" class="bil-select"></select></div>
-        </div>
-
-        <div class="bil-assessment-row">
-          <div class="bil-dimension">
-            <div class="cia-icon cia-a">A</div>
-            <div><strong>Availability</strong><span>BIL-A</span></div>
-          </div>
-          <div class="bil-description">The impact to the availability of systems and information.</div>
-          <div class="bil-select-wrap"><select id="bilA" class="bil-select"></select></div>
-        </div>
-      </div>
-
-      <div class="bil-result-panel">
-        <div class="bil-result-block">
-          <span>Overall BIL (BIL-V)</span>
-          <strong id="bilV">0</strong>
-          <div class="bil-basis-pill" id="bilBasisText">Highest of C0 / I0 / A0</div>
-        </div>
-        <div class="bil-result-divider"></div>
-        <div class="bil-result-block driver-block">
-          <span>Primary Driver</span>
-          <strong id="driverFull">None</strong>
-          <div class="driver-sub" id="driverDetail">—</div>
-        </div>
-        <div class="bil-result-divider"></div>
-        <div class="bil-result-block cia-basis-block">
-          <span>Assessment Basis (CIA)</span>
-          <div class="cia-basis-cards">
-            <div class="cia-mini-card cia-mini-c"><small>C</small><strong id="ciaBasisC">0</strong><span id="ciaBasisCLabel">N/A</span></div>
-            <div class="cia-mini-card cia-mini-i"><small>I</small><strong id="ciaBasisI">0</strong><span id="ciaBasisILabel">N/A</span></div>
-            <div class="cia-mini-card cia-mini-a"><small>A</small><strong id="ciaBasisA">0</strong><span id="ciaBasisALabel">N/A</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bil-info-note">
-        <span class="info-dot">i</span>
-        <span><strong>BIL represents potential business impact.</strong> It does not determine how likely a cyber threat is to occur.</span>
-      </div>
-
-      <div class="screen-actions">
-        <span></span>
-        <button class="primary screen-nav bil-next" data-step-index="1">Next: Threats →</button>
-      </div>
-    </section>
-
-    <section class="card step-screen" id="step-threats">
-      <div class="toolbar">
-        <div>
-          <h2 style="margin:0">2. Relevant Threats</h2>
-          <div class="sub" style="margin:4px 0 0">
+<section class="card step-screen bil-screen" id="step-bil">
+<div class="bil-title-row">
+<div class="bil-heading-wrap">
+<div class="bil-icon">▥</div>
+<div>
+<h2>1. Assess Asset Business Impact</h2>
+<div class="sub bil-intro">Select the OVIC-aligned Business Impact Level for Confidentiality, Integrity and Availability.</div>
+</div>
+</div>
+</div>
+<div class="bil-assessment-table">
+<div class="bil-table-head">
+<div>Dimension</div>
+<div>Description</div>
+<div>Business Impact Level (OVIC)</div>
+</div>
+<div class="bil-assessment-row">
+<div class="bil-dimension">
+<div class="cia-icon cia-c">C</div>
+<div><strong>Confidentiality</strong><span>BIL-C</span></div>
+</div>
+<div class="bil-description">The impact to the confidentiality of information.</div>
+<div class="bil-select-wrap"><select class="bil-select" id="bilC"></select></div>
+</div>
+<div class="bil-assessment-row">
+<div class="bil-dimension">
+<div class="cia-icon cia-i">I</div>
+<div><strong>Integrity</strong><span>BIL-I</span></div>
+</div>
+<div class="bil-description">The impact to the accuracy and trustworthiness of information.</div>
+<div class="bil-select-wrap"><select class="bil-select" id="bilI"></select></div>
+</div>
+<div class="bil-assessment-row">
+<div class="bil-dimension">
+<div class="cia-icon cia-a">A</div>
+<div><strong>Availability</strong><span>BIL-A</span></div>
+</div>
+<div class="bil-description">The impact to the availability of systems and information.</div>
+<div class="bil-select-wrap"><select class="bil-select" id="bilA"></select></div>
+</div>
+</div>
+<div class="bil-result-panel">
+<div class="bil-result-block">
+<span>Overall BIL (BIL-V)</span>
+<strong id="bilV">0</strong>
+<div class="bil-basis-pill" id="bilBasisText">Highest of C0 / I0 / A0</div>
+</div>
+<div class="bil-result-divider"></div>
+<div class="bil-result-block driver-block">
+<span>Primary Driver</span>
+<strong id="driverFull">None</strong>
+<div class="driver-sub" id="driverDetail">—</div>
+</div>
+<div class="bil-result-divider"></div>
+<div class="bil-result-block cia-basis-block">
+<span>Assessment Basis (CIA)</span>
+<div class="cia-basis-cards">
+<div class="cia-mini-card cia-mini-c"><small>C</small><strong id="ciaBasisC">0</strong><span id="ciaBasisCLabel">N/A</span></div>
+<div class="cia-mini-card cia-mini-i"><small>I</small><strong id="ciaBasisI">0</strong><span id="ciaBasisILabel">N/A</span></div>
+<div class="cia-mini-card cia-mini-a"><small>A</small><strong id="ciaBasisA">0</strong><span id="ciaBasisALabel">N/A</span></div>
+</div>
+</div>
+</div>
+<div class="bil-info-note">
+<span class="info-dot">i</span>
+<span><strong>BIL represents potential business impact.</strong> It does not determine how likely a cyber threat is to occur.</span>
+</div>
+<div class="screen-actions">
+<span></span>
+<button class="primary screen-nav bil-next" data-step-index="1">Next: Threats →</button>
+</div>
+</section>
+<section class="card step-screen" id="step-threats">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">2. Relevant Threats</h2>
+<div class="sub" style="margin:4px 0 0">
             Automatically ranked from highest to lowest impact. Select only the threats that are applicable to this asset.
           </div>
-        </div>
-        <span class="pill" id="threatCount">0 relevant threats</span>
-      </div>
-
-      <div style="overflow:auto;max-height:620px">
-        <table>
-          <thead>
-            <tr>
-              <th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input type="checkbox" id="selectAllThreats" aria-label="Select all threats"> Select All</label></th>
-              <th>Priority</th>
-              <th>Threat</th>
-              <th>Primary CIA Driver</th>
-              <th>Threat Impact</th>
-              <th>Relative Score</th>
-            </tr>
-          </thead>
-          <tbody id="results"></tbody>
-        </table>
-      </div>
-    <div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous</button><button class="primary screen-nav" data-step-index="2">Next →</button></div></section>
-  </div>
-
-  <details class="step-config" id="config-threat-cia"><summary>⚙ Threat-to-CIA Matrix Configurator</summary>
-    <div class="config-wrap">
-      <p class="config-note">
+</div>
+<span class="pill" id="threatCount">0 relevant threats</span>
+</div>
+<div style="overflow:auto;max-height:620px">
+<table>
+<thead>
+<tr>
+<th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input aria-label="Select all threats" id="selectAllThreats" type="checkbox"/> Select All</label></th>
+<th>Priority</th>
+<th>Threat</th>
+<th>Primary CIA Driver</th>
+<th>Threat Impact</th>
+<th>Relative Score</th>
+</tr>
+</thead>
+<tbody id="results"></tbody>
+</table>
+</div>
+<details class="step-config" id="config-threat-cia"><summary>⚙ Threat-to-CIA Matrix Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">
         Configure how strongly each threat affects Confidentiality, Integrity and Availability.
         Values: 0 = no material relationship, 1 = secondary, 2 = significant, 3 = primary.
         Changes are saved in this browser and immediately affect threat ranking.
       </p>
-      <details class="config-help">
-        <summary>Help: Threat-to-CIA Configurator</summary>
-        <div class="config-help-body">
-          <ul><li><strong>Purpose:</strong> Defines which CIA dimensions each threat can affect.</li><li><strong>Scale:</strong> 0 = none, 1 = secondary, 2 = significant, 3 = primary.</li><li><strong>Effect:</strong> The mapping is combined with BIL-C, BIL-I and BIL-A to calculate the threat impact for the asset.</li><li><strong>Guideline:</strong> Use the strongest reasonably expected business effect of the threat, not the likelihood of occurrence.</li><li><strong>Example:</strong> Denial of Service would normally have a strong Availability relationship and little or no Confidentiality relationship.</li></ul>
-        </div>
-      </details>
+<details class="config-help">
+<summary>Help: Threat-to-CIA Configurator</summary>
+<div class="config-help-body">
+<ul><li><strong>Purpose:</strong> Defines which CIA dimensions each threat can affect.</li><li><strong>Scale:</strong> 0 = none, 1 = secondary, 2 = significant, 3 = primary.</li><li><strong>Effect:</strong> The mapping is combined with BIL-C, BIL-I and BIL-A to calculate the threat impact for the asset.</li><li><strong>Guideline:</strong> Use the strongest reasonably expected business effect of the threat, not the likelihood of occurrence.</li><li><strong>Example:</strong> Denial of Service would normally have a strong Availability relationship and little or no Confidentiality relationship.</li></ul>
+</div>
+</details>
+<div class="toolbar">
+<div class="pill">Configuration scale: 0–3</div>
+<button class="danger" id="resetBtn">Reset default matrix</button>
+</div>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Confidentiality</th>
+<th>Integrity</th>
+<th>Availability</th>
+</tr>
+</thead>
+<tbody id="configBody"></tbody>
+</table>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous: BIL</button><button class="primary screen-nav" data-step-index="2">Next: Exposure →</button></div></section>
 
-      <div class="toolbar">
-        <div class="pill">Configuration scale: 0–3</div>
-        <button class="danger" id="resetBtn">Reset default matrix</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Threat</th>
-            <th>Confidentiality</th>
-            <th>Integrity</th>
-            <th>Availability</th>
-          </tr>
-        </thead>
-        <tbody id="configBody"></tbody>
-      </table>
-    </div>
 
-  </details>
-
-  <section class="card step-screen" id="step-exposure" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">3. Asset Exposure</h2>
-        <div class="sub" style="margin:4px 0 0">
+<section class="card step-screen" id="step-exposure" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">3. Asset Exposure</h2>
+<div class="sub" style="margin:4px 0 0">
           Describe the asset's exposure characteristics. These answers are used to calculate the suggested inherent likelihood for applicable threats.
         </div>
-      </div>
-    </div>
-
-    <div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous</button><button class="primary screen-nav" data-step-index="3">Next →</button></div></section>
-
-  <details class="step-config" id="config-exposure-likelihood"><summary>⚙ Exposure-to-Likelihood Configurator</summary>
-    <div class="config-wrap">
-      <p class="config-note">
+</div>
+</div>
+<div id="exposureQuestions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px"></div>
+<details class="step-config" id="config-exposure-likelihood"><summary>⚙ Exposure-to-Likelihood Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">
         Configure the exposure questions used in the assessment and identify which threats each question can influence.
         Every exposure question uses the same five-level scoring scale.
       </p>
-
-      <details class="config-help">
-        <summary>Help: Exposure-to-Likelihood Configurator</summary>
-        <div class="config-help-body">
-          <ul>
-            <li><strong>Purpose:</strong> Defines the asset exposure questions that influence suggested inherent likelihood.</li>
-            <li><strong>Standard scoring:</strong> None = +0, Low = +0.25, Medium = +0.50, High = +0.75, Very High = +1.00.</li>
-            <li><strong>Threat mapping:</strong> Each exposure question is mapped only to the threats that it can reasonably influence.</li>
-            <li><strong>Calculation:</strong> Base Threat Likelihood + scores from applicable exposure questions, capped at 5.</li>
-            <li><strong>Example:</strong> If Internet Exposure is High (+0.75) and Remote Access is Medium (+0.50), a mapped threat receives +1.25 in total.</li>
-            <li><strong>Question management:</strong> You can rename questions, add new questions, remove questions, and change their relevant-threat mappings.</li>
-          </ul>
-        </div>
-      </details>
-
-      <div class="exposure-score-scale">
-        <div><strong>None</strong><span>+0.00</span></div>
-        <div><strong>Low</strong><span>+0.25</span></div>
-        <div><strong>Medium</strong><span>+0.50</span></div>
-        <div><strong>High</strong><span>+0.75</span></div>
-        <div><strong>Very High</strong><span>+1.00</span></div>
-      </div>
-
-      <div class="toolbar">
-        <div class="pill">Questions are configurable and stored in this browser.</div>
-        <div class="toolbar-actions">
-          <button class="primary" id="addExposureQuestionBtn">+ Add Exposure Question</button>
-          <button class="danger" id="resetExposureLikelihoodBtn">Reset Exposure Configuration</button>
-        </div>
-      </div>
-
-      <div class="exposure-config-section">
-        <h3>Base Threat Likelihood</h3>
-        <div style="overflow:auto;max-height:360px">
-          <table>
-            <thead><tr><th>Threat</th><th>Base Likelihood</th></tr></thead>
-            <tbody id="baseLikelihoodConfigBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="exposure-config-section">
-        <h3>Exposure Questions & Threat Mapping</h3>
-        <div id="exposureQuestionConfigList"></div>
-      </div>
-    </div>
-  </details>
+<details class="config-help">
+<summary>Help: Exposure-to-Likelihood Configurator</summary>
+<div class="config-help-body">
+<ul>
+<li><strong>Purpose:</strong> Defines the asset exposure questions that influence suggested inherent likelihood.</li>
+<li><strong>Standard scoring:</strong> None = +0, Low = +0.25, Medium = +0.50, High = +0.75, Very High = +1.00.</li>
+<li><strong>Threat mapping:</strong> Each exposure question is mapped only to the threats that it can reasonably influence.</li>
+<li><strong>Calculation:</strong> Base Threat Likelihood + scores from applicable exposure questions, capped at 5.</li>
+<li><strong>Example:</strong> If Internet Exposure is High (+0.75) and Remote Access is Medium (+0.50), a mapped threat receives +1.25 in total.</li>
+<li><strong>Question management:</strong> You can rename questions, add new questions, remove questions, and change their relevant-threat mappings.</li>
+</ul>
+</div>
+</details>
+</div></details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous: Threats</button><button class="primary screen-nav" data-step-index="3">Next: Inherent Risk →</button></div>
+</section>
 
 
-      <div class="toolbar">
-        <div class="pill">Response-specific adjustments make the likelihood model transparent and configurable.</div>
-        <button class="danger" id="resetExposureLikelihoodBtn">Reset likelihood configuration</button>
-      </div>
 
-      <div class="exposure-config-section">
-        <h3>Base Threat Likelihood</h3>
-        <div style="overflow:auto;max-height:360px">
-          <table>
-            <thead><tr><th>Threat</th><th>Base Likelihood</th></tr></thead>
-            <tbody id="baseLikelihoodConfigBody"></tbody>
-          </table>
-        </div>
-      </div>
 
-      <div class="exposure-config-section">
-        <h3>Exposure Response → Threat Adjustment</h3>
-        <div class="exposure-config-picker">
-          <div>
-            <label>Exposure Factor</label>
-            <select id="exposureFactorConfigSelect"></select>
-          </div>
-          <div>
-            <label>Response Option</label>
-            <select id="exposureResponseConfigSelect"></select>
-          </div>
-        </div>
-        <div class="config-note" id="exposureConfigExplanation"></div>
-        
-        <div style="overflow:auto;max-height:460px">
-          <table>
-            <thead><tr><th>Threat</th><th>Likelihood Adjustment</th></tr></thead>
-            <tbody id="exposureResponseThreatConfigBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </details>
 
-  <section class="card step-screen" id="step-inherent" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">4. Inherent Risk</h2>
-        <div class="sub" style="margin:4px 0 0">
+
+
+
+
+
+
+<section class="card step-screen" id="step-inherent" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">4. Inherent Risk</h2>
+<div class="sub" style="margin:4px 0 0">
           Suggested inherent likelihood is derived from the Asset Exposure assessment. The assessor can override the suggested value where justified.
         </div>
-      </div>
-      <span class="pill" id="riskCount">0 threats assessed</span>
-    </div>
-
-    <div style="overflow:auto;max-height:760px">
-      <table>
-        <thead>
-          <tr>
-            <th>Priority</th>
-            <th>Risk Statement</th>
-            <th>Threat Impact</th>
-            <th>Suggested Likelihood</th>
-            <th>Assessed Likelihood</th>
-            <th>Inherent Risk Score</th>
-            <th>Matrix</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="riskResults"></tbody>
-      </table>
-    </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
-    <details class="inline-config" style="margin-top:18px">
-      <summary>⚙ Risk Matrix Configurator</summary>
-      <div class="config-wrap">
-        <p class="config-note">
+</div>
+<span class="pill" id="riskCount">0 threats assessed</span>
+</div>
+<div style="overflow:auto;max-height:760px">
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Risk Statement</th>
+<th>Threat Impact</th>
+<th>Suggested Likelihood</th>
+<th>Assessed Likelihood</th>
+<th>Inherent Risk Score</th>
+<th>Matrix</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody id="riskResults"></tbody>
+</table>
+</div>
+<details class="inline-config" style="margin-top:18px">
+<summary>⚙ Risk Matrix Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">
           Configure the risk value and colour for each Likelihood × Impact combination.
           This shared matrix is used by both Inherent Risk and Residual Risk.
         </p>
-      <details class="config-help">
-        <summary>Help: Risk Matrix Configurator</summary>
-        <div class="config-help-body">
-          <ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
-        </div>
-      </details>
+<details class="config-help">
+<summary>Help: Risk Matrix Configurator</summary>
+<div class="config-help-body">
+<ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
+</div>
+</details>
+<div class="toolbar">
+<div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
+<button class="danger risk-matrix-reset">Reset risk matrix</button>
+</div>
+<div class="risk-matrix-wrap">
+<div class="matrix-axis-title">Severity / Consequence →</div>
+<table class="risk-matrix-config-table">
+<thead>
+<tr>
+<th class="axis-corner">Frequency / Likelihood ↓</th>
+<th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
+</tr>
+</thead>
+<tbody class="riskMatrixConfigBody"></tbody>
+</table>
+</div>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous: Exposure</button><button class="primary screen-nav" data-step-index="4">Next: Controls →</button></div>
 
-        <div class="toolbar">
-          <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
-          <button class="danger risk-matrix-reset">Reset risk matrix</button>
-        </div>
-        <div class="risk-matrix-wrap">
-          <div class="matrix-axis-title">Severity / Consequence →</div>
-          <table class="risk-matrix-config-table">
-            <thead>
-              <tr>
-                <th class="axis-corner">Frequency / Likelihood ↓</th>
-                <th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
-              </tr>
-            </thead>
-            <tbody class="riskMatrixConfigBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </details>
 </section>
-
-  <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">5. Prioritised Controls</h2>
-        <div class="sub" style="margin:4px 0 0">
+<section class="card step-screen" id="step-prioritised" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">5. Prioritised Controls</h2>
+<div class="sub" style="margin:4px 0 0">
           Only selected threats are considered. Controls are ranked by the highest <strong>Inherent Risk Score × Control Effectiveness</strong> relationship for this asset.
         </div>
-      </div>
-      <span class="pill" id="controlCount">0 controls</span>
-    </div>
-
-    <div style="overflow:auto;max-height:700px">
-      <table>
-        <thead>
-          <tr>
-            <th>Priority</th>
-            <th>Control</th>
-            <th>Control Type</th>
-            <th>Risk Driving Priority</th>
-            <th>Inherent Risk Score</th>
-            <th>Effectiveness</th>
-            <th>Control Priority Score</th>
-            <th>Other Relevant Threats</th>
-          </tr>
-        </thead>
-        <tbody id="controlResults"></tbody>
-      </table>
-    </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="3">← Previous</button><button class="primary screen-nav" data-step-index="5">Next →</button></div></section>
-
-
-  <details class="step-config" id="config-control-library"><summary>⚙ Control Library & Threat Mapping Configurator</summary>
-    <div class="config-wrap">
-      <p class="config-note">
+</div>
+<span class="pill" id="controlCount">0 controls</span>
+</div>
+<div style="overflow:auto;max-height:700px">
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Control</th>
+<th>Control Type</th>
+<th>Risk Driving Priority</th>
+<th>Inherent Risk Score</th>
+<th>Effectiveness</th>
+<th>Control Priority Score</th>
+<th>Other Relevant Threats</th>
+</tr>
+</thead>
+<tbody id="controlResults"></tbody>
+</table>
+</div>
+<details class="step-config" id="config-control-library"><summary>⚙ Control Library &amp; Threat Mapping Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">
         Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
         effectiveness rating for each Control-to-Threat relationship.
       </p>
-      <details class="config-help">
-        <summary>Help: Control Library & Threat Mapping Configurator</summary>
-        <div class="config-help-body">
-          <ul><li><strong>Purpose:</strong> Defines which threats each control mitigates and how effective that control is against each threat.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
-        </div>
-      </details>
+<details class="config-help">
+<summary>Help: Control Library &amp; Threat Mapping Configurator</summary>
+<div class="config-help-body">
+<ul><li><strong>Purpose:</strong> Defines which threats each control mitigates and how effective that control is against each threat.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
+</div>
+</details>
+<div class="toolbar">
+<div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
+<div style="display:flex;gap:8px">
+<button class="primary" id="addControlBtn">+ Add Control</button>
+<button class="danger" id="resetControlMapBtn">Reset prototype controls</button>
+</div>
+</div>
+<div id="controlConfigurator"></div>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="3">← Previous: Inherent Risk</button><button class="primary screen-nav" data-step-index="5">Next: Checklist →</button></div></section>
 
-      <div class="toolbar">
-        <div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
-        <div style="display:flex;gap:8px">
-          <button class="primary" id="addControlBtn">+ Add Control</button>
-          <button class="danger" id="resetControlMapBtn">Reset prototype controls</button>
-        </div>
-      </div>
-      <div id="controlConfigurator"></div>
-    </div>
-  </details>
-
-  <section class="card step-screen" id="step-checklist" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">6. Control Checklist</h2>
-        <div class="sub" style="margin:4px 0 0">
+<section class="card step-screen" id="step-checklist" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">6. Control Checklist</h2>
+<div class="sub" style="margin:4px 0 0">
           Assess the implementation status of each prioritised control. Preventive controls reduce likelihood, while Detective, Corrective and Recovery controls reduce residual impact.
         </div>
-      </div>
-      <span class="pill" id="controlAssessmentCount">0 controls assessed</span>
-    </div>
-
-    <div style="overflow:auto;max-height:720px">
-      <table>
-        <thead>
-          <tr>
-            <th>Priority</th>
-            <th>Control</th>
-            <th>Control Type</th>
-            <th>Relevant Threats</th>
-            <th>Effectiveness</th>
-            <th>Assessment</th>
-            <th>Comments</th>
-          </tr>
-        </thead>
-        <tbody id="controlChecklistBody"></tbody>
-      </table>
-    </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="4">← Previous</button><button class="primary screen-nav" data-step-index="6">Next →</button></div></section>
-
-  <section class="card step-screen" id="step-residual" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">7. Residual Risk</h2>
-        <div class="sub" style="margin:4px 0 0">
+</div>
+<span class="pill" id="controlAssessmentCount">0 controls assessed</span>
+</div>
+<div style="overflow:auto;max-height:720px">
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Control</th>
+<th>Control Type</th>
+<th>Relevant Threats</th>
+<th>Effectiveness</th>
+<th>Assessment</th>
+<th>Comments</th>
+</tr>
+</thead>
+<tbody id="controlChecklistBody"></tbody>
+</table>
+</div>
+<div class="screen-actions"><button class="secondary screen-nav" data-step-index="4">← Previous: Controls</button><button class="primary screen-nav" data-step-index="6">Next: Residual Risk →</button></div></section>
+<section class="card step-screen" id="step-residual" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">7. Residual Risk</h2>
+<div class="sub" style="margin:4px 0 0">
           Residual risk is calculated after considering how implemented controls reduce likelihood and impact.
         </div>
-      </div>
-      <span class="pill" id="residualRiskCount">0 risks calculated</span>
-    </div>
-
-    <div style="overflow:auto;max-height:760px">
-      <table>
-        <thead>
-          <tr>
-            <th>Risk Statement</th>
-            <th>Inherent Risk</th>
-            <th>Likelihood Mitigation</th>
-            <th>Residual Likelihood</th>
-            <th>Impact Mitigation</th>
-            <th>Residual Impact</th>
-            <th>Residual Risk</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="residualRiskBody"></tbody>
-      </table>
-    </div>
-  <div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous</button><button class="primary screen-nav" data-step-index="7">Next →</button></div>
-  </section>
-
-
-
-  <section class="card step-screen" id="step-report" style="margin-top:20px">
-    <div class="toolbar">
-      <div>
-        <h2 style="margin:0">8. Report</h2>
-        <div class="sub" style="margin:4px 0 0">
+</div>
+<span class="pill" id="residualRiskCount">0 risks calculated</span>
+</div>
+<div style="overflow:auto;max-height:760px">
+<table>
+<thead>
+<tr>
+<th>Risk Statement</th>
+<th>Inherent Risk</th>
+<th>Likelihood Mitigation</th>
+<th>Residual Likelihood</th>
+<th>Impact Mitigation</th>
+<th>Residual Impact</th>
+<th>Residual Risk</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody id="residualRiskBody"></tbody>
+</table>
+</div>
+<details class="inline-config" style="margin-top:18px">
+<summary>⚙ Risk Matrix Configurator (Shared)</summary>
+<div class="config-wrap">
+<p class="config-note">
+          Configure the risk value and colour for each Likelihood × Impact combination.
+          This shared matrix is used by both Inherent Risk and Residual Risk.
+        </p>
+<details class="config-help">
+<summary>Help: Risk Matrix Configurator</summary>
+<div class="config-help-body">
+<ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
+</div>
+</details>
+<div class="toolbar">
+<div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
+<button class="danger risk-matrix-reset">Reset risk matrix</button>
+</div>
+<div class="risk-matrix-wrap">
+<div class="matrix-axis-title">Severity / Consequence →</div>
+<table class="risk-matrix-config-table">
+<thead>
+<tr>
+<th class="axis-corner">Frequency / Likelihood ↓</th>
+<th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
+</tr>
+</thead>
+<tbody class="riskMatrixConfigBody"></tbody>
+</table>
+</div>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="5">← Previous: Checklist</button><button class="primary screen-nav" data-step-index="7">Next: Report →</button></div>
+</section>
+<section class="card step-screen" id="step-report" style="margin-top:20px">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">8. Report</h2>
+<div class="sub" style="margin:4px 0 0">
           Review the consolidated assessment report, add recommendations, and download a copy.
         </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="secondary" id="downloadWordBtn">Download Word</button>
-        <button class="primary" id="downloadPdfBtn">Download PDF</button>
-      </div>
-    </div>
-
-    <div id="reportPrintable" class="report-paper">
-      <div class="report-header">
-        <h1>Cybersecurity Risk Assessment Report</h1>
-        <div class="muted-small">Generated from the BIL-driven cybersecurity risk assessment prototype.</div>
-      </div>
-
-      <div id="reportContent"></div>
-
-      <div class="report-section">
-        <h3>Recommendations</h3>
-        <textarea id="reportRecommendation" class="recommendation-box"
-          placeholder="Enter recommendations, treatment actions or assessor conclusions..."></textarea>
-      </div>
-    </div>
-
-    <div class="screen-actions">
-      <button class="secondary screen-nav" data-step-index="6">← Previous</button>
-      <span></span>
-    </div>
-  </section>
-
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="secondary" id="downloadWordBtn">Download Word</button>
+<button class="primary" id="downloadPdfBtn">Download PDF</button>
+</div>
+</div>
+<div class="report-paper" id="reportPrintable">
+<div class="report-header">
+<h1>Cybersecurity Risk Assessment Report</h1>
+<div class="muted-small">Generated from the BIL-driven cybersecurity risk assessment prototype.</div>
+</div>
+<div id="reportContent"></div>
+<div class="report-section">
+<h3>Recommendations</h3>
+<textarea class="recommendation-box" id="reportRecommendation" placeholder="Enter recommendations, treatment actions or assessor conclusions..."></textarea>
+</div>
+</div>
+<div class="screen-actions">
+<button class="secondary screen-nav" data-step-index="6">← Previous: Residual Risk</button>
+<span></span>
+</div>
+</section>
 </main>
-
 <footer>
   Prototype methodology only. Threat-to-CIA and Threat-to-Control mappings are illustrative and should be formally reviewed and approved before operational use.
 </footer>
-
 <script>
 const BIL_LABELS = ["N/A","Minor","Limited","Major","Serious","Exceptional"];
 
