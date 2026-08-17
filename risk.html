@@ -1265,7 +1265,7 @@
 <div><strong>Very High</strong><span>+1.00</span></div>
 </div>
 <div class="toolbar">
-<div class="pill">Questions are configurable and stored in this browser.</div>
+<div class="pill">Exposure questions and mappings are configurable and stored in this browser. Assessment selections reset on page reload.</div>
 <div class="toolbar-actions">
 <button class="primary" id="addExposureQuestionBtn">+ Add Exposure Question</button>
 <button class="danger" id="resetExposureLikelihoodBtn">Reset Exposure Configuration</button>
@@ -1926,20 +1926,14 @@ function normalizeLegacyExposureAnswers(saved){
 }
 
 function loadExposureAnswers(){
-  try{
-    const saved=JSON.parse(
-      localStorage.getItem("bilExposureAnswersV4") ||
-      localStorage.getItem("bilExposureAnswersV2") ||
-      localStorage.getItem("bilExposureAnswersV1")
-    );
-    return normalizeLegacyExposureAnswers(saved);
-  }catch(e){}
-  return normalizeLegacyExposureAnswers({});
+  const result={};
+  exposureQuestionDefs.forEach(q=>result[q.id]="");
+  return result;
 }
 let exposureAnswers=loadExposureAnswers();
 
 function saveExposureAnswers(){
-  localStorage.setItem("bilExposureAnswersV4",JSON.stringify(exposureAnswers));
+  // Assessment responses are session-only and intentionally reset on page reload.
 }
 
 function loadLikelihoodOverrides(){
