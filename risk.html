@@ -2437,8 +2437,8 @@ function renderInherentRisk(){
         <td>
           <div class="risk-statement">${buildRiskStatement(t)}</div>
         </td>
-        <td><span class="score">${t.score.toFixed(2)}</span><br><span class="muted-small">Impact ${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
-        <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}<br><span class="muted-small">Raw ${t.suggestedRaw.toFixed(2)}</span></td>
+        <td><span class="score">${t.impact}</span> – ${BIL_LABELS[t.impact]}</td>
+        <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}</td>
         <td>
           <select class="assessed-likelihood" data-threat-id="${t.id}">
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
