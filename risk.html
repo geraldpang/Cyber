@@ -1070,6 +1070,12 @@
 <div class="toolbar">
 <div>
 <h2 style="margin:0">2. Relevant Threats</h2>
+      <div class="config-note">
+        <strong>Auto-selection recommendation:</strong> When BIL is complete, the threat(s) with the highest
+        Relative Score are selected automatically. If several threats have the same highest score, all tied
+        threats are selected. You can amend the selections manually. Selections reset when the page is reloaded.
+      </div>
+
 <div class="sub" style="margin:4px 0 0">
             Automatically ranked from highest to lowest impact. Select only the threats that are applicable to this asset.
           </div>
@@ -1608,7 +1614,10 @@ function setupBILSelect(id){
     o.textContent=`${n} – ${BIL_LABELS[n]}`;
     el.appendChild(o);
   }
-  el.addEventListener("change", render);
+  el.addEventListener("change", ()=>{
+    lastThreatAutoSelectBilSignature = null;
+    render();
+  });
 }
 
 setupBILSelect("bilC");
@@ -1620,17 +1629,14 @@ function ciaName(k){
 }
 
 function loadThreatSelections(){
-  try{
-    const saved = JSON.parse(localStorage.getItem("bilThreatSelectionsV3"));
-    if(saved && typeof saved === "object") return saved;
-  }catch(e){}
   return {};
 }
 
 let threatSelections = loadThreatSelections();
+let lastThreatAutoSelectBilSignature = null;
 
 function saveThreatSelections(){
-  localStorage.setItem("bilThreatSelectionsV3", JSON.stringify(threatSelections));
+  // Assessment threat selections are session-only and reset on page reload.
 }
 
 function isThreatSelected(threatId){
@@ -1702,6 +1708,24 @@ function render(){
     .map(t=>({...t,...scoreThreat(t,bil)}))
     .filter(t=>t.score>0)
     .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
+
+  // Automatically recommend the threat(s) with the highest Relative Score.
+  // This runs once for each distinct completed BIL assessment. Manual changes
+  // made afterwards are preserved until BIL changes again.
+  const bilSignature = bilComplete ? `${bil.c}|${bil.i}|${bil.a}` : null;
+  if(bilComplete && bilSignature !== lastThreatAutoSelectBilSignature){
+    threatSelections = {};
+    if(ranked.length){
+      const highestRelativeScore = ranked[0].score;
+      ranked.forEach(t=>{
+        threatSelections[t.id] = Math.abs(t.score - highestRelativeScore) < 0.0001;
+      });
+    }
+    lastThreatAutoSelectBilSignature = bilSignature;
+  }else if(!bilComplete){
+    threatSelections = {};
+    lastThreatAutoSelectBilSignature = null;
+  }
 
   const tbody=document.getElementById("results");
   tbody.innerHTML="";
