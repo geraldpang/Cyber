@@ -964,6 +964,16 @@
       box-sizing:border-box;
     }
 
+
+    /* Hide Risk Matrix editor UI without removing structural containers */
+    .risk-matrix-config,
+    .risk-matrix-editor,
+    .risk-matrix-reset,
+    [id*="riskMatrixConfig"],
+    [id*="riskMatrixConfigurator"]{
+      display:none !important;
+    }
+
 </style>
 </head>
 <body>
@@ -1259,6 +1269,7 @@
 <li><strong>Calculation:</strong> Base Threat Likelihood + scores from applicable exposure questions, capped at 5.</li>
 <li><strong>Example:</strong> If Internet Exposure is High (+0.75) and Remote Access is Medium (+0.50), a mapped threat receives +1.25 in total.</li>
 <li><strong>Question management:</strong> You can rename questions, add new questions, remove questions, and change their relevant-threat mappings.</li>
+            <li><strong>Vulnerability Exposure:</strong> Consider known vulnerabilities, patching status, exploitability, exposure to attack, and whether effective compensating controls are in place.</li>
             <li><strong>Cause / Precursor wording:</strong> This phrase is used in Inherent Risk statements when the exposure is active for a mapped threat. Up to the three highest active exposure drivers are used.</li>
 </ul>
 </div>
@@ -1389,23 +1400,7 @@
 </div>
 <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
 
-<div class="toolbar">
-<div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
-<button class="danger risk-matrix-reset">Reset risk matrix</button>
-</div>
-<div class="risk-matrix-wrap">
-<div class="matrix-axis-title">Severity / Consequence →</div>
-<table class="risk-matrix-config-table">
-<thead>
-<tr>
-<th class="axis-corner">Frequency / Likelihood ↓</th>
-<th>S0</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th>
-</tr>
-</thead>
-<tbody class="riskMatrixConfigBody"></tbody>
-</table>
-</div>
-</div>
+
 </details>
 </section>
 <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
@@ -1904,6 +1899,7 @@ const defaultExposureQuestionDefs = [
   {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", cause:"exposure of sensitive or privileged information", threats:["T02","T03","T04","T10","T12"]},
   {id:"removableMedia", label:"What is the level of exposure from removable media?", cause:"use of removable media", threats:["T01","T07","T13"]},
   {id:"legacyTech", label:"What is the level of exposure from legacy or unsupported technology?", cause:"legacy or unsupported technology", threats:["T01","T05","T07","T08","T14"]},
+  {id:"vulnerabilityExposure", label:"What is the level of exposure associated with known vulnerabilities?", cause:"known or exploitable vulnerabilities within the asset", threats:["T02","T03","T05","T07","T08","T11","T14"]},
   {id:"bespokeSoftware", label:"What is the level of exposure from bespoke or custom-developed software?", cause:"bespoke or custom-developed software", threats:["T03","T07","T08","T14"]},
   {id:"emailWeb", label:"What is the level of exposure from email or web access?", cause:"user access to email and web services", threats:["T06","T07","T12"]},
   {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", cause:"high system and network interconnectivity", threats:["T01","T02","T05","T07","T09","T11","T14"]},
@@ -1912,7 +1908,7 @@ const defaultExposureQuestionDefs = [
 
 function loadExposureQuestionDefs(){
   try{
-    const saved=JSON.parse(localStorage.getItem("bilExposureQuestionDefsV2"));
+    const saved=JSON.parse(localStorage.getItem("bilExposureQuestionDefsV3"));
     if(Array.isArray(saved) && saved.length) return saved;
   }catch(e){}
   return structuredClone(defaultExposureQuestionDefs);
@@ -1920,7 +1916,7 @@ function loadExposureQuestionDefs(){
 let exposureQuestionDefs=loadExposureQuestionDefs();
 
 function saveExposureQuestionDefs(){
-  localStorage.setItem("bilExposureQuestionDefsV2",JSON.stringify(exposureQuestionDefs));
+  localStorage.setItem("bilExposureQuestionDefsV3",JSON.stringify(exposureQuestionDefs));
 }
 
 function questionDef(questionId){
@@ -2931,86 +2927,8 @@ function riskBadgeHtml(likelihood, impact){
 }
 
 function renderRiskMatrixConfigurators(){
-  document.querySelectorAll(".riskMatrixConfigBody").forEach(body=>{
-    body.innerHTML="";
-
-    [5,4,3,2,1].forEach(likelihood=>{
-      const tr=document.createElement("tr");
-
-      const rowLabel=document.createElement("th");
-      rowLabel.className="risk-row-label";
-      rowLabel.textContent=`F${likelihood} – ${LIKELIHOOD_LABELS[likelihood]}`;
-      tr.appendChild(rowLabel);
-
-      [0,1,2,3,4,5].forEach(impact=>{
-        const td=document.createElement("td");
-        const cell=getRiskMatrixCell(likelihood,impact);
-        const color=riskColorDef(cell.color);
-
-        const editor=document.createElement("div");
-        editor.className="risk-cell-editor";
-        editor.style.background=color.bg;
-        editor.style.color=color.fg;
-
-        const valueInput=document.createElement("input");
-        valueInput.className="risk-cell-value";
-        valueInput.type="number";
-        valueInput.min="0";
-        valueInput.step="1";
-        valueInput.value=cell.value;
-        valueInput.title=`F${likelihood} / S${impact} risk value`;
-
-        const colorSelect=document.createElement("select");
-        colorSelect.className="risk-cell-color";
-        colorSelect.title=`F${likelihood} / S${impact} colour`;
-        RISK_COLOR_OPTIONS.forEach(c=>{
-          const o=document.createElement("option");
-          o.value=c.id;
-          o.textContent=c.label;
-          if(cell.color===c.id) o.selected=true;
-          colorSelect.appendChild(o);
-        });
-
-        function commit(){
-          riskMatrix[String(likelihood)] = riskMatrix[String(likelihood)] || {};
-          riskMatrix[String(likelihood)][String(impact)] = {
-            value:+valueInput.value || 0,
-            color:colorSelect.value
-          };
-          saveRiskMatrix();
-          renderRiskMatrixConfigurators();
-          renderInherentRisk();
-          renderResidualRisk();
-          renderControls();
-          renderControlChecklist();
-          if(typeof renderReport==="function") renderReport();
-        }
-
-        valueInput.addEventListener("change",commit);
-        colorSelect.addEventListener("change",commit);
-
-        editor.appendChild(valueInput);
-        editor.appendChild(colorSelect);
-        td.appendChild(editor);
-        tr.appendChild(td);
-      });
-
-      body.appendChild(tr);
-    });
-  });
-
-  document.querySelectorAll(".risk-matrix-reset").forEach(btn=>{
-    btn.onclick=()=>{
-      riskMatrix=structuredClone(defaultRiskMatrix);
-      saveRiskMatrix();
-      renderRiskMatrixConfigurators();
-      renderInherentRisk();
-      renderResidualRisk();
-      renderControls();
-      renderControlChecklist();
-      if(typeof renderReport==="function") renderReport();
-    };
-  });
+  // Matrix editor UI intentionally hidden.
+  // Risk matrix data remains active for risk calculations.
 }
 
 const ASSESSMENT_FACTORS = {
