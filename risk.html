@@ -974,6 +974,232 @@
       display:none !important;
     }
 
+
+/* IEC 62443-3-3 / SL-T additions */
+.slt-summary{margin:14px 0;padding:15px 18px;border:1px solid #bae6fd;background:#f0f9ff;border-radius:12px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.slt-summary .slt-level{font-size:28px;font-weight:800;color:#075985;min-width:95px}
+.slt-summary .slt-label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#526273;font-weight:700}
+.slt-summary .slt-basis{font-size:12px;color:#526273;line-height:1.45}
+.iec-notes{max-width:380px;white-space:normal;line-height:1.45}.iec-notes details summary{cursor:pointer;color:#075985;font-weight:700}.iec-notes-content{margin-top:7px;max-height:220px;overflow:auto}
+.iec-meta{display:grid;grid-template-columns:150px minmax(260px,1fr) minmax(260px,1fr);gap:10px;margin-bottom:10px}.iec-meta textarea{min-height:88px;width:100%}.iec-slt-checks{display:flex;gap:9px;flex-wrap:wrap}.iec-slt-checks label{white-space:nowrap}
+@media(max-width:900px){.iec-meta{grid-template-columns:1fr}}
+
+
+/* ===== Step 5 - simplified IEC Controls experience ===== */
+.controls-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+.controls-summary-card{
+  border:1px solid #d9e5ec;
+  border-radius:12px;
+  padding:14px 16px;
+  background:#f8fbfd;
+}
+.controls-summary-card .label{
+  font-size:12px;
+  color:#64748b;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.controls-summary-card .value{
+  font-size:24px;
+  font-weight:800;
+  color:#0f3f5f;
+  margin-top:3px;
+}
+.controls-summary-card .hint{
+  font-size:12px;
+  color:#64748b;
+  margin-top:3px;
+}
+.controls-filterbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin:14px 0 12px;
+  padding:12px;
+  border:1px solid #d9e5ec;
+  border-radius:12px;
+  background:#fff;
+}
+.controls-filterbar input,
+.controls-filterbar select{
+  min-height:38px;
+}
+.controls-filterbar .controls-search{
+  flex:1 1 280px;
+}
+.controls-filterbar .controls-filter{
+  flex:0 0 220px;
+}
+.control-card-list{
+  display:grid;
+  gap:12px;
+}
+.control-priority-card{
+  border:1px solid #d8e2e8;
+  border-radius:14px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
+}
+.control-priority-card.is-risk-linked{
+  border-left:5px solid #0b73b8;
+}
+.control-card-main{
+  display:grid;
+  grid-template-columns:52px minmax(260px,1.2fr) minmax(240px,1fr) 150px;
+  gap:16px;
+  align-items:start;
+  padding:16px;
+}
+.control-card-rank{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eaf4fa;
+  color:#075985;
+  font-weight:800;
+}
+.control-card-title{
+  font-size:16px;
+  font-weight:800;
+  color:#0f172a;
+  line-height:1.3;
+}
+.control-card-req{
+  font-size:13px;
+  color:#075985;
+  font-weight:800;
+  margin-bottom:4px;
+}
+.control-card-badges{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.control-mini-badge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:4px 8px;
+  background:#eef5f8;
+  color:#334155;
+  font-size:11px;
+  font-weight:700;
+}
+.control-why{
+  border-left:3px solid #b9d9e9;
+  padding-left:12px;
+}
+.control-why .why-label{
+  font-size:11px;
+  font-weight:800;
+  color:#64748b;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:5px;
+}
+.control-why .why-threat{
+  font-size:13px;
+  font-weight:700;
+  color:#1e293b;
+}
+.control-why .why-cause{
+  font-size:12px;
+  color:#475569;
+  margin-top:5px;
+  line-height:1.45;
+}
+.control-priority-score{
+  text-align:right;
+}
+.control-priority-score .score-label{
+  font-size:11px;
+  color:#64748b;
+  font-weight:700;
+  text-transform:uppercase;
+}
+.control-priority-score .score-value{
+  font-size:24px;
+  font-weight:800;
+  color:#0f3f5f;
+}
+.control-priority-score .score-sub{
+  font-size:11px;
+  color:#64748b;
+  margin-top:2px;
+}
+.control-card-details{
+  border-top:1px solid #e7eef2;
+  padding:0 16px 12px;
+}
+.control-card-details details{
+  border:0;
+  border-top:1px solid #edf2f5;
+  border-radius:0;
+  background:transparent;
+  padding:0;
+}
+.control-card-details details:first-child{
+  border-top:0;
+}
+.control-card-details summary{
+  padding:10px 0;
+  font-size:13px;
+  font-weight:700;
+  color:#075985;
+  cursor:pointer;
+}
+.control-detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px 20px;
+  padding:2px 0 12px;
+}
+.control-detail-item .k{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#64748b;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+.control-detail-item .v{
+  font-size:13px;
+  color:#334155;
+}
+.control-note-text{
+  font-size:13px;
+  line-height:1.55;
+  color:#334155;
+  white-space:normal;
+  padding-bottom:12px;
+}
+.controls-empty{
+  padding:30px;
+  text-align:center;
+  color:#64748b;
+  border:1px dashed #cbd5e1;
+  border-radius:12px;
+  background:#f8fafc;
+}
+@media(max-width:950px){
+  .controls-summary-grid{grid-template-columns:1fr;}
+  .control-card-main{grid-template-columns:44px 1fr;}
+  .control-why,.control-priority-score{grid-column:2;}
+  .control-priority-score{text-align:left;}
+}
+
 </style>
 </head>
 <body>
@@ -1316,7 +1542,7 @@ The assessor can manually include or exclude any threat, and manual choices over
 <section class="card step-screen" id="step-inherent" style="margin-top:20px">
 <div class="toolbar">
 <div>
-<h2 style="margin:0">4. Inherent Risk</h2>
+<h2 style="margin:0">4. Inherent Risk &amp; Target Security Level</h2>
 <div class="sub" style="margin:4px 0 0">
           Suggested inherent likelihood is derived from the Asset Exposure assessment. The assessor can override the suggested value where justified.
         </div>
@@ -1374,7 +1600,7 @@ The assessor can manually include or exclude any threat, and manual choices over
           </p>
 
           <p>
-            <strong>Important:</strong> Controls are not used when calculating Inherent Risk. Their effect is assessed
+            <strong>Target Security Level:</strong> After all selected threats are assessed, the highest Inherent Risk is mapped to the Resulting SL-T. By default, Green/Blue = SL-T 1, Yellow = SL-T 2, Orange = SL-T 3 and Red = SL-T 4. The mapping can be configured below.<br><br><strong>Important:</strong> Controls are not used when calculating Inherent Risk. Their effect is assessed
             later and is reflected in Residual Risk.
           </p>
         </div>
@@ -1382,6 +1608,10 @@ The assessor can manually include or exclude any threat, and manual choices over
 
 </div>
 <span class="pill" id="riskCount">0 threats assessed</span>
+</div>
+<div class="slt-summary" id="sltSummary">
+  <div><div class="slt-label">Resulting Target Security Level</div><div class="slt-level" id="sltValue">Pending</div></div>
+  <div><div class="slt-label">Determined by highest Inherent Risk</div><div class="slt-basis" id="sltBasis">Select threats and assess Inherent Risk to determine SL-T.</div></div>
 </div>
 <div style="overflow:auto;max-height:760px">
 <table>
@@ -1399,6 +1629,13 @@ The assessor can manually include or exclude any threat, and manual choices over
 <tbody id="riskResults"></tbody>
 </table>
 </div>
+<details class="step-config" id="config-slt-mapping">
+<summary>⚙ Inherent Risk to SL-T Mapping Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">The highest Inherent Risk determines the Resulting SL-T using this organisational mapping. This mapping is configurable and does not alter the IEC 62443-3-3 requirement applicability imported from the control library.</p>
+<div id="sltMappingConfigurator" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px"></div>
+<div style="margin-top:10px"><button class="danger" id="resetSltMapBtn">Reset SL-T mapping</button></div>
+</div></details>
 <div class="screen-actions"><button class="secondary screen-nav" data-step-index="2">← Previous</button><button class="primary screen-nav" data-step-index="4">Next →</button></div>
 
 
@@ -1406,57 +1643,70 @@ The assessor can manually include or exclude any threat, and manual choices over
 </section>
 <section class="card step-screen" id="step-prioritised" style="margin-top:20px">
 <div class="toolbar">
-<div>
-<h2 style="margin:0">5. Prioritised Controls</h2>
-<div class="sub" style="margin:4px 0 0">
-          Only selected threats are considered. Controls are prioritised using <strong>Inherent Risk × Threat Effectiveness</strong>, with a bounded boost when the control directly addresses an active <strong>Cause / Precursor</strong> from the asset exposure assessment.
-        </div>
+  <div>
+    <h2 style="margin:0">5. IEC 62443-3-3 Controls</h2>
+    <div class="sub" style="margin:4px 0 0">
+      Review the IEC 62443-3-3 requirements applicable to the <strong>Resulting SL-T</strong>.
+      Requirements linked to the selected risks are shown first, with a simple explanation of <strong>why</strong> they are prioritised.
+    </div>
+  </div>
+  <span class="pill" id="controlCount">SL-T pending</span>
 </div>
-<span class="pill" id="controlCount">0 controls</span>
+
+<div class="controls-summary-grid">
+  <div class="controls-summary-card">
+    <div class="label">Resulting SL-T</div>
+    <div class="value" id="controlsSummarySlt">—</div>
+    <div class="hint">Derived from Step 4 Inherent Risk</div>
+  </div>
+  <div class="controls-summary-card">
+    <div class="label">Applicable IEC Requirements</div>
+    <div class="value" id="controlsSummaryApplicable">0</div>
+    <div class="hint">Filtered by the resulting SL-T</div>
+  </div>
+  <div class="controls-summary-card">
+    <div class="label">Risk-Prioritised</div>
+    <div class="value" id="controlsSummaryPrioritised">0</div>
+    <div class="hint">Mapped to selected threats</div>
+  </div>
 </div>
+
+<div class="controls-filterbar">
+  <input id="controlSearch" class="controls-search" type="search" placeholder="Search requirement or title…">
+  <select id="controlViewFilter" class="controls-filter" aria-label="Filter controls">
+    <option value="prioritised">Risk-prioritised first</option>
+    <option value="all">All SL-T requirements</option>
+    <option value="unlinked">SL-T requirements not linked to selected risks</option>
+  </select>
+</div>
+
+<div id="controlResults" class="control-card-list"></div>
+
 <details class="section-help">
-<summary>How Control Priority is derived</summary>
-<div class="section-help-body">
-<p><strong>Base Control Priority = Inherent Risk Score × Threat Effectiveness.</strong></p>
-<p>If the control directly addresses one or more active <strong>Cause / Precursor</strong> conditions for that threat, a bounded context boost is applied:</p>
-<div class="formula-box"><strong>Final Control Priority = Base Control Priority × (1 + Precursor Boost)</strong></div>
-<p>The Precursor Boost is 10% per 1.00 of matched active exposure, capped at 25%. Exposure already contributes to likelihood and Inherent Risk, so this bounded boost is used only to improve control prioritisation and does not change the risk score.</p>
-</div>
+  <summary>How control priority is determined</summary>
+  <div class="section-help-body">
+    <p><strong>First:</strong> the Resulting SL-T determines which IEC 62443-3-3 requirements are applicable.</p>
+    <p><strong>Then:</strong> requirements mapped to selected threats are prioritised using Inherent Risk × Threat Effectiveness, with a bounded Cause / Precursor context boost.</p>
+    <p>The detailed calculation is available inside each requirement card. Requirements that are applicable to the SL-T but not mapped to a selected risk remain available under <strong>All SL-T requirements</strong>.</p>
+  </div>
 </details>
-<div style="overflow:auto;max-height:700px">
-<table>
-<thead>
-<tr>
-<th>Priority</th>
-<th>Control</th>
-<th>Control Type</th>
-<th>Risk Driving Priority</th>
-<th>Cause / Precursor Addressed</th>
-<th>Inherent Risk Score</th>
-<th>Effectiveness</th>
-<th>Control Priority Score</th>
-<th>Other Relevant Threats</th>
-</tr>
-</thead>
-<tbody id="controlResults"></tbody>
-</table>
-</div>
-<details class="step-config" id="config-control-library"><summary>⚙ Control Library, Threat &amp; Cause Mapping Configurator</summary>
+
+<details class="step-config" id="config-control-library"><summary>⚙ IEC 62443-3-3 Requirement, Threat &amp; Cause Mapping Configurator</summary>
 <div class="config-wrap">
 <p class="config-note">
-        Configure each control, select one or more control types, map the threats it mitigates, and map the Cause / Precursor conditions it directly addresses. Threat effectiveness remains the core control relationship; active precursor matches provide a transparent prioritisation boost.
+        IEC 62443-3-3 Req, Title, Informative Notes and Applicable SL-T are imported from the uploaded control library. You can still configure Control Type, Threat mappings, Effectiveness and Cause / Precursor mappings.
       </p>
 <details class="config-help">
-<summary>Help: Control Library, Threat &amp; Cause Mapping Configurator</summary>
+<summary>Help: IEC 62443-3-3 Requirement, Threat &amp; Cause Mapping Configurator</summary>
 <div class="config-help-body">
-<ul><li><strong>Purpose:</strong> Defines which threats each control mitigates, its effectiveness against each threat, and which Cause / Precursor conditions the control directly addresses.</li><li><strong>Cause / Precursor match:</strong> Active mapped exposure conditions provide a bounded control-priority boost of up to 25%. This does not change Inherent Risk and avoids treating exposure as a second risk score.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
+<ul><li><strong>Purpose:</strong> Maintains the IEC 62443-3-3 requirement metadata and the existing Threat, Effectiveness, Control Type and Cause / Precursor mappings.</li><li><strong>SL-T filtering:</strong> Only requirements marked applicable to the Resulting SL-T from Step 4 are shown in Prioritised Controls and the Checklist.</li><li><strong>Cause / Precursor match:</strong> Active mapped exposure conditions provide a bounded control-priority boost of up to 25%. This does not change Inherent Risk and avoids treating exposure as a second risk score.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
 </div>
 </details>
 <div class="toolbar">
 <div class="pill">Effectiveness: 1 Low · 2 Moderate · 3 High · 4 Very High</div>
 <div style="display:flex;gap:8px">
-<button class="primary" id="addControlBtn">+ Add Control</button>
-<button class="danger" id="resetControlMapBtn">Reset prototype controls</button>
+<button class="primary" id="addControlBtn">+ Add Requirement</button>
+<button class="danger" id="resetControlMapBtn">Reset IEC requirements</button>
 </div>
 </div>
 <div id="controlConfigurator"></div>
@@ -1478,7 +1728,7 @@ The assessor can manually include or exclude any threat, and manual choices over
 <thead>
 <tr>
 <th>Priority</th>
-<th>Control</th>
+<th>IEC 62443-3-3 Requirement</th>
 <th>Control Type</th>
 <th>Relevant Threats</th>
 <th>Cause / Precursor Addressed</th>
@@ -2459,6 +2709,67 @@ function buildRiskStatement(t){
   return `Risk of <span class="risk-event">${event}</span> by <span class="risk-hazard">${hazard}</span> caused by <span class="risk-cause">${escHtml(cause)}</span>.`;
 }
 
+const DEFAULT_SLT_RISK_MAP={green:1,blue:1,yellow:2,orange:3,red:4};
+
+function loadSltRiskMap(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("bilSltRiskBandMapV1"));
+    if(saved && typeof saved==="object") return {...DEFAULT_SLT_RISK_MAP,...saved};
+  }catch(e){}
+  return structuredClone(DEFAULT_SLT_RISK_MAP);
+}
+let sltRiskMap=loadSltRiskMap();
+function saveSltRiskMap(){ localStorage.setItem("bilSltRiskBandMapV1",JSON.stringify(sltRiskMap)); }
+
+function calculateSLTResult(){
+  const risks=currentApplicableRiskThreats().map(t=>{
+    const cell=getRiskMatrixCell(t.assessed,t.impact);
+    return {...t,riskScore:+cell.value,riskColor:String(cell.color||"yellow").toLowerCase()};
+  }).sort((a,b)=>b.riskScore-a.riskScore || b.impact-a.impact || b.assessed-a.assessed || a.id.localeCompare(b.id));
+  if(!risks.length) return {slt:null,highest:null};
+  const highest=risks[0];
+  const slt=Math.max(1,Math.min(4,+sltRiskMap[highest.riskColor]||1));
+  return {slt,highest};
+}
+
+function applicableSltText(levels){
+  const vals=(Array.isArray(levels)?levels:[]).map(Number).filter(n=>n>=1&&n<=4).sort((a,b)=>a-b);
+  return vals.length ? vals.map(n=>`SL-T ${n}`).join(" / ") : "Not configured";
+}
+
+function isControlApplicableToSLT(control,slt=calculateSLTResult().slt){
+  return slt!==null && Array.isArray(control.applicableSLT) && control.applicableSLT.map(Number).includes(+slt);
+}
+
+function updateSLTSummary(){
+  const result=calculateSLTResult();
+  const value=document.getElementById("sltValue");
+  const basis=document.getElementById("sltBasis");
+  if(!value||!basis) return;
+  if(!result.slt){
+    value.textContent="Pending";
+    basis.textContent="Select threats and assess Inherent Risk to determine SL-T.";
+    return;
+  }
+  value.textContent=`SL-T ${result.slt}`;
+  const h=result.highest;
+  basis.textContent=`Driven by ${h.id} – ${h.name}: Inherent Risk ${h.riskScore} (${h.riskColor}).`;
+}
+
+function renderSltMappingConfigurator(){
+  const host=document.getElementById("sltMappingConfigurator");
+  if(!host) return;
+  host.innerHTML="";
+  [["green","Green"],["blue","Blue"],["yellow","Yellow"],["orange","Orange"],["red","Red"]].forEach(([key,label])=>{
+    const wrap=document.createElement("label");
+    wrap.innerHTML=`<strong>${label}</strong><select data-slt-color="${key}" style="margin-top:5px">${[1,2,3,4].map(n=>`<option value="${n}" ${+sltRiskMap[key]===n?"selected":""}>SL-T ${n}</option>`).join("")}</select>`;
+    wrap.querySelector("select").addEventListener("change",e=>{
+      sltRiskMap[key]=+e.target.value; saveSltRiskMap(); updateSLTSummary(); renderControls(); renderControlChecklist(); renderResidualRisk(); if(typeof renderReport==="function") renderReport();
+    });
+    host.appendChild(wrap);
+  });
+}
+
 function renderInherentRisk(){
   const applicable = currentRankedThreats().map(t=>{
     const suggested = suggestedLikelihood(t.id);
@@ -2477,200 +2788,76 @@ function renderInherentRisk(){
     tbody.innerHTML = '<tr><td colspan="7" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
   }else{
     applicable.forEach((t,idx)=>{
-      tr=document.createElement("tr");
+      const tr=document.createElement("tr");
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
-        <td>
-          <div class="risk-statement">${buildRiskStatement(t)}</div>
-        </td>
+        <td><div class="risk-statement">${buildRiskStatement(t)}</div></td>
         <td><span class="score">${t.impact}</span> – ${BIL_LABELS[t.impact]}</td>
         <td><span class="score">${t.suggested}</span> – ${LIKELIHOOD_LABELS[t.suggested]}</td>
         <td>
           <select class="assessed-likelihood" data-threat-id="${t.id}">
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
           </select>
-          ${likelihoodOverrides[t.id]
-            ? '<br><span class="muted-small">Assessor override</span>'
-            : '<br><span class="muted-small">Based on suggested likelihood</span>'}
+          ${likelihoodOverrides[t.id]?'<br><span class="muted-small">Assessor override</span>':'<br><span class="muted-small">Based on suggested likelihood</span>'}
         </td>
-        <td>
-          ${riskBadgeHtml(t.assessed,t.impact)}
-        </td>
-        <td class="notes-cell">
-          <input class="notes-input inherent-note" data-note-for="${t.id}"
-                 type="text" placeholder="Add notes…"
-                 value="${(inherentRiskNotes[t.id]||"").replaceAll('"','&quot;')}">
-        </td>`;
+        <td>${riskBadgeHtml(t.assessed,t.impact)}</td>
+        <td class="notes-cell"><input class="notes-input inherent-note" data-note-for="${t.id}" type="text" placeholder="Add notes…" value="${(inherentRiskNotes[t.id]||"").replaceAll('"','&quot;')}"></td>`;
       tbody.appendChild(tr);
     });
   }
 
   tbody.querySelectorAll(".assessed-likelihood").forEach(sel=>{
     sel.addEventListener("change",()=>{
-      const threatId=sel.dataset.threatId;
-      const suggested=suggestedLikelihood(threatId);
-      const value=+sel.value;
-
-      if(value===suggested){
-        delete likelihoodOverrides[threatId];
-      }else{
-        likelihoodOverrides[threatId]={ value };
-      }
-      saveLikelihoodOverrides();
-      renderInherentRisk();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
+      const threatId=sel.dataset.threatId; const suggested=suggestedLikelihood(threatId); const value=+sel.value;
+      if(value===suggested) delete likelihoodOverrides[threatId]; else likelihoodOverrides[threatId]={value};
+      saveLikelihoodOverrides(); renderInherentRisk(); renderControls(); renderControlChecklist(); renderResidualRisk(); if(typeof renderReport==="function") renderReport();
     });
   });
-
-  tbody.querySelectorAll(".inherent-note").forEach(input=>{
-    input.addEventListener("change",()=>{
-      inherentRiskNotes[input.dataset.noteFor] = input.value.trim();
-      saveInherentRiskNotes();
-    });
-  });
-
-  const count = document.getElementById("riskCount");
-  if(count) count.textContent = `${applicable.length} threat${applicable.length===1?"":"s"} assessed`;
+  tbody.querySelectorAll(".inherent-note").forEach(input=>input.addEventListener("change",()=>{ inherentRiskNotes[input.dataset.noteFor]=input.value.trim(); saveInherentRiskNotes(); }));
+  const count=document.getElementById("riskCount"); if(count) count.textContent=`${applicable.length} threat${applicable.length===1?"":"s"} assessed`;
+  updateSLTSummary();
 }
 
 const CONTROL_TYPES = ["Preventive","Detective","Corrective","Recovery"];
 
-const defaultPrototypeControls = [
-  {id:"PC-01", name:"Multi-Factor Authentication", types:["Preventive"]},
-  {id:"PC-02", name:"Privileged Access Management", types:["Preventive"]},
-  {id:"PC-03", name:"Secure Configuration Management", types:["Preventive"]},
-  {id:"PC-04", name:"Vulnerability and Patch Management", types:["Preventive"]},
-  {id:"PC-05", name:"Endpoint Malware Protection", types:["Preventive","Detective"]},
-  {id:"PC-06", name:"Application Control", types:["Preventive"]},
-  {id:"PC-07", name:"Network Segmentation", types:["Preventive"]},
-  {id:"PC-08", name:"Security Logging and Monitoring", types:["Detective"]},
-  {id:"PC-09", name:"Data Encryption", types:["Preventive"]},
-  {id:"PC-10", name:"Backup and Recovery", types:["Recovery"]},
-  {id:"PC-11", name:"Email and Web Protection", types:["Preventive","Detective"]},
-  {id:"PC-12", name:"Security Awareness Training", types:["Preventive"]},
-  {id:"PC-13", name:"Supplier Security Management", types:["Preventive"]},
-  {id:"PC-14", name:"Incident Response Capability", types:["Corrective","Recovery"]},
-  {id:"PC-15", name:"Access Control Review", types:["Preventive"]},
-  {id:"PC-16", name:"Network Resilience and Capacity Protection", types:["Preventive","Recovery"]},
-  {id:"PC-17", name:"Secure Remote Access", types:["Preventive","Detective"]},
-  {id:"PC-18", name:"Third-Party Access Management", types:["Preventive"]},
-  {id:"PC-19", name:"Removable Media Control", types:["Preventive"]},
-  {id:"PC-20", name:"Legacy Technology Hardening", types:["Preventive","Detective"]}
-];
+const defaultPrototypeControls = [{"id":"IEC-001","req":"SR 1.1","name":"Human User Identification and Authentication","informativeNotes":"The system should enable identification and authentication for all human users across all user-access interfaces, ensuring segregation of duty and least privilege.\n\nNotes: This includes application interfaces and remote desktop interfaces.\n\nIt is acceptable to implement this requirement in combination with other external authentication solutions including physical security measures in railways.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-002","req":"SR 1.1 RE(1)","name":"Unique Identification & Authentication","informativeNotes":"The system should provide the capability to uniquely identify and authenticate all human users.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-003","req":"SR 1.1 RE(2)","name":"Multifactor auth for untrusted networks","informativeNotes":"The control system should provide the capability to employ multifactor authentication for human user access to the control system via an untrusted network.\n\nNotes: The feasible multifactor authentication solutions outside the IT system in railways are generally external and could comprise a badge or a physical recognition of presence for the human user e.g. by a phone call. This could equally apply to regularly planned maintenance activities.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-004","req":"SR 1.1 RE(3)","name":"Multifactor auth for All networks","informativeNotes":"The control system shall provide the capability to employ multifactor authentications for all human user access to the control system.\n\nNotes: The feasible multifactor authentication solutions outside the IT system in railways are generally external and could comprise a badge or a physical recognition of presence for the human user e.g. by a phone call. This could equally apply to regularly planned maintenance activities.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-005","req":"SR 1.2","name":"Software process and device identification and authentication","informativeNotes":"The control system must identify and authenticate all software processes and devices, enforcing this across all access interfaces to uphold least privilege.\n\nNotes: All software services shall be identified and authenticated prior to their execution. Identification of internal software processes/services and devices are not a common practice in railway applications or railway systems.\n\nWhitelist application management supports integrity of the running processes as a workaround for this requirement. This capability should be incorporated by the operating system.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-006","req":"SR 1.2 RE(1)","name":"Unique identification and authentication of software processes and devices","informativeNotes":"The control system shall provide the capability to uniquely identify and authenticate all software processes and devices.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-007","req":"SR 1.3","name":"Account Management","informativeNotes":"The control system shall provide the capability to support the management of all accounts by authorized users, including adding, activating, modifying, disabling and removing accounts.\n\nNotes: Railways have mostly a distributed system supported by simple passwords. The full account management requires a major change in the existing control/command and IT infrastructure. The issue of maintenance and multiple commercial contractors complicates the issue.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-008","req":"SR 1.3 RE(1)","name":"Unified Account Management","informativeNotes":"The control system shall provide the capability to support unified account management.\n\nNotes: The operators should install a unique account and user administration system in combination with physical security in fulfilment of this requirement. The decision for the appropriate solution is left to the operators ideally in a standardized manner across the railway industry.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-009","req":"SR 1.4","name":"Identifier management","informativeNotes":"The control system shall provide the capability to support the management of identifiers by user, group, role or control system interface. \n\nNotes: An Identifier is a construct (username, tag) which is associated closely to a user or subscriber.\n\nAuthentication is a procedure based on a secret given by an identified user or subscriber which enable the verification of it, maybe uniquely.\n\nFull account management can often only support with an external solution in a form of compensating countermeasures Example of a compensating countermeasure for rolling stock:\n\nDrivers can have free access to cab control systems, without need of further identification, once they have entered into the cabin (with a key) and have inserted their driver licence card. On the contrary, they have to identify themselves on their wireless tablet, even if they are inside the cab, because wireless devices can work outside the restricted area, making the countermeasure useless.\n\nNote: Local emergency actions for the control system should not be hampered by identification requirements.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-010","req":"SR 1.5","name":"Authenticator management","informativeNotes":"The control system shall provide the capability to:\n·        initialize authenticator content;\n·        change all default authenticators upon control system installation;\n·        change/refresh all authenticators; and\n·        protect all authenticators from unauthorized disclosure and modification when stored and transmitted. In case a unique authentication management system for the railway system is not feasible, an external solution based on compensating countermeasures should be considered.\nNotes: Example of a compensating countermeasure for rolling stock - A possible solution is to demand the authentication responsibility to the system in charge for identification. E.g. the driver’s card reader not only identifies the driver, but also performs the authentication of the card and do this service for all the subsystems connected to it, which are not able to authenticate the driver but trust the card reader.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-011","req":"SR 1.5 RE(1)","name":"Hardware security for software process identity credentials","informativeNotes":"For software process and device users, the control system shall provide the capability to protect the relevant authenticators via hardware mechanisms.\n\nNotes: Credentials used as a base of trust shall be storage with Hardware Secure Mechanism. If this for meaningful reasons is not possible the chain of trust should be supported by logically Secure Mechanism plus a compensating countermeasure (e.g. monitoring).","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-012","req":"SR 1.6","name":"Wireless access management","informativeNotes":"The control system shall provide the capability to identify and authenticate all users (humans, software processes or devices) engaged in wireless communication.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-013","req":"SR 1.6 RE(1) -","name":"Wireless Unique identification and authentication","informativeNotes":"The control system shall provide the capability to uniquely identify and authenticate all users (humans, software processes or devices) engaged in wireless communication.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-014","req":"SR 1.7","name":"Strength of password-based authentication","informativeNotes":"For control systems utilizing password-based authentication, the control system shall provide the capability to enforce configurable password strength based on minimum length and variety of character types.\n\nNotes: This will be a big challenge especially for the maintainers. They are used to very simple passwords today and to non-personal (role specific) login. But SR 1.7 is a must because most components cannot be protected against brute force login attempts.\n\nIn case this requirement cannot be fulfilled the integrity of authentication information should be supported by external means and compensating countermeasures (e.g. use of personal card readers to control access to restricted areas and functions)","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-015","req":"SR 1.7 RE(1)","name":"Password generation and lifetime restrictions for human users","informativeNotes":"The control system shall prevent user account from reusing a password for a configurable number of generations. Control system shall provide the capability to enforce password minimum and maximum lifetime restrictions for human users.\n\nNotes: Lifetime restriction for human users is not currently consistently implemented in railways. To support this, an external solution with additional system capability can be used e.g. for authentication control as a compensating countermeasure.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-016","req":"SR 1.7 RE(2)","name":"Password lifetime restrictions for all users","informativeNotes":"The control system shall provide the capability to enforce password minimum and maximum lifetime restrictions for all users. \n\nNotes: In addition, the railway application should enforce password minimum and maximum lifetime restrictions for human user.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Integrity"},{"id":"IEC-017","req":"SR 1.8","name":"Public Key Infrastructure (PKI) Certificate","informativeNotes":"Where PKI is utilized, the control system shall provide the capability to operate a PKI according to commonly accepted best practices or obtain public key certificates from an existing PKI.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Confidentiality"},{"id":"IEC-018","req":"SR 1.9","name":"Strength of public key authentication","informativeNotes":"For control systems utilizing public key authentication, the control system shall provide the capability to:\n·       validate certificates by checking the validity of the signature of a given certificate.\n·        validate certificates by constructing a certification path to an accepted CA or in the case of self-signed certificates by deploying leaf certificates to all hosts which communicate with the subject to which the certificate is issued.\n·        validate certificates by checking a given certificate’s revocation status.\n·        establish user (human, software process or device) control of the corresponding private key; and\n·        map the authenticated identity to a user (human, software process or device).\n\nNotes: In case the given requirements for validation of certificates cannot be supported in railway system, an external solution (e.g. an offline copy of the CA that is updated every 24 h) as compensating countermeasure should be established.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Confidentiality"},{"id":"IEC-019","req":"SR 1.9 RE(1)","name":"Hardware security for public key authentication","informativeNotes":"The control system shall provide the capability to protect the relevant private keys via hardware mechanisms according to commonly accepted security industry practices and recommendations.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Confidentiality"},{"id":"IEC-020","req":"SR1.10","name":"Authenticator feedback","informativeNotes":"The control system shall provide the capability to obscure feedback of authentication information during the authentication process.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-021","req":"SR 1.11","name":"Unsuccessful login attempts","informativeNotes":"The control system shall provide the capability to enforce a limit of a configurable number of consecutive invalid access attempts by any user (human, software process or device) during a configurable time period. The control system shall provide the capability to deny access for a specified period of time or until unlocked by an administrator when this limit has been exceeded.\n\nNotes: For system accounts on behalf of which critical services or servers are run, the control system shall provide the capability to disallow interactive logons.\n\nFor mission or safety critical systems that deliver essential railway functions, limitation on login attempts may result in system or function unavailability and adversely affect safety.\n\nImplementation of this requirement should be fully cognisant of safety and operational availability implications. For example, a freezing of a system (e.g. safe stop in an ETCS Level 2 system) can lead to an unsafe situation.\n\nThus, the required system reaction shall be defined with respect to safety and availability.","applicableSLT":[1,2,3,4],"types":["Preventive","Detective"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-022","req":"SR 1.12","name":"System use notification","informativeNotes":"The control system shall provide the capability to display a system use notification message before authenticating. The system use notification message shall be configurable by authorized personnel.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-023","req":"SR 1.13","name":"Access via untrusted networks","informativeNotes":"The control system shall provide the capability to monitor and control all methods of access to the control system via untrusted networks.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Baseline"},{"id":"IEC-024","req":"SR 1.13 RE(1)","name":"Explicit access request approval","informativeNotes":"The control system shall provide the capability to deny access requests via untrusted networks unless approved by an assigned role.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 1 - Identification and Authentication Control (IAC)","securityDriver":"Confidentiality"},{"id":"IEC-025","req":"SR 2.1 -","name":"Authorization enforcement","informativeNotes":"On all interfaces, the control system shall provide the capability to enforce authorizations assigned to all human users for controlling use of the control system to support segregation of duties and least privilege.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Baseline"},{"id":"IEC-026","req":"SR 2.1 RE(1)","name":"Authorization enforcement for all users","informativeNotes":"On all interfaces, the control system shall provide the capability to enforce authorizations assigned to all users (humans, software processes and devices) for controlling use of the control system to support segregation of duties and least privilege.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-027","req":"SR 2.1 RE(2)","name":"Permission mapping to roles","informativeNotes":"The control system shall provide the capability for an authorized user or role to define and modify the mapping of permissions to roles for all human users.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-028","req":"SR 2.1 RE(3)","name":"Supervisor override","informativeNotes":"The control system shall support supervisor manual override of the current human user authorizations for a configurable time or event sequence.\n\nNotes: Railway operators do not generally have a supervisor to oversee the integrity of their actions and decisions. There is always one person fully responsible for a task (e.g. cab driver for his train running).\n\nSupervisor override is common in railways in order to manually accept special situations. These are documented in a juridical way.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-029","req":"SR 2.1 RE(4)","name":"Dual approval","informativeNotes":"The control system shall support dual approval where an action can result in serious impact on the industrial process.\n\nNotes: This may conflict with time critical activities/functions. In case of such conflicts, this requirement should be implemented with alternative approaches to establish the chain of trust efficiently.\n\nFor example, changing a set point in the TCMS that can affect the computation of the speed of the train should require a dual approval; bypassing the ETCS control of the speed of the train may require a pre-defined sequence of actions, carefully chosen to minimize the risk of accidental execution, performed by the driver in case of danger.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-030","req":"SR 2.2","name":"Wireless use control","informativeNotes":"The control system shall provide the capability to authorize, monitor and enforce usage restrictions for wireless connectivity to the control system according to commonly accepted security industry practices.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Baseline"},{"id":"IEC-031","req":"SR 2.2 RE(1)","name":"Identify and report unauthorized wireless devices","informativeNotes":"The control system shall provide the capability to identify and report unauthorized wireless devices transmitting within the control system physical environment.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-032","req":"SR 2.3","name":"Use control for portable and mobile devices","informativeNotes":"The control system shall provide the capability to automatically enforce configurable usage restrictions that include:\n·        preventing the use of portable and mobile devices;\n·        requiring context specific authorization; and\n·        restricting code and data transfer to/from portable and mobile devices.\n\nNotes: Portable and mobile devices are already widely used in railway infrastructure. E.g. for diagnostic purposes but also to safety relevant purposes such as shunting / track works. A secure management of mobile access is crucial in the safety critical railway environment.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Baseline"},{"id":"IEC-033","req":"SR 2.3 RE(1)","name":"Enforcement of security status of portable and mobile devices","informativeNotes":"The control system shall provide the capability to verify that portable or mobile devices attempting to connect to a zone comply with the security requirements of that zone.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-034","req":"SR 2.4","name":"Mobile code","informativeNotes":"The control system shall provide the capability to enforce usage restrictions for mobile code technologies based on the potential to cause damage to the control system that include:\n·        preventing the execution of mobile code;\n·        requiring proper authentication and authorization for origin of the code;\n·        restricting mobile code transfer to/from the control system; and","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Baseline"},{"id":"IEC-035","req":"SR 2.4 RE(1)","name":"Mobile code integrity check","informativeNotes":"The control system shall provide the capability to verify integrity of the mobile code before allowing code execution.","applicableSLT":[3,4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-036","req":"SR 2.5","name":"Session lock","informativeNotes":"The control system shall provide the capability to prevent further access by initiating a session lock after a configurable time period of inactivity or by manual initiation. The session lock shall remain in effect until the human user who owns the session or another authorized human user re-establishes access using appropriate identification and authentication procedures.\n\nNotes: In view of the safety critical nature of the railway environment, session locks should be carefully applied so as not to interact adversely with system availability and access to essential functions.\n\nFor example, the user screen could be locked upon user request or after a configured period of inactivity and require re-authentication if an authorized user wants to unlock it.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Baseline"},{"id":"IEC-037","req":"SR 2.6","name":"Remote session termination","informativeNotes":"The control system shall provide the capability to terminate a remote session either automatically after a configurable time period of inactivity or manually by the user who initiated the session.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-038","req":"SR 2.7","name":"Concurrent session control","informativeNotes":"The control system shall provide the capability to limit the number of concurrent sessions per interface for any given user (human, software process or device) to a configurable number of sessions.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-039","req":"SR 2.8","name":"Auditable events","informativeNotes":"The control system must create audit records for security activities, covering categories like access, errors, system operations, configurations, reconnaissance, and audit logs, detailing time, source, category, type, event ID, and result.","applicableSLT":[1,2,3,4],"types":["Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-040","req":"SR 2.8 RE(1)","name":"Centrally managed, system-wide audit trail","informativeNotes":"The control system must centralize audit event management, consolidating records from various components into a unified, time-synchronized trail. It should enable export in standard formats for analysis by tools like SIEM.\n\nNotes: Components and sub-systems that log events locally should ensure the monitoring and logging information are transferred to a centrally managed system. There may be a time delay between the local logging data and the transfer to the central system","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-041","req":"SR 2.9","name":"Audit storage capacity","informativeNotes":"The control system must ensure adequate audit storage as per standard log management guidelines and include mechanisms to prevent exceeding this capacity.","applicableSLT":[1,2,3,4],"types":["Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-042","req":"SR 2.9 RE(1)","name":"Warn when audit record storage capacity threshold reached","informativeNotes":"The control system shall provide the capability to issue a warning when the allocated audit record storage volume reaches a configurable percentage of maximum audit record storage capacity.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-043","req":"SR 2.10","name":"Response to audit processing failures","informativeNotes":"The control system must alert staff and safeguard critical services against audit failures, enabling responses in line with industry practices.","applicableSLT":[1,2,3,4],"types":["Detective","Corrective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-044","req":"SR 2.11","name":"Timestamps","informativeNotes":"The control system shall provide timestamps for use in audit record generation.","applicableSLT":[2,3,4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-045","req":"SR 2.11 RE(1)","name":"Internal time synchronization","informativeNotes":"The control system shall provide the capability to synchronize internal system clocks at a configurable frequency.","applicableSLT":[3,4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-046","req":"SR 2.11 RE(2)","name":"Protection of time source integrity","informativeNotes":"The time source shall be protected from unauthorized alteration and shall cause an audit event upon alteration.","applicableSLT":[4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-047","req":"SR 2.12","name":"Non-repudiation for human users","informativeNotes":"The control system shall provide the capability to determine whether a given human user took a particular action.","applicableSLT":[3,4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-048","req":"SR 2.12 RE(1)","name":"Non-repudiation for all users","informativeNotes":"The control system shall provide the capability to determine whether a given user (human, software process or device) took a particular action.","applicableSLT":[4],"types":["Preventive","Detective"],"fr":"FR 2 - User Control (UC)","securityDriver":"Integrity"},{"id":"IEC-049","req":"SR 3.1","name":"Communication integrity","informativeNotes":"The control system shall provide the capability to protect the integrity of transmitted information.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Baseline"},{"id":"IEC-050","req":"SR 3.1 RE(1)","name":"Cryptographic integrity protection","informativeNotes":"The control system shall provide the capability to employ cryptographic mechanisms to recognize changes to information during communication.\n\nNotes: The cryptographic mechanisms employed should be secure. Rolling stock and restricted network segments with an adequate boundary, intrusion detection and diverse transmission channel (e.g. use of Ethernet and MVB) can use these as compensating countermeasures. Open untrusted networks without compensating countermeasures require this extra protection in railways.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-051","req":"SR 3.2","name":"Malicious code protection","informativeNotes":"The control system shall provide the capability to employ protection mechanisms to prevent, detect, report and mitigate the effects of malicious code or unauthorized software. The control system shall provide the capability to update the protection mechanisms.\n\nNotes: Prevention means mechanisms such as removable media control, and workstation and laptop management policies, used in conjunction with means of detection at railway system entry points (e.g. USB cleaning stations, IDS, etc.) may be preferred as a compensating security measure from detection mechanisms deployed on all railway embedded devices.\n\nNotes: Use of USB ports should be strictly limited. When no other solution is available, USB controller and OS driver hardening should be employed to prevent execution of code from USB devices.","applicableSLT":[1,2,3,4],"types":["Preventive","Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-052","req":"SR 3.2 RE(1)","name":"Malicious code protection on entry and exit points","informativeNotes":"The control system shall provide the capability to employ malicious code protection mechanisms at all entry and exit points.","applicableSLT":[2,3,4],"types":["Preventive","Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-053","req":"SR 3.2 RE(2)","name":"Central management and reporting for malicious code protection","informativeNotes":"The control system shall provide the capability to manage malicious code protection mechanisms.\n\nNotes: Malware and malicious code protection should be centrally managed for integrity and consistency in railways. SIEM protection is largely a dynamic anomaly detection/protection mechanism and may prove inadequate for malicious code protection.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-054","req":"SR 3.3","name":"Security functionality verification","informativeNotes":"The control system shall provide the capability to support verification of the intended operation of security functions and report when anomalies are discovered during FAT, SAT and scheduled maintenance. These security functions shall include all those necessary to support the security requirements specified in this standard.","applicableSLT":[1,2,3,4],"types":["Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Baseline"},{"id":"IEC-055","req":"SR 3.3 RE(1)","name":"Automated mechanisms for security functionality verification","informativeNotes":"The control system shall provide the capability to employ automated mechanisms to support management of security verification during FAT, SAT and scheduled maintenance.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-056","req":"SR 3.3 RE(2)","name":"Security functionality verification during normal operation","informativeNotes":"The control system shall provide the capability to support verification of the intended operation of security functions during normal operations.\n\nNotes: This requirement needs to be carefully implemented to avoid detrimental effects. It may not be suitable for safety systems","applicableSLT":[4],"types":["Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-057","req":"SR 3.4","name":"Software and information integrity","informativeNotes":"The control system shall provide the capability to detect, record, report and protect against unauthorized changes to software and information at rest.","applicableSLT":[2,3,4],"types":["Preventive","Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-058","req":"SR 3.4 RE(1)","name":"Automated notification about integrity violations","informativeNotes":"The control system shall provide the capability to use automated tools that provide notification to a configurable set of recipients upon discovering discrepancies during integrity verification.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-059","req":"SR 3.5","name":"Input validation","informativeNotes":"The control system shall validate the syntax and content of any input which is used as an industrial process control input or input that directly impacts the action of the control system.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Baseline"},{"id":"IEC-060","req":"SR 3.6","name":"Deterministic output","informativeNotes":"The control system shall provide the capability to set outputs to a predetermined state if normal operation cannot be maintained as a result of an attack.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Baseline"},{"id":"IEC-061","req":"SR 3.7","name":"Error handling","informativeNotes":"The control system shall identify and handle error conditions in a manner such that effective remediation can occur. This shall be done in a manner which does not provide information that could be exploited by adversaries to attack the IACS unless revealing this information is necessary for the timely troubleshooting of problems.","applicableSLT":[2,3,4],"types":["Preventive","Corrective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-062","req":"SR 3.8","name":"Session integrity","informativeNotes":"The control system shall provide the capability to protect the integrity of sessions. The control system shall reject any usage of invalid session IDs.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-063","req":"SR 3.8 RE(1)","name":"Invalidation of session IDs after session termination","informativeNotes":"The control system shall provide the capability to invalidate session IDs upon user logout or other session termination (including browser sessions).","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-064","req":"SR 3.8 RE(2)","name":"Unique session ID generation","informativeNotes":"The control system shall provide the capability to generate a unique session ID for each session and treat all unexpected session IDs as invalid.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-065","req":"SR 3.8 RE(3)","name":"Randomness of session Ids","informativeNotes":"The control system shall provide the capability to generate unique session IDs with commonly accepted sources of randomness.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-066","req":"SR 3.9","name":"Protection of audit information","informativeNotes":"The control system shall protect audit information and audit tools (if present) from unauthorized access, modification and deletion.","applicableSLT":[2,3,4],"types":["Preventive","Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Confidentiality"},{"id":"IEC-067","req":"SR 3.9 RE(1)","name":"Audit records on write-once media","informativeNotes":"The control system shall provide the capability to produce audit records on hardware-enforced write-once media.","applicableSLT":[4],"types":["Preventive","Detective"],"fr":"FR 3 - System Integrity (SI)","securityDriver":"Integrity"},{"id":"IEC-068","req":"SR 4.1","name":"Information confidentiality","informativeNotes":"The control system shall provide the capability to protect the confidentiality of information for which explicit read authorization is supported, whether at rest or in transit.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Baseline"},{"id":"IEC-069","req":"SR 4.1 RE(1)","name":"Protection of confidentiality at rest or in transit via untrusted networks","informativeNotes":"The control system shall provide the capability to protect the confidentiality of information at rest and remote access sessions traversing an untrusted network.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Confidentiality"},{"id":"IEC-070","req":"SR 4.1 RE(2)","name":"Protection of confidentiality across zone boundaries","informativeNotes":"The control system shall provide the capability to protect the confidentiality of information traversing any zone boundary.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Confidentiality"},{"id":"IEC-071","req":"SR 4.2","name":"Information persistence","informativeNotes":"The control system shall provide the capability to purge all information for which explicit read authorization is supported from components to be released from active service and/or decommissioned.\n\nNotes: Current railway applications do not implement extensive permission management so implementation of this requirement for information purging in components and systems is challenging. Read authorization should not be the only criteria for data/information criticality that qualifies for purging.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Confidentiality"},{"id":"IEC-072","req":"SR 4.2 RE(1)","name":"Purging of shared memory resources","informativeNotes":"The control system shall provide the capability to prevent unauthorized and unintended information transfer via volatile shared memory resources.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Confidentiality"},{"id":"IEC-073","req":"SR 4.3","name":"Use of cryptography","informativeNotes":"If cryptography is required, the control system shall use cryptographic algorithms, key sizes and mechanisms for key establishment and management according to commonly accepted security industry practices and recommendations.\n\nNotes: The railway application product supplier should document the practices and procedures relating to cryptographic key establishment and management. The railway application should utilize established and tested encryption and hash algorithms, such as the advanced encryption standards.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 4 - Data confidentiality (CI)","securityDriver":"Confidentiality"},{"id":"IEC-074","req":"SR 5.1","name":"Network segmentation","informativeNotes":"The control system shall provide the capability to logically segment control system networks from non-control system networks and to logically segment critical control system networks from other control system networks.\n\nNotes: In response to an incident, it may be necessary to break the connections between different network segments. In that event, the services necessary to support essential operations should be maintained in such a way that the devices can continue to operate properly and/or shutdown in an orderly manner. This may require that some servers may need to be duplicated on the control system network to support normal network features, e.g. dynamic host configuration protocol (DHCP), domain name service (DNS) or local CAs. It may also mean that some critical control systems and safety-related systems be designed from the beginning to be completely isolated from other networks.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-075","req":"SR 5.1 RE(1)","name":"Physical network segmentation","informativeNotes":"The control system shall provide the capability to physically segment control system networks from non-control system networks and to physically segment critical control system networks from non-critical control system networks.\n\nNotes: In case physical segregation is technically not feasible or even an increase in cybersecurity risks, a logical segregation concept is acceptable","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-076","req":"SR 5.1 RE(2)","name":"Independence from non- railway application networks","informativeNotes":"The control system shall have the capability to provide network services to control system networks, critical or otherwise, without a connection to non-control system networks.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-077","req":"SR 5.1 RE(3)","name":"Logical and physical isolation of critical networks","informativeNotes":"The control system shall provide the capability to logically and physically isolate critical control system networks from non-critical control system networks.\n\nNote: The criticality of a railway application is determined by the risk assessment and that should influence the logical and physical isolation. The usage of segmentation methods like different fibres or the usage of cryptographic measures are ways to implement this requirement in railway applications.","applicableSLT":[4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-078","req":"SR 5.2","name":"Zone boundary protection","informativeNotes":"The control system shall provide the capability to monitor and control communications at zone boundaries to enforce the compartmentalization defined in the risk-based zones and conduits model.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Baseline"},{"id":"IEC-079","req":"SR 5.2 RE(1)","name":"Deny by default, allow by exception","informativeNotes":"The control system shall provide the capability to deny network traffic by default and allow network traffic by exception (also termed deny all, permit by exception).","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-080","req":"SR 5.2 RE(2)","name":"Island mode","informativeNotes":"The control system shall provide the capability to prevent any communication through the control system boundary (also termed island mode).","applicableSLT":[3,4],"types":["Preventive","Corrective"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-081","req":"SR 5.2 RE(3)","name":"Fail close","informativeNotes":"The control system shall provide the capability to prevent any communication through the control system boundary when there is an operational failure of the boundary protection mechanisms (also termed fail close). This ‘fail close’ functionality shall be designed such that it does not interfere with the operation of a SIS or other safety-related functions.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-082","req":"SR 5.3","name":"General purpose person- to-person communication restrictions","informativeNotes":"The control system shall provide the capability to prevent general purpose person-to-person messages from being received from users or systems external to the control system.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Baseline"},{"id":"IEC-083","req":"SR 5.3 RE(1)","name":"Prohibit all general-purpose person-to- person communications","informativeNotes":"The control system shall provide the capability to prevent both transmission and receipt of general-purpose person-to-person messages.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Confidentiality"},{"id":"IEC-084","req":"SR 5.4","name":"Application partitioning","informativeNotes":"The control system shall provide the capability to support partitioning of data, applications and services based on criticality to facilitate implementing a zoning model.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 5 - Restricted data flow  (RDF)","securityDriver":"Baseline"},{"id":"IEC-085","req":"SR 6.1","name":"Audit log accessibility","informativeNotes":"The control system shall provide the capability for authorized humans and/or tools to access audit logs on a read-only basis.","applicableSLT":[1,2,3,4],"types":["Detective"],"fr":"FR 6 - Timely response to events (TRE)","securityDriver":"Baseline"},{"id":"IEC-086","req":"SR 6.1 RE(1)","name":"Programmatic access to audit logs","informativeNotes":"The control system shall provide programmatic access to audit records using an application programming interface (API).","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 6 - Timely response to events (TRE)","securityDriver":"Integrity"},{"id":"IEC-087","req":"SR 6.2","name":"Continuous monitoring","informativeNotes":"The control system shall provide the capability to continuously monitor all security mechanism performance using commonly accepted security industry practices and recommendations to detect, characterize and report security breaches in a timely manner.","applicableSLT":[2,3,4],"types":["Detective"],"fr":"FR 6 - Timely response to events (TRE)","securityDriver":"Integrity"},{"id":"IEC-088","req":"SR 7.1 -","name":"Denial of service protection","informativeNotes":"The control system shall provide the capability to operate in a degraded mode during a DoS event.","applicableSLT":[1,2,3,4],"types":["Preventive","Corrective"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-089","req":"SR 7.1 RE(1)","name":"Manage communication loads","informativeNotes":"The control system shall provide the capability to manage communication loads (such as using rate limiting) to mitigate the effects of information flooding types of DoS events.","applicableSLT":[2,3,4],"types":["Preventive"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"},{"id":"IEC-090","req":"SR 7.1 RE(2)","name":"Limit DoS effects to other systems or networks","informativeNotes":"The control system shall provide the capability to restrict the ability of all users (humans, software processes and devices) to cause DoS events which affect other control systems or networks.","applicableSLT":[3,4],"types":["Preventive"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"},{"id":"IEC-091","req":"SR 7.2","name":"Resource management","informativeNotes":"The control system shall provide the capability to limit the use of resources by security functions to prevent resource exhaustion.\nWatchdog based time allocation and scheduling is prevalent in the safety critical railway environment and applications.\nThis is largely applied at monitoring rather than control level.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-092","req":"SR 7.3","name":"Control system backup","informativeNotes":"The identity and location of critical files and the ability to conduct backups of user-level and system-level information (including system state information) shall be supported by the control system without affecting normal plant operations.\n\nNotes: Configuration management based on baselines are employed in most railway products. The identity and location of critical files should be known at application level. Theability to conduct backups specifically the critical information and files should be supported by railway application","applicableSLT":[1,2,3,4],"types":["Recovery"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-093","req":"SR 7.3 RE(1)","name":"Backup verification","informativeNotes":"The control system shall provide the capability to verify the reliability of backup mechanisms.","applicableSLT":[2,3,4],"types":["Detective","Recovery"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"},{"id":"IEC-094","req":"SR 7.3 RE(2)","name":"Backup Automation","informativeNotes":"The control system shall provide the capability to automate the backup function based on a configurable frequency.\n\nAutomate backup based on a configurable frequency","applicableSLT":[3,4],"types":["Recovery"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"},{"id":"IEC-095","req":"SR 7.4","name":"Control system recovery and reconstitution.","informativeNotes":"The control system shall provide the capability to recover and reconstitute to a known secure state after a disruption or failure.\n\nNotes: In view of the safety critical nature, Railways have strict policies on recovery and reconstitution to ensure a safe state in addition to a secure state. A threat risk assessment shall be carried out in order to not breach safety mechanisms for vital data, in case of system recovery from backed up information.","applicableSLT":[1,2,3,4],"types":["Corrective","Recovery"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-096","req":"SR 7.5","name":"Emergency power","informativeNotes":"The control system shall provide the capability to switch to and from an emergency power supply without affecting the existing security state or a documented degraded mode.","applicableSLT":[1,2,3,4],"types":["Recovery"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-097","req":"SR 7.6","name":"Network and security configuration settings","informativeNotes":"The control system shall provide the capability to be configured according to recommended network and security configurations as described in guidelines provided by the control system supplier. The control system shall provide an interface to the currently deployed network and security configuration settings.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-098","req":"SR 7.6 RE(1)","name":"Machine readable reporting of current security settings","informativeNotes":"The control system shall provide the capability to generate a report listing the currently deployed security settings in a machine-readable format.","applicableSLT":[3,4],"types":["Detective"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"},{"id":"IEC-099","req":"SR 7.7","name":"Least functionality","informativeNotes":"The control system shall provide the capability to specifically prohibit and/or restrict the use of unnecessary functions, ports, protocols and/or services.","applicableSLT":[1,2,3,4],"types":["Preventive"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Baseline"},{"id":"IEC-100","req":"SR 7.8","name":"Control system component inventory","informativeNotes":"The control system shall provide the capability to report the current list of installed components and their associated properties.","applicableSLT":[2,3,4],"types":["Detective"],"fr":"FR 7 - Resource Availability (RA)","securityDriver":"Availbility"}];
 
-const defaultControlMappings = [
-  ["T01","PC-03",3],["T01","PC-04",2],["T01","PC-10",4],["T01","PC-14",2],
-  ["T02","PC-01",4],["T02","PC-02",4],["T02","PC-15",3],["T02","PC-08",2],
-  ["T03","PC-02",4],["T03","PC-15",3],["T03","PC-08",3],["T03","PC-03",2],
-  ["T04","PC-09",4],["T04","PC-01",3],["T04","PC-15",3],["T04","PC-08",2],
-  ["T05","PC-16",4],["T05","PC-07",3],["T05","PC-08",2],["T05","PC-14",2],
-  ["T06","PC-12",4],["T06","PC-11",4],["T06","PC-01",3],["T06","PC-08",2],
-  ["T07","PC-06",4],["T07","PC-05",4],["T07","PC-04",3],["T07","PC-07",3],["T07","PC-10",4],["T07","PC-14",3],
-  ["T08","PC-03",3],["T08","PC-04",3],["T08","PC-06",2],["T08","PC-08",2],
-  ["T09","PC-13",4],["T09","PC-08",3],["T09","PC-07",2],["T09","PC-14",3],
-  ["T10","PC-08",4],["T10","PC-02",3],["T10","PC-15",2],
-  ["T11","PC-01",4],["T11","PC-07",3],["T11","PC-15",3],["T11","PC-08",2],
-  ["T12","PC-01",4],["T12","PC-02",3],["T12","PC-15",3],["T12","PC-12",2],
-  ["T13","PC-05",4],["T13","PC-06",4],["T13","PC-12",2],["T13","PC-08",2],
-  ["T14","PC-07",3],["T14","PC-08",3],["T14","PC-03",2],
-  ["T02","PC-17",4],["T06","PC-17",3],["T07","PC-17",4],["T11","PC-17",4],["T12","PC-17",4],
-  ["T02","PC-18",3],["T09","PC-18",4],["T11","PC-18",4],["T12","PC-18",3],
-  ["T01","PC-19",3],["T07","PC-19",3],["T13","PC-19",4],
-  ["T01","PC-20",3],["T05","PC-20",3],["T07","PC-20",4],["T08","PC-20",3],["T14","PC-20",3]
-].map(([threatId,controlId,effectiveness])=>({threatId,controlId,effectiveness}));
+const defaultControlMappings = [{"threatId":"T02","controlId":"IEC-001","effectiveness":4},{"threatId":"T06","controlId":"IEC-001","effectiveness":2},{"threatId":"T11","controlId":"IEC-001","effectiveness":3},{"threatId":"T12","controlId":"IEC-001","effectiveness":4},{"threatId":"T02","controlId":"IEC-002","effectiveness":4},{"threatId":"T06","controlId":"IEC-002","effectiveness":2},{"threatId":"T11","controlId":"IEC-002","effectiveness":3},{"threatId":"T12","controlId":"IEC-002","effectiveness":4},{"threatId":"T02","controlId":"IEC-003","effectiveness":4},{"threatId":"T06","controlId":"IEC-003","effectiveness":2},{"threatId":"T07","controlId":"IEC-003","effectiveness":2},{"threatId":"T11","controlId":"IEC-003","effectiveness":4},{"threatId":"T12","controlId":"IEC-003","effectiveness":4},{"threatId":"T02","controlId":"IEC-004","effectiveness":4},{"threatId":"T06","controlId":"IEC-004","effectiveness":2},{"threatId":"T07","controlId":"IEC-004","effectiveness":2},{"threatId":"T11","controlId":"IEC-004","effectiveness":4},{"threatId":"T12","controlId":"IEC-004","effectiveness":4},{"threatId":"T02","controlId":"IEC-005","effectiveness":3},{"threatId":"T03","controlId":"IEC-005","effectiveness":3},{"threatId":"T09","controlId":"IEC-005","effectiveness":2},{"threatId":"T11","controlId":"IEC-005","effectiveness":2},{"threatId":"T02","controlId":"IEC-006","effectiveness":3},{"threatId":"T03","controlId":"IEC-006","effectiveness":3},{"threatId":"T09","controlId":"IEC-006","effectiveness":2},{"threatId":"T11","controlId":"IEC-006","effectiveness":2},{"threatId":"T02","controlId":"IEC-007","effectiveness":4},{"threatId":"T07","controlId":"IEC-007","effectiveness":2},{"threatId":"T11","controlId":"IEC-007","effectiveness":3},{"threatId":"T12","controlId":"IEC-007","effectiveness":4},{"threatId":"T02","controlId":"IEC-008","effectiveness":4},{"threatId":"T07","controlId":"IEC-008","effectiveness":2},{"threatId":"T11","controlId":"IEC-008","effectiveness":3},{"threatId":"T12","controlId":"IEC-008","effectiveness":4},{"threatId":"T02","controlId":"IEC-009","effectiveness":4},{"threatId":"T07","controlId":"IEC-009","effectiveness":2},{"threatId":"T11","controlId":"IEC-009","effectiveness":3},{"threatId":"T12","controlId":"IEC-009","effectiveness":4},{"threatId":"T02","controlId":"IEC-010","effectiveness":4},{"threatId":"T07","controlId":"IEC-010","effectiveness":2},{"threatId":"T11","controlId":"IEC-010","effectiveness":3},{"threatId":"T12","controlId":"IEC-010","effectiveness":4},{"threatId":"T02","controlId":"IEC-011","effectiveness":3},{"threatId":"T09","controlId":"IEC-011","effectiveness":2},{"threatId":"T12","controlId":"IEC-011","effectiveness":4},{"threatId":"T02","controlId":"IEC-012","effectiveness":3},{"threatId":"T11","controlId":"IEC-012","effectiveness":4},{"threatId":"T14","controlId":"IEC-012","effectiveness":2},{"threatId":"T02","controlId":"IEC-013","effectiveness":3},{"threatId":"T11","controlId":"IEC-013","effectiveness":4},{"threatId":"T14","controlId":"IEC-013","effectiveness":2},{"threatId":"T02","controlId":"IEC-014","effectiveness":3},{"threatId":"T06","controlId":"IEC-014","effectiveness":2},{"threatId":"T07","controlId":"IEC-014","effectiveness":2},{"threatId":"T12","controlId":"IEC-014","effectiveness":4},{"threatId":"T02","controlId":"IEC-015","effectiveness":3},{"threatId":"T06","controlId":"IEC-015","effectiveness":2},{"threatId":"T07","controlId":"IEC-015","effectiveness":2},{"threatId":"T12","controlId":"IEC-015","effectiveness":4},{"threatId":"T02","controlId":"IEC-016","effectiveness":3},{"threatId":"T06","controlId":"IEC-016","effectiveness":2},{"threatId":"T07","controlId":"IEC-016","effectiveness":2},{"threatId":"T12","controlId":"IEC-016","effectiveness":4},{"threatId":"T02","controlId":"IEC-017","effectiveness":3},{"threatId":"T03","controlId":"IEC-017","effectiveness":3},{"threatId":"T04","controlId":"IEC-017","effectiveness":2},{"threatId":"T09","controlId":"IEC-017","effectiveness":3},{"threatId":"T11","controlId":"IEC-017","effectiveness":3},{"threatId":"T02","controlId":"IEC-018","effectiveness":3},{"threatId":"T03","controlId":"IEC-018","effectiveness":3},{"threatId":"T04","controlId":"IEC-018","effectiveness":2},{"threatId":"T09","controlId":"IEC-018","effectiveness":3},{"threatId":"T11","controlId":"IEC-018","effectiveness":3},{"threatId":"T02","controlId":"IEC-019","effectiveness":3},{"threatId":"T03","controlId":"IEC-019","effectiveness":3},{"threatId":"T04","controlId":"IEC-019","effectiveness":2},{"threatId":"T09","controlId":"IEC-019","effectiveness":3},{"threatId":"T11","controlId":"IEC-019","effectiveness":3},{"threatId":"T06","controlId":"IEC-020","effectiveness":1},{"threatId":"T12","controlId":"IEC-020","effectiveness":2},{"threatId":"T02","controlId":"IEC-021","effectiveness":3},{"threatId":"T06","controlId":"IEC-021","effectiveness":1},{"threatId":"T12","controlId":"IEC-021","effectiveness":4},{"threatId":"T02","controlId":"IEC-022","effectiveness":1},{"threatId":"T06","controlId":"IEC-022","effectiveness":1},{"threatId":"T02","controlId":"IEC-023","effectiveness":4},{"threatId":"T07","controlId":"IEC-023","effectiveness":2},{"threatId":"T11","controlId":"IEC-023","effectiveness":4},{"threatId":"T12","controlId":"IEC-023","effectiveness":3},{"threatId":"T02","controlId":"IEC-024","effectiveness":4},{"threatId":"T07","controlId":"IEC-024","effectiveness":2},{"threatId":"T11","controlId":"IEC-024","effectiveness":4},{"threatId":"T12","controlId":"IEC-024","effectiveness":3},{"threatId":"T02","controlId":"IEC-025","effectiveness":4},{"threatId":"T03","controlId":"IEC-025","effectiveness":4},{"threatId":"T04","controlId":"IEC-025","effectiveness":3},{"threatId":"T12","controlId":"IEC-025","effectiveness":2},{"threatId":"T02","controlId":"IEC-026","effectiveness":4},{"threatId":"T03","controlId":"IEC-026","effectiveness":4},{"threatId":"T04","controlId":"IEC-026","effectiveness":3},{"threatId":"T12","controlId":"IEC-026","effectiveness":2},{"threatId":"T02","controlId":"IEC-027","effectiveness":4},{"threatId":"T03","controlId":"IEC-027","effectiveness":4},{"threatId":"T04","controlId":"IEC-027","effectiveness":3},{"threatId":"T12","controlId":"IEC-027","effectiveness":2},{"threatId":"T02","controlId":"IEC-028","effectiveness":2},{"threatId":"T03","controlId":"IEC-028","effectiveness":4},{"threatId":"T10","controlId":"IEC-028","effectiveness":3},{"threatId":"T02","controlId":"IEC-029","effectiveness":2},{"threatId":"T03","controlId":"IEC-029","effectiveness":4},{"threatId":"T10","controlId":"IEC-029","effectiveness":4},{"threatId":"T02","controlId":"IEC-030","effectiveness":3},{"threatId":"T11","controlId":"IEC-030","effectiveness":4},{"threatId":"T02","controlId":"IEC-031","effectiveness":2},{"threatId":"T11","controlId":"IEC-031","effectiveness":4},{"threatId":"T14","controlId":"IEC-031","effectiveness":3},{"threatId":"T02","controlId":"IEC-032","effectiveness":2},{"threatId":"T04","controlId":"IEC-032","effectiveness":2},{"threatId":"T07","controlId":"IEC-032","effectiveness":3},{"threatId":"T13","controlId":"IEC-032","effectiveness":4},{"threatId":"T02","controlId":"IEC-033","effectiveness":2},{"threatId":"T07","controlId":"IEC-033","effectiveness":4},{"threatId":"T13","controlId":"IEC-033","effectiveness":4},{"threatId":"T01","controlId":"IEC-034","effectiveness":3},{"threatId":"T03","controlId":"IEC-034","effectiveness":3},{"threatId":"T07","controlId":"IEC-034","effectiveness":4},{"threatId":"T08","controlId":"IEC-034","effectiveness":2},{"threatId":"T01","controlId":"IEC-035","effectiveness":4},{"threatId":"T03","controlId":"IEC-035","effectiveness":4},{"threatId":"T07","controlId":"IEC-035","effectiveness":4},{"threatId":"T08","controlId":"IEC-035","effectiveness":2},{"threatId":"T02","controlId":"IEC-036","effectiveness":3},{"threatId":"T11","controlId":"IEC-036","effectiveness":2},{"threatId":"T12","controlId":"IEC-036","effectiveness":2},{"threatId":"T02","controlId":"IEC-037","effectiveness":3},{"threatId":"T07","controlId":"IEC-037","effectiveness":2},{"threatId":"T11","controlId":"IEC-037","effectiveness":4},{"threatId":"T02","controlId":"IEC-038","effectiveness":2},{"threatId":"T12","controlId":"IEC-038","effectiveness":2},{"threatId":"T02","controlId":"IEC-039","effectiveness":2},{"threatId":"T03","controlId":"IEC-039","effectiveness":2},{"threatId":"T07","controlId":"IEC-039","effectiveness":2},{"threatId":"T10","controlId":"IEC-039","effectiveness":4},{"threatId":"T11","controlId":"IEC-039","effectiveness":2},{"threatId":"T07","controlId":"IEC-040","effectiveness":3},{"threatId":"T10","controlId":"IEC-040","effectiveness":4},{"threatId":"T11","controlId":"IEC-040","effectiveness":3},{"threatId":"T14","controlId":"IEC-040","effectiveness":3},{"threatId":"T05","controlId":"IEC-041","effectiveness":1},{"threatId":"T07","controlId":"IEC-041","effectiveness":1},{"threatId":"T10","controlId":"IEC-041","effectiveness":2},{"threatId":"T05","controlId":"IEC-042","effectiveness":1},{"threatId":"T10","controlId":"IEC-042","effectiveness":2},{"threatId":"T05","controlId":"IEC-043","effectiveness":2},{"threatId":"T07","controlId":"IEC-043","effectiveness":2},{"threatId":"T10","controlId":"IEC-043","effectiveness":3},{"threatId":"T03","controlId":"IEC-044","effectiveness":2},{"threatId":"T10","controlId":"IEC-044","effectiveness":4},{"threatId":"T03","controlId":"IEC-045","effectiveness":2},{"threatId":"T10","controlId":"IEC-045","effectiveness":4},{"threatId":"T03","controlId":"IEC-046","effectiveness":3},{"threatId":"T09","controlId":"IEC-046","effectiveness":2},{"threatId":"T10","controlId":"IEC-046","effectiveness":4},{"threatId":"T02","controlId":"IEC-047","effectiveness":2},{"threatId":"T03","controlId":"IEC-047","effectiveness":3},{"threatId":"T10","controlId":"IEC-047","effectiveness":4},{"threatId":"T02","controlId":"IEC-048","effectiveness":2},{"threatId":"T03","controlId":"IEC-048","effectiveness":3},{"threatId":"T10","controlId":"IEC-048","effectiveness":4},{"threatId":"T01","controlId":"IEC-049","effectiveness":4},{"threatId":"T03","controlId":"IEC-049","effectiveness":4},{"threatId":"T09","controlId":"IEC-049","effectiveness":3},{"threatId":"T11","controlId":"IEC-049","effectiveness":2},{"threatId":"T01","controlId":"IEC-050","effectiveness":4},{"threatId":"T03","controlId":"IEC-050","effectiveness":4},{"threatId":"T09","controlId":"IEC-050","effectiveness":3},{"threatId":"T11","controlId":"IEC-050","effectiveness":2},{"threatId":"T01","controlId":"IEC-051","effectiveness":3},{"threatId":"T03","controlId":"IEC-051","effectiveness":3},{"threatId":"T07","controlId":"IEC-051","effectiveness":4},{"threatId":"T13","controlId":"IEC-051","effectiveness":4},{"threatId":"T07","controlId":"IEC-052","effectiveness":4},{"threatId":"T09","controlId":"IEC-052","effectiveness":2},{"threatId":"T11","controlId":"IEC-052","effectiveness":3},{"threatId":"T13","controlId":"IEC-052","effectiveness":4},{"threatId":"T07","controlId":"IEC-053","effectiveness":4},{"threatId":"T11","controlId":"IEC-053","effectiveness":2},{"threatId":"T13","controlId":"IEC-053","effectiveness":3},{"threatId":"T01","controlId":"IEC-054","effectiveness":2},{"threatId":"T03","controlId":"IEC-054","effectiveness":3},{"threatId":"T07","controlId":"IEC-054","effectiveness":2},{"threatId":"T08","controlId":"IEC-054","effectiveness":4},{"threatId":"T09","controlId":"IEC-054","effectiveness":2},{"threatId":"T01","controlId":"IEC-055","effectiveness":2},{"threatId":"T03","controlId":"IEC-055","effectiveness":3},{"threatId":"T07","controlId":"IEC-055","effectiveness":2},{"threatId":"T08","controlId":"IEC-055","effectiveness":4},{"threatId":"T09","controlId":"IEC-055","effectiveness":2},{"threatId":"T01","controlId":"IEC-056","effectiveness":2},{"threatId":"T03","controlId":"IEC-056","effectiveness":3},{"threatId":"T07","controlId":"IEC-056","effectiveness":2},{"threatId":"T08","controlId":"IEC-056","effectiveness":4},{"threatId":"T09","controlId":"IEC-056","effectiveness":2},{"threatId":"T01","controlId":"IEC-057","effectiveness":4},{"threatId":"T03","controlId":"IEC-057","effectiveness":4},{"threatId":"T07","controlId":"IEC-057","effectiveness":3},{"threatId":"T08","controlId":"IEC-057","effectiveness":4},{"threatId":"T09","controlId":"IEC-057","effectiveness":3},{"threatId":"T01","controlId":"IEC-058","effectiveness":3},{"threatId":"T03","controlId":"IEC-058","effectiveness":4},{"threatId":"T07","controlId":"IEC-058","effectiveness":2},{"threatId":"T08","controlId":"IEC-058","effectiveness":3},{"threatId":"T01","controlId":"IEC-059","effectiveness":3},{"threatId":"T03","controlId":"IEC-059","effectiveness":4},{"threatId":"T07","controlId":"IEC-059","effectiveness":2},{"threatId":"T08","controlId":"IEC-059","effectiveness":4},{"threatId":"T01","controlId":"IEC-060","effectiveness":3},{"threatId":"T03","controlId":"IEC-060","effectiveness":3},{"threatId":"T08","controlId":"IEC-060","effectiveness":3},{"threatId":"T04","controlId":"IEC-061","effectiveness":2},{"threatId":"T05","controlId":"IEC-061","effectiveness":2},{"threatId":"T08","controlId":"IEC-061","effectiveness":3},{"threatId":"T02","controlId":"IEC-062","effectiveness":3},{"threatId":"T03","controlId":"IEC-062","effectiveness":2},{"threatId":"T11","controlId":"IEC-062","effectiveness":3},{"threatId":"T12","controlId":"IEC-062","effectiveness":2},{"threatId":"T02","controlId":"IEC-063","effectiveness":3},{"threatId":"T03","controlId":"IEC-063","effectiveness":2},{"threatId":"T11","controlId":"IEC-063","effectiveness":3},{"threatId":"T12","controlId":"IEC-063","effectiveness":2},{"threatId":"T02","controlId":"IEC-064","effectiveness":3},{"threatId":"T03","controlId":"IEC-064","effectiveness":2},{"threatId":"T11","controlId":"IEC-064","effectiveness":3},{"threatId":"T12","controlId":"IEC-064","effectiveness":2},{"threatId":"T02","controlId":"IEC-065","effectiveness":3},{"threatId":"T03","controlId":"IEC-065","effectiveness":2},{"threatId":"T11","controlId":"IEC-065","effectiveness":3},{"threatId":"T12","controlId":"IEC-065","effectiveness":2},{"threatId":"T02","controlId":"IEC-066","effectiveness":2},{"threatId":"T03","controlId":"IEC-066","effectiveness":3},{"threatId":"T10","controlId":"IEC-066","effectiveness":4},{"threatId":"T03","controlId":"IEC-067","effectiveness":2},{"threatId":"T10","controlId":"IEC-067","effectiveness":4},{"threatId":"T02","controlId":"IEC-068","effectiveness":3},{"threatId":"T04","controlId":"IEC-068","effectiveness":4},{"threatId":"T11","controlId":"IEC-068","effectiveness":2},{"threatId":"T02","controlId":"IEC-069","effectiveness":3},{"threatId":"T04","controlId":"IEC-069","effectiveness":4},{"threatId":"T11","controlId":"IEC-069","effectiveness":4},{"threatId":"T04","controlId":"IEC-070","effectiveness":4},{"threatId":"T09","controlId":"IEC-070","effectiveness":2},{"threatId":"T11","controlId":"IEC-070","effectiveness":3},{"threatId":"T03","controlId":"IEC-071","effectiveness":2},{"threatId":"T04","controlId":"IEC-071","effectiveness":4},{"threatId":"T03","controlId":"IEC-072","effectiveness":2},{"threatId":"T04","controlId":"IEC-072","effectiveness":4},{"threatId":"T08","controlId":"IEC-072","effectiveness":2},{"threatId":"T03","controlId":"IEC-073","effectiveness":3},{"threatId":"T04","controlId":"IEC-073","effectiveness":4},{"threatId":"T09","controlId":"IEC-073","effectiveness":2},{"threatId":"T11","controlId":"IEC-073","effectiveness":3},{"threatId":"T05","controlId":"IEC-074","effectiveness":3},{"threatId":"T07","controlId":"IEC-074","effectiveness":4},{"threatId":"T09","controlId":"IEC-074","effectiveness":3},{"threatId":"T11","controlId":"IEC-074","effectiveness":4},{"threatId":"T14","controlId":"IEC-074","effectiveness":3},{"threatId":"T05","controlId":"IEC-075","effectiveness":3},{"threatId":"T07","controlId":"IEC-075","effectiveness":4},{"threatId":"T09","controlId":"IEC-075","effectiveness":3},{"threatId":"T11","controlId":"IEC-075","effectiveness":4},{"threatId":"T05","controlId":"IEC-076","effectiveness":2},{"threatId":"T07","controlId":"IEC-076","effectiveness":4},{"threatId":"T09","controlId":"IEC-076","effectiveness":3},{"threatId":"T11","controlId":"IEC-076","effectiveness":4},{"threatId":"T05","controlId":"IEC-077","effectiveness":3},{"threatId":"T07","controlId":"IEC-077","effectiveness":4},{"threatId":"T09","controlId":"IEC-077","effectiveness":3},{"threatId":"T11","controlId":"IEC-077","effectiveness":4},{"threatId":"T05","controlId":"IEC-078","effectiveness":3},{"threatId":"T07","controlId":"IEC-078","effectiveness":4},{"threatId":"T09","controlId":"IEC-078","effectiveness":3},{"threatId":"T11","controlId":"IEC-078","effectiveness":4},{"threatId":"T14","controlId":"IEC-078","effectiveness":4},{"threatId":"T02","controlId":"IEC-079","effectiveness":3},{"threatId":"T07","controlId":"IEC-079","effectiveness":3},{"threatId":"T11","controlId":"IEC-079","effectiveness":4},{"threatId":"T14","controlId":"IEC-079","effectiveness":4},{"threatId":"T05","controlId":"IEC-080","effectiveness":4},{"threatId":"T07","controlId":"IEC-080","effectiveness":3},{"threatId":"T11","controlId":"IEC-080","effectiveness":3},{"threatId":"T05","controlId":"IEC-081","effectiveness":3},{"threatId":"T07","controlId":"IEC-081","effectiveness":2},{"threatId":"T11","controlId":"IEC-081","effectiveness":4},{"threatId":"T06","controlId":"IEC-082","effectiveness":4},{"threatId":"T07","controlId":"IEC-082","effectiveness":4},{"threatId":"T11","controlId":"IEC-082","effectiveness":3},{"threatId":"T06","controlId":"IEC-083","effectiveness":4},{"threatId":"T07","controlId":"IEC-083","effectiveness":4},{"threatId":"T01","controlId":"IEC-084","effectiveness":2},{"threatId":"T03","controlId":"IEC-084","effectiveness":3},{"threatId":"T07","controlId":"IEC-084","effectiveness":3},{"threatId":"T08","controlId":"IEC-084","effectiveness":4},{"threatId":"T02","controlId":"IEC-085","effectiveness":2},{"threatId":"T03","controlId":"IEC-085","effectiveness":2},{"threatId":"T07","controlId":"IEC-085","effectiveness":2},{"threatId":"T10","controlId":"IEC-085","effectiveness":4},{"threatId":"T11","controlId":"IEC-085","effectiveness":2},{"threatId":"T07","controlId":"IEC-086","effectiveness":3},{"threatId":"T10","controlId":"IEC-086","effectiveness":4},{"threatId":"T11","controlId":"IEC-086","effectiveness":3},{"threatId":"T14","controlId":"IEC-086","effectiveness":3},{"threatId":"T02","controlId":"IEC-087","effectiveness":3},{"threatId":"T07","controlId":"IEC-087","effectiveness":4},{"threatId":"T09","controlId":"IEC-087","effectiveness":3},{"threatId":"T11","controlId":"IEC-087","effectiveness":4},{"threatId":"T14","controlId":"IEC-087","effectiveness":4},{"threatId":"T05","controlId":"IEC-088","effectiveness":4},{"threatId":"T07","controlId":"IEC-088","effectiveness":2},{"threatId":"T05","controlId":"IEC-089","effectiveness":4},{"threatId":"T05","controlId":"IEC-090","effectiveness":4},{"threatId":"T11","controlId":"IEC-090","effectiveness":2},{"threatId":"T05","controlId":"IEC-091","effectiveness":4},{"threatId":"T01","controlId":"IEC-092","effectiveness":4},{"threatId":"T03","controlId":"IEC-092","effectiveness":3},{"threatId":"T05","controlId":"IEC-092","effectiveness":2},{"threatId":"T07","controlId":"IEC-092","effectiveness":4},{"threatId":"T01","controlId":"IEC-093","effectiveness":4},{"threatId":"T03","controlId":"IEC-093","effectiveness":3},{"threatId":"T07","controlId":"IEC-093","effectiveness":4},{"threatId":"T01","controlId":"IEC-094","effectiveness":4},{"threatId":"T03","controlId":"IEC-094","effectiveness":3},{"threatId":"T07","controlId":"IEC-094","effectiveness":4},{"threatId":"T01","controlId":"IEC-095","effectiveness":4},{"threatId":"T03","controlId":"IEC-095","effectiveness":4},{"threatId":"T05","controlId":"IEC-095","effectiveness":3},{"threatId":"T07","controlId":"IEC-095","effectiveness":4},{"threatId":"T01","controlId":"IEC-096","effectiveness":1},{"threatId":"T05","controlId":"IEC-096","effectiveness":4},{"threatId":"T02","controlId":"IEC-097","effectiveness":2},{"threatId":"T03","controlId":"IEC-097","effectiveness":3},{"threatId":"T07","controlId":"IEC-097","effectiveness":3},{"threatId":"T11","controlId":"IEC-097","effectiveness":3},{"threatId":"T14","controlId":"IEC-097","effectiveness":4},{"threatId":"T07","controlId":"IEC-098","effectiveness":2},{"threatId":"T09","controlId":"IEC-098","effectiveness":2},{"threatId":"T11","controlId":"IEC-098","effectiveness":2},{"threatId":"T14","controlId":"IEC-098","effectiveness":3},{"threatId":"T05","controlId":"IEC-099","effectiveness":2},{"threatId":"T07","controlId":"IEC-099","effectiveness":3},{"threatId":"T08","controlId":"IEC-099","effectiveness":2},{"threatId":"T11","controlId":"IEC-099","effectiveness":4},{"threatId":"T14","controlId":"IEC-099","effectiveness":4},{"threatId":"T07","controlId":"IEC-100","effectiveness":2},{"threatId":"T09","controlId":"IEC-100","effectiveness":3},{"threatId":"T11","controlId":"IEC-100","effectiveness":2},{"threatId":"T14","controlId":"IEC-100","effectiveness":3}];
 
-// Control-to-Cause/Precursor applicability.
-// IDs correspond to Step 2 Exposure question IDs.
-const defaultControlPrecursorMappings = {
-  "PC-01":["remoteAccess","privilegedAccess","thirdParty"],
-  "PC-02":["privilegedAccess","remoteAccess"],
-  "PC-03":["legacyTech","bespokeSoftware","internetFacing"],
-  "PC-04":["vulnerabilityExposure","legacyTech","internetFacing"],
-  "PC-05":["emailWeb","removableMedia","vulnerabilityExposure"],
-  "PC-06":["bespokeSoftware","removableMedia","legacyTech"],
-  "PC-07":["interconnectivity","thirdParty","internetFacing"],
-  "PC-08":["remoteAccess","privilegedAccess","thirdParty","internetFacing"],
-  "PC-09":["sensitiveData"],
-  "PC-10":[],
-  "PC-11":["emailWeb"],
-  "PC-12":["emailWeb","removableMedia"],
-  "PC-13":["thirdParty"],
-  "PC-14":[],
-  "PC-15":["privilegedAccess","remoteAccess","thirdParty"],
-  "PC-16":["internetFacing","interconnectivity","legacyTech"],
-  "PC-17":["remoteAccess","internetFacing","thirdParty"],
-  "PC-18":["thirdParty","remoteAccess"],
-  "PC-19":["removableMedia"],
-  "PC-20":["legacyTech","vulnerabilityExposure"]
-};
+const defaultControlPrecursorMappings = {"IEC-001":["remoteAccess","privilegedAccess","thirdParty"],"IEC-002":["remoteAccess","privilegedAccess","thirdParty"],"IEC-003":["remoteAccess","internetFacing","thirdParty","privilegedAccess"],"IEC-004":["remoteAccess","internetFacing","thirdParty","privilegedAccess"],"IEC-005":["interconnectivity","thirdParty","bespokeSoftware"],"IEC-006":["interconnectivity","thirdParty","bespokeSoftware"],"IEC-007":["privilegedAccess","remoteAccess","thirdParty"],"IEC-008":["privilegedAccess","remoteAccess","thirdParty"],"IEC-009":["privilegedAccess","remoteAccess","thirdParty"],"IEC-010":["privilegedAccess","remoteAccess","thirdParty"],"IEC-011":["privilegedAccess","thirdParty","bespokeSoftware"],"IEC-012":["interconnectivity","internetFacing","remoteAccess"],"IEC-013":["interconnectivity","internetFacing","remoteAccess"],"IEC-014":["privilegedAccess","remoteAccess","thirdParty"],"IEC-015":["privilegedAccess","remoteAccess","thirdParty"],"IEC-016":["privilegedAccess","remoteAccess","thirdParty"],"IEC-017":["remoteAccess","thirdParty","interconnectivity","internetFacing"],"IEC-018":["remoteAccess","thirdParty","interconnectivity","internetFacing"],"IEC-019":["remoteAccess","thirdParty","interconnectivity","internetFacing"],"IEC-020":["remoteAccess","privilegedAccess"],"IEC-021":["remoteAccess","internetFacing","privilegedAccess"],"IEC-022":["remoteAccess"],"IEC-023":["remoteAccess","internetFacing","thirdParty"],"IEC-024":["remoteAccess","internetFacing","thirdParty"],"IEC-025":["privilegedAccess","remoteAccess","thirdParty"],"IEC-026":["privilegedAccess","remoteAccess","thirdParty"],"IEC-027":["privilegedAccess","remoteAccess","thirdParty"],"IEC-028":["privilegedAccess","remoteAccess","thirdParty"],"IEC-029":["privilegedAccess","remoteAccess","thirdParty"],"IEC-030":["interconnectivity","internetFacing"],"IEC-031":["interconnectivity","internetFacing"],"IEC-032":["removableMedia","thirdParty"],"IEC-033":["removableMedia","thirdParty"],"IEC-034":["bespokeSoftware","emailWeb","removableMedia"],"IEC-035":["bespokeSoftware","emailWeb","removableMedia"],"IEC-036":["remoteAccess","privilegedAccess"],"IEC-037":["remoteAccess","privilegedAccess"],"IEC-038":["remoteAccess","privilegedAccess"],"IEC-039":["privilegedAccess","remoteAccess","internetFacing","interconnectivity"],"IEC-040":["privilegedAccess","remoteAccess","internetFacing","interconnectivity"],"IEC-041":["interconnectivity","internetFacing"],"IEC-042":["interconnectivity","internetFacing"],"IEC-043":["interconnectivity","internetFacing"],"IEC-044":["interconnectivity","thirdParty"],"IEC-045":["interconnectivity","thirdParty"],"IEC-046":["interconnectivity","thirdParty"],"IEC-047":["privilegedAccess","remoteAccess"],"IEC-048":["privilegedAccess","remoteAccess"],"IEC-049":["interconnectivity","thirdParty","remoteAccess"],"IEC-050":["interconnectivity","thirdParty","remoteAccess"],"IEC-051":["vulnerabilityExposure","removableMedia","emailWeb","internetFacing"],"IEC-052":["vulnerabilityExposure","removableMedia","emailWeb","internetFacing"],"IEC-053":["vulnerabilityExposure","removableMedia","emailWeb","internetFacing"],"IEC-054":["vulnerabilityExposure","legacyTech","bespokeSoftware"],"IEC-055":["vulnerabilityExposure","legacyTech","bespokeSoftware"],"IEC-056":["vulnerabilityExposure","legacyTech","bespokeSoftware"],"IEC-057":["vulnerabilityExposure","bespokeSoftware","legacyTech"],"IEC-058":["vulnerabilityExposure","bespokeSoftware","legacyTech"],"IEC-059":["vulnerabilityExposure","bespokeSoftware","legacyTech"],"IEC-060":["vulnerabilityExposure","bespokeSoftware","legacyTech"],"IEC-061":["bespokeSoftware","legacyTech"],"IEC-062":["remoteAccess","internetFacing","privilegedAccess"],"IEC-063":["remoteAccess","internetFacing","privilegedAccess"],"IEC-064":["remoteAccess","internetFacing","privilegedAccess"],"IEC-065":["remoteAccess","internetFacing","privilegedAccess"],"IEC-066":["privilegedAccess","remoteAccess"],"IEC-067":["privilegedAccess","remoteAccess"],"IEC-068":["sensitiveData","privilegedAccess"],"IEC-069":["sensitiveData","remoteAccess","internetFacing"],"IEC-070":["sensitiveData","interconnectivity","thirdParty"],"IEC-071":["sensitiveData"],"IEC-072":["sensitiveData"],"IEC-073":["sensitiveData","remoteAccess","thirdParty","interconnectivity"],"IEC-074":["interconnectivity","internetFacing","thirdParty","remoteAccess","legacyTech"],"IEC-075":["interconnectivity","thirdParty","legacyTech"],"IEC-076":["interconnectivity","internetFacing","thirdParty"],"IEC-077":["interconnectivity","thirdParty","legacyTech"],"IEC-078":["interconnectivity","internetFacing","thirdParty","remoteAccess"],"IEC-079":["interconnectivity","internetFacing","remoteAccess"],"IEC-080":["interconnectivity","internetFacing"],"IEC-081":["interconnectivity","internetFacing"],"IEC-082":["emailWeb","thirdParty","internetFacing"],"IEC-083":["emailWeb","thirdParty","internetFacing"],"IEC-084":["bespokeSoftware","interconnectivity"],"IEC-085":["privilegedAccess","remoteAccess","internetFacing","interconnectivity"],"IEC-086":["privilegedAccess","remoteAccess","internetFacing","interconnectivity"],"IEC-087":["internetFacing","remoteAccess","interconnectivity","thirdParty","vulnerabilityExposure","privilegedAccess"],"IEC-088":["internetFacing","interconnectivity"],"IEC-089":["internetFacing","interconnectivity"],"IEC-090":["internetFacing","interconnectivity"],"IEC-091":["internetFacing","interconnectivity"],"IEC-092":[],"IEC-093":[],"IEC-094":[],"IEC-095":[],"IEC-096":[],"IEC-097":["vulnerabilityExposure","legacyTech","internetFacing","interconnectivity"],"IEC-098":["vulnerabilityExposure","legacyTech"],"IEC-099":["vulnerabilityExposure","legacyTech","internetFacing","emailWeb","interconnectivity"],"IEC-100":["vulnerabilityExposure","legacyTech","thirdParty"]};
 
 function loadPrototypeControls(){
-  let saved=null;
   try{
-    saved = JSON.parse(localStorage.getItem("bilPrototypeControlsV3"));
+    const saved=JSON.parse(localStorage.getItem("bilIEC62443ControlLibraryV2"));
     if(Array.isArray(saved) && saved.length) return saved;
   }catch(e){}
-
-  // Migrate V2 while adding any new prototype controls introduced by this version.
-  try{
-    const old = JSON.parse(localStorage.getItem("bilPrototypeControlsV2"));
-    if(Array.isArray(old) && old.length){
-      const merged=structuredClone(old);
-      const ids=new Set(merged.map(c=>c.id));
-      defaultPrototypeControls.forEach(c=>{ if(!ids.has(c.id)) merged.push(structuredClone(c)); });
-      return merged;
-    }
-  }catch(e){}
-
   return structuredClone(defaultPrototypeControls);
 }
 
 function loadControlMappings(){
   try{
-    const saved = JSON.parse(localStorage.getItem("bilThreatControlMapV3"));
+    const saved=JSON.parse(localStorage.getItem("bilIEC62443ThreatMapV2"));
     if(Array.isArray(saved)) return saved;
   }catch(e){}
-
-  // Migrate V2/V1 and append newly introduced default mappings without
-  // disturbing existing configured relationships.
-  let old=null;
-  for(const key of ["bilThreatControlMapV2","bilThreatControlMapV1"]){
-    try{
-      const candidate=JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(candidate) && candidate.length){ old=candidate; break; }
-    }catch(e){}
-  }
-  if(old){
-    const merged=structuredClone(old);
-    const keys=new Set(merged.map(m=>`${m.threatId}|${m.controlId}`));
-    defaultControlMappings.forEach(m=>{
-      const k=`${m.threatId}|${m.controlId}`;
-      if(!keys.has(k)) merged.push(structuredClone(m));
-    });
-    return merged;
-  }
   return structuredClone(defaultControlMappings);
 }
 
-let prototypeControls = loadPrototypeControls();
-let controlMappings = loadControlMappings();
-
 function loadControlPrecursorMappings(){
   try{
-    const saved=JSON.parse(localStorage.getItem("bilControlPrecursorMapV1"));
+    const saved=JSON.parse(localStorage.getItem("bilIEC62443PrecursorMapV2"));
     if(saved && typeof saved==="object" && !Array.isArray(saved)) return saved;
   }catch(e){}
   return structuredClone(defaultControlPrecursorMappings);
 }
-let controlPrecursorMappings = loadControlPrecursorMappings();
+
+let prototypeControls=loadPrototypeControls();
+let controlMappings=loadControlMappings();
+let controlPrecursorMappings=loadControlPrecursorMappings();
 
 function saveControlConfig(){
-  localStorage.setItem("bilPrototypeControlsV3", JSON.stringify(prototypeControls));
-  localStorage.setItem("bilThreatControlMapV3", JSON.stringify(controlMappings));
-  localStorage.setItem("bilControlPrecursorMapV1", JSON.stringify(controlPrecursorMappings));
+  localStorage.setItem("bilIEC62443ControlLibraryV2",JSON.stringify(prototypeControls));
+  localStorage.setItem("bilIEC62443ThreatMapV2",JSON.stringify(controlMappings));
+  localStorage.setItem("bilIEC62443PrecursorMapV2",JSON.stringify(controlPrecursorMappings));
 }
 
 function effectivenessLabel(n){
@@ -2743,77 +2930,135 @@ function buildShortRiskStatement(t){
 }
 
 function renderControls(){
+  const sltResult=calculateSLTResult();
   const rankedControls=getPrioritisedControlData();
-  const tbody=document.getElementById("controlResults");
-  if(!tbody) return;
-  tbody.innerHTML="";
+  const host=document.getElementById("controlResults");
+  if(!host) return;
 
-  if(!rankedControls.length){
-    tbody.innerHTML='<tr><td colspan="9" class="empty">Select applicable threats to identify prioritised controls.</td></tr>';
+  const search=(document.getElementById("controlSearch")?.value||"").trim().toLowerCase();
+  const view=document.getElementById("controlViewFilter")?.value || "prioritised";
+
+  const linkedCount=rankedControls.filter(c=>c.bestThreat).length;
+  const sltEl=document.getElementById("controlsSummarySlt");
+  const applicableEl=document.getElementById("controlsSummaryApplicable");
+  const prioritisedEl=document.getElementById("controlsSummaryPrioritised");
+  if(sltEl) sltEl.textContent=sltResult.slt ? `SL-T ${sltResult.slt}` : "—";
+  if(applicableEl) applicableEl.textContent=sltResult.slt ? rankedControls.length : "0";
+  if(prioritisedEl) prioritisedEl.textContent=sltResult.slt ? linkedCount : "0";
+
+  host.innerHTML="";
+
+  if(!sltResult.slt){
+    host.innerHTML='<div class="controls-empty">Complete Step 4 – Inherent Risk to determine the Resulting SL-T and applicable IEC requirements.</div>';
+    const count=document.getElementById("controlCount"); if(count) count.textContent="SL-T pending";
+    return;
+  }
+
+  let visible=rankedControls.filter(c=>{
+    if(view==="unlinked" && c.bestThreat) return false;
+    if(view==="prioritised" && !c.bestThreat) return false;
+    if(search){
+      const hay=`${c.req||""} ${c.name||""} ${c.fr||""} ${c.informativeNotes||""}`.toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if(!visible.length){
+    host.innerHTML='<div class="controls-empty">No IEC requirements match the current view.</div>';
   }else{
-    rankedControls.forEach((c,idx)=>{
-      const others = c.relevantThreats
-        .filter(x=>x.threat.id!==c.bestThreat.id)
+    visible.forEach((c,idx)=>{
+      const pm=c.bestPrecursorMatch || {matched:[],boost:0,boostFactor:1};
+      const notes=escHtml(c.informativeNotes||"").replaceAll("\n","<br>");
+      const otherThreats=(c.relevantThreats||[])
+        .filter(x=>!c.bestThreat || x.threat.id!==c.bestThreat.id)
         .sort((a,b)=>b.score-a.score)
-        .slice(0,4);
+        .slice(0,6);
 
-      const tags = others.length
-        ? `<div class="threat-tags">${others.map(x=>`<span class="threat-tag" title="${x.threat.name}: priority ${x.score.toFixed(2)}">${x.threat.id} · ${x.score.toFixed(1)}</span>`).join("")}</div>`
-        : '<span class="muted-small">—</span>';
+      const card=document.createElement("article");
+      card.className=`control-priority-card ${c.bestThreat?"is-risk-linked":""}`;
 
-      const pm=c.bestPrecursorMatch;
-      const causeHtml=pm.matched.length
-        ? `<strong>${precursorText(pm.matched)}</strong><br><span class="muted-small">${pm.matched.length} active match${pm.matched.length===1?"":"es"} · +${(pm.boost*100).toFixed(0)}% priority context</span>`
-        : '<span class="muted-small">No direct active precursor match</span>';
+      const riskWhy=c.bestThreat
+        ? `<div class="why-threat">${escHtml(c.bestThreat.id)} – ${escHtml(c.bestThreat.name)}</div>
+           <div class="why-cause">${pm.matched?.length
+             ? `<strong>Cause / Precursor:</strong> ${escHtml(precursorText(pm.matched))}`
+             : 'No direct active Cause / Precursor match.'}</div>`
+        : `<div class="why-threat">Applicable to SL-T ${sltResult.slt}</div>
+           <div class="why-cause">This requirement is applicable to the target security level but is not currently mapped to a selected risk.</div>`;
 
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td><span class="rank">${idx+1}</span></td>
-        <td><strong>${c.id}</strong> – ${c.name}</td>
-        <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
-        <td>
-          <div class="control-risk-summary">${buildShortRiskStatement(c.bestThreat)}</div>
-          <span class="muted-small">${c.bestThreat.id} – ${c.bestThreat.name}</span>
-        </td>
-        <td>${causeHtml}</td>
-        <td>
-          <span class="score">${c.bestThreat.inherentRiskScore.toFixed(2)}</span>
-          <br><span class="muted-small">Impact ${c.bestThreat.score.toFixed(2)} × Likelihood ${c.bestThreat.assessed}</span>
-        </td>
-        <td>
-          <select class="priority-effectiveness"
-                  data-control-id="${c.id}"
-                  data-threat-id="${c.bestThreat.id}">
-            ${[1,2,3,4].map(n=>`<option value="${n}" ${c.bestEffectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
-          </select>
-        </td>
-        <td>
-          <span class="score">${c.bestScore.toFixed(2)}</span>
-          <br><span class="muted-small">${c.bestBaseScore.toFixed(2)} base × ${pm.boostFactor.toFixed(2)} precursor</span>
-        </td>
-        <td>${tags}</td>`;
-      tbody.appendChild(tr);
+      const scoreBlock=c.bestThreat
+        ? `<div class="score-label">Priority score</div>
+           <div class="score-value">${c.bestScore.toFixed(1)}</div>
+           <div class="score-sub">${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</div>`
+        : `<div class="score-label">Priority</div>
+           <div class="score-value">—</div>
+           <div class="score-sub">SL-T applicable</div>`;
+
+      const technical=c.bestThreat
+        ? `<div class="control-detail-grid">
+            <div class="control-detail-item"><span class="k">Inherent Risk</span><span class="v">${c.bestThreat.inherentRiskScore}</span></div>
+            <div class="control-detail-item"><span class="k">Threat Effectiveness</span><span class="v">
+              <select class="priority-effectiveness" data-control-id="${c.id}" data-threat-id="${c.bestThreat.id}">
+                ${[1,2,3,4].map(n=>`<option value="${n}" ${c.bestEffectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
+              </select>
+            </span></div>
+            <div class="control-detail-item"><span class="k">Base Priority</span><span class="v">${c.bestBaseScore.toFixed(2)}</span></div>
+            <div class="control-detail-item"><span class="k">Precursor Boost</span><span class="v">+${(pm.boost*100).toFixed(0)}%</span></div>
+            <div class="control-detail-item"><span class="k">Final Priority</span><span class="v">${c.bestScore.toFixed(2)}</span></div>
+            <div class="control-detail-item"><span class="k">Other Relevant Threats</span><span class="v">${otherThreats.length?otherThreats.map(x=>`${x.threat.id} (${x.effectiveness})`).join(", "):"—"}</span></div>
+          </div>`
+        : `<div class="control-note-text">No selected-threat relationship currently drives a risk priority for this requirement.</div>`;
+
+      card.innerHTML=`
+        <div class="control-card-main">
+          <div class="control-card-rank">${c.bestThreat ? `<div class="control-card-rank">${idx+1}</div>` : '<div class="control-card-rank">•</div>'}</div>
+          <div>
+            <div class="control-card-req">${escHtml(c.req||c.id)}</div>
+            <div class="control-card-title">${escHtml(c.name||"Untitled requirement")}</div>
+            <div class="control-card-badges">
+              <span class="control-mini-badge">SL-T ${sltResult.slt}</span>
+              <span class="control-mini-badge">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span>
+              <span class="control-mini-badge">${escHtml(c.fr||"IEC 62443-3-3")}</span>
+            </div>
+          </div>
+          <div class="control-why">
+            <div class="why-label">Why this is prioritised</div>
+            ${riskWhy}
+          </div>
+          <div class="control-priority-score">${scoreBlock}</div>
+        </div>
+        <div class="control-card-details">
+          <details>
+            <summary>Requirement details</summary>
+            <div class="control-detail-grid">
+              <div class="control-detail-item"><span class="k">Applicable SL-T</span><span class="v">${applicableSltText(c.applicableSLT)}</span></div>
+              <div class="control-detail-item"><span class="k">Control Type</span><span class="v">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span></div>
+            </div>
+            <div class="control-note-text">${notes||"No informative notes available."}</div>
+          </details>
+          <details>
+            <summary>Priority calculation &amp; threat mappings</summary>
+            ${technical}
+          </details>
+        </div>`;
+      host.appendChild(card);
     });
   }
 
-  tbody.querySelectorAll(".priority-effectiveness").forEach(sel=>{
-    sel.addEventListener("change",()=>{
-      const controlId=sel.dataset.controlId;
-      const threatId=sel.dataset.threatId;
-      const mapping=controlMappings.find(m=>m.controlId===controlId && m.threatId===threatId);
-      if(mapping){
-        mapping.effectiveness=+sel.value;
-        saveControlConfig();
-        renderControls();
-        renderControlChecklist();
-        renderResidualRisk();
-        if(typeof renderReport==="function") renderReport();
-      }
-    });
-  });
+  host.querySelectorAll(".priority-effectiveness").forEach(sel=>sel.addEventListener("change",()=>{
+    const m=controlMappings.find(m=>m.controlId===sel.dataset.controlId&&m.threatId===sel.dataset.threatId);
+    if(m){
+      m.effectiveness=+sel.value;
+      saveControlConfig();
+      renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
+    }
+  }));
 
   const count=document.getElementById("controlCount");
-  if(count) count.textContent=`${rankedControls.length} prioritised control${rankedControls.length===1?"":"s"}`;
+  if(count) count.textContent=`${rankedControls.length} requirements · SL-T ${sltResult.slt}`;
 }
 
 function newControlId(){
@@ -2832,199 +3077,43 @@ function threatOptionHtml(selectedId, excludedIds=[]){
 }
 
 function renderControlConfigurator(){
-  const host=document.getElementById("controlConfigurator");
-  host.innerHTML="";
-
+  const host=document.getElementById("controlConfigurator"); if(!host)return; host.innerHTML="";
   prototypeControls.forEach(control=>{
-    const card=document.createElement("div");
-    card.className="control-config-card";
+    const card=document.createElement("div"); card.className="control-config-card";
+    const meta=document.createElement("div"); meta.className="iec-meta";
+    meta.innerHTML=`
+      <label><strong>Req</strong><input class="iec-req" type="text" value="${escHtml(control.req||control.id)}"></label>
+      <label><strong>Title</strong><input class="iec-title" type="text" value="${escHtml(control.name||"")}"></label>
+      <label><strong>Applicable SL-T</strong><div class="iec-slt-checks">${[1,2,3,4].map(n=>`<label><input class="iec-slt" type="checkbox" value="${n}" ${(control.applicableSLT||[]).map(Number).includes(n)?"checked":""}> ${n}</label>`).join("")}</div></label>
+      <label style="grid-column:1/-1"><strong>Informative Notes</strong><textarea class="iec-notes-input">${escHtml(control.informativeNotes||"")}</textarea></label>`;
+    card.appendChild(meta);
+    const head=document.createElement("div"); head.className="control-config-head";
+    head.innerHTML=`<div><strong>${escHtml(control.req||control.id)}</strong></div><div class="type-checks"></div><div><button class="danger icon-btn">Delete</button></div>`; card.appendChild(head);
+    const commitMeta=()=>{control.req=meta.querySelector(".iec-req").value.trim()||control.req;control.name=meta.querySelector(".iec-title").value.trim()||control.name;control.informativeNotes=meta.querySelector(".iec-notes-input").value;control.applicableSLT=[...meta.querySelectorAll(".iec-slt:checked")].map(x=>+x.value);saveControlConfig();renderControls();renderControlChecklist();if(typeof renderReport==="function")renderReport();};
+    meta.querySelector(".iec-req").addEventListener("change",commitMeta);meta.querySelector(".iec-title").addEventListener("change",commitMeta);meta.querySelector(".iec-notes-input").addEventListener("change",commitMeta);meta.querySelectorAll(".iec-slt").forEach(x=>x.addEventListener("change",commitMeta));
+    const typeHost=head.querySelector(".type-checks"); CONTROL_TYPES.forEach(type=>{const label=document.createElement("label");label.innerHTML=`<input type="checkbox" ${(control.types||[]).includes(type)?"checked":""}> ${type}`;label.querySelector("input").addEventListener("change",e=>{control.types=control.types||[];if(e.target.checked&&!control.types.includes(type))control.types.push(type);if(!e.target.checked)control.types=control.types.filter(x=>x!==type);saveControlConfig();renderControls();renderControlChecklist();renderResidualRisk();});typeHost.appendChild(label);});
+    head.querySelector("button").addEventListener("click",()=>{if(!confirm(`Delete ${control.req||control.id} – ${control.name}?`))return;prototypeControls=prototypeControls.filter(c=>c.id!==control.id);controlMappings=controlMappings.filter(m=>m.controlId!==control.id);delete controlPrecursorMappings[control.id];saveControlConfig();renderControlConfigurator();renderControls();renderControlChecklist();renderResidualRisk();if(typeof renderReport==="function")renderReport();});
 
-    const head=document.createElement("div");
-    head.className="control-config-head";
-    head.innerHTML=`
-      <div><strong>${control.id}</strong></div>
-      <div><input type="text" value="${control.name.replaceAll('"','&quot;')}" aria-label="Control name"></div>
-      <div class="type-checks"></div>
-      <div><button class="danger icon-btn" title="Delete control">Delete</button></div>`;
-    card.appendChild(head);
+    const area=document.createElement("div");area.className="mapping-area";area.innerHTML='<div class="mapping-title">Threats mitigated and effectiveness</div>';
+    const mappings=controlMappings.filter(m=>m.controlId===control.id).sort((a,b)=>a.threatId.localeCompare(b.threatId));
+    mappings.forEach(mapping=>{const row=document.createElement("div");row.className="mapping-row";const used=mappings.map(x=>x.threatId);row.innerHTML=`<select class="threat-select">${threatOptionHtml(mapping.threatId,used)}</select><select class="effectiveness-select">${[1,2,3,4].map(n=>`<option value="${n}" ${+mapping.effectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}</select><button class="secondary icon-btn">Remove</button>`;row.querySelector(".threat-select").addEventListener("change",e=>{mapping.threatId=e.target.value;saveControlConfig();renderControlConfigurator();renderControls();renderControlChecklist();});row.querySelector(".effectiveness-select").addEventListener("change",e=>{mapping.effectiveness=+e.target.value;saveControlConfig();renderControls();renderControlChecklist();renderResidualRisk();});row.querySelector("button").addEventListener("click",()=>{const idx=controlMappings.indexOf(mapping);if(idx>=0)controlMappings.splice(idx,1);saveControlConfig();renderControlConfigurator();renderControls();renderControlChecklist();renderResidualRisk();});area.appendChild(row);});
+    const add=document.createElement("button");add.className="secondary";add.style.marginTop="8px";add.textContent="+ Add Threat";add.disabled=!threats.find(t=>!mappings.some(m=>m.threatId===t.id));add.addEventListener("click",()=>{const first=threats.find(t=>!controlMappings.some(m=>m.controlId===control.id&&m.threatId===t.id));if(!first)return;controlMappings.push({controlId:control.id,threatId:first.id,effectiveness:2});saveControlConfig();renderControlConfigurator();renderControls();renderControlChecklist();renderResidualRisk();});area.appendChild(add);card.appendChild(area);
 
-    const nameInput=head.querySelector('input[type="text"]');
-    nameInput.addEventListener("change",()=>{
-      control.name=nameInput.value.trim() || control.name;
-      saveControlConfig();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
-    });
-
-    const typeHost=head.querySelector(".type-checks");
-    CONTROL_TYPES.forEach(type=>{
-      const label=document.createElement("label");
-      const checked=(control.types||[]).includes(type);
-      label.innerHTML=`<input type="checkbox" ${checked?"checked":""}> ${type}`;
-      label.querySelector("input").addEventListener("change",e=>{
-        control.types = control.types || [];
-        if(e.target.checked && !control.types.includes(type)) control.types.push(type);
-        if(!e.target.checked) control.types=control.types.filter(x=>x!==type);
-        saveControlConfig();
-        renderControls();
-        renderControlChecklist();
-        renderResidualRisk();
-      });
-      typeHost.appendChild(label);
-    });
-
-    head.querySelector("button").addEventListener("click",()=>{
-      if(!confirm(`Delete ${control.id} – ${control.name}?`)) return;
-      prototypeControls=prototypeControls.filter(c=>c.id!==control.id);
-      controlMappings=controlMappings.filter(m=>m.controlId!==control.id);
-      delete controlPrecursorMappings[control.id];
-      saveControlConfig();
-      renderControlConfigurator();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
-    });
-
-    const area=document.createElement("div");
-    area.className="mapping-area";
-    const title=document.createElement("div");
-    title.className="mapping-title";
-    title.textContent="Threats mitigated and effectiveness";
-    area.appendChild(title);
-
-    const mappings=controlMappings
-      .filter(m=>m.controlId===control.id)
-      .sort((a,b)=>a.threatId.localeCompare(b.threatId));
-
-    if(!mappings.length){
-      const empty=document.createElement("div");
-      empty.className="muted-small";
-      empty.textContent="No threats mapped to this control.";
-      area.appendChild(empty);
-    }
-
-    mappings.forEach(mapping=>{
-      const row=document.createElement("div");
-      row.className="mapping-row";
-      const used=mappings.map(x=>x.threatId);
-      row.innerHTML=`
-        <select class="threat-select">${threatOptionHtml(mapping.threatId,used)}</select>
-        <select class="effectiveness-select">
-          ${[1,2,3,4].map(n=>`<option value="${n}" ${+mapping.effectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
-        </select>
-        <button class="secondary icon-btn">Remove</button>`;
-
-      row.querySelector(".threat-select").addEventListener("change",e=>{
-        mapping.threatId=e.target.value;
-        saveControlConfig();
-        renderControlConfigurator();
-        renderControls();
-        renderControlChecklist();
-      });
-      row.querySelector(".effectiveness-select").addEventListener("change",e=>{
-        mapping.effectiveness=+e.target.value;
-        saveControlConfig();
-        renderControls();
-        renderControlChecklist();
-        renderResidualRisk();
-      });
-      row.querySelector("button").addEventListener("click",()=>{
-        const idx=controlMappings.indexOf(mapping);
-        if(idx>=0) controlMappings.splice(idx,1);
-        saveControlConfig();
-        renderControlConfigurator();
-        renderControls();
-        renderControlChecklist();
-        renderResidualRisk();
-      });
-      area.appendChild(row);
-    });
-
-    const availableThreat=threats.find(t=>!mappings.some(m=>m.threatId===t.id));
-    const add=document.createElement("button");
-    add.className="secondary";
-    add.style.marginTop="8px";
-    add.textContent="+ Add Threat";
-    add.disabled=!availableThreat;
-    add.addEventListener("click",()=>{
-      const first=threats.find(t=>!controlMappings.some(m=>m.controlId===control.id && m.threatId===t.id));
-      if(!first) return;
-      controlMappings.push({controlId:control.id,threatId:first.id,effectiveness:2});
-      saveControlConfig();
-      renderControlConfigurator();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
-    });
-    area.appendChild(add);
-    card.appendChild(area);
-
-    const precursorArea=document.createElement("div");
-    precursorArea.className="mapping-area";
-    precursorArea.style.marginTop="12px";
-
-    const ptitle=document.createElement("div");
-    ptitle.className="mapping-title";
-    ptitle.textContent="Cause / Precursor addressed";
-    precursorArea.appendChild(ptitle);
-
-    const pnote=document.createElement("div");
-    pnote.className="muted-small";
-    pnote.style.marginBottom="8px";
-    pnote.textContent="Select exposure conditions this control directly addresses. Active matches provide up to a 25% prioritisation boost.";
-    precursorArea.appendChild(pnote);
-
-    const grid=document.createElement("div");
-    grid.className="type-checks";
-    grid.style.display="grid";
-    grid.style.gridTemplateColumns="repeat(auto-fit,minmax(260px,1fr))";
-    grid.style.gap="6px 12px";
-
-    const mappedIds=new Set(controlPrecursorMappings[control.id] || []);
-    exposureQuestionDefs.forEach(q=>{
-      const label=document.createElement("label");
-      const cause=(q.cause||"").trim() || q.label;
-      label.title=q.label;
-      label.innerHTML=`<input type="checkbox" data-precursor-id="${q.id}" ${mappedIds.has(q.id)?"checked":""}> ${cause}`;
-      label.querySelector("input").addEventListener("change",e=>{
-        const current=new Set(controlPrecursorMappings[control.id] || []);
-        if(e.target.checked) current.add(q.id);
-        else current.delete(q.id);
-        controlPrecursorMappings[control.id]=[...current];
-        saveControlConfig();
-        renderControls();
-        renderControlChecklist();
-        if(typeof renderReport==="function") renderReport();
-      });
-      grid.appendChild(label);
-    });
-    precursorArea.appendChild(grid);
-    card.appendChild(precursorArea);
-
-    host.appendChild(card);
+    const precursorArea=document.createElement("div");precursorArea.className="mapping-area";precursorArea.style.marginTop="12px";precursorArea.innerHTML='<div class="mapping-title">Cause / Precursor addressed</div><div class="muted-small" style="margin-bottom:8px">Select exposure conditions this requirement directly addresses.</div>';
+    const grid=document.createElement("div");grid.className="type-checks";grid.style.display="grid";grid.style.gridTemplateColumns="repeat(auto-fit,minmax(260px,1fr))";grid.style.gap="6px 12px";const mappedIds=new Set(controlPrecursorMappings[control.id]||[]);
+    exposureQuestionDefs.forEach(q=>{const label=document.createElement("label");const cause=(q.cause||"").trim()||q.label;label.title=q.label;label.innerHTML=`<input type="checkbox" ${mappedIds.has(q.id)?"checked":""}> ${escHtml(cause)}`;label.querySelector("input").addEventListener("change",e=>{const current=new Set(controlPrecursorMappings[control.id]||[]);if(e.target.checked)current.add(q.id);else current.delete(q.id);controlPrecursorMappings[control.id]=[...current];saveControlConfig();renderControls();renderControlChecklist();if(typeof renderReport==="function")renderReport();});grid.appendChild(label);});precursorArea.appendChild(grid);card.appendChild(precursorArea);host.appendChild(card);
   });
 }
 
 document.getElementById("addControlBtn").addEventListener("click",()=>{
-  const id=newControlId();
-  prototypeControls.push({id,name:"New Prototype Control",types:["Preventive"]});
-  controlPrecursorMappings[id]=[];
-  saveControlConfig();
-  renderControlConfigurator();
-  renderControls();
+  let n=1; while(prototypeControls.some(c=>c.id===`IEC-CUSTOM-${n}`)) n++;
+  const id=`IEC-CUSTOM-${n}`;
+  prototypeControls.push({id,req:`CUSTOM ${n}`,name:"New IEC Requirement",informativeNotes:"",applicableSLT:[1,2,3,4],types:["Preventive"],fr:"Custom",securityDriver:""});
+  controlPrecursorMappings[id]=[]; saveControlConfig(); renderControlConfigurator(); renderControls(); renderControlChecklist();
 });
 
 document.getElementById("resetControlMapBtn").addEventListener("click",()=>{
-  prototypeControls=structuredClone(defaultPrototypeControls);
-  controlMappings=structuredClone(defaultControlMappings);
-  controlPrecursorMappings=structuredClone(defaultControlPrecursorMappings);
-  saveControlConfig();
-  renderControlConfigurator();
-  renderControls();
+  prototypeControls=structuredClone(defaultPrototypeControls); controlMappings=structuredClone(defaultControlMappings); controlPrecursorMappings=structuredClone(defaultControlPrecursorMappings); saveControlConfig(); renderControlConfigurator(); renderControls(); renderControlChecklist(); renderResidualRisk(); if(typeof renderReport==="function")renderReport();
 });
 
 // Re-render Phase 2 whenever Phase 1 recalculates.
@@ -3033,6 +3122,8 @@ render = function(){
   originalRender();
   if(document.getElementById("riskResults")) renderInherentRisk();
   if(document.getElementById("controlResults")) renderControls();
+document.getElementById("controlSearch")?.addEventListener("input",()=>renderControls());
+document.getElementById("controlViewFilter")?.addEventListener("change",()=>renderControls());
   if(document.getElementById("controlChecklistBody")) renderControlChecklist();
   if(document.getElementById("residualRiskBody")) renderResidualRisk();
 };
@@ -3162,133 +3253,61 @@ function saveResidualRiskNotes(){
 }
 
 function getPrioritisedControlData(){
-  const riskThreats = currentApplicableRiskThreats();
-  const threatById = Object.fromEntries(riskThreats.map(t=>[t.id,t]));
-  const controlById = Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
-  const controlAgg = {};
+  const sltResult=calculateSLTResult();
+  if(!sltResult.slt) return [];
+  const riskThreats=currentApplicableRiskThreats();
+  const threatById=Object.fromEntries(riskThreats.map(t=>[t.id,t]));
+  const eligible=prototypeControls.filter(c=>isControlApplicableToSLT(c,sltResult.slt));
+  const controlById=Object.fromEntries(eligible.map(c=>[c.id,c]));
+  const controlAgg={};
+
+  eligible.forEach(c=>{
+    controlAgg[c.id]={...c,bestScore:0,bestBaseScore:0,bestThreat:null,bestEffectiveness:0,bestPrecursorMatch:{matched:[],matchScore:0,boost:0,boostFactor:1},relevantThreats:[]};
+  });
 
   for(const m of controlMappings){
-    const t = threatById[m.threatId];
-    const c = controlById[m.controlId];
-    if(!t || !c || +m.effectiveness<=0) continue;
-
-    const baseScore = t.inherentRiskScore * (+m.effectiveness);
-    const precursorMatch = precursorMatchForControlThreat(c.id,t.id);
-    const score = baseScore * precursorMatch.boostFactor;
-
-    const rel={
-      threat:t,
-      effectiveness:+m.effectiveness,
-      baseScore,
-      score,
-      precursorMatch
-    };
-
-    if(!controlAgg[c.id]){
-      controlAgg[c.id] = {
-        ...c,
-        bestScore:score,
-        bestBaseScore:baseScore,
-        bestThreat:t,
-        bestEffectiveness:+m.effectiveness,
-        bestPrecursorMatch:precursorMatch,
-        relevantThreats:[rel]
-      };
-    }else{
-      controlAgg[c.id].relevantThreats.push(rel);
-      if(
-        score > controlAgg[c.id].bestScore ||
-        (score===controlAgg[c.id].bestScore && precursorMatch.matchScore>controlAgg[c.id].bestPrecursorMatch.matchScore)
-      ){
-        controlAgg[c.id].bestScore=score;
-        controlAgg[c.id].bestBaseScore=baseScore;
-        controlAgg[c.id].bestThreat=t;
-        controlAgg[c.id].bestEffectiveness=+m.effectiveness;
-        controlAgg[c.id].bestPrecursorMatch=precursorMatch;
-      }
+    const t=threatById[m.threatId]; const c=controlById[m.controlId];
+    if(!t||!c||+m.effectiveness<=0) continue;
+    const baseScore=t.inherentRiskScore*(+m.effectiveness);
+    const precursorMatch=precursorMatchForControlThreat(c.id,t.id);
+    const score=baseScore*precursorMatch.boostFactor;
+    const rel={threat:t,effectiveness:+m.effectiveness,baseScore,score,precursorMatch};
+    controlAgg[c.id].relevantThreats.push(rel);
+    if(!controlAgg[c.id].bestThreat || score>controlAgg[c.id].bestScore || (score===controlAgg[c.id].bestScore && precursorMatch.matchScore>controlAgg[c.id].bestPrecursorMatch.matchScore)){
+      Object.assign(controlAgg[c.id],{bestScore:score,bestBaseScore:baseScore,bestThreat:t,bestEffectiveness:+m.effectiveness,bestPrecursorMatch:precursorMatch});
     }
   }
 
   return Object.values(controlAgg).sort((a,b)=>{
+    if((b.bestThreat?1:0)!==(a.bestThreat?1:0)) return (b.bestThreat?1:0)-(a.bestThreat?1:0);
     if(b.bestScore!==a.bestScore) return b.bestScore-a.bestScore;
-    if(b.bestPrecursorMatch.matchScore!==a.bestPrecursorMatch.matchScore)
-      return b.bestPrecursorMatch.matchScore-a.bestPrecursorMatch.matchScore;
-    const aHigh=a.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
-    const bHigh=b.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
-    if(bHigh!==aHigh) return bHigh-aHigh;
-    if(b.bestEffectiveness!==a.bestEffectiveness) return b.bestEffectiveness-a.bestEffectiveness;
-    return b.relevantThreats.length-a.relevantThreats.length;
+    if(b.bestPrecursorMatch.matchScore!==a.bestPrecursorMatch.matchScore) return b.bestPrecursorMatch.matchScore-a.bestPrecursorMatch.matchScore;
+    return String(a.req||a.id).localeCompare(String(b.req||b.id),undefined,{numeric:true});
   });
 }
 
 function renderControlChecklist(){
-  const controls = getPrioritisedControlData();
-  const tbody=document.getElementById("controlChecklistBody");
-  if(!tbody) return;
-  tbody.innerHTML="";
-
-  if(!controls.length){
-    tbody.innerHTML='<tr><td colspan="8" class="empty">No controls are currently applicable.</td></tr>';
-  }else{
-    controls.forEach((c,idx)=>{
-      const assessment = controlAssessments[c.id] || "";
-      const relevant = c.relevantThreats
-        .slice()
-        .sort((a,b)=>b.score-a.score)
-        .map(x=>`${x.threat.id} (${x.effectiveness})`)
-        .join(", ");
-
-      const causes=c.bestPrecursorMatch.matched.length
-        ? precursorText(c.bestPrecursorMatch.matched)
-        : "—";
-
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td><span class="rank">${idx+1}</span></td>
-        <td><strong>${c.id}</strong> – ${c.name}</td>
-        <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
-        <td><span class="muted-small">${relevant}</span></td>
-        <td><span class="muted-small">${causes}</span></td>
-        <td>${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</td>
-        <td>
-          <select class="assessment-select" data-control-id="${c.id}">
-            <option value="" ${assessment===""?"selected":""}>Select…</option>
-            ${["Implemented","Partially Implemented","Not Implemented","Not Sure","Not Applicable"]
-              .map(v=>`<option value="${v}" ${assessment===v?"selected":""}>${v}</option>`).join("")}
-          </select>
-        </td>
-        <td>
-          <input class="notes-input control-comment" data-comment-for="${c.id}"
-                 type="text" placeholder="Add comments"
-                 value="${(controlComments[c.id]||"").replaceAll('"','&quot;')}">
-        </td>`;
-      tbody.appendChild(tr);
-    });
-  }
-
-  tbody.querySelectorAll(".assessment-select").forEach(sel=>{
-    sel.addEventListener("change",()=>{
-      controlAssessments[sel.dataset.controlId]=sel.value;
-      saveControlAssessments();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
-    });
+  const controls=getPrioritisedControlData(); const sltResult=calculateSLTResult();
+  const tbody=document.getElementById("controlChecklistBody"); if(!tbody)return; tbody.innerHTML="";
+  if(!sltResult.slt) tbody.innerHTML='<tr><td colspan="8" class="empty">SL-T has not yet been determined.</td></tr>';
+  else if(!controls.length) tbody.innerHTML='<tr><td colspan="8" class="empty">No IEC requirements are applicable.</td></tr>';
+  else controls.forEach((c,idx)=>{
+    const assessment=controlAssessments[c.id]||"";
+    const relevant=c.relevantThreats.length?c.relevantThreats.slice().sort((a,b)=>b.score-a.score).map(x=>`${x.threat.id} (${x.effectiveness})`).join(", "):"—";
+    const causes=c.bestThreat&&c.bestPrecursorMatch.matched.length?precursorText(c.bestPrecursorMatch.matched):"—";
+    const tr=document.createElement("tr"); tr.innerHTML=`
+      <td><span class="rank">${idx+1}</span></td>
+      <td><strong>${escHtml(c.req||c.id)}</strong> – ${escHtml(c.name||"")}<br><span class="muted-small">${applicableSltText(c.applicableSLT)}</span></td>
+      <td>${escHtml((c.types||[]).join(" / ")||"Unclassified")}</td>
+      <td><span class="muted-small">${relevant}</span></td><td><span class="muted-small">${escHtml(causes)}</span></td>
+      <td>${c.bestThreat?`${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}`:"—"}</td>
+      <td><select class="assessment-select" data-control-id="${c.id}"><option value="" ${assessment===""?"selected":""}>Select…</option>${["Implemented","Partially Implemented","Not Implemented","Not Sure","Not Applicable"].map(v=>`<option value="${v}" ${assessment===v?"selected":""}>${v}</option>`).join("")}</select></td>
+      <td><input class="notes-input control-comment" data-comment-for="${c.id}" type="text" placeholder="Add comments" value="${(controlComments[c.id]||"").replaceAll('"','&quot;')}"></td>`; tbody.appendChild(tr);
   });
-
-  tbody.querySelectorAll(".control-comment").forEach(input=>{
-    input.addEventListener("change",()=>{
-      controlComments[input.dataset.commentFor] = input.value.trim();
-      saveControlComments();
-    });
-  });
-
-  const assessed = controls.filter(c=>{
-    const v=controlAssessments[c.id];
-    return v && v!=="Not Sure";
-  }).length;
-  const count=document.getElementById("controlAssessmentCount");
-  if(count) count.textContent=`${assessed} / ${controls.length} controls assessed`;
+  tbody.querySelectorAll(".assessment-select").forEach(sel=>sel.addEventListener("change",()=>{controlAssessments[sel.dataset.controlId]=sel.value;saveControlAssessments();renderControlChecklist();renderResidualRisk();if(typeof renderReport==="function")renderReport();}));
+  tbody.querySelectorAll(".control-comment").forEach(input=>input.addEventListener("change",()=>{controlComments[input.dataset.commentFor]=input.value.trim();saveControlComments();}));
+  const assessed=controls.filter(c=>{const v=controlAssessments[c.id];return v&&v!=="Not Sure";}).length;
+  const count=document.getElementById("controlAssessmentCount");if(count)count.textContent=sltResult.slt?`${assessed} / ${controls.length} SL-T ${sltResult.slt} requirements assessed`:"SL-T pending";
 }
 
 function controlContribution(effectiveness, implementationFactor){
@@ -3304,7 +3323,8 @@ function controlContribution(effectiveness, implementationFactor){
 }
 
 function residualForThreat(t){
-  const mappings = controlMappings.filter(m=>m.threatId===t.id && +m.effectiveness>0);
+  const currentSlt=calculateSLTResult().slt;
+  const mappings = controlMappings.filter(m=>m.threatId===t.id && +m.effectiveness>0 && isControlApplicableToSLT(prototypeControls.find(c=>c.id===m.controlId)||{},currentSlt));
 
   // Residual risk starts from the inherent values.
   const inherentLikelihood = Number.isFinite(+t.assessed)
@@ -3611,12 +3631,9 @@ function renderReport(){
     const status=controlAssessments[c.id]||"";
     return `<tr>
       <td>${idx+1}</td>
-      <td>${escHtml(c.id)} - ${escHtml(c.name)}</td>
-      <td>${escHtml((c.types||[]).join(" / "))}</td>
-      <td>${escHtml(precursorText(c.bestPrecursorMatch.matched))}</td>
-      <td>${c.bestEffectiveness} - ${effectivenessLabel(c.bestEffectiveness)}</td>
-      <td>${escHtml(status)}</td>
-      <td>${escHtml(controlComments[c.id]||"")}</td>
+      <td>${escHtml(c.req||c.id)}</td><td>${escHtml(c.name||"")}</td><td>${escHtml(c.informativeNotes||"")}</td><td>${escHtml(applicableSltText(c.applicableSLT))}</td>
+      <td>${escHtml((c.types||[]).join(" / "))}</td><td>${escHtml(c.bestThreat?precursorText(c.bestPrecursorMatch.matched):"—")}</td>
+      <td>${c.bestThreat?`${c.bestEffectiveness} - ${effectivenessLabel(c.bestEffectiveness)}`:"—"}</td><td>${escHtml(status)}</td><td>${escHtml(controlComments[c.id]||"")}</td>
     </tr>`;
   }).join("");
 
@@ -3642,6 +3659,7 @@ function renderReport(){
         <div class="report-summary-box"><span>BIL-V</span><strong>${bilV}</strong></div>
         <div class="report-summary-box"><span>BIL Driver</span><strong>${drivers.join(" + ")}</strong></div>
         <div class="report-summary-box"><span>Applicable Threats</span><strong>${threats.length}</strong></div>
+        <div class="report-summary-box"><span>Resulting SL-T</span><strong>${calculateSLTResult().slt?`SL-T ${calculateSLTResult().slt}`:"Pending"}</strong></div>
       </div>
     </div>
 
@@ -3661,8 +3679,8 @@ function renderReport(){
     <div class="report-section">
       <h3>Control Assessment</h3>
       <table class="report-table">
-        <thead><tr><th>#</th><th>Control</th><th>Type</th><th>Cause / Precursor Addressed</th><th>Effectiveness</th><th>Status</th><th>Comments</th></tr></thead>
-        <tbody>${controlRows || '<tr><td colspan="7">No applicable controls.</td></tr>'}</tbody>
+        <thead><tr><th>#</th><th>Req</th><th>Title</th><th>Informative Notes</th><th>Applicable SL-T</th><th>Type</th><th>Cause / Precursor Addressed</th><th>Effectiveness</th><th>Status</th><th>Comments</th></tr></thead>
+        <tbody>${controlRows || '<tr><td colspan="10">No applicable IEC requirements.</td></tr>'}</tbody>
       </table>
     </div>
 
@@ -3734,6 +3752,8 @@ showStep=function(index){
   originalShowStep(index);
   if(index===7) renderReport();
 };
+
+document.getElementById("resetSltMapBtn")?.addEventListener("click",()=>{sltRiskMap=structuredClone(DEFAULT_SLT_RISK_MAP);saveSltRiskMap();renderSltMappingConfigurator();updateSLTSummary();renderControls();renderControlChecklist();renderResidualRisk();if(typeof renderReport==="function")renderReport();});
 
 // Start on the first screen.
 showStep(0);
