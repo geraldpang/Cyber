@@ -2978,16 +2978,17 @@ const EFFECTIVENESS_REDUCTION = {
 };
 
 function loadControlAssessments(){
+  // Control Checklist responses are assessment-session state.
+  // Reloading the page starts the checklist from Select… again.
   try{
-    const saved = JSON.parse(localStorage.getItem("bilControlAssessmentsV2"));
-    if(saved && typeof saved==="object") return saved;
+    localStorage.removeItem("bilControlAssessmentsV2");
   }catch(e){}
   return {};
 }
 let controlAssessments = loadControlAssessments();
 
 function saveControlAssessments(){
-  localStorage.setItem("bilControlAssessmentsV2", JSON.stringify(controlAssessments));
+  // Session-only assessment state. Do not persist across page reloads.
 }
 
 function loadControlComments(){
