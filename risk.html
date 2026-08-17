@@ -1996,16 +1996,18 @@ function saveExposureAnswers(){
 }
 
 function loadLikelihoodOverrides(){
+  // Assessed Likelihood is assessment-session state.
+  // A new/reloaded assessment must start from the current Suggested Likelihood,
+  // rather than reusing an override from a previous assessment.
   try{
-    const saved = JSON.parse(localStorage.getItem("bilLikelihoodOverridesV1"));
-    if(saved && typeof saved==="object") return saved;
+    localStorage.removeItem("bilLikelihoodOverridesV1");
   }catch(e){}
   return {};
 }
 let likelihoodOverrides = loadLikelihoodOverrides();
 
 function saveLikelihoodOverrides(){
-  localStorage.setItem("bilLikelihoodOverridesV1", JSON.stringify(likelihoodOverrides));
+  // Session-only assessment state. Do not persist across page reloads.
 }
 
 function loadInherentRiskNotes(){
@@ -2432,6 +2434,9 @@ function renderInherentRisk(){
           <select class="assessed-likelihood" data-threat-id="${t.id}">
             ${[1,2,3,4,5].map(n=>`<option value="${n}" ${t.assessed===n?"selected":""}>${n} – ${LIKELIHOOD_LABELS[n]}</option>`).join("")}
           </select>
+          ${likelihoodOverrides[t.id]
+            ? '<br><span class="muted-small">Assessor override</span>'
+            : '<br><span class="muted-small">Based on suggested likelihood</span>'}
         </td>
         <td>
           ${riskBadgeHtml(t.assessed,t.impact)}
