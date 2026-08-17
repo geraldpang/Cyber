@@ -1409,11 +1409,20 @@ The assessor can manually include or exclude any threat, and manual choices over
 <div>
 <h2 style="margin:0">5. Prioritised Controls</h2>
 <div class="sub" style="margin:4px 0 0">
-          Only selected threats are considered. Controls are ranked by the highest <strong>Inherent Risk Score × Control Effectiveness</strong> relationship for this asset.
+          Only selected threats are considered. Controls are prioritised using <strong>Inherent Risk × Threat Effectiveness</strong>, with a bounded boost when the control directly addresses an active <strong>Cause / Precursor</strong> from the asset exposure assessment.
         </div>
 </div>
 <span class="pill" id="controlCount">0 controls</span>
 </div>
+<details class="section-help">
+<summary>How Control Priority is derived</summary>
+<div class="section-help-body">
+<p><strong>Base Control Priority = Inherent Risk Score × Threat Effectiveness.</strong></p>
+<p>If the control directly addresses one or more active <strong>Cause / Precursor</strong> conditions for that threat, a bounded context boost is applied:</p>
+<div class="formula-box"><strong>Final Control Priority = Base Control Priority × (1 + Precursor Boost)</strong></div>
+<p>The Precursor Boost is 10% per 1.00 of matched active exposure, capped at 25%. Exposure already contributes to likelihood and Inherent Risk, so this bounded boost is used only to improve control prioritisation and does not change the risk score.</p>
+</div>
+</details>
 <div style="overflow:auto;max-height:700px">
 <table>
 <thead>
@@ -1422,6 +1431,7 @@ The assessor can manually include or exclude any threat, and manual choices over
 <th>Control</th>
 <th>Control Type</th>
 <th>Risk Driving Priority</th>
+<th>Cause / Precursor Addressed</th>
 <th>Inherent Risk Score</th>
 <th>Effectiveness</th>
 <th>Control Priority Score</th>
@@ -1431,16 +1441,15 @@ The assessor can manually include or exclude any threat, and manual choices over
 <tbody id="controlResults"></tbody>
 </table>
 </div>
-<details class="step-config" id="config-control-library"><summary>⚙ Control Library &amp; Threat Mapping Configurator</summary>
+<details class="step-config" id="config-control-library"><summary>⚙ Control Library, Threat &amp; Cause Mapping Configurator</summary>
 <div class="config-wrap">
 <p class="config-note">
-        Configure each control, select one or more control types, then add the threats it mitigates and assign a separate
-        effectiveness rating for each Control-to-Threat relationship.
+        Configure each control, select one or more control types, map the threats it mitigates, and map the Cause / Precursor conditions it directly addresses. Threat effectiveness remains the core control relationship; active precursor matches provide a transparent prioritisation boost.
       </p>
 <details class="config-help">
-<summary>Help: Control Library &amp; Threat Mapping Configurator</summary>
+<summary>Help: Control Library, Threat &amp; Cause Mapping Configurator</summary>
 <div class="config-help-body">
-<ul><li><strong>Purpose:</strong> Defines which threats each control mitigates and how effective that control is against each threat.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
+<ul><li><strong>Purpose:</strong> Defines which threats each control mitigates, its effectiveness against each threat, and which Cause / Precursor conditions the control directly addresses.</li><li><strong>Cause / Precursor match:</strong> Active mapped exposure conditions provide a bounded control-priority boost of up to 25%. This does not change Inherent Risk and avoids treating exposure as a second risk score.</li><li><strong>Effectiveness scale:</strong> 1 = Low, 2 = Moderate, 3 = High, 4 = Very High.</li><li><strong>Control type:</strong> Preventive reduces likelihood; Detective, Corrective and Recovery reduce residual impact.</li><li><strong>Guideline:</strong> Effectiveness belongs to the Control-to-Threat relationship, not to the control globally.</li><li><strong>Example:</strong> MFA may be Very High against insecure credentials, High against unauthorised access, and only Moderate against ransomware.</li><li><strong>Multi-type controls:</strong> If a control has more than one type, the prototype splits its effect across those types to avoid double counting.</li></ul>
 </div>
 </details>
 <div class="toolbar">
@@ -1472,6 +1481,7 @@ The assessor can manually include or exclude any threat, and manual choices over
 <th>Control</th>
 <th>Control Type</th>
 <th>Relevant Threats</th>
+<th>Cause / Precursor Addressed</th>
 <th>Effectiveness</th>
 <th>Assessment</th>
 <th>Comments</th>
@@ -2544,7 +2554,11 @@ const defaultPrototypeControls = [
   {id:"PC-13", name:"Supplier Security Management", types:["Preventive"]},
   {id:"PC-14", name:"Incident Response Capability", types:["Corrective","Recovery"]},
   {id:"PC-15", name:"Access Control Review", types:["Preventive"]},
-  {id:"PC-16", name:"Network Resilience and Capacity Protection", types:["Preventive","Recovery"]}
+  {id:"PC-16", name:"Network Resilience and Capacity Protection", types:["Preventive","Recovery"]},
+  {id:"PC-17", name:"Secure Remote Access", types:["Preventive","Detective"]},
+  {id:"PC-18", name:"Third-Party Access Management", types:["Preventive"]},
+  {id:"PC-19", name:"Removable Media Control", types:["Preventive"]},
+  {id:"PC-20", name:"Legacy Technology Hardening", types:["Preventive","Detective"]}
 ];
 
 const defaultControlMappings = [
@@ -2561,40 +2575,145 @@ const defaultControlMappings = [
   ["T11","PC-01",4],["T11","PC-07",3],["T11","PC-15",3],["T11","PC-08",2],
   ["T12","PC-01",4],["T12","PC-02",3],["T12","PC-15",3],["T12","PC-12",2],
   ["T13","PC-05",4],["T13","PC-06",4],["T13","PC-12",2],["T13","PC-08",2],
-  ["T14","PC-07",3],["T14","PC-08",3],["T14","PC-03",2]
+  ["T14","PC-07",3],["T14","PC-08",3],["T14","PC-03",2],
+  ["T02","PC-17",4],["T06","PC-17",3],["T07","PC-17",4],["T11","PC-17",4],["T12","PC-17",4],
+  ["T02","PC-18",3],["T09","PC-18",4],["T11","PC-18",4],["T12","PC-18",3],
+  ["T01","PC-19",3],["T07","PC-19",3],["T13","PC-19",4],
+  ["T01","PC-20",3],["T05","PC-20",3],["T07","PC-20",4],["T08","PC-20",3],["T14","PC-20",3]
 ].map(([threatId,controlId,effectiveness])=>({threatId,controlId,effectiveness}));
 
+// Control-to-Cause/Precursor applicability.
+// IDs correspond to Step 2 Exposure question IDs.
+const defaultControlPrecursorMappings = {
+  "PC-01":["remoteAccess","privilegedAccess","thirdParty"],
+  "PC-02":["privilegedAccess","remoteAccess"],
+  "PC-03":["legacyTech","bespokeSoftware","internetFacing"],
+  "PC-04":["vulnerabilityExposure","legacyTech","internetFacing"],
+  "PC-05":["emailWeb","removableMedia","vulnerabilityExposure"],
+  "PC-06":["bespokeSoftware","removableMedia","legacyTech"],
+  "PC-07":["interconnectivity","thirdParty","internetFacing"],
+  "PC-08":["remoteAccess","privilegedAccess","thirdParty","internetFacing"],
+  "PC-09":["sensitiveData"],
+  "PC-10":[],
+  "PC-11":["emailWeb"],
+  "PC-12":["emailWeb","removableMedia"],
+  "PC-13":["thirdParty"],
+  "PC-14":[],
+  "PC-15":["privilegedAccess","remoteAccess","thirdParty"],
+  "PC-16":["internetFacing","interconnectivity","legacyTech"],
+  "PC-17":["remoteAccess","internetFacing","thirdParty"],
+  "PC-18":["thirdParty","remoteAccess"],
+  "PC-19":["removableMedia"],
+  "PC-20":["legacyTech","vulnerabilityExposure"]
+};
+
 function loadPrototypeControls(){
+  let saved=null;
   try{
-    const saved = JSON.parse(localStorage.getItem("bilPrototypeControlsV2"));
+    saved = JSON.parse(localStorage.getItem("bilPrototypeControlsV3"));
     if(Array.isArray(saved) && saved.length) return saved;
   }catch(e){}
+
+  // Migrate V2 while adding any new prototype controls introduced by this version.
+  try{
+    const old = JSON.parse(localStorage.getItem("bilPrototypeControlsV2"));
+    if(Array.isArray(old) && old.length){
+      const merged=structuredClone(old);
+      const ids=new Set(merged.map(c=>c.id));
+      defaultPrototypeControls.forEach(c=>{ if(!ids.has(c.id)) merged.push(structuredClone(c)); });
+      return merged;
+    }
+  }catch(e){}
+
   return structuredClone(defaultPrototypeControls);
 }
 
 function loadControlMappings(){
   try{
-    const saved = JSON.parse(localStorage.getItem("bilThreatControlMapV2"));
+    const saved = JSON.parse(localStorage.getItem("bilThreatControlMapV3"));
     if(Array.isArray(saved)) return saved;
   }catch(e){}
-  // Migrate previous prototype mappings if present.
-  try{
-    const old = JSON.parse(localStorage.getItem("bilThreatControlMapV1"));
-    if(Array.isArray(old) && old.length) return old;
-  }catch(e){}
+
+  // Migrate V2/V1 and append newly introduced default mappings without
+  // disturbing existing configured relationships.
+  let old=null;
+  for(const key of ["bilThreatControlMapV2","bilThreatControlMapV1"]){
+    try{
+      const candidate=JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(candidate) && candidate.length){ old=candidate; break; }
+    }catch(e){}
+  }
+  if(old){
+    const merged=structuredClone(old);
+    const keys=new Set(merged.map(m=>`${m.threatId}|${m.controlId}`));
+    defaultControlMappings.forEach(m=>{
+      const k=`${m.threatId}|${m.controlId}`;
+      if(!keys.has(k)) merged.push(structuredClone(m));
+    });
+    return merged;
+  }
   return structuredClone(defaultControlMappings);
 }
 
 let prototypeControls = loadPrototypeControls();
 let controlMappings = loadControlMappings();
 
+function loadControlPrecursorMappings(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("bilControlPrecursorMapV1"));
+    if(saved && typeof saved==="object" && !Array.isArray(saved)) return saved;
+  }catch(e){}
+  return structuredClone(defaultControlPrecursorMappings);
+}
+let controlPrecursorMappings = loadControlPrecursorMappings();
+
 function saveControlConfig(){
-  localStorage.setItem("bilPrototypeControlsV2", JSON.stringify(prototypeControls));
-  localStorage.setItem("bilThreatControlMapV2", JSON.stringify(controlMappings));
+  localStorage.setItem("bilPrototypeControlsV3", JSON.stringify(prototypeControls));
+  localStorage.setItem("bilThreatControlMapV3", JSON.stringify(controlMappings));
+  localStorage.setItem("bilControlPrecursorMapV1", JSON.stringify(controlPrecursorMappings));
 }
 
 function effectivenessLabel(n){
   return ["None","Low","Moderate","High","Very High"][n] || "None";
+}
+
+function activeCauseEntriesForThreat(threatId){
+  return exposureQuestionDefs
+    .filter(q=>(q.threats||[]).includes(threatId))
+    .map(q=>{
+      const value=exposureAnswers[q.id] ?? "";
+      const level=exposureLevel(value);
+      return {
+        id:q.id,
+        cause:(q.cause||"").trim() || q.label,
+        level:level.label,
+        score:Number.isFinite(level.score) ? level.score : 0
+      };
+    })
+    .filter(x=>x.score>0)
+    .sort((a,b)=>b.score-a.score);
+}
+
+function precursorMatchForControlThreat(controlId, threatId){
+  const mappedIds=new Set(controlPrecursorMappings[controlId] || []);
+  const matched=activeCauseEntriesForThreat(threatId).filter(x=>mappedIds.has(x.id));
+  const matchScore=matched.reduce((sum,x)=>sum+x.score,0);
+
+  // Exposure already contributes to Suggested/Assessed Likelihood and therefore
+  // Inherent Risk. To avoid double-counting it as another risk score, precursor
+  // matching is used only as a bounded prioritisation context boost (max 25%).
+  const boost=Math.min(0.25, matchScore * 0.10);
+  return {
+    matched,
+    matchScore,
+    boost,
+    boostFactor:1+boost
+  };
+}
+
+function precursorText(items, limit=3){
+  if(!items || !items.length) return "—";
+  return items.slice(0,limit).map(x=>x.cause).join("; ");
 }
 
 function currentRankedThreats(){
@@ -2624,51 +2743,13 @@ function buildShortRiskStatement(t){
 }
 
 function renderControls(){
-  const riskThreats = currentApplicableRiskThreats();
-  const threatById = Object.fromEntries(riskThreats.map(t=>[t.id,t]));
-  const controlById = Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
-  const controlAgg = {};
-
-  for(const m of controlMappings){
-    const t = threatById[m.threatId];
-    const c = controlById[m.controlId];
-    if(!t || !c || +m.effectiveness<=0) continue;
-
-    // Phase 5 ranking relationship:
-    // asset-specific Inherent Risk Score × configured Control Effectiveness.
-    const score = t.inherentRiskScore * (+m.effectiveness);
-
-    if(!controlAgg[c.id]){
-      controlAgg[c.id] = {
-        ...c,
-        bestScore: score,
-        bestThreat: t,
-        bestEffectiveness: +m.effectiveness,
-        relevantThreats: [{threat:t,effectiveness:+m.effectiveness,score}]
-      };
-    }else{
-      controlAgg[c.id].relevantThreats.push({threat:t,effectiveness:+m.effectiveness,score});
-      if(score > controlAgg[c.id].bestScore){
-        controlAgg[c.id].bestScore = score;
-        controlAgg[c.id].bestThreat = t;
-        controlAgg[c.id].bestEffectiveness = +m.effectiveness;
-      }
-    }
-  }
-
-  const rankedControls = Object.values(controlAgg).sort((a,b)=>{
-    if(b.bestScore !== a.bestScore) return b.bestScore-a.bestScore;
-    const aHigh = a.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
-    const bHigh = b.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
-    if(bHigh !== aHigh) return bHigh-aHigh;
-    if(b.bestEffectiveness !== a.bestEffectiveness) return b.bestEffectiveness-a.bestEffectiveness;
-    return b.relevantThreats.length-a.relevantThreats.length;
-  });
-
+  const rankedControls=getPrioritisedControlData();
   const tbody=document.getElementById("controlResults");
+  if(!tbody) return;
   tbody.innerHTML="";
+
   if(!rankedControls.length){
-    tbody.innerHTML='<tr><td colspan="8" class="empty">Select BIL ratings above 0 to identify prioritised controls.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="9" class="empty">Select applicable threats to identify prioritised controls.</td></tr>';
   }else{
     rankedControls.forEach((c,idx)=>{
       const others = c.relevantThreats
@@ -2677,8 +2758,13 @@ function renderControls(){
         .slice(0,4);
 
       const tags = others.length
-        ? `<div class="threat-tags">${others.map(x=>`<span class="threat-tag" title="${x.threat.name}: ${x.threat.inherentRiskScore.toFixed(2)} × ${x.effectiveness} = ${x.score.toFixed(2)}">${x.threat.id} · ${x.score.toFixed(1)}</span>`).join("")}</div>`
+        ? `<div class="threat-tags">${others.map(x=>`<span class="threat-tag" title="${x.threat.name}: priority ${x.score.toFixed(2)}">${x.threat.id} · ${x.score.toFixed(1)}</span>`).join("")}</div>`
         : '<span class="muted-small">—</span>';
+
+      const pm=c.bestPrecursorMatch;
+      const causeHtml=pm.matched.length
+        ? `<strong>${precursorText(pm.matched)}</strong><br><span class="muted-small">${pm.matched.length} active match${pm.matched.length===1?"":"es"} · +${(pm.boost*100).toFixed(0)}% priority context</span>`
+        : '<span class="muted-small">No direct active precursor match</span>';
 
       const tr=document.createElement("tr");
       tr.innerHTML=`
@@ -2689,6 +2775,7 @@ function renderControls(){
           <div class="control-risk-summary">${buildShortRiskStatement(c.bestThreat)}</div>
           <span class="muted-small">${c.bestThreat.id} – ${c.bestThreat.name}</span>
         </td>
+        <td>${causeHtml}</td>
         <td>
           <span class="score">${c.bestThreat.inherentRiskScore.toFixed(2)}</span>
           <br><span class="muted-small">Impact ${c.bestThreat.score.toFixed(2)} × Likelihood ${c.bestThreat.assessed}</span>
@@ -2702,12 +2789,13 @@ function renderControls(){
         </td>
         <td>
           <span class="score">${c.bestScore.toFixed(2)}</span>
-          <br><span class="muted-small">${c.bestThreat.inherentRiskScore.toFixed(2)} × ${c.bestEffectiveness}</span>
+          <br><span class="muted-small">${c.bestBaseScore.toFixed(2)} base × ${pm.boostFactor.toFixed(2)} precursor</span>
         </td>
         <td>${tags}</td>`;
       tbody.appendChild(tr);
     });
   }
+
   tbody.querySelectorAll(".priority-effectiveness").forEach(sel=>{
     sel.addEventListener("change",()=>{
       const controlId=sel.dataset.controlId;
@@ -2719,12 +2807,13 @@ function renderControls(){
         renderControls();
         renderControlChecklist();
         renderResidualRisk();
+        if(typeof renderReport==="function") renderReport();
       }
     });
   });
 
-  document.getElementById("controlCount").textContent =
-    `${rankedControls.length} prioritised control${rankedControls.length===1?"":"s"}`;
+  const count=document.getElementById("controlCount");
+  if(count) count.textContent=`${rankedControls.length} prioritised control${rankedControls.length===1?"":"s"}`;
 }
 
 function newControlId(){
@@ -2762,7 +2851,8 @@ function renderControlConfigurator(){
     const nameInput=head.querySelector('input[type="text"]');
     nameInput.addEventListener("change",()=>{
       control.name=nameInput.value.trim() || control.name;
-      saveControlConfig(); renderControls();
+      saveControlConfig();
+      renderControls();
       renderControlChecklist();
       renderResidualRisk();
       if(typeof renderReport==="function") renderReport();
@@ -2777,7 +2867,10 @@ function renderControlConfigurator(){
         control.types = control.types || [];
         if(e.target.checked && !control.types.includes(type)) control.types.push(type);
         if(!e.target.checked) control.types=control.types.filter(x=>x!==type);
-        saveControlConfig(); renderControls();
+        saveControlConfig();
+        renderControls();
+        renderControlChecklist();
+        renderResidualRisk();
       });
       typeHost.appendChild(label);
     });
@@ -2786,6 +2879,7 @@ function renderControlConfigurator(){
       if(!confirm(`Delete ${control.id} – ${control.name}?`)) return;
       prototypeControls=prototypeControls.filter(c=>c.id!==control.id);
       controlMappings=controlMappings.filter(m=>m.controlId!==control.id);
+      delete controlPrecursorMappings[control.id];
       saveControlConfig();
       renderControlConfigurator();
       renderControls();
@@ -2828,11 +2922,14 @@ function renderControlConfigurator(){
         saveControlConfig();
         renderControlConfigurator();
         renderControls();
+        renderControlChecklist();
       });
       row.querySelector(".effectiveness-select").addEventListener("change",e=>{
         mapping.effectiveness=+e.target.value;
         saveControlConfig();
         renderControls();
+        renderControlChecklist();
+        renderResidualRisk();
       });
       row.querySelector("button").addEventListener("click",()=>{
         const idx=controlMappings.indexOf(mapping);
@@ -2840,6 +2937,8 @@ function renderControlConfigurator(){
         saveControlConfig();
         renderControlConfigurator();
         renderControls();
+        renderControlChecklist();
+        renderResidualRisk();
       });
       area.appendChild(row);
     });
@@ -2863,6 +2962,49 @@ function renderControlConfigurator(){
     });
     area.appendChild(add);
     card.appendChild(area);
+
+    const precursorArea=document.createElement("div");
+    precursorArea.className="mapping-area";
+    precursorArea.style.marginTop="12px";
+
+    const ptitle=document.createElement("div");
+    ptitle.className="mapping-title";
+    ptitle.textContent="Cause / Precursor addressed";
+    precursorArea.appendChild(ptitle);
+
+    const pnote=document.createElement("div");
+    pnote.className="muted-small";
+    pnote.style.marginBottom="8px";
+    pnote.textContent="Select exposure conditions this control directly addresses. Active matches provide up to a 25% prioritisation boost.";
+    precursorArea.appendChild(pnote);
+
+    const grid=document.createElement("div");
+    grid.className="type-checks";
+    grid.style.display="grid";
+    grid.style.gridTemplateColumns="repeat(auto-fit,minmax(260px,1fr))";
+    grid.style.gap="6px 12px";
+
+    const mappedIds=new Set(controlPrecursorMappings[control.id] || []);
+    exposureQuestionDefs.forEach(q=>{
+      const label=document.createElement("label");
+      const cause=(q.cause||"").trim() || q.label;
+      label.title=q.label;
+      label.innerHTML=`<input type="checkbox" data-precursor-id="${q.id}" ${mappedIds.has(q.id)?"checked":""}> ${cause}`;
+      label.querySelector("input").addEventListener("change",e=>{
+        const current=new Set(controlPrecursorMappings[control.id] || []);
+        if(e.target.checked) current.add(q.id);
+        else current.delete(q.id);
+        controlPrecursorMappings[control.id]=[...current];
+        saveControlConfig();
+        renderControls();
+        renderControlChecklist();
+        if(typeof renderReport==="function") renderReport();
+      });
+      grid.appendChild(label);
+    });
+    precursorArea.appendChild(grid);
+    card.appendChild(precursorArea);
+
     host.appendChild(card);
   });
 }
@@ -2870,6 +3012,7 @@ function renderControlConfigurator(){
 document.getElementById("addControlBtn").addEventListener("click",()=>{
   const id=newControlId();
   prototypeControls.push({id,name:"New Prototype Control",types:["Preventive"]});
+  controlPrecursorMappings[id]=[];
   saveControlConfig();
   renderControlConfigurator();
   renderControls();
@@ -2878,6 +3021,7 @@ document.getElementById("addControlBtn").addEventListener("click",()=>{
 document.getElementById("resetControlMapBtn").addEventListener("click",()=>{
   prototypeControls=structuredClone(defaultPrototypeControls);
   controlMappings=structuredClone(defaultControlMappings);
+  controlPrecursorMappings=structuredClone(defaultControlPrecursorMappings);
   saveControlConfig();
   renderControlConfigurator();
   renderControls();
@@ -3028,28 +3172,51 @@ function getPrioritisedControlData(){
     const c = controlById[m.controlId];
     if(!t || !c || +m.effectiveness<=0) continue;
 
-    const score = t.inherentRiskScore * (+m.effectiveness);
+    const baseScore = t.inherentRiskScore * (+m.effectiveness);
+    const precursorMatch = precursorMatchForControlThreat(c.id,t.id);
+    const score = baseScore * precursorMatch.boostFactor;
+
+    const rel={
+      threat:t,
+      effectiveness:+m.effectiveness,
+      baseScore,
+      score,
+      precursorMatch
+    };
 
     if(!controlAgg[c.id]){
       controlAgg[c.id] = {
         ...c,
         bestScore:score,
+        bestBaseScore:baseScore,
         bestThreat:t,
         bestEffectiveness:+m.effectiveness,
-        relevantThreats:[{threat:t,effectiveness:+m.effectiveness,score}]
+        bestPrecursorMatch:precursorMatch,
+        relevantThreats:[rel]
       };
     }else{
-      controlAgg[c.id].relevantThreats.push({threat:t,effectiveness:+m.effectiveness,score});
-      if(score > controlAgg[c.id].bestScore){
+      controlAgg[c.id].relevantThreats.push(rel);
+      if(
+        score > controlAgg[c.id].bestScore ||
+        (score===controlAgg[c.id].bestScore && precursorMatch.matchScore>controlAgg[c.id].bestPrecursorMatch.matchScore)
+      ){
         controlAgg[c.id].bestScore=score;
+        controlAgg[c.id].bestBaseScore=baseScore;
         controlAgg[c.id].bestThreat=t;
         controlAgg[c.id].bestEffectiveness=+m.effectiveness;
+        controlAgg[c.id].bestPrecursorMatch=precursorMatch;
       }
     }
   }
 
   return Object.values(controlAgg).sort((a,b)=>{
     if(b.bestScore!==a.bestScore) return b.bestScore-a.bestScore;
+    if(b.bestPrecursorMatch.matchScore!==a.bestPrecursorMatch.matchScore)
+      return b.bestPrecursorMatch.matchScore-a.bestPrecursorMatch.matchScore;
+    const aHigh=a.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
+    const bHigh=b.relevantThreats.filter(x=>x.threat.inherentRiskScore>=12).length;
+    if(bHigh!==aHigh) return bHigh-aHigh;
+    if(b.bestEffectiveness!==a.bestEffectiveness) return b.bestEffectiveness-a.bestEffectiveness;
     return b.relevantThreats.length-a.relevantThreats.length;
   });
 }
@@ -3061,7 +3228,7 @@ function renderControlChecklist(){
   tbody.innerHTML="";
 
   if(!controls.length){
-    tbody.innerHTML='<tr><td colspan="7" class="empty">No controls are currently applicable.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" class="empty">No controls are currently applicable.</td></tr>';
   }else{
     controls.forEach((c,idx)=>{
       const assessment = controlAssessments[c.id] || "";
@@ -3071,12 +3238,17 @@ function renderControlChecklist(){
         .map(x=>`${x.threat.id} (${x.effectiveness})`)
         .join(", ");
 
+      const causes=c.bestPrecursorMatch.matched.length
+        ? precursorText(c.bestPrecursorMatch.matched)
+        : "—";
+
       const tr=document.createElement("tr");
       tr.innerHTML=`
         <td><span class="rank">${idx+1}</span></td>
         <td><strong>${c.id}</strong> – ${c.name}</td>
         <td>${(c.types||[]).join(" / ") || "Unclassified"}</td>
         <td><span class="muted-small">${relevant}</span></td>
+        <td><span class="muted-small">${causes}</span></td>
         <td>${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</td>
         <td>
           <select class="assessment-select" data-control-id="${c.id}">
@@ -3441,6 +3613,7 @@ function renderReport(){
       <td>${idx+1}</td>
       <td>${escHtml(c.id)} - ${escHtml(c.name)}</td>
       <td>${escHtml((c.types||[]).join(" / "))}</td>
+      <td>${escHtml(precursorText(c.bestPrecursorMatch.matched))}</td>
       <td>${c.bestEffectiveness} - ${effectivenessLabel(c.bestEffectiveness)}</td>
       <td>${escHtml(status)}</td>
       <td>${escHtml(controlComments[c.id]||"")}</td>
@@ -3488,8 +3661,8 @@ function renderReport(){
     <div class="report-section">
       <h3>Control Assessment</h3>
       <table class="report-table">
-        <thead><tr><th>#</th><th>Control</th><th>Type</th><th>Effectiveness</th><th>Status</th><th>Comments</th></tr></thead>
-        <tbody>${controlRows || '<tr><td colspan="6">No applicable controls.</td></tr>'}</tbody>
+        <thead><tr><th>#</th><th>Control</th><th>Type</th><th>Cause / Precursor Addressed</th><th>Effectiveness</th><th>Status</th><th>Comments</th></tr></thead>
+        <tbody>${controlRows || '<tr><td colspan="7">No applicable controls.</td></tr>'}</tbody>
       </table>
     </div>
 
