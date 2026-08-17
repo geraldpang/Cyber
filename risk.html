@@ -1206,7 +1206,8 @@
 <h2 style="margin:0">3. Identify Relevant Threats</h2>
       <div class="config-note">
 <strong>Exposure-based prioritisation:</strong> Threats are ranked using the asset's exposure profile from Step 2.
-The assessor decides which threats should proceed to Inherent Risk. Threat selections reset when the page is reloaded.
+Threats rated <strong>High</strong> or <strong>Very High</strong> under Exposure / Likelihood are automatically selected for risk assessment.
+The assessor can manually include or exclude any threat, and manual choices override the recommendation for the current assessment session.
 </div>
 
 <div class="sub" style="margin:4px 0 0">
@@ -1652,6 +1653,11 @@ function loadThreatSelections(){
 }
 
 let threatSelections = loadThreatSelections();
+
+// Tracks threats selected automatically by the exposure rule.
+// Manual assessor choices are removed from this set so they are preserved.
+let autoSelectedThreats = new Set();
+
 let lastThreatAutoSelectBilSignature = null;
 
 function saveThreatSelections(){
@@ -1686,6 +1692,11 @@ function exposurePriorityLabel(total){
   if(total <= 1.00) return "Medium";
   if(total <= 1.50) return "High";
   return "Very High";
+}
+
+function shouldAutoSelectThreatByExposure(total){
+  const label = exposurePriorityLabel(total);
+  return label === "High" || label === "Very High";
 }
 
 function rankedThreatCandidates(){
@@ -1752,7 +1763,31 @@ function render(){
   if(driver.includes("A")) document.querySelector(".cia-mini-a")?.classList.add("is-driver");
 
   const ranked=rankedThreatCandidates();
-  if(!bilComplete) threatSelections = {};
+  if(!bilComplete){
+    threatSelections = {};
+    autoSelectedThreats = new Set();
+  }else{
+    ranked.forEach(t=>{
+      const recommended = shouldAutoSelectThreatByExposure(t.exposureScore);
+
+      // No assessor decision yet: follow the exposure-based recommendation.
+      if(!(t.id in threatSelections)){
+        if(recommended){
+          threatSelections[t.id] = true;
+          autoSelectedThreats.add(t.id);
+        }
+      }
+      // If this threat is still system-managed, keep it aligned with exposure.
+      else if(autoSelectedThreats.has(t.id)){
+        if(recommended){
+          threatSelections[t.id] = true;
+        }else{
+          delete threatSelections[t.id];
+          autoSelectedThreats.delete(t.id);
+        }
+      }
+    });
+  }
 
   const tbody=document.getElementById("results");
   if(!tbody) return;
@@ -1770,7 +1805,10 @@ function render(){
 
       const tr=document.createElement("tr");
       tr.innerHTML=`
-        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Include ${t.id} in Risk"></td>
+        <td>
+          <input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Include ${t.id} in Risk">
+          ${autoSelectedThreats.has(t.id) ? '<span class="muted-small" style="margin-left:6px">Auto</span>' : ''}
+        </td>
         <td><span class="rank">${idx+1}</span></td>
         <td><strong>${t.id}</strong> – ${t.name}</td>
         <td>
@@ -1805,6 +1843,10 @@ function render(){
   tbody.querySelectorAll(".threat-use").forEach(cb=>{
     cb.addEventListener("change",()=>{
       threatSelections[cb.dataset.threatId]=cb.checked;
+
+      // Assessor action overrides the system recommendation.
+      autoSelectedThreats.delete(cb.dataset.threatId);
+
       saveThreatSelections();
       updateThreatSelectionViews();
       renderInherentRisk();
@@ -1818,7 +1860,10 @@ function render(){
   const selectAll=document.getElementById("selectAllThreats");
   if(selectAll){
     selectAll.onchange=()=>{
-      ranked.forEach(t=>{ threatSelections[t.id]=selectAll.checked; });
+      ranked.forEach(t=>{
+        threatSelections[t.id]=selectAll.checked;
+        autoSelectedThreats.delete(t.id);
+      });
       saveThreatSelections();
       tbody.querySelectorAll(".threat-use").forEach(cb=>{ cb.checked=selectAll.checked; });
       selectAll.indeterminate=false;
