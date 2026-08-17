@@ -1489,6 +1489,30 @@
 <div class="toolbar">
 <div>
 <h2 style="margin:0">7. Residual Risk</h2>
+      <details class="section-help residual-risk-help">
+        <summary>How Residual Risk is derived</summary>
+        <div class="section-help-body">
+          <p>
+            <strong>Residual Risk</strong> starts from the Inherent Risk values and changes only where assessed controls
+            provide measurable mitigation.
+          </p>
+          <ul>
+            <li><strong>Preventive controls</strong> can reduce Residual Likelihood.</li>
+            <li><strong>Detective, Corrective and Recovery controls</strong> can reduce Residual Impact.</li>
+            <li><strong>Blank, Not Implemented, Not Sure or Not Applicable</strong> controls provide no mitigation.</li>
+          </ul>
+          <div class="formula-box">
+            <strong>If Likelihood Mitigation = 0% → Residual Likelihood = Assessed Inherent Likelihood</strong><br>
+            <strong>If Impact Mitigation = 0% → Residual Impact = Inherent Impact</strong><br>
+            <strong>If both are 0% → Residual Risk = Inherent Risk</strong>
+          </div>
+          <p>
+            The resulting Residual Likelihood and Residual Impact are then looked up against the same risk matrix used
+            for Inherent Risk.
+          </p>
+        </div>
+      </details>
+
 <div class="sub" style="margin:4px 0 0">
           Residual risk is calculated after considering how implemented controls reduce likelihood and impact.
         </div>
@@ -3146,13 +3170,31 @@ function renderControlChecklist(){
 }
 
 function controlContribution(effectiveness, implementationFactor){
-  if(implementationFactor===null) return null;
   const base = EFFECTIVENESS_REDUCTION[+effectiveness] || 0;
-  return base * implementationFactor;
+
+  // Blank / unassessed / Not Applicable / invalid statuses provide no
+  // measurable mitigation. They must never introduce NaN into the model.
+  if(implementationFactor===null || !Number.isFinite(+implementationFactor)){
+    return 0;
+  }
+
+  return base * Math.max(0, Math.min(1, +implementationFactor));
 }
 
 function residualForThreat(t){
   const mappings = controlMappings.filter(m=>m.threatId===t.id && +m.effectiveness>0);
+
+  // Residual risk starts from the inherent values.
+  const inherentLikelihood = Number.isFinite(+t.assessed)
+    ? +t.assessed
+    : (Number.isFinite(+t.suggested) ? +t.suggested : 1);
+
+  // Inherent Risk uses the rounded threat impact, so Residual Impact must
+  // start from the same value. This guarantees 0% mitigation = no change.
+  const inherentImpact = Number.isFinite(+t.impact)
+    ? +t.impact
+    : Math.max(1, Math.min(5, Math.round(+t.score || 1)));
+
   let likelihoodResidualFactor = 1.0;
   let impactResidualFactor = 1.0;
 
@@ -3163,22 +3205,26 @@ function residualForThreat(t){
     const status = controlAssessments[control.id] || "";
     const implementationFactor = ASSESSMENT_FACTORS[status];
     const contribution = controlContribution(+m.effectiveness, implementationFactor);
-    if(contribution===null) continue;
+
+    // Zero contribution means no mitigation and therefore no change.
+    if(!Number.isFinite(contribution) || contribution<=0) continue;
 
     const types = control.types || [];
-    const applicableTypes = types.filter(t => ["Preventive","Detective","Corrective","Recovery"].includes(t));
+    const applicableTypes = types.filter(type =>
+      ["Preventive","Detective","Corrective","Recovery"].includes(type)
+    );
     const typeCount = Math.max(1, applicableTypes.length);
 
-    // For multi-type controls, split the configured effectiveness equally
-    // across the selected control types to avoid double counting.
-    const allocatedContribution = contribution / typeCount;
+    // Split effectiveness across multiple control types to avoid double counting.
+    const allocatedContribution = Math.max(
+      0,
+      Math.min(1, contribution / typeCount)
+    );
 
-    // Preventive controls reduce likelihood.
     if(types.includes("Preventive")){
       likelihoodResidualFactor *= (1 - allocatedContribution);
     }
 
-    // Detective, Corrective and Recovery controls reduce realised impact.
     if(types.includes("Detective")){
       impactResidualFactor *= (1 - allocatedContribution);
     }
@@ -3190,20 +3236,44 @@ function residualForThreat(t){
     }
   }
 
-  const preventiveCoverage = 1 - likelihoodResidualFactor;
-  const impactMitigation = 1 - impactResidualFactor;
+  likelihoodResidualFactor = Math.max(0, Math.min(1, likelihoodResidualFactor));
+  impactResidualFactor = Math.max(0, Math.min(1, impactResidualFactor));
 
-  const residualLikelihoodRaw = Math.max(1, t.assessed * likelihoodResidualFactor);
-  const residualLikelihood = Math.max(1, Math.min(5, Math.round(residualLikelihoodRaw)));
+  const preventiveCoverage = Math.max(0, Math.min(1, 1 - likelihoodResidualFactor));
+  const impactMitigation = Math.max(0, Math.min(1, 1 - impactResidualFactor));
 
-  // Preserve BIL as the underlying business impact; residual impact is a separate realised-impact value.
-  const residualImpactRaw = Math.max(1, t.score * impactResidualFactor);
-  const residualImpact = Math.max(1, Math.min(5, Math.round(residualImpactRaw)));
+  // Exact no-mitigation rule:
+  // 0% likelihood mitigation => residual likelihood = inherent likelihood.
+  const residualLikelihoodRaw = preventiveCoverage===0
+    ? inherentLikelihood
+    : Math.max(1, inherentLikelihood * likelihoodResidualFactor);
+
+  const residualLikelihood = preventiveCoverage===0
+    ? inherentLikelihood
+    : Math.max(1, Math.min(5, Math.round(residualLikelihoodRaw)));
+
+  // Exact no-mitigation rule:
+  // 0% impact mitigation => residual impact = inherent impact.
+  const residualImpactRaw = impactMitigation===0
+    ? inherentImpact
+    : Math.max(1, inherentImpact * impactResidualFactor);
+
+  const residualImpact = impactMitigation===0
+    ? inherentImpact
+    : Math.max(1, Math.min(5, Math.round(residualImpactRaw)));
 
   const matrixCell = getRiskMatrixCell(residualLikelihood, residualImpact);
   const residualRiskScore = +matrixCell.value;
 
+  const inherentCell = getRiskMatrixCell(inherentLikelihood, inherentImpact);
+  const inherentRiskScore = Number.isFinite(+t.inherentRiskScore)
+    ? +t.inherentRiskScore
+    : +inherentCell.value;
+
   return {
+    inherentLikelihood,
+    inherentImpact,
+    inherentRiskScore,
     preventiveCoverage,
     impactMitigation,
     residualLikelihoodRaw,
@@ -3211,7 +3281,10 @@ function residualForThreat(t){
     residualImpactRaw,
     residualImpact,
     residualRiskScore,
-    residualRiskColor:matrixCell.color
+    residualRiskColor:matrixCell.color,
+    hasLikelihoodMitigation:preventiveCoverage>0,
+    hasImpactMitigation:impactMitigation>0,
+    hasAnyMitigation:(preventiveCoverage>0 || impactMitigation>0)
   };
 }
 
@@ -3241,18 +3314,18 @@ function renderResidualRisk(){
         </td>
         <td>
           <span class="score">${t.residualLikelihood}</span> – ${LIKELIHOOD_LABELS[t.residualLikelihood]}
-          <br><span class="muted-small">Raw ${t.residualLikelihoodRaw.toFixed(2)}</span>
+          ${!t.hasLikelihoodMitigation ? '<br><span class="muted-small">No change from inherent</span>' : ''}
         </td>
         <td>
           <span class="score">${(t.impactMitigation*100).toFixed(0)}%</span>
         </td>
         <td>
-          <span class="score">${t.residualImpact}</span>
-          <br><span class="muted-small">Raw ${t.residualImpactRaw.toFixed(2)}</span>
+          <span class="score">${t.residualImpact}</span> – ${BIL_LABELS[t.residualImpact]}
+          ${!t.hasImpactMitigation ? '<br><span class="muted-small">No change from inherent</span>' : ''}
         </td>
         <td>
           ${riskBadgeHtml(t.residualLikelihood,t.residualImpact)}
-          <div class="risk-movement">${t.inherentRiskScore} → ${t.residualRiskScore}</div>
+          <div class="risk-movement">${t.inherentRiskScore} → ${t.residualRiskScore}${!t.hasAnyMitigation ? " (unchanged)" : ""}</div>
         </td>
         <td>
           <input class="notes-input residual-note" data-residual-note-for="${t.id}"
