@@ -1210,7 +1210,7 @@ The assessor decides which threats should proceed to Inherent Risk. Threat selec
 </div>
 
 <div class="sub" style="margin:4px 0 0">
-            Threats with the strongest mapped exposure are shown first. <strong>Exposure Relevance</strong> updates live from Step 2. <strong>BIL Impact Relevance</strong> remains based on BIL and the Threat-to-CIA mapping. Review both, then select the threats that should proceed to risk assessment.
+            Threats with the strongest mapped exposure are shown first. <strong>Exposure / Likelihood</strong> updates live from Step 2. <strong>Cause / Precursor</strong> shows the configured exposure conditions driving that threat, rather than repeating the assessment questions. <strong>BIL Impact Relevance</strong> remains based on BIL and the Threat-to-CIA mapping.
           </div>
       <details class="section-help threat-score-help">
         <summary>Help: How the Relative Score is calculated</summary>
@@ -1266,9 +1266,9 @@ The assessor decides which threats should proceed to Inherent Risk. Threat selec
 <tr>
 <th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input aria-label="Select all threats" id="selectAllThreats" type="checkbox"/> Include in Risk</label></th>
 <th>Priority</th>
-<th>Threat</th>
-<th>Exposure Relevance</th>
-<th>Exposure Drivers</th>
+<th>Threat / Hazard</th>
+<th>Exposure / Likelihood</th>
+<th>Cause / Precursor</th>
 <th>Threat Impact</th>
 <th>BIL Impact Relevance</th>
 </tr>
@@ -1765,12 +1765,12 @@ function render(){
       const pct=(t.score/5)*100;
       const exposureDrivers=t.exposureDrivers.length
         ? t.exposureDrivers.slice().sort((a,b)=>b.score-a.score).slice(0,3)
-            .map(d=>`${d.level}: ${d.question.replace(/\?$/,"")}`).join("<br>")
-        : '<span class="muted-small">No active mapped exposure</span>';
+            .map(d=>d.cause).join("<br>")
+        : '<span class="muted-small">No active mapped cause / precursor</span>';
 
       const tr=document.createElement("tr");
       tr.innerHTML=`
-        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Include ${t.id} in Inherent Risk"></td>
+        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Include ${t.id} in Risk"></td>
         <td><span class="rank">${idx+1}</span></td>
         <td><strong>${t.id}</strong> – ${t.name}</td>
         <td>
@@ -2286,6 +2286,7 @@ function exposureUpliftForThreat(threatId){
       total += level.score;
       drivers.push({
         question:q.label,
+        cause:(q.cause || "").trim() || q.label,
         level:level.label,
         score:level.score
       });
