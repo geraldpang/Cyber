@@ -980,16 +980,16 @@
 <header>
 <div class="wrap">
 <h1>Cybersecurity Threat Risk Assessment Process</h1>
-<p>Prototype for BIL-Driven Cyber Risk Assessment</p>
+<p>Prototype for BIL & Exposure-Driven Cyber Risk Assessment</p>
 </div>
 </header>
 <div class="stepper-shell">
 <div class="stepper" id="progressStepper">
 <button class="step active" data-target="step-bil"><span>1</span><small>BIL</small></button>
 <div class="step-line"></div>
-<button class="step" data-target="step-threats"><span>2</span><small>Threats</small></button>
+<button class="step" data-target="step-exposure"><span>2</span><small>Exposure</small></button>
 <div class="step-line"></div>
-<button class="step" data-target="step-exposure"><span>3</span><small>Exposure</small></button>
+<button class="step" data-target="step-threats"><span>3</span><small>Threats</small></button>
 <div class="step-line"></div>
 <button class="step" data-target="step-inherent"><span>4</span><small>Inherent Risk</small></button>
 <div class="step-line"></div>
@@ -1073,123 +1073,15 @@
 </div>
 <div class="screen-actions">
 <span></span>
-<button class="primary screen-nav bil-next" data-step-index="1">Next: Threats →</button>
+<button class="primary screen-nav bil-next" data-step-index="1">Next: Exposure →</button>
 </div>
 </section>
-<section class="card step-screen" id="step-threats">
-<div class="toolbar">
-<div>
-<h2 style="margin:0">2. Relevant Threats</h2>
-      <div class="config-note">
-        <strong>Auto-selection recommendation:</strong> When BIL is complete, the threat(s) with the highest
-        Relative Score are selected automatically. If several threats have the same highest score, all tied
-        threats are selected. You can amend the selections manually. Selections reset when the page is reloaded.
-      </div>
-
-<div class="sub" style="margin:4px 0 0">
-            Automatically ranked from highest to lowest impact. Select only the threats that are applicable to this asset.
-          </div>
-      <details class="section-help threat-score-help">
-        <summary>Help: How the Relative Score is calculated</summary>
-        <div class="section-help-body">
-          <p>
-            The <strong>Relative Score</strong> is used to rank threats according to how strongly each threat could affect
-            the asset's assessed Confidentiality, Integrity and Availability impact.
-          </p>
-
-          <div class="formula-box">
-            <strong>Relative Score = MAX(BIL-C × C Weight, BIL-I × I Weight, BIL-A × A Weight)</strong>
-          </div>
-
-          <p>
-            Threat-to-CIA weights are configured on a 0–3 scale and are normalised before calculation:
-          </p>
-          <ul>
-            <li><strong>0 – None:</strong> no meaningful relationship to that CIA dimension.</li>
-            <li><strong>1 – Secondary:</strong> limited relationship.</li>
-            <li><strong>2 – Significant:</strong> meaningful relationship.</li>
-            <li><strong>3 – Primary:</strong> strongest relationship.</li>
-          </ul>
-
-          <p>
-            The normalised weights are therefore 0, 0.33, 0.67 and 1.00. The calculation uses the
-            <strong>highest resulting CIA value</strong>, because the threat is prioritised according to its strongest
-            business-impact pathway.
-          </p>
-
-          <div class="worked-example">
-            <strong>Example</strong><br>
-            Assume the asset is assessed as <strong>C2 / I4 / A5</strong> and a threat is mapped as
-            <strong>C1 / I2 / A3</strong>.<br><br>
-            Confidentiality = 2 × 0.33 = 0.66<br>
-            Integrity = 4 × 0.67 = 2.68<br>
-            Availability = 5 × 1.00 = 5.00<br><br>
-            <strong>Relative Score = 5.00</strong>
-          </div>
-
-          <p>
-            <strong>Important:</strong> Relative Score represents <em>potential impact relevance</em>, not likelihood.
-            Likelihood is assessed later using Asset Exposure and the inherent-likelihood model.
-          </p>
-        </div>
-      </details>
-
-</div>
-<span class="pill" id="threatCount">0 relevant threats</span>
-</div>
-<div style="overflow:auto;max-height:620px">
-<table>
-<thead>
-<tr>
-<th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input aria-label="Select all threats" id="selectAllThreats" type="checkbox"/> Select All</label></th>
-<th>Priority</th>
-<th>Threat</th>
-<th>Primary CIA Driver</th>
-<th>Threat Impact</th>
-<th>Relative Score</th>
-</tr>
-</thead>
-<tbody id="results"></tbody>
-</table>
-</div>
-<details class="step-config" id="config-threat-cia"><summary>⚙ Threat-to-CIA Matrix Configurator</summary>
-<div class="config-wrap">
-<p class="config-note">
-        Configure how strongly each threat affects Confidentiality, Integrity and Availability.
-        Values: 0 = no material relationship, 1 = secondary, 2 = significant, 3 = primary.
-        Changes are saved in this browser and immediately affect threat ranking.
-      </p>
-<details class="config-help">
-<summary>Help: Threat-to-CIA Configurator</summary>
-<div class="config-help-body">
-<ul><li><strong>Purpose:</strong> Defines which CIA dimensions each threat can affect.</li><li><strong>Scale:</strong> 0 = none, 1 = secondary, 2 = significant, 3 = primary.</li><li><strong>Effect:</strong> The mapping is combined with BIL-C, BIL-I and BIL-A to calculate the threat impact for the asset.</li><li><strong>Guideline:</strong> Use the strongest reasonably expected business effect of the threat, not the likelihood of occurrence.</li><li><strong>Example:</strong> Denial of Service would normally have a strong Availability relationship and little or no Confidentiality relationship.</li></ul>
-</div>
-</details>
-<div class="toolbar">
-<div class="pill">Configuration scale: 0–3</div>
-<button class="danger" id="resetBtn">Reset default matrix</button>
-</div>
-<table>
-<thead>
-<tr>
-<th>Threat</th>
-<th>Confidentiality</th>
-<th>Integrity</th>
-<th>Availability</th>
-</tr>
-</thead>
-<tbody id="configBody"></tbody>
-</table>
-</div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous</button><button class="primary screen-nav" data-step-index="2">Next →</button></div></section>
-
-
 <section class="card step-screen" id="step-exposure" style="margin-top:20px">
 <div class="toolbar">
 <div>
-<h2 style="margin:0">3. Asset Exposure</h2>
+<h2 style="margin:0">2. Asset Exposure</h2>
 <div class="sub" style="margin:4px 0 0">
-          Describe the asset's exposure characteristics. These answers are used to calculate the suggested inherent likelihood for applicable threats.
+          Describe the asset's exposure characteristics. Exposure is used to prioritise threats and also to calculate suggested inherent likelihood for threats selected by the assessor.
         </div>
 </div>
 </div>
@@ -1198,11 +1090,11 @@
       <div class="exposure-impact-panel" id="exposureThreatImpactPanel">
         <div class="exposure-impact-head">
           <div>
-            <h3>Exposure Impact on Threat Likelihood</h3>
+            <h3>Exposure Signals for Threat Prioritisation</h3>
             <p>
-              Only threats explicitly checked in <strong>Step 2 – Relevant Threats</strong> are shown here.
-              Exposure does not change the asset's BIL; it changes the <strong>suggested inherent likelihood</strong>
-              for selected threats that are mapped to the exposure factors below.
+              All configured threats are shown here so you can see how the asset's exposure profile affects them before threat selection.
+              Exposure does not change the asset's BIL. It is used to <strong>prioritise threats in Step 3</strong> and also contributes
+              to the <strong>suggested inherent likelihood</strong> for threats the assessor later selects.
             </p>
           </div>
           <details class="section-help exposure-impact-help">
@@ -1305,7 +1197,115 @@
 <div id="exposureQuestionConfigList"></div>
 </div>
 </div>
-</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous</button><button class="primary screen-nav" data-step-index="3">Next →</button></div></section>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="0">← Previous</button><button class="primary screen-nav" data-step-index="2">Next: Threats →</button></div></section>
+
+
+<section class="card step-screen" id="step-threats">
+<div class="toolbar">
+<div>
+<h2 style="margin:0">3. Identify Relevant Threats</h2>
+      <div class="config-note">
+<strong>Exposure-based prioritisation:</strong> Threats are ranked using the asset's exposure profile from Step 2.
+The assessor decides which threats should proceed to Inherent Risk. Threat selections reset when the page is reloaded.
+</div>
+
+<div class="sub" style="margin:4px 0 0">
+            Threats with the strongest mapped exposure are shown first. <strong>Exposure Relevance</strong> updates live from Step 2. <strong>BIL Impact Relevance</strong> remains based on BIL and the Threat-to-CIA mapping. Review both, then select the threats that should proceed to risk assessment.
+          </div>
+      <details class="section-help threat-score-help">
+        <summary>Help: How the Relative Score is calculated</summary>
+        <div class="section-help-body">
+          <p>
+            The <strong>Relative Score</strong> is used to rank threats according to how strongly each threat could affect
+            the asset's assessed Confidentiality, Integrity and Availability impact.
+          </p>
+
+          <div class="formula-box">
+            <strong>Relative Score = MAX(BIL-C × C Weight, BIL-I × I Weight, BIL-A × A Weight)</strong>
+          </div>
+
+          <p>
+            Threat-to-CIA weights are configured on a 0–3 scale and are normalised before calculation:
+          </p>
+          <ul>
+            <li><strong>0 – None:</strong> no meaningful relationship to that CIA dimension.</li>
+            <li><strong>1 – Secondary:</strong> limited relationship.</li>
+            <li><strong>2 – Significant:</strong> meaningful relationship.</li>
+            <li><strong>3 – Primary:</strong> strongest relationship.</li>
+          </ul>
+
+          <p>
+            The normalised weights are therefore 0, 0.33, 0.67 and 1.00. The calculation uses the
+            <strong>highest resulting CIA value</strong>, because the threat is prioritised according to its strongest
+            business-impact pathway.
+          </p>
+
+          <div class="worked-example">
+            <strong>Example</strong><br>
+            Assume the asset is assessed as <strong>C2 / I4 / A5</strong> and a threat is mapped as
+            <strong>C1 / I2 / A3</strong>.<br><br>
+            Confidentiality = 2 × 0.33 = 0.66<br>
+            Integrity = 4 × 0.67 = 2.68<br>
+            Availability = 5 × 1.00 = 5.00<br><br>
+            <strong>Relative Score = 5.00</strong>
+          </div>
+
+          <p>
+            <strong>Important:</strong> Relative Score represents <em>potential impact relevance</em>, not likelihood.
+            Likelihood is assessed later using Asset Exposure and the inherent-likelihood model.
+          </p>
+        </div>
+      </details>
+
+</div>
+<span class="pill" id="threatCount">0 relevant threats</span>
+</div>
+<div style="overflow:auto;max-height:620px">
+<table>
+<thead>
+<tr>
+<th><label style="display:flex;align-items:center;gap:6px;white-space:nowrap"><input aria-label="Select all threats" id="selectAllThreats" type="checkbox"/> Include in Risk</label></th>
+<th>Priority</th>
+<th>Threat</th>
+<th>Exposure Relevance</th>
+<th>Exposure Drivers</th>
+<th>Threat Impact</th>
+<th>BIL Impact Relevance</th>
+</tr>
+</thead>
+<tbody id="results"></tbody>
+</table>
+</div>
+<details class="step-config" id="config-threat-cia"><summary>⚙ Threat-to-CIA Matrix Configurator</summary>
+<div class="config-wrap">
+<p class="config-note">
+        Configure how strongly each threat affects Confidentiality, Integrity and Availability.
+        Values: 0 = no material relationship, 1 = secondary, 2 = significant, 3 = primary.
+        Changes are saved in this browser and immediately affect threat ranking.
+      </p>
+<details class="config-help">
+<summary>Help: Threat-to-CIA Configurator</summary>
+<div class="config-help-body">
+<ul><li><strong>Purpose:</strong> Defines which CIA dimensions each threat can affect.</li><li><strong>Scale:</strong> 0 = none, 1 = secondary, 2 = significant, 3 = primary.</li><li><strong>Effect:</strong> The mapping is combined with BIL-C, BIL-I and BIL-A to calculate the threat impact for the asset.</li><li><strong>Guideline:</strong> Use the strongest reasonably expected business effect of the threat, not the likelihood of occurrence.</li><li><strong>Example:</strong> Denial of Service would normally have a strong Availability relationship and little or no Confidentiality relationship.</li></ul>
+</div>
+</details>
+<div class="toolbar">
+<div class="pill">Configuration scale: 0–3</div>
+<button class="danger" id="resetBtn">Reset default matrix</button>
+</div>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Confidentiality</th>
+<th>Integrity</th>
+<th>Availability</th>
+</tr>
+</thead>
+<tbody id="configBody"></tbody>
+</table>
+</div>
+</details><div class="screen-actions"><button class="secondary screen-nav" data-step-index="1">← Previous: Exposure</button><button class="primary screen-nav" data-step-index="3">Next: Inherent Risk →</button></div></section>
 
 
 
@@ -1675,6 +1675,34 @@ function scoreThreat(t, bil){
   return {score:max, impact:Math.min(5, Math.round(max)), drivers};
 }
 
+function threatExposurePriority(threatId){
+  const exposure = exposureUpliftForThreat(threatId);
+  return { exposureScore: exposure.total, exposureDrivers: exposure.drivers || [] };
+}
+
+function exposurePriorityLabel(total){
+  if(total <= 0) return "None";
+  if(total <= 0.50) return "Low";
+  if(total <= 1.00) return "Medium";
+  if(total <= 1.50) return "High";
+  return "Very High";
+}
+
+function rankedThreatCandidates(){
+  const bil={
+    c:document.getElementById("bilC").value==="" ? null : +document.getElementById("bilC").value,
+    i:document.getElementById("bilI").value==="" ? null : +document.getElementById("bilI").value,
+    a:document.getElementById("bilA").value==="" ? null : +document.getElementById("bilA").value
+  };
+  if(![bil.c,bil.i,bil.a].every(v=>v!==null)) return [];
+  return threats.map(t=>{
+    const impactData=scoreThreat(t,bil);
+    const exposureData=threatExposurePriority(t.id);
+    return {...t,...impactData,...exposureData};
+  }).filter(t=>t.score>0)
+    .sort((a,b)=>b.exposureScore-a.exposureScore || b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
+}
+
 function render(){
   const bil={
     c:document.getElementById("bilC").value==="" ? null : +document.getElementById("bilC").value,
@@ -1723,43 +1751,34 @@ function render(){
   if(driver.includes("I")) document.querySelector(".cia-mini-i")?.classList.add("is-driver");
   if(driver.includes("A")) document.querySelector(".cia-mini-a")?.classList.add("is-driver");
 
-  const ranked=threats
-    .map(t=>({...t,...scoreThreat(t,bil)}))
-    .filter(t=>t.score>0)
-    .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
-
-  // Automatically recommend the threat(s) with the highest Relative Score.
-  // This runs once for each distinct completed BIL assessment. Manual changes
-  // made afterwards are preserved until BIL changes again.
-  const bilSignature = bilComplete ? `${bil.c}|${bil.i}|${bil.a}` : null;
-  if(bilComplete && bilSignature !== lastThreatAutoSelectBilSignature){
-    threatSelections = {};
-    if(ranked.length){
-      const highestRelativeScore = ranked[0].score;
-      ranked.forEach(t=>{
-        threatSelections[t.id] = Math.abs(t.score - highestRelativeScore) < 0.0001;
-      });
-    }
-    lastThreatAutoSelectBilSignature = bilSignature;
-  }else if(!bilComplete){
-    threatSelections = {};
-    lastThreatAutoSelectBilSignature = null;
-  }
+  const ranked=rankedThreatCandidates();
+  if(!bilComplete) threatSelections = {};
 
   const tbody=document.getElementById("results");
+  if(!tbody) return;
   tbody.innerHTML="";
+
   if(!ranked.length){
-    tbody.innerHTML='<tr><td colspan="6" class="empty">Complete the BIL assessment to identify and prioritise relevant threats.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" class="empty">Complete BIL and Asset Exposure, then review the prioritised threats.</td></tr>';
   }else{
     ranked.forEach((t,idx)=>{
-      const tr=document.createElement("tr");
       const pct=(t.score/5)*100;
+      const exposureDrivers=t.exposureDrivers.length
+        ? t.exposureDrivers.slice().sort((a,b)=>b.score-a.score).slice(0,3)
+            .map(d=>`${d.level}: ${d.question.replace(/\?$/,"")}`).join("<br>")
+        : '<span class="muted-small">No active mapped exposure</span>';
+
+      const tr=document.createElement("tr");
       tr.innerHTML=`
-        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Use ${t.id}"></td>
+        <td><input type="checkbox" class="threat-use" data-threat-id="${t.id}" ${isThreatSelected(t.id) ? "checked" : ""} aria-label="Include ${t.id} in Inherent Risk"></td>
         <td><span class="rank">${idx+1}</span></td>
         <td><strong>${t.id}</strong> – ${t.name}</td>
-        <td>${t.drivers.join(" / ")}</td>
-        <td><span class="score">${t.impact} – ${BIL_LABELS[t.impact]}</span></td>
+        <td>
+          <strong>${exposurePriorityLabel(t.exposureScore)}</strong>
+          <br><span class="muted-small">Current exposure +${t.exposureScore.toFixed(2)}</span>
+        </td>
+        <td>${exposureDrivers}</td>
+        <td><span class="score">${t.impact}</span> – ${BIL_LABELS[t.impact]}</td>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
             <div class="bar"><i style="width:${pct}%"></i></div>
@@ -1769,54 +1788,50 @@ function render(){
       tbody.appendChild(tr);
     });
   }
+
+  const updateThreatSelectionViews=()=>{
+    const selectAll=document.getElementById("selectAllThreats");
+    const boxes=[...tbody.querySelectorAll(".threat-use")];
+    const checked=boxes.filter(x=>x.checked).length;
+    if(selectAll){
+      selectAll.checked=boxes.length>0 && checked===boxes.length;
+      selectAll.indeterminate=checked>0 && checked<boxes.length;
+    }
+    const selectedCount=ranked.filter(t=>isThreatSelected(t.id)).length;
+    const count=document.getElementById("threatCount");
+    if(count) count.textContent=`${selectedCount} selected / ${ranked.length} prioritised threat${ranked.length===1?"":"s"}`;
+  };
+
   tbody.querySelectorAll(".threat-use").forEach(cb=>{
     cb.addEventListener("change",()=>{
-      threatSelections[cb.dataset.threatId] = cb.checked;
+      threatSelections[cb.dataset.threatId]=cb.checked;
       saveThreatSelections();
-
-      const selectAll = document.getElementById("selectAllThreats");
-      const allBoxes = [...tbody.querySelectorAll(".threat-use")];
-      const checkedCount = allBoxes.filter(x=>x.checked).length;
-      if(selectAll){
-        selectAll.checked = allBoxes.length > 0 && checkedCount === allBoxes.length;
-        selectAll.indeterminate = checkedCount > 0 && checkedCount < allBoxes.length;
-      }
-
-      const selectedCountNow = ranked.filter(t=>isThreatSelected(t.id)).length;
-      document.getElementById("threatCount").textContent =
-        `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
-
-      if(typeof renderInherentRisk === "function") renderInherentRisk();
-      if(typeof renderControls === "function") renderControls();
+      updateThreatSelectionViews();
+      renderInherentRisk();
+      renderControls();
       renderControlChecklist();
       renderResidualRisk();
       if(typeof renderReport==="function") renderReport();
     });
   });
 
-  const selectedCount = ranked.filter(t=>isThreatSelected(t.id)).length;
-  const selectAll = document.getElementById("selectAllThreats");
+  const selectAll=document.getElementById("selectAllThreats");
   if(selectAll){
-    selectAll.checked = ranked.length > 0 && selectedCount === ranked.length;
-    selectAll.indeterminate = selectedCount > 0 && selectedCount < ranked.length;
-
-    selectAll.onchange = ()=>{
-      ranked.forEach(t=>{ threatSelections[t.id] = selectAll.checked; });
+    selectAll.onchange=()=>{
+      ranked.forEach(t=>{ threatSelections[t.id]=selectAll.checked; });
       saveThreatSelections();
-      tbody.querySelectorAll(".threat-use").forEach(cb=>{ cb.checked = selectAll.checked; });
-      selectAll.indeterminate = false;
-
-      const selectedCountNow = ranked.filter(t=>isThreatSelected(t.id)).length;
-      document.getElementById("threatCount").textContent =
-        `${selectedCountNow} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
-
-      if(typeof renderInherentRisk === "function") renderInherentRisk();
-      if(typeof renderControls === "function") renderControls();
+      tbody.querySelectorAll(".threat-use").forEach(cb=>{ cb.checked=selectAll.checked; });
+      selectAll.indeterminate=false;
+      updateThreatSelectionViews();
+      renderInherentRisk();
+      renderControls();
+      renderControlChecklist();
+      renderResidualRisk();
+      if(typeof renderReport==="function") renderReport();
     };
   }
 
-  document.getElementById("threatCount").textContent =
-    `${selectedCount} selected / ${ranked.length} relevant threat${ranked.length===1?"":"s"}`;
+  updateThreatSelectionViews();
 }
 
 function makeScaleSelect(value,onChange){
@@ -2079,7 +2094,13 @@ function renderExposureQuestions(){
     sel.addEventListener("change",()=>{
       exposureAnswers[q.id]=sel.value;
       saveExposureAnswers();
+
+      // Exposure directly drives Threat prioritisation, so refresh Step 3
+      // immediately whenever an assessor changes an exposure answer.
       renderExposureThreatImpact();
+      render();
+
+      // Selected threats continue into the downstream risk calculation.
       renderInherentRisk();
       renderControls();
       if(typeof renderControlChecklist==="function") renderControlChecklist();
@@ -2131,6 +2152,7 @@ function refreshExposureDependentViews(){
   saveExposureAnswers();
   renderExposureQuestions();
   renderExposureThreatImpact();
+  render();
   renderInherentRisk();
   renderControls();
   if(typeof renderControlChecklist==="function") renderControlChecklist();
@@ -2283,80 +2305,46 @@ function renderExposureThreatImpact(){
   let unchanged=0;
   let totalUplift=0;
 
-  const relevantThreats = threats.filter(t=>threatSelections[t.id] === true);
-
-  relevantThreats.forEach(t=>{
-    const cfg=likelihoodConfig[t.id]||{base:3};
-    const base=+cfg.base||3;
+  const exposureThreats=threats.map(t=>{
+    const cfg=likelihoodConfig[t.id]||{base:1};
+    const base=+cfg.base||1;
     const impact=exposureUpliftForThreat(t.id);
     const raw=Math.max(1,Math.min(5,base+impact.total));
     const suggested=Math.max(1,Math.min(5,Math.round(raw)));
+    return {...t,base,impact,raw,suggested};
+  }).sort((a,b)=>b.impact.total-a.impact.total || b.suggested-a.suggested || a.id.localeCompare(b.id));
 
-    if(impact.total>0){
-      affected++;
-      totalUplift += impact.total;
-    } else {
-      unchanged++;
-    }
+  exposureThreats.forEach(t=>{
+    if(t.impact.total>0){ affected++; totalUplift+=t.impact.total; }
+    else unchanged++;
 
     const tr=document.createElement("tr");
+    const drivers=t.impact.drivers.length
+      ? `<div class="exposure-driver-list">${t.impact.drivers.slice().sort((a,b)=>b.score-a.score).map(d=>
+          `<span class="exposure-driver-chip active" title="+${d.score.toFixed(2)} likelihood uplift">${d.level}: ${d.question.replace(/\?$/,"")}</span>`
+        ).join("")}</div>`
+      : '<span class="uplift-zero">No active mapped exposure</span>';
 
-    const tdThreat=document.createElement("td");
-    tdThreat.innerHTML=`<strong>${t.id}</strong> – ${t.name}`;
-
-    const tdBase=document.createElement("td");
-    tdBase.innerHTML=`<span class="likelihood-badge">${base}</span> <span>${LIKELIHOOD_LABELS[Math.round(base)]||""}</span>`;
-
-    const tdUplift=document.createElement("td");
-    tdUplift.innerHTML=impact.total>0
-      ? `<span class="uplift-positive">+${impact.total.toFixed(2)}</span>`
-      : `<span class="uplift-zero">+0.00</span>`;
-
-    const tdSuggested=document.createElement("td");
-    tdSuggested.innerHTML=`<span class="likelihood-badge">${suggested}</span> <span>${LIKELIHOOD_LABELS[suggested]}</span>`;
-
-    const tdDrivers=document.createElement("td");
-    if(impact.drivers.length){
-      const wrap=document.createElement("div");
-      wrap.className="exposure-driver-list";
-      impact.drivers.forEach(d=>{
-        const chip=document.createElement("span");
-        chip.className="exposure-driver-chip active";
-        chip.textContent=`${d.level}: ${d.question.replace(/\?$/,"")}`;
-        chip.title=`+${d.score.toFixed(2)} likelihood uplift`;
-        wrap.appendChild(chip);
-      });
-      tdDrivers.appendChild(wrap);
-    }else{
-      tdDrivers.innerHTML='<span class="uplift-zero">No selected exposure currently affects this threat</span>';
-    }
-
-    tr.append(tdThreat,tdBase,tdUplift,tdSuggested,tdDrivers);
+    tr.innerHTML=`
+      <td><strong>${t.id}</strong> – ${t.name}</td>
+      <td><span class="likelihood-badge">${t.base}</span> <span>${LIKELIHOOD_LABELS[Math.round(t.base)]||""}</span></td>
+      <td>${t.impact.total>0 ? `<span class="uplift-positive">+${t.impact.total.toFixed(2)}</span>` : `<span class="uplift-zero">+0.00</span>`}</td>
+      <td><span class="likelihood-badge">${t.suggested}</span> <span>${LIKELIHOOD_LABELS[t.suggested]}</span></td>
+      <td>${drivers}</td>`;
     body.appendChild(tr);
   });
 
   summary.innerHTML="";
   [
-    `${affected} threat${affected===1?"":"s"} affected`,
-    `${unchanged} unchanged`,
-    `Total mapped uplift across selected threats: +${totalUplift.toFixed(2)}`
+    `${affected} threat${affected===1?"":"s"} affected by current exposure`,
+    `${unchanged} currently unchanged`,
+    `Total mapped exposure uplift: +${totalUplift.toFixed(2)}`
   ].forEach(text=>{
     const pill=document.createElement("span");
     pill.className="impact-summary-pill";
     pill.textContent=text;
     summary.appendChild(pill);
   });
-
-  if(!relevantThreats.length){
-    const tr=document.createElement("tr");
-    const td=document.createElement("td");
-    td.colSpan=5;
-    td.textContent="No threats have been selected in Step 2 – Relevant Threats. Select at least one relevant threat to assess exposure impact.";
-    td.style.color="#667085";
-    td.style.textAlign="center";
-    tr.appendChild(td);
-    body.appendChild(tr);
-  }
 }
 
 function activePrecursorsForThreat(threatId){
@@ -2559,15 +2547,7 @@ function effectivenessLabel(n){
 }
 
 function currentRankedThreats(){
-  const bil={
-    c:+document.getElementById("bilC").value,
-    i:+document.getElementById("bilI").value,
-    a:+document.getElementById("bilA").value
-  };
-  return threats
-    .map(t=>({...t,...scoreThreat(t,bil)}))
-    .filter(t=>t.score>0 && isThreatSelected(t.id))
-    .sort((a,b)=>b.score-a.score || b.impact-a.impact || a.id.localeCompare(b.id));
+  return rankedThreatCandidates().filter(t=>isThreatSelected(t.id));
 }
 
 function currentApplicableRiskThreats(){
@@ -3328,8 +3308,8 @@ function showStep(index){
   });
 
   document.querySelectorAll(".step-config").forEach(x=>x.classList.remove("active-config"));
-  if(index===1) document.getElementById("config-threat-cia")?.classList.add("active-config");
-  if(index===2) document.getElementById("config-exposure-likelihood")?.classList.add("active-config");
+  if(index===1) document.getElementById("config-exposure-likelihood")?.classList.add("active-config");
+  if(index===2) document.getElementById("config-threat-cia")?.classList.add("active-config");
   if(index===4) document.getElementById("config-control-library")?.classList.add("active-config");
 
   // Keep the active step visible on small screens.
