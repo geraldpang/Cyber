@@ -1821,18 +1821,18 @@ const defaultExposureQuestionDefs = [
   {id:"internetFacing", label:"How exposed is the asset to the internet or external networks?", cause:"internet-facing systems and externally accessible services", threats:["T02","T05","T07","T11","T12","T14"]},
   {id:"remoteAccess", label:"What is the level of remote access exposure?", cause:"remote access pathways to the environment", threats:["T02","T07","T09","T11","T12"]},
   {id:"thirdParty", label:"What is the level of third-party or supplier connectivity?", cause:"third-party or supplier connectivity", threats:["T02","T03","T04","T09","T11","T12"]},
-  {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", cause:"processing of sensitive or privileged information", threats:["T02","T03","T04","T10","T12"]},
+  {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", cause:"exposure of sensitive or privileged information", threats:["T02","T03","T04","T10","T12"]},
   {id:"removableMedia", label:"What is the level of exposure from removable media?", cause:"use of removable media", threats:["T01","T07","T13"]},
   {id:"legacyTech", label:"What is the level of exposure from legacy or unsupported technology?", cause:"legacy or unsupported technology", threats:["T01","T05","T07","T08","T14"]},
   {id:"bespokeSoftware", label:"What is the level of exposure from bespoke or custom-developed software?", cause:"bespoke or custom-developed software", threats:["T03","T07","T08","T14"]},
   {id:"emailWeb", label:"What is the level of exposure from email or web access?", cause:"user access to email and web services", threats:["T06","T07","T12"]},
-  {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", cause:"system and network interconnectivity", threats:["T01","T02","T05","T07","T09","T11","T14"]},
+  {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", cause:"high system and network interconnectivity", threats:["T01","T02","T05","T07","T09","T11","T14"]},
   {id:"privilegedAccess", label:"What is the level of exposure associated with privileged access?", cause:"privileged or administrative access", threats:["T02","T03","T10","T12"]}
 ];
 
 function loadExposureQuestionDefs(){
   try{
-    const saved=JSON.parse(localStorage.getItem("bilExposureQuestionDefsV1"));
+    const saved=JSON.parse(localStorage.getItem("bilExposureQuestionDefsV2"));
     if(Array.isArray(saved) && saved.length) return saved;
   }catch(e){}
   return structuredClone(defaultExposureQuestionDefs);
@@ -1840,7 +1840,7 @@ function loadExposureQuestionDefs(){
 let exposureQuestionDefs=loadExposureQuestionDefs();
 
 function saveExposureQuestionDefs(){
-  localStorage.setItem("bilExposureQuestionDefsV1",JSON.stringify(exposureQuestionDefs));
+  localStorage.setItem("bilExposureQuestionDefsV2",JSON.stringify(exposureQuestionDefs));
 }
 
 function questionDef(questionId){
