@@ -919,6 +919,51 @@
       font-size:12px;
     }
 
+
+    /* Inherent Risk table layout */
+    #step-inherent .table-wrap{
+      overflow-x:auto;
+    }
+    #step-inherent table{
+      width:100%;
+      table-layout:fixed;
+    }
+    #step-inherent th,
+    #step-inherent td{
+      vertical-align:top;
+    }
+    #step-inherent .col-priority{width:7%}
+    #step-inherent .col-risk-statement{width:35%}
+    #step-inherent .col-threat-impact{width:11%}
+    #step-inherent .col-suggested-likelihood{width:12%}
+    #step-inherent .col-assessed-likelihood{width:12%}
+    #step-inherent .col-risk-score{width:11%}
+    #step-inherent .col-notes{width:12%}
+
+    #step-inherent .notes-cell{
+      min-width:160px;
+    }
+    #step-inherent .notes-cell textarea,
+    #step-inherent .notes-cell input{
+      width:100%;
+      min-width:140px;
+      box-sizing:border-box;
+    }
+
+    @media(max-width:1100px){
+      #step-inherent table{
+        min-width:1100px;
+      }
+    }
+
+
+    #step-inherent .notes-input{
+      width:100%;
+      min-width:150px;
+      max-width:none;
+      box-sizing:border-box;
+    }
+
 </style>
 </head>
 <body>
@@ -1323,17 +1368,16 @@
 <div style="overflow:auto;max-height:760px">
 <table>
 <thead>
-<tr>
-<th>Priority</th>
-<th>Risk Statement</th>
-<th>Threat Impact</th>
-<th>Suggested Likelihood</th>
-<th>Assessed Likelihood</th>
-<th>Inherent Risk Score</th>
-
-<th>Notes</th>
-</tr>
-</thead>
+          <tr>
+            <th class="col-priority">Priority</th>
+            <th class="col-risk-statement">Risk Statement</th>
+            <th class="col-threat-impact">Threat Impact</th>
+            <th class="col-suggested-likelihood">Suggested Likelihood</th>
+            <th class="col-assessed-likelihood">Assessed Likelihood</th>
+            <th class="col-risk-score">Inherent Risk Score</th>
+            <th class="col-notes">Notes</th>
+          </tr>
+        </thead>
 <tbody id="riskResults"></tbody>
 </table>
 </div>
@@ -1462,19 +1506,7 @@
 <tbody id="residualRiskBody"></tbody>
 </table>
 </div>
-<details class="inline-config" style="margin-top:18px">
-<summary>⚙ Risk Matrix Configurator (Shared)</summary>
-<div class="config-wrap">
-<p class="config-note">
-          Configure the risk value and colour for each Likelihood × Impact combination.
-          This shared matrix is used by both Inherent Risk and Residual Risk.
-        </p>
-<details class="config-help">
-<summary>Help: Risk Matrix Configurator</summary>
-<div class="config-help-body">
-<ul><li><strong>Purpose:</strong> Defines the risk value and colour returned for each Likelihood × Impact combination.</li><li><strong>Rows:</strong> Likelihood levels F1–F5.</li><li><strong>Columns:</strong> Impact / Severity levels S0–S5.</li><li><strong>Shared configuration:</strong> The same matrix is used for both Inherent Risk and Residual Risk.</li><li><strong>Effect:</strong> Any change made in either matrix view immediately changes the other view and recalculates risk values.</li><li><strong>Guideline:</strong> Keep the matrix monotonic where practical: higher likelihood and/or higher impact should not normally result in a lower risk value.</li><li><strong>Colour:</strong> Use colour to communicate risk significance consistently across the assessment.</li></ul>
-</div>
-</details>
+
 <div class="toolbar">
 <div class="pill">Rows = Likelihood 1–5 · Columns = Impact 0–5</div>
 <button class="danger risk-matrix-reset">Reset risk matrix</button>
@@ -2188,7 +2220,7 @@ function exposureUpliftForThreat(threatId){
 
   exposureQuestionDefs.forEach(q=>{
     if(!questionAppliesToThreat(q,threatId)) return;
-    const value=exposureAnswers[q.id] || "none";
+    const value=exposureAnswers[q.id] ?? "";
     const level=exposureLevel(value);
     if(level.score>0){
       total += level.score;
@@ -2314,7 +2346,7 @@ function activePrecursorsForThreat(threatId){
 
 function causePrecursorPhrase(threatId){
   const items=activePrecursorsForThreat(threatId);
-  if(!items.length) return "the asset\'s inherent exposure";
+  if(!items.length) return "no active mapped exposure precursor identified";
   if(items.length===1) return items[0];
   if(items.length===2) return `${items[0]} and ${items[1]}`;
   return `${items[0]}, ${items[1]}, and ${items[2]}`;
@@ -2333,23 +2365,7 @@ function riskEventPhrase(t){
   return "compromise of " + d.join(" and ");
 }
 
-function activePrecursorsForThreat(threatId){
-  const items=[];
-  const cfg = likelihoodConfig[threatId] || {};
-  for(const q of exposureQuestionDefs){
-    if(!(+cfg[q.id]||0)) continue;
 
-    if(q.type==="boolean" && exposureAnswers[q.id]===true){
-      items.push(q.shortLabel || q.label);
-    }else if(q.type==="level"){
-      const level=exposureAnswers[q.id] || "low";
-      if(level==="medium" || level==="high"){
-        items.push(`${level} ${q.shortLabel || q.label}`.toLowerCase());
-      }
-    }
-  }
-  return items;
-}
 
 function buildRiskStatement(t){
   const event = riskEventPhrase(t);
@@ -2374,7 +2390,7 @@ function renderInherentRisk(){
   tbody.innerHTML = "";
 
   if(!applicable.length){
-    tbody.innerHTML = '<tr><td colspan="8" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Select one or more applicable threats to calculate inherent risk.</td></tr>';
   }else{
     applicable.forEach((t,idx)=>{
       tr=document.createElement("tr");
@@ -2392,12 +2408,10 @@ function renderInherentRisk(){
         </td>
         <td>
           ${riskBadgeHtml(t.assessed,t.impact)}
-          <br><span class="muted-small">L${t.assessed} × I${t.impact}</span>
         </td>
-        <td></td>
-        <td>
+        <td class="notes-cell">
           <input class="notes-input inherent-note" data-note-for="${t.id}"
-                 type="text" placeholder="Add notes"
+                 type="text" placeholder="Add notes…"
                  value="${(inherentRiskNotes[t.id]||"").replaceAll('"','&quot;')}">
         </td>`;
       tbody.appendChild(tr);
