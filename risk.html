@@ -1208,6 +1208,7 @@
 <li><strong>Calculation:</strong> Base Threat Likelihood + scores from applicable exposure questions, capped at 5.</li>
 <li><strong>Example:</strong> If Internet Exposure is High (+0.75) and Remote Access is Medium (+0.50), a mapped threat receives +1.25 in total.</li>
 <li><strong>Question management:</strong> You can rename questions, add new questions, remove questions, and change their relevant-threat mappings.</li>
+            <li><strong>Cause / Precursor wording:</strong> This phrase is used in Inherent Risk statements when the exposure is active for a mapped threat. Up to the three highest active exposure drivers are used.</li>
 </ul>
 </div>
 </details>
@@ -1302,6 +1303,12 @@
             The system looks up <strong>Likelihood 3 × Impact 4</strong> in the risk matrix and returns the configured
             Inherent Risk value.
           </div>
+
+          <p>
+            <strong>Cause / Precursor:</strong> The generated risk statement uses active Asset Exposure factors mapped
+            to the threat. The system takes up to the three highest exposure drivers and uses the configurable
+            Cause / Precursor wording from Step 3.
+          </p>
 
           <p>
             <strong>Important:</strong> Controls are not used when calculating Inherent Risk. Their effect is assessed
@@ -1811,16 +1818,16 @@ const EXPOSURE_LEVELS = [
 ];
 
 const defaultExposureQuestionDefs = [
-  {id:"internetFacing", label:"How exposed is the asset to the internet or external networks?", threats:["T02","T05","T07","T11","T12","T14"]},
-  {id:"remoteAccess", label:"What is the level of remote access exposure?", threats:["T02","T07","T09","T11","T12"]},
-  {id:"thirdParty", label:"What is the level of third-party or supplier connectivity?", threats:["T02","T03","T04","T09","T11","T12"]},
-  {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", threats:["T02","T03","T04","T10","T12"]},
-  {id:"removableMedia", label:"What is the level of exposure from removable media?", threats:["T01","T07","T13"]},
-  {id:"legacyTech", label:"What is the level of exposure from legacy or unsupported technology?", threats:["T01","T05","T07","T08","T14"]},
-  {id:"bespokeSoftware", label:"What is the level of exposure from bespoke or custom-developed software?", threats:["T03","T07","T08","T14"]},
-  {id:"emailWeb", label:"What is the level of exposure from email or web access?", threats:["T06","T07","T12"]},
-  {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", threats:["T01","T02","T05","T07","T09","T11","T14"]},
-  {id:"privilegedAccess", label:"What is the level of exposure associated with privileged access?", threats:["T02","T03","T10","T12"]}
+  {id:"internetFacing", label:"How exposed is the asset to the internet or external networks?", cause:"internet-facing systems and externally accessible services", threats:["T02","T05","T07","T11","T12","T14"]},
+  {id:"remoteAccess", label:"What is the level of remote access exposure?", cause:"remote access pathways to the environment", threats:["T02","T07","T09","T11","T12"]},
+  {id:"thirdParty", label:"What is the level of third-party or supplier connectivity?", cause:"third-party or supplier connectivity", threats:["T02","T03","T04","T09","T11","T12"]},
+  {id:"sensitiveData", label:"What is the level of exposure associated with sensitive or privileged information?", cause:"processing of sensitive or privileged information", threats:["T02","T03","T04","T10","T12"]},
+  {id:"removableMedia", label:"What is the level of exposure from removable media?", cause:"use of removable media", threats:["T01","T07","T13"]},
+  {id:"legacyTech", label:"What is the level of exposure from legacy or unsupported technology?", cause:"legacy or unsupported technology", threats:["T01","T05","T07","T08","T14"]},
+  {id:"bespokeSoftware", label:"What is the level of exposure from bespoke or custom-developed software?", cause:"bespoke or custom-developed software", threats:["T03","T07","T08","T14"]},
+  {id:"emailWeb", label:"What is the level of exposure from email or web access?", cause:"user access to email and web services", threats:["T06","T07","T12"]},
+  {id:"interconnectivity", label:"What is the level of system and network interconnectivity?", cause:"system and network interconnectivity", threats:["T01","T02","T05","T07","T09","T11","T14"]},
+  {id:"privilegedAccess", label:"What is the level of exposure associated with privileged access?", cause:"privileged or administrative access", threats:["T02","T03","T10","T12"]}
 ];
 
 function loadExposureQuestionDefs(){
@@ -2099,6 +2106,27 @@ function renderExposureQuestionConfig(){
     left.appendChild(label);
     left.appendChild(input);
 
+    const causeLabel=document.createElement("label");
+    causeLabel.textContent="Cause / Precursor wording";
+    causeLabel.style.display="block";
+    causeLabel.style.fontSize="12px";
+    causeLabel.style.fontWeight="700";
+    causeLabel.style.marginTop="10px";
+    causeLabel.style.marginBottom="5px";
+
+    const causeInput=document.createElement("input");
+    causeInput.type="text";
+    causeInput.value=q.cause || q.label.replace(/\?$/,"");
+    causeInput.placeholder="e.g. remote access pathways to the environment";
+    causeInput.addEventListener("change",()=>{
+      q.cause=causeInput.value.trim() || q.label.replace(/\?$/,"");
+      saveExposureQuestionDefs();
+      refreshExposureDependentViews();
+    });
+
+    left.appendChild(causeLabel);
+    left.appendChild(causeInput);
+
     const remove=document.createElement("button");
     remove.className="danger remove-exposure-question";
     remove.textContent="Remove";
@@ -2119,7 +2147,7 @@ function renderExposureQuestionConfig(){
 
     const meta=document.createElement("div");
     meta.className="exposure-question-meta";
-    meta.innerHTML=`<strong>Standard scale:</strong> None +0 · Low +0.25 · Medium +0.50 · High +0.75 · Very High +1.00<br><strong>Relevant threats:</strong> Select the threats whose likelihood this exposure question can influence.`;
+    meta.innerHTML=`<strong>Standard scale:</strong> None +0 · Low +0.25 · Medium +0.50 · High +0.75 · Very High +1.00<br><strong>Cause / Precursor wording:</strong> Used in generated risk statements when this exposure is active.<br><strong>Relevant threats:</strong> Select the threats whose likelihood this exposure question can influence.`;
     card.appendChild(meta);
 
     const grid=document.createElement("div");
@@ -2263,15 +2291,33 @@ function renderExposureThreatImpact(){
 
 function activePrecursorsForThreat(threatId){
   const items=[];
+
   exposureQuestionDefs.forEach(q=>{
-    if(questionAppliesToThreat(q,threatId)){
-      const level=exposureLevel(exposureAnswers[q.id] ?? "");
-      if(level.score>0){
-        items.push(`${q.label.replace(/\?$/,"")} – ${level.label}`);
-      }
+    if(!questionAppliesToThreat(q,threatId)) return;
+
+    const value=exposureAnswers[q.id] ?? "";
+    const level=exposureLevel(value);
+
+    if(level.score!==null && level.score>0){
+      items.push({
+        text:(q.cause || q.label.replace(/\?$/,"")).trim(),
+        score:level.score
+      });
     }
   });
-  return items;
+
+  return items
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,3)
+    .map(x=>x.text);
+}
+
+function causePrecursorPhrase(threatId){
+  const items=activePrecursorsForThreat(threatId);
+  if(!items.length) return "${escHtml(causePrecursorPhrase(t.id))}";
+  if(items.length===1) return items[0];
+  if(items.length===2) return `${items[0]} and ${items[1]}`;
+  return `${items[0]}, ${items[1]}, and ${items[2]}`;
 }
 
 function riskEventPhrase(t){
@@ -2310,7 +2356,7 @@ function buildRiskStatement(t){
   const hazard = `${t.name} (${t.id})`;
   const precursors = activePrecursorsForThreat(t.id);
 
-  let cause = "the asset's inherent exposure";
+  let cause = "${escHtml(causePrecursorPhrase(t.id))}";
   if(precursors.length===1) cause = precursors[0];
   else if(precursors.length===2) cause = `${precursors[0]} and ${precursors[1]}`;
   else if(precursors.length>2) cause = `${precursors.slice(0,-1).join(", ")} and ${precursors[precursors.length-1]}`;
@@ -3219,6 +3265,7 @@ document.getElementById("addExposureQuestionBtn").addEventListener("click",()=>{
   exposureQuestionDefs.push({
     id,
     label:"New Exposure Question",
+    cause:"new exposure condition",
     threats:[]
   });
   exposureAnswers[id]="";
