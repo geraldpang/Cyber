@@ -1442,6 +1442,132 @@
   .config-threat-row{grid-template-columns:1fr;}
 }
 
+
+/* ===== Step 5 Risk-First Treatment View ===== */
+.control-view-toggle{
+  display:inline-flex;
+  gap:4px;
+  padding:4px;
+  border:1px solid #d7e2e8;
+  border-radius:10px;
+  background:#f8fbfd;
+}
+.control-view-toggle button{
+  border:0;
+  background:transparent;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  color:#475569;
+  font-weight:700;
+}
+.control-view-toggle button.active{
+  background:#fff;
+  color:#075985;
+  box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+.risk-treatment-list{
+  display:grid;
+  gap:16px;
+}
+.risk-treatment-group{
+  border:1px solid #d8e2e8;
+  border-radius:14px;
+  background:#fff;
+  overflow:hidden;
+}
+.risk-treatment-header{
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr) auto;
+  gap:14px;
+  align-items:start;
+  padding:15px 16px;
+  background:#f8fbfd;
+  border-bottom:1px solid #d8e2e8;
+}
+.risk-treatment-rank{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#0b73b8;color:#fff;font-weight:800;
+}
+.risk-treatment-title{
+  font-size:16px;font-weight:800;color:#0f172a;
+}
+.risk-treatment-cause{
+  margin-top:5px;font-size:12px;color:#475569;line-height:1.45;
+}
+.risk-treatment-score{
+  text-align:right;
+}
+.risk-treatment-score .k{
+  font-size:11px;color:#64748b;text-transform:uppercase;font-weight:800;
+}
+.risk-treatment-score .v{
+  font-size:23px;font-weight:800;color:#0f3f5f;
+}
+.risk-treatment-controls{
+  display:grid;
+  gap:0;
+}
+.risk-treatment-control{
+  display:grid;
+  grid-template-columns:46px minmax(260px,1.4fr) minmax(220px,1fr) 150px;
+  gap:12px;
+  align-items:start;
+  padding:13px 16px;
+  border-top:1px solid #edf2f5;
+}
+.risk-treatment-control:first-child{border-top:0}
+.risk-treatment-control .rank{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#eaf4fa;color:#075985;font-size:12px;font-weight:800;
+}
+.risk-treatment-control .req{
+  color:#075985;font-weight:800;font-size:12px;
+}
+.risk-treatment-control .title{
+  font-size:13px;font-weight:800;color:#1e293b;margin-top:2px;
+}
+.risk-treatment-control .meta{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;
+}
+.risk-treatment-control .why{
+  font-size:12px;color:#475569;line-height:1.45;
+}
+.risk-treatment-control .why strong{
+  color:#334155;
+}
+.risk-treatment-control .eff{
+  text-align:right;
+}
+.risk-treatment-control .eff .value{
+  font-size:14px;font-weight:800;color:#0f3f5f;
+}
+.risk-treatment-control .eff .sub{
+  margin-top:3px;font-size:11px;color:#64748b;
+}
+.risk-coverage-badge{
+  display:inline-flex;align-items:center;border-radius:999px;
+  padding:4px 8px;font-size:11px;font-weight:800;
+  background:#e9f7ef;color:#166534;
+}
+.risk-coverage-badge.warn{
+  background:#fff4e5;color:#9a3412;
+}
+.risk-treatment-footer{
+  padding:10px 16px 13px;
+  background:#fbfdfe;
+  border-top:1px solid #edf2f5;
+  font-size:12px;color:#64748b;
+}
+@media(max-width:950px){
+  .risk-treatment-header{grid-template-columns:44px 1fr}
+  .risk-treatment-score{grid-column:2;text-align:left}
+  .risk-treatment-control{grid-template-columns:36px 1fr}
+  .risk-treatment-control .why,.risk-treatment-control .eff{grid-column:2;text-align:left}
+}
+
 </style>
 </head>
 <body>
@@ -1914,12 +2040,11 @@ The assessor can manually include or exclude any threat, and manual choices over
 </div>
 
 <div class="controls-filterbar">
-  <input id="controlSearch" class="controls-search" type="search" placeholder="Search requirement or title…">
-  <select id="controlViewFilter" class="controls-filter" aria-label="Filter controls">
-    <option value="prioritised">Risk-prioritised first</option>
-    <option value="all">All SL-T requirements</option>
-    <option value="unlinked">SL-T requirements not linked to selected risks</option>
-  </select>
+  <div class="control-view-toggle" role="group" aria-label="Control view">
+    <button type="button" id="riskTreatmentViewBtn" class="active">Risk Treatment View</button>
+    <button type="button" id="controlPortfolioViewBtn">Control Portfolio View</button>
+  </div>
+  <input id="controlSearch" class="controls-search" type="search" placeholder="Search risk, requirement or title…">
 </div>
 
 <div id="controlResults" class="control-card-list"></div>
@@ -1929,7 +2054,7 @@ The assessor can manually include or exclude any threat, and manual choices over
   <div class="section-help-body">
     <p><strong>First:</strong> the Resulting SL-T determines which IEC 62443-3-3 requirements are applicable.</p>
     <p><strong>Then:</strong> requirements mapped to selected threats are prioritised using Inherent Risk × Threat Effectiveness, with a bounded Cause / Precursor context boost.</p>
-    <p>The detailed calculation is available inside each requirement card. Requirements that are applicable to the SL-T but not mapped to a selected risk remain available under <strong>All SL-T requirements</strong>.</p>
+    <p>The default <strong>Risk Treatment View</strong> groups requirements beneath each risk, highest Inherent Risk first. The optional <strong>Control Portfolio View</strong> consolidates requirements across multiple risks.</p>
   </div>
 </details>
 
@@ -3171,22 +3296,30 @@ function buildShortRiskStatement(t){
   return `Risk of ${event} by ${t.name}`;
 }
 
+let controlsPrimaryView="risk";
+
 function renderControls(){
   const sltResult=calculateSLTResult();
-  const rankedControls=getPrioritisedControlData();
+  const portfolioControls=getPrioritisedControlData();
+  const riskTreatment=getRiskTreatmentData();
   const host=document.getElementById("controlResults");
   if(!host) return;
 
   const search=(document.getElementById("controlSearch")?.value||"").trim().toLowerCase();
-  const view=document.getElementById("controlViewFilter")?.value || "prioritised";
 
-  const linkedCount=rankedControls.filter(c=>c.bestThreat).length;
   const sltEl=document.getElementById("controlsSummarySlt");
   const applicableEl=document.getElementById("controlsSummaryApplicable");
   const prioritisedEl=document.getElementById("controlsSummaryPrioritised");
+  const linkedCount=portfolioControls.filter(c=>c.bestThreat).length;
+
   if(sltEl) sltEl.textContent=sltResult.slt ? `SL-T ${sltResult.slt}` : "—";
-  if(applicableEl) applicableEl.textContent=sltResult.slt ? rankedControls.length : "0";
+  if(applicableEl) applicableEl.textContent=sltResult.slt ? portfolioControls.length : "0";
   if(prioritisedEl) prioritisedEl.textContent=sltResult.slt ? linkedCount : "0";
+
+  const riskBtn=document.getElementById("riskTreatmentViewBtn");
+  const portfolioBtn=document.getElementById("controlPortfolioViewBtn");
+  if(riskBtn) riskBtn.classList.toggle("active",controlsPrimaryView==="risk");
+  if(portfolioBtn) portfolioBtn.classList.toggle("active",controlsPrimaryView==="portfolio");
 
   host.innerHTML="";
 
@@ -3196,111 +3329,177 @@ function renderControls(){
     return;
   }
 
-  let visible=rankedControls.filter(c=>{
-    if(view==="unlinked" && c.bestThreat) return false;
-    if(view==="prioritised" && !c.bestThreat) return false;
-    if(search){
-      const hay=`${c.req||""} ${c.name||""} ${c.fr||""} ${c.informativeNotes||""}`.toLowerCase();
-      if(!hay.includes(search)) return false;
-    }
-    return true;
-  });
-
-  if(!visible.length){
-    host.innerHTML='<div class="controls-empty">No IEC requirements match the current view.</div>';
-  }else{
-    visible.forEach((c,idx)=>{
-      const pm=c.bestPrecursorMatch || {matched:[],boost:0,boostFactor:1};
-      const notes=escHtml(c.informativeNotes||"").replaceAll("\n","<br>");
-      const otherThreats=(c.relevantThreats||[])
-        .filter(x=>!c.bestThreat || x.threat.id!==c.bestThreat.id)
-        .sort((a,b)=>b.score-a.score)
-        .slice(0,6);
-
-      const card=document.createElement("article");
-      card.className=`control-priority-card ${c.bestThreat?"is-risk-linked":""}`;
-
-      const riskWhy=c.bestThreat
-        ? `<div class="why-threat">${escHtml(c.bestThreat.id)} – ${escHtml(c.bestThreat.name)}</div>
-           <div class="why-cause">${pm.matched?.length
-             ? `<strong>Cause / Precursor:</strong> ${escHtml(precursorText(pm.matched))}`
-             : 'No direct active Cause / Precursor match.'}</div>`
-        : `<div class="why-threat">Applicable to SL-T ${sltResult.slt}</div>
-           <div class="why-cause">This requirement is applicable to the target security level but is not currently mapped to a selected risk.</div>`;
-
-      const scoreBlock=c.bestThreat
-        ? `<div class="score-label">Priority score</div>
-           <div class="score-value">${c.bestScore.toFixed(1)}</div>
-           <div class="score-sub">${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</div>`
-        : `<div class="score-label">Priority</div>
-           <div class="score-value">—</div>
-           <div class="score-sub">SL-T applicable</div>`;
-
-      const technical=c.bestThreat
-        ? `<div class="control-detail-grid">
-            <div class="control-detail-item"><span class="k">Inherent Risk</span><span class="v">${c.bestThreat.inherentRiskScore}</span></div>
-            <div class="control-detail-item"><span class="k">Threat Effectiveness</span><span class="v">
-              <select class="priority-effectiveness" data-control-id="${c.id}" data-threat-id="${c.bestThreat.id}">
-                ${[1,2,3,4].map(n=>`<option value="${n}" ${c.bestEffectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
-              </select>
-            </span></div>
-            <div class="control-detail-item"><span class="k">Base Priority</span><span class="v">${c.bestBaseScore.toFixed(2)}</span></div>
-            <div class="control-detail-item"><span class="k">Precursor Boost</span><span class="v">+${(pm.boost*100).toFixed(0)}%</span></div>
-            <div class="control-detail-item"><span class="k">Final Priority</span><span class="v">${c.bestScore.toFixed(2)}</span></div>
-            <div class="control-detail-item"><span class="k">Other Relevant Threats</span><span class="v">${otherThreats.length?otherThreats.map(x=>`${x.threat.id} (${x.effectiveness})`).join(", "):"—"}</span></div>
-          </div>`
-        : `<div class="control-note-text">No selected-threat relationship currently drives a risk priority for this requirement.</div>`;
-
-      card.innerHTML=`
-        <div class="control-card-main">
-          <div class="control-card-rank">${c.bestThreat ? `<div class="control-card-rank">${idx+1}</div>` : '<div class="control-card-rank">•</div>'}</div>
-          <div>
-            <div class="control-card-req">${escHtml(c.req||c.id)}</div>
-            <div class="control-card-title">${escHtml(c.name||"Untitled requirement")}</div>
-            <div class="control-card-badges">
-              <span class="control-mini-badge">SL-T ${sltResult.slt}</span>
-              <span class="control-mini-badge">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span>
-              <span class="control-mini-badge">${escHtml(c.fr||"IEC 62443-3-3")}</span>
-            </div>
-          </div>
-          <div class="control-why">
-            <div class="why-label">Why this is prioritised</div>
-            ${riskWhy}
-          </div>
-          <div class="control-priority-score">${scoreBlock}</div>
-        </div>
-        <div class="control-card-details">
-          <details>
-            <summary>Requirement details</summary>
-            <div class="control-detail-grid">
-              <div class="control-detail-item"><span class="k">Applicable SL-T</span><span class="v">${applicableSltText(c.applicableSLT)}</span></div>
-              <div class="control-detail-item"><span class="k">Control Type</span><span class="v">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span></div>
-            </div>
-            <div class="control-note-text">${notes||"No informative notes available."}</div>
-          </details>
-          <details>
-            <summary>Priority calculation &amp; threat mappings</summary>
-            ${technical}
-          </details>
-        </div>`;
-      host.appendChild(card);
+  if(controlsPrimaryView==="risk"){
+    const groups=riskTreatment.filter(g=>{
+      if(!search) return true;
+      const riskHay=`${g.risk.id} ${g.risk.name} ${riskEventPhrase(g.risk)} ${causePrecursorPhrase(g.risk.id)}`.toLowerCase();
+      const controlHit=g.controls.some(c=>`${c.req||""} ${c.name||""} ${c.informativeNotes||""}`.toLowerCase().includes(search));
+      return riskHay.includes(search) || controlHit;
     });
+
+    if(!groups.length){
+      host.innerHTML='<div class="controls-empty">No risks or IEC requirements match the current search.</div>';
+    }else{
+      const wrap=document.createElement("div");
+      wrap.className="risk-treatment-list";
+
+      groups.forEach((g,gi)=>{
+        const risk=g.risk;
+        const cause=causePrecursorPhrase(risk.id);
+        const strongCount=g.controls.filter(c=>c.effectiveness>=3).length;
+        const coverageClass=strongCount>0?"risk-coverage-badge":"risk-coverage-badge warn";
+        const coverageText=strongCount>0?`${strongCount} strong control${strongCount===1?"":"s"}`:"No High/Very High mapped control";
+
+        const section=document.createElement("section");
+        section.className="risk-treatment-group";
+
+        const visibleControls=g.controls.filter(c=>{
+          if(!search) return true;
+          const hay=`${c.req||""} ${c.name||""} ${c.informativeNotes||""}`.toLowerCase();
+          const riskHay=`${risk.id} ${risk.name} ${cause}`.toLowerCase();
+          return hay.includes(search) || riskHay.includes(search);
+        });
+
+        section.innerHTML=`
+          <div class="risk-treatment-header">
+            <div class="risk-treatment-rank">${g.riskIndex+1}</div>
+            <div>
+              <div class="risk-treatment-title">${escHtml(risk.id)} – ${escHtml(risk.name)}</div>
+              <div class="risk-treatment-cause"><strong>Risk:</strong> ${buildShortRiskStatement(risk)}<br><strong>Cause / Precursor:</strong> ${escHtml(cause)}</div>
+              <div style="margin-top:8px"><span class="${coverageClass}">${coverageText}</span></div>
+            </div>
+            <div class="risk-treatment-score">
+              <div class="k">Inherent Risk</div>
+              <div class="v">${risk.inherentRiskScore}</div>
+              <div class="muted-small">Impact ${risk.impact} · Likelihood ${risk.assessed}</div>
+            </div>
+          </div>
+          <div class="risk-treatment-controls"></div>
+          <div class="risk-treatment-footer">
+            Controls are ranked <strong>within this risk</strong> by Effectiveness, then active Cause / Precursor relevance.
+          </div>`;
+
+        const controlsHost=section.querySelector(".risk-treatment-controls");
+        if(!visibleControls.length){
+          controlsHost.innerHTML='<div class="controls-empty" style="margin:12px">No mapped IEC requirement matches this search.</div>';
+        }else{
+          visibleControls.forEach((c,ci)=>{
+            const row=document.createElement("div");
+            row.className="risk-treatment-control";
+            const pm=c.precursorMatch;
+            const causeText=pm.matched.length?precursorText(pm.matched):"No direct active precursor match";
+            row.innerHTML=`
+              <div class="rank">${ci+1}</div>
+              <div>
+                <div class="req">${escHtml(c.req||c.id)}</div>
+                <div class="title">${escHtml(c.name||"Untitled requirement")}</div>
+                <div class="meta">
+                  <span class="control-mini-badge">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span>
+                  <span class="control-mini-badge">${applicableSltText(c.applicableSLT)}</span>
+                </div>
+              </div>
+              <div class="why">
+                <strong>Why:</strong> ${escHtml(causeText)}
+                ${pm.boost>0?`<br><span class="muted-small">Precursor relevance +${(pm.boost*100).toFixed(0)}% portfolio context</span>`:""}
+              </div>
+              <div class="eff">
+                <div class="value">${c.effectiveness} – ${effectivenessLabel(c.effectiveness)}</div>
+                <div class="sub">Threat effectiveness</div>
+                <select class="risk-view-effectiveness" data-control-id="${c.id}" data-threat-id="${risk.id}" style="margin-top:6px">
+                  ${[1,2,3,4].map(n=>`<option value="${n}" ${c.effectiveness===n?"selected":""}>${n} – ${effectivenessLabel(n)}</option>`).join("")}
+                </select>
+              </div>`;
+            controlsHost.appendChild(row);
+          });
+        }
+
+        wrap.appendChild(section);
+      });
+
+      host.appendChild(wrap);
+    }
+
+    host.querySelectorAll(".risk-view-effectiveness").forEach(sel=>sel.addEventListener("change",()=>{
+      const m=controlMappings.find(m=>m.controlId===sel.dataset.controlId&&m.threatId===sel.dataset.threatId);
+      if(m){
+        m.effectiveness=+sel.value;
+        saveControlConfig();
+        renderControls();
+        renderControlChecklist();
+        renderResidualRisk();
+        if(typeof renderReport==="function") renderReport();
+      }
+    }));
+  } else {
+    // Secondary consolidated portfolio view.
+    let visible=portfolioControls.filter(c=>{
+      if(!c.bestThreat) return false;
+      if(!search) return true;
+      return `${c.req||""} ${c.name||""} ${c.fr||""} ${c.informativeNotes||""} ${c.bestThreat?.id||""} ${c.bestThreat?.name||""}`.toLowerCase().includes(search);
+    });
+
+    if(!visible.length){
+      host.innerHTML='<div class="controls-empty">No prioritised IEC requirements match the current search.</div>';
+    }else{
+      visible.forEach((c,idx)=>{
+        const pm=c.bestPrecursorMatch || {matched:[],boost:0,boostFactor:1};
+        const notes=escHtml(c.informativeNotes||"").replaceAll("\n","<br>");
+        const otherThreats=(c.relevantThreats||[])
+          .filter(x=>!c.bestThreat || x.threat.id!==c.bestThreat.id)
+          .sort((a,b)=>b.score-a.score)
+          .slice(0,6);
+
+        const card=document.createElement("article");
+        card.className="control-priority-card is-risk-linked";
+        card.innerHTML=`
+          <div class="control-card-main">
+            <div class="control-card-rank">${idx+1}</div>
+            <div>
+              <div class="control-card-req">${escHtml(c.req||c.id)}</div>
+              <div class="control-card-title">${escHtml(c.name||"Untitled requirement")}</div>
+              <div class="control-card-badges">
+                <span class="control-mini-badge">SL-T ${sltResult.slt}</span>
+                <span class="control-mini-badge">${escHtml((c.types||[]).join(" / ")||"Unclassified")}</span>
+              </div>
+            </div>
+            <div class="control-why">
+              <div class="why-label">Best portfolio relationship</div>
+              <div class="why-threat">${escHtml(c.bestThreat.id)} – ${escHtml(c.bestThreat.name)}</div>
+              <div class="why-cause">${pm.matched.length?`<strong>Cause / Precursor:</strong> ${escHtml(precursorText(pm.matched))}`:"No direct active precursor match."}</div>
+            </div>
+            <div class="control-priority-score">
+              <div class="score-label">Portfolio score</div>
+              <div class="score-value">${c.bestScore.toFixed(1)}</div>
+              <div class="score-sub">${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</div>
+            </div>
+          </div>
+          <div class="control-card-details">
+            <details>
+              <summary>Requirement details</summary>
+              <div class="control-note-text">${notes||"No informative notes available."}</div>
+            </details>
+            <details>
+              <summary>Portfolio calculation &amp; other threats</summary>
+              <div class="control-detail-grid">
+                <div class="control-detail-item"><span class="k">Inherent Risk</span><span class="v">${c.bestThreat.inherentRiskScore}</span></div>
+                <div class="control-detail-item"><span class="k">Effectiveness</span><span class="v">${c.bestEffectiveness} – ${effectivenessLabel(c.bestEffectiveness)}</span></div>
+                <div class="control-detail-item"><span class="k">Base Score</span><span class="v">${c.bestBaseScore.toFixed(2)}</span></div>
+                <div class="control-detail-item"><span class="k">Precursor Boost</span><span class="v">+${(pm.boost*100).toFixed(0)}%</span></div>
+                <div class="control-detail-item"><span class="k">Other Relevant Threats</span><span class="v">${otherThreats.length?otherThreats.map(x=>`${x.threat.id} (${x.effectiveness})`).join(", "):"—"}</span></div>
+              </div>
+            </details>
+          </div>`;
+        host.appendChild(card);
+      });
+    }
   }
 
-  host.querySelectorAll(".priority-effectiveness").forEach(sel=>sel.addEventListener("change",()=>{
-    const m=controlMappings.find(m=>m.controlId===sel.dataset.controlId&&m.threatId===sel.dataset.threatId);
-    if(m){
-      m.effectiveness=+sel.value;
-      saveControlConfig();
-      renderControls();
-      renderControlChecklist();
-      renderResidualRisk();
-      if(typeof renderReport==="function") renderReport();
-    }
-  }));
-
   const count=document.getElementById("controlCount");
-  if(count) count.textContent=`${rankedControls.length} requirements · SL-T ${sltResult.slt}`;
+  if(count){
+    count.textContent=controlsPrimaryView==="risk"
+      ? `${riskTreatment.length} risks · SL-T ${sltResult.slt}`
+      : `${portfolioControls.filter(c=>c.bestThreat).length} portfolio controls · SL-T ${sltResult.slt}`;
+  }
 }
 
 function newControlId(){
@@ -3601,7 +3800,15 @@ render = function(){
   if(document.getElementById("riskResults")) renderInherentRisk();
   if(document.getElementById("controlResults")) renderControls();
 document.getElementById("controlSearch")?.addEventListener("input",()=>renderControls());
-document.getElementById("controlViewFilter")?.addEventListener("change",()=>renderControls());
+document.getElementById("riskTreatmentViewBtn")?.addEventListener("click",()=>{
+  controlsPrimaryView="risk";
+  renderControls();
+});
+document.getElementById("controlPortfolioViewBtn")?.addEventListener("click",()=>{
+  controlsPrimaryView="portfolio";
+  renderControls();
+});
+
   if(document.getElementById("controlChecklistBody")) renderControlChecklist();
   if(document.getElementById("residualRiskBody")) renderResidualRisk();
 };
@@ -3728,6 +3935,64 @@ let residualRiskNotes = loadResidualRiskNotes();
 
 function saveResidualRiskNotes(){
   localStorage.setItem("bilResidualRiskNotesV1", JSON.stringify(residualRiskNotes));
+}
+
+function getRiskTreatmentData(){
+  const sltResult=calculateSLTResult();
+  if(!sltResult.slt) return [];
+
+  const risks=currentApplicableRiskThreats()
+    .slice()
+    .sort((a,b)=>
+      b.inherentRiskScore-a.inherentRiskScore ||
+      b.impact-a.impact ||
+      b.assessed-a.assessed ||
+      a.id.localeCompare(b.id)
+    );
+
+  const eligibleIds=new Set(
+    prototypeControls
+      .filter(c=>isControlApplicableToSLT(c,sltResult.slt))
+      .map(c=>c.id)
+  );
+  const controlById=Object.fromEntries(prototypeControls.map(c=>[c.id,c]));
+
+  return risks.map((risk,riskIndex)=>{
+    const controls=controlMappings
+      .filter(m=>m.threatId===risk.id && +m.effectiveness>0 && eligibleIds.has(m.controlId))
+      .map(m=>{
+        const control=controlById[m.controlId];
+        const precursorMatch=precursorMatchForControlThreat(m.controlId,risk.id);
+        const effectiveness=+m.effectiveness;
+        const baseScore=risk.inherentRiskScore*effectiveness;
+        const portfolioScore=baseScore*precursorMatch.boostFactor;
+        return {
+          ...control,
+          effectiveness,
+          precursorMatch,
+          baseScore,
+          portfolioScore
+        };
+      })
+      .sort((a,b)=>{
+        // Risk is already dominant because controls are grouped by risk.
+        // Within a risk: Effectiveness first, then active precursor relevance.
+        if(b.effectiveness!==a.effectiveness) return b.effectiveness-a.effectiveness;
+        if(b.precursorMatch.matchScore!==a.precursorMatch.matchScore)
+          return b.precursorMatch.matchScore-a.precursorMatch.matchScore;
+        // Prefer preventive treatment as a tie-breaker, but retain defence in depth.
+        const ap=(a.types||[]).includes("Preventive")?1:0;
+        const bp=(b.types||[]).includes("Preventive")?1:0;
+        if(bp!==ap) return bp-ap;
+        return String(a.req||a.id).localeCompare(String(b.req||b.id),undefined,{numeric:true});
+      });
+
+    return {
+      risk,
+      riskIndex,
+      controls
+    };
+  });
 }
 
 function getPrioritisedControlData(){
