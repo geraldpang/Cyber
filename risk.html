@@ -2064,7 +2064,7 @@ The assessor can manually include or exclude any threat, and manual choices over
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
 <button class="secondary" id="downloadWordBtn">Download Word</button>
-<button class="primary" id="downloadPdfBtn">Download PDF</button>
+<button class="primary" id="downloadPdfBtn">Save as PDF</button>
 </div>
 </div>
 <div class="report-paper" id="reportPrintable">
@@ -4199,13 +4199,23 @@ function reportHtmlDocument(){
   }
   return `<!doctype html><html><head><meta charset="utf-8"><title>Cybersecurity Risk Assessment Report</title>
   <style>
-  body{font-family:Arial,sans-serif;color:#172033;font-size:11pt;margin:30px}
-  h1{font-size:20pt} h3{font-size:13pt;margin-top:18px}
-  table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:15px}
-  th,td{border:1px solid #bbb;padding:6px;vertical-align:top} th{background:#eee}
-  .report-summary-grid{display:table;width:100%;margin-bottom:15px}
-  .report-summary-box{display:inline-block;border:1px solid #ccc;padding:8px;margin:3px;min-width:100px}
-  .risk-value-badge{display:inline-block;padding:4px 7px;border-radius:5px;font-weight:bold}
+  @page{size:A4 landscape;margin:10mm}
+  *{box-sizing:border-box}
+  body{font-family:Arial,sans-serif;color:#172033;font-size:9.5pt;margin:0;background:#fff}
+  h1{font-size:20pt;margin:0 0 6px} h3{font-size:13pt;margin:18px 0 8px}
+  .report-paper{width:100%;max-width:none;border:0;box-shadow:none;padding:0}
+  .report-header{margin-bottom:14px}
+  .report-section{break-inside:auto;page-break-inside:auto}
+  table{width:100%;border-collapse:collapse;font-size:7.5pt;margin-bottom:14px;table-layout:auto}
+  thead{display:table-header-group}
+  tr{break-inside:avoid;page-break-inside:avoid}
+  th,td{border:1px solid #bbb;padding:5px;vertical-align:top;overflow-wrap:anywhere}
+  th{background:#eee}
+  .report-summary-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:15px}
+  .report-summary-box{border:1px solid #ccc;padding:7px;min-width:100px}
+  .report-summary-box span{display:block;font-size:8pt;color:#667085}
+  .report-summary-box strong{display:block;margin-top:2px}
+  .risk-value-badge{display:inline-block;padding:3px 6px;border-radius:5px;font-weight:bold}
   .risk-event,.risk-hazard,.risk-cause{font-weight:normal;color:inherit;background:none;text-decoration:none;padding:0}
   </style></head><body>${reportClone.innerHTML}</body></html>`;
 }
@@ -4220,10 +4230,65 @@ document.getElementById("downloadWordBtn")?.addEventListener("click",()=>{
   setTimeout(()=>URL.revokeObjectURL(url),500);
 });
 
-document.getElementById("downloadPdfBtn")?.addEventListener("click",()=>{
-  renderReport();
-  window.print();
-});
+function printReportAsPdf(){
+  const reportDoc=reportHtmlDocument();
+
+  // Open the report in its own document so the application navigation,
+  // hidden step screens and print visibility rules cannot interfere.
+  const printWindow=window.open("","_blank","noopener,noreferrer");
+  if(printWindow){
+    printWindow.document.open();
+    printWindow.document.write(reportDoc);
+    printWindow.document.close();
+
+    const triggerPrint=()=>{
+      try{
+        printWindow.focus();
+        printWindow.print();
+      }catch(e){
+        console.error("PDF print failed",e);
+      }
+    };
+
+    // Give the new document time to lay out tables before opening print.
+    if(printWindow.document.readyState==="complete"){
+      setTimeout(triggerPrint,250);
+    }else{
+      printWindow.addEventListener("load",()=>setTimeout(triggerPrint,250),{once:true});
+    }
+    return;
+  }
+
+  // Fallback for browsers that block a new window: print a temporary iframe.
+  const frame=document.createElement("iframe");
+  frame.setAttribute("aria-hidden","true");
+  frame.style.position="fixed";
+  frame.style.right="0";
+  frame.style.bottom="0";
+  frame.style.width="0";
+  frame.style.height="0";
+  frame.style.border="0";
+  document.body.appendChild(frame);
+
+  const doc=frame.contentWindow.document;
+  doc.open();
+  doc.write(reportDoc);
+  doc.close();
+
+  const cleanup=()=>setTimeout(()=>frame.remove(),1000);
+  setTimeout(()=>{
+    try{
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }catch(e){
+      console.error("PDF print fallback failed",e);
+    }finally{
+      cleanup();
+    }
+  },300);
+}
+
+document.getElementById("downloadPdfBtn")?.addEventListener("click",printReportAsPdf);
 
 const originalShowStep=showStep;
 showStep=function(index){
