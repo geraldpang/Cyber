@@ -1,8 +1,9 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
 // Edits the TRA question bank in the D1 database bound as "DB".
-// Every request must come through Cloudflare Access. The Access token is verified here,
-// using the ACCESS_TEAM_DOMAIN and ACCESS_AUD variables set on the Pages project.
-// If those variables are missing, editing is refused.
+// Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
+// secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
+// (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
+// If neither is configured, editing is refused.
 
 const THREAT_RE = /^T\d{2}$/;
 const STATEMENT_RE = /^(IT|OT)-R\d{2}$/;
@@ -128,6 +129,7 @@ function level(v) {
 // ---- Cloudflare Access token check ----
 let certCache = { at: 0, keys: [] };
 async function verifyAccess(request, env) {
+  if (!(env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD)) return verifyPassword(request, env);
   const team = String(env.ACCESS_TEAM_DOMAIN || "").replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const aud = String(env.ACCESS_AUD || "").trim();
   if (!team || !aud) return { ok: false, status: 503, msg: "Editing is not set up yet. Add the ACCESS_TEAM_DOMAIN and ACCESS_AUD variables to the Pages project." };
@@ -154,6 +156,25 @@ async function verifyAccess(request, env) {
   } catch {
     return { ok: false, status: 403, msg: "Your Cloudflare Access sign-in could not be verified. Reload the page and sign in again." };
   }
+}
+async function verifyPassword(request, env) {
+  const user = String(env.ADMIN_USER || ""), pass = String(env.ADMIN_PASSWORD || "");
+  if (!user || !pass) return { ok: false, status: 503, msg: "Editing is not set up yet. Add the ADMIN_USER and ADMIN_PASSWORD secrets to the Pages project." };
+  const h = request.headers.get("authorization") || "";
+  if (!h.startsWith("Basic ")) return { ok: false, status: 401, msg: "Sign in with the editor ID and password." };
+  let u = "", p = "";
+  try { const d = b64text(h.slice(6).trim()); const i = d.indexOf(":"); u = d.slice(0, i); p = d.slice(i + 1); } catch {}
+  const ok = (await same(u, user)) & (await same(p, pass));
+  if (!ok) { await new Promise((r) => setTimeout(r, 800)); return { ok: false, status: 401, msg: "The editor ID or password is incorrect." }; }
+  return { ok: true, email: u };
+}
+async function same(a, b) {
+  const enc = new TextEncoder();
+  const [x, y] = await Promise.all([crypto.subtle.digest("SHA-256", enc.encode(a)), crypto.subtle.digest("SHA-256", enc.encode(b))]);
+  const ax = new Uint8Array(x), by = new Uint8Array(y);
+  let diff = 0;
+  for (let i = 0; i < ax.length; i++) diff |= ax[i] ^ by[i];
+  return diff === 0 ? 1 : 0;
 }
 function b64bytes(s) {
   const b = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4));
