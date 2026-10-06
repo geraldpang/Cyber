@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRA Question Bank Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+:root{--nav:#0F3D3E;--action:#118D8A;--accent:#4CC9C0;--bg:#F2F5F7;--text:#223037;--panel:#FFFFFF;--muted:#5B6B70;--line:#D8E2E3;--tint:#E7F3F2;--ot:#B4531A;--err:#B42318;--ok:#1E7A4C;
+--f-head:"Source Serif 4",Georgia,serif;--f-body:"IBM Plex Sans","Segoe UI",Arial,sans-serif;--f-mono:"IBM Plex Mono",Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--f-body)}
+header{background:var(--nav);color:#fff;padding:18px 16px}
+header .in,main{max-width:1200px;margin:0 auto}
+header h1{font:600 26px/1.2 var(--f-head);margin:0}
+header p{margin:4px 0 0;color:#CFE6E4;max-width:80ch}
+header a{color:var(--accent)}
+main{padding:20px 16px 60px}
+.status{margin:0 0 16px;padding:10px 14px;border-radius:4px;background:var(--tint);border:1px solid var(--line)}
+.status.err{background:#FDECEA;border-color:#F3B8B2;color:var(--err)}
+h2{font:600 20px var(--f-head);margin:28px 0 6px}
+.sub{color:var(--muted);margin:0 0 12px;max-width:85ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:0 0 12px}
+.card-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin-bottom:8px}
+.id{font:500 13px var(--f-mono)}
+.id.ot{color:var(--ot)}
+.tag{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 16px}
+label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:14px var(--f-body);color:var(--text);background:#fff}
+textarea{min-height:58px;resize:vertical}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--action);outline-offset:1px}
+.preview{margin:10px 0 0;padding:8px 10px;background:var(--bg);border-radius:4px;font-size:13.5px}
+.chips{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px}
+.chips label{display:flex;gap:5px;align-items:center;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.chips input{accent-color:var(--action);width:15px;height:15px}
+.thr{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:2px 12px;margin-top:4px}
+.thr label{display:flex;gap:6px;align-items:center;font-size:12.5px;cursor:pointer}
+.thr b{font:500 11.5px var(--f-mono)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+button{font:600 13px var(--f-body);border-radius:4px;padding:7px 14px;cursor:pointer;border:1px solid var(--action);background:var(--action);color:#fff}
+button.sec{background:#fff;color:var(--action)}
+button.del{background:#fff;color:var(--err);border-color:#E5B3AE}
+button:disabled{opacity:.5;cursor:not-allowed}
+.msg{font-size:12.5px;color:var(--muted)}
+.msg.ok{color:var(--ok)}.msg.err{color:var(--err)}
+.dirty .msg::before{content:"Unsaved changes";color:var(--ot)}
+.sethead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.empty{color:var(--muted);padding:20px;text-align:center}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>TRA question bank editor</h1>
+  <p>Edit the risk statements and the exposure and vulnerability questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
+</div></header>
+<main>
+  <div class="status" id="status" role="status">Loading the question bank…</div>
+  <form class="card" id="login" hidden>
+    <div class="card-h"><strong>Sign in to edit</strong><span class="tag">The page stays view-only until you sign in. You'll need to sign in again after reloading the page.</span></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,260px)) auto;align-items:end">
+      <div><label class="f" for="lgUser">Editor ID</label><input type="text" id="lgUser" autocomplete="username" required></div>
+      <div><label class="f" for="lgPass">Password</label><input type="password" id="lgPass" autocomplete="current-password" required style="width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:14px var(--f-body)"></div>
+      <div><button type="submit">Sign in</button></div>
+    </div>
+    <p class="msg err" id="lgMsg" aria-live="polite" style="margin:8px 0 0"></p>
+  </form>
+  <section id="statements"></section>
+  <section id="questions"></section>
+</main>
+<script>
+(function(){
+const CONTEXTS=['Safety','Financial','Reputation / Political','Legal','Engineering / Technical'];
+const LIK={1:'Rare',2:'Unlikely',3:'Possible',4:'Likely',5:'Almost certain'};
+let data=null,canEdit=false,authHeader=null; /* credentials are held in memory only */
+const authed=(h={})=>authHeader?Object.assign({authorization:authHeader},h):h;
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+const fv=(f,n)=>{const el=f.querySelector('[name="'+n+'"]');return el?el.value:'';};
+function setStatus(html,err){const el=$('#status');el.innerHTML=html;el.classList.toggle('err',!!err);}
+
+async function load(){
+  try{
+    const r=await fetch('/api/tra-questions?t='+Date.now(),{headers:{accept:'application/json'}});
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+    data=j;
+  }catch(e){setStatus('Could not load the question bank: '+esc(e.message),true);return;}
+  try{
+    const a=await fetch('/api/admin/tra-questions',{headers:authed({accept:'application/json'})});
+    const ct=a.headers.get('content-type')||'';
+    const j=ct.includes('json')?await a.json():{error:'Editing is not available.'};
+    canEdit=a.ok;
+    $('#login').hidden=a.ok||a.status===503;
+    setStatus(a.ok?'Signed in as <strong>'+esc(j.email||'an authorised user')+'</strong>. Save each card after editing it.':'View only. '+esc(a.status===401&&!authHeader?'Sign in below to edit.':(j.error||'Editing is not available.')),!a.ok&&!!authHeader);
+    if(!a.ok&&authHeader){$('#lgMsg').textContent=j.error||'Sign-in failed.';authHeader=null;}
+  }catch(e){canEdit=false;setStatus('View only. Editing could not be checked.',true);}
+  render();
+}
+
+const threatBoxes=(name,sel)=>`<div class="thr">${data.threats.map(t=>`<label><input type="checkbox" name="${name}" value="${esc(t.id)}" ${sel.includes(t.id)?'checked':''} ${canEdit?'':'disabled'}><b>${esc(t.id)}</b> ${esc(t.name)}</label>`).join('')}</div>`;
+const dis=()=>canEdit?'':'disabled';
+
+function render(){
+  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". Tick the risk contexts and the threats that are relevant to it.</p>`+
+  data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
+    <div class="card-h"><span class="id ${s.system_type==='OT'?'ot':''}">${esc(s.id)}</span><span class="tag">${esc(s.system_type)} · ${esc(s.tag)}</span></div>
+    <div class="grid">
+      <div><label class="f" for="ev_${esc(s.id)}">Event</label><input type="text" id="ev_${esc(s.id)}" name="event" value="${esc(s.event)}" maxlength="1000" ${dis()}></div>
+      <div><label class="f" for="hz_${esc(s.id)}">Hazard</label><input type="text" id="hz_${esc(s.id)}" name="hazard" value="${esc(s.hazard)}" maxlength="1000" ${dis()}></div>
+    </div>
+    <div class="preview" data-preview>${esc(s.statement)}</div>
+    <div style="margin-top:10px"><span class="f" style="font-size:12px;font-weight:600;color:var(--muted)">Risk contexts</span><div class="chips">${CONTEXTS.map(c=>`<label><input type="checkbox" name="ctx" value="${esc(c)}" ${s.risk_contexts.includes(c)?'checked':''} ${dis()}> ${esc(c)}</label>`).join('')}</div></div>
+    <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',s.threats)}</div>
+    <div class="actions"><button type="submit" ${dis()}>Save ${esc(s.id)}</button><span class="msg" aria-live="polite"></span></div>
+  </form>`).join('');
+  const set=(key,label,hint)=>{const qs=data.questions[key]||[];return `<div class="sethead"><h2>${label}</h2><button type="button" class="sec" data-add="${key}" ${dis()}>+ Add ${key} question</button></div><p class="sub">${hint}</p>`+
+    (qs.length?qs.map(q=>`<form class="card" data-kind="question" data-id="${esc(q.id)}">
+      <div class="card-h"><span class="id">${esc(q.id)}</span></div>
+      <div class="grid" style="grid-template-columns:minmax(0,1fr) 200px">
+        <div><label class="f" for="qt_${esc(q.id)}">Question</label><textarea id="qt_${esc(q.id)}" name="question" maxlength="1000" ${dis()}>${esc(q.question)}</textarea></div>
+        <div><label class="f" for="ql_${esc(q.id)}">Likelihood${key==='exposure'?' if Yes':''}</label><select id="ql_${esc(q.id)}" name="likelihood" ${dis()}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${q.likelihood===n?'selected':''}>${n} – ${LIK[n]}</option>`).join('')}</select></div>
+      </div>
+      <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',q.threats)}</div>
+      <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
+    </form>`).join(''):`<div class="card empty">No ${key} questions yet.</div>`);};
+  $('#questions').innerHTML=set('exposure','Exposure questions','How the system can be reached. In the TRA, the highest likelihood among exposure questions answered Yes sets the starting inherent likelihood.')+
+    set('vulnerability','Vulnerability questions','Weaknesses in the system. A Yes identifies the ticked threats. Likelihood is recorded for reference.');
+}
+
+async function post(body){
+  const r=await fetch('/api/admin/tra-questions',{method:'POST',headers:authed({'content-type':'application/json',accept:'application/json'}),body:JSON.stringify(body)});
+  const ct=r.headers.get('content-type')||'';
+  const j=ct.includes('json')?await r.json():{error:'Your sign-in has expired. Reload the page to sign in again.'};
+  if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+
+document.addEventListener('input',e=>{const f=e.target.closest('form.card');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
+  if(f.dataset.kind==='statement'){f.querySelector('[data-preview]').textContent='Risk of '+fv(f,'event').trim()+' due to '+fv(f,'hazard').trim()+'.';}});
+document.addEventListener('change',e=>{const f=e.target.closest('form.card');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
+
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='login'){e.preventDefault();const u=$('#lgUser').value.trim(),p=$('#lgPass').value;$('#lgMsg').textContent='';
+    authHeader='Basic '+btoa(String.fromCharCode(...new TextEncoder().encode(u+':'+p)));$('#lgPass').value='';await load();return;}
+  const f=e.target.closest('form.card');if(!f)return;e.preventDefault();if(!canEdit)return;
+  const msg=f.querySelector('.msg'),btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='msg';msg.textContent='Saving…';
+  const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
+  try{
+    if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
+    else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),likelihood:Number(fv(f,'likelihood')),threats:checked('thr')});
+    f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
+  }catch(err){msg.className='msg err';msg.textContent=err.message;}
+  btn.disabled=false;});
+
+const confirmDel={};
+document.addEventListener('click',async e=>{
+  const add=e.target.closest('[data-add]');
+  if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question_set:add.dataset.add,question:'New question',likelihood:3,threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
+  const del=e.target.closest('[data-del]');
+  if(del&&canEdit){const id=del.dataset.del;if(!confirmDel[id]){confirmDel[id]=1;del.textContent='Click again to delete '+id;setTimeout(()=>{delete confirmDel[id];if(del.isConnected)del.textContent='Delete';},4000);return;}
+    del.disabled=true;try{await post({action:'deleteQuestion',id});await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
+});
+window.addEventListener('beforeunload',e=>{if(document.querySelector('form.dirty')){e.preventDefault();e.returnValue='';}});
+load();
+})();
+</script>
+</body>
+</html>
