@@ -35,7 +35,7 @@ export async function onRequestGet({ env }) {
         tag: s.tag,
         event: s.event,
         hazard: s.hazard,
-        risk_contexts: s.risk_contexts.split(";").map((x) => x.trim()).filter(Boolean),
+        risk_contexts: s.risk_contexts.split(",").map((x) => x.trim()).filter(Boolean),
         statement: `Risk of ${s.event} due to ${s.hazard}.`,
         threats: stThreats[s.id] || [],
         updated_at: s.updated_at,
@@ -46,7 +46,7 @@ export async function onRequestGet({ env }) {
       },
     });
   } catch (err) {
-    return json({ error: "Could not read the question bank." }, 500);
+    return json({ error: "Could not read the question bank.", detail: String((err && err.message) || err) }, 500);
   }
 }
 
