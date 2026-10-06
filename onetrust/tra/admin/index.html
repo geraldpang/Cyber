@@ -103,9 +103,9 @@ const threatBoxes=(name,sel)=>`<div class="thr">${data.threats.map(t=>`<label><i
 const dis=()=>canEdit?'':'disabled';
 
 function render(){
-  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". Tick the risk contexts and the threats that are relevant to it.</p>`+
+  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". All 7 statements apply to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to each.</p>`+
   data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
-    <div class="card-h"><span class="id ${s.system_type==='OT'?'ot':''}">${esc(s.id)}</span><span class="tag">${esc(s.system_type)} · ${esc(s.tag)}</span></div>
+    <div class="card-h"><span class="id">${esc(s.id)}</span><span class="tag">${esc(s.tag)}</span></div>
     <div class="grid">
       <div><label class="f" for="ev_${esc(s.id)}">Event</label><input type="text" id="ev_${esc(s.id)}" name="event" value="${esc(s.event)}" maxlength="1000" ${dis()}></div>
       <div><label class="f" for="hz_${esc(s.id)}">Hazard</label><input type="text" id="hz_${esc(s.id)}" name="hazard" value="${esc(s.hazard)}" maxlength="1000" ${dis()}></div>
