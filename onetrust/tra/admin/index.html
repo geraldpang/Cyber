@@ -91,9 +91,11 @@ async function load(){
     const a=await fetch('/api/admin/tra-questions',{headers:authed({accept:'application/json'})});
     const ct=a.headers.get('content-type')||'';
     const j=ct.includes('json')?await a.json():{error:'Editing is not available.'};
-    canEdit=a.ok;
-    $('#login').hidden=a.ok||a.status===503;
-    setStatus(a.ok?'Signed in as <strong>'+esc(j.email||'an authorised user')+'</strong>. Save each card after editing it.':'View only. '+esc(a.status===401&&!authHeader?'Sign in below to edit.':(j.error||'Editing is not available.')),!a.ok&&!!authHeader);
+    const good=a.ok&&j.ok===true; /* a page or 404 fallback is not a sign-in */
+    if(a.ok&&!good)j.error='The editor API was not found at /api/admin/tra-questions. Check the file name in functions/api/admin/.';
+    canEdit=good;
+    $('#login').hidden=good||a.status===503||(a.ok&&!good);
+    setStatus(good?'Signed in as <strong>'+esc(j.email||'an authorised user')+'</strong>. Save each card after editing it.':'View only. '+esc(a.status===401&&!authHeader?'Sign in below to edit.':(j.error||'Editing is not available.')),(!a.ok&&!!authHeader)||(a.ok&&!good));
     if(!a.ok&&authHeader){$('#lgMsg').textContent=j.error||'Sign-in failed.';authHeader=null;}
   }catch(e){canEdit=false;setStatus('View only. Editing could not be checked.',true);}
   render();
