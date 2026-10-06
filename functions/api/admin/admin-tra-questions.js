@@ -6,7 +6,7 @@
 // If neither is configured, editing is refused.
 
 const THREAT_RE = /^T\d{2}$/;
-const STATEMENT_RE = /^(IT|OT)-R\d{2}$/;
+const STATEMENT_RE = /^R\d{2}$/;
 const QUESTION_RE = /^[EV]\d{1,2}$/;
 const CONTEXTS = ["Safety", "Financial", "Reputation / Political", "Legal", "Engineering / Technical"];
 const MAX_TEXT = 1000;
