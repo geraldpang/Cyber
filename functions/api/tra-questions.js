@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: GET /api/tra-questions
 // Returns the TRA question bank from the D1 database bound as "DB".
-// Read-only. Editing will be added separately behind Cloudflare Access.
+// Read-only and public. Editing is done by functions/api/admin/tra-questions.js (sign-in required).
 
 export async function onRequestGet({ env }) {
   if (!env.DB) {
@@ -9,7 +9,7 @@ export async function onRequestGet({ env }) {
   try {
     const [threats, statements, statementThreats, questions, questionThreats] = await env.DB.batch([
       env.DB.prepare("SELECT id, name FROM threats ORDER BY sort_order"),
-      env.DB.prepare("SELECT id, system_type, tag, event, hazard, risk_contexts, updated_at FROM risk_statements ORDER BY sort_order"),
+      env.DB.prepare("SELECT id, tag, event, hazard, risk_contexts, updated_at FROM risk_statements ORDER BY sort_order"),
       env.DB.prepare("SELECT statement_id, threat_id FROM risk_statement_threats ORDER BY threat_id"),
       env.DB.prepare("SELECT id, question_set, question, likelihood, updated_at FROM questions WHERE active = 1 ORDER BY question_set, sort_order"),
       env.DB.prepare("SELECT question_id, threat_id FROM question_threats ORDER BY threat_id"),
@@ -31,7 +31,6 @@ export async function onRequestGet({ env }) {
       threats: threats.results,
       risk_statements: statements.results.map((s) => ({
         id: s.id,
-        system_type: s.system_type,
         tag: s.tag,
         event: s.event,
         hazard: s.hazard,
