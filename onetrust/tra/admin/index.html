@@ -105,7 +105,7 @@ const threatBoxes=(name,sel)=>`<div class="thr">${data.threats.map(t=>`<label><i
 const dis=()=>canEdit?'':'disabled';
 
 function render(){
-  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". All 7 statements apply to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to each.</p>`+
+  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". All 6 statements apply to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to each.</p>`+
   data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
     <div class="card-h"><span class="id">${esc(s.id)}</span><span class="tag">${esc(s.tag)}</span></div>
     <div class="grid">
