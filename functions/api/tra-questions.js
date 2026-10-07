@@ -4,6 +4,7 @@
 //
 // likelihood_questions: the questions the TRA asks, each rated 1 (Rare) to 5 (Almost certain),
 //   with a description for every level and the threats the answer applies to.
+// controls: the MTM and IEC 62443 control sets, with threats, CIA and (IEC) SL-T.
 // questions: the older exposure / vulnerability (Yes/No) questions, kept for pages not yet updated.
 
 export async function onRequestGet({ env }) {
@@ -32,6 +33,7 @@ export async function onRequestGet({ env }) {
         updated_at: s.updated_at,
       })),
       likelihood_questions: await likelihoodQuestions(env),
+      controls: await controlSets(env),
       questions: await legacyQuestions(env),
     });
   } catch (err) {
@@ -54,6 +56,33 @@ async function likelihoodQuestions(env) {
       levels: [q.level_1, q.level_2, q.level_3, q.level_4, q.level_5],
       threats: byQ[q.id] || [],
       updated_at: q.updated_at,
+    }));
+  } catch (err) {
+    if (/no such table/i.test(String(err && err.message))) return [];
+    throw err;
+  }
+}
+
+// MTM and IEC 62443 controls with their threats, CIA and (IEC) SL-T. Returns [] until the control tables exist.
+async function controlSets(env) {
+  try {
+    const [cs, links] = await env.DB.batch([
+      env.DB.prepare("SELECT id, control_set, code, title, description, domain, sl, cia, updated_at FROM controls WHERE active = 1 ORDER BY control_set DESC, sort_order"),
+      env.DB.prepare("SELECT control_id, threat_id FROM control_threats ORDER BY threat_id"),
+    ]);
+    const byC = links.results.reduce((m, r) => ((m[r.control_id] ||= []).push(r.threat_id), m), {});
+    const list = (v) => String(v || "").split(",").map((x) => x.trim()).filter(Boolean);
+    return cs.results.map((c) => ({
+      id: c.id,
+      set: c.control_set,
+      code: c.code,
+      title: c.title,
+      description: c.description || "",
+      domain: c.domain || "",
+      sl: list(c.sl).map(Number).filter((n) => n >= 1 && n <= 4),
+      cia: list(c.cia).filter((x) => ["C", "I", "A"].includes(x)),
+      threats: byC[c.id] || [],
+      updated_at: c.updated_at,
     }));
   } catch (err) {
     if (/no such table/i.test(String(err && err.message))) return [];
