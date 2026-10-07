@@ -28,7 +28,7 @@ h2{font:600 20px var(--f-head);margin:28px 0 6px}
 .tag{color:var(--muted);font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 16px}
 label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 4px}
-input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:14px var(--f-body);color:var(--text);background:#fff}
+input[type=text],input[type=search],textarea,select{width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;font:14px var(--f-body);color:var(--text);background:#fff}
 textarea{min-height:58px;resize:vertical}
 input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--action);outline-offset:1px}
 .preview{margin:10px 0 0;padding:8px 10px;background:var(--bg);border-radius:4px;font-size:13.5px}
@@ -48,6 +48,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .dirty .msg::before{content:"Unsaved changes";color:var(--ot)}
 .sethead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
 .empty{color:var(--muted);padding:20px;text-align:center}
+.ctl{padding:10px 14px}.ctl summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.ctl summary .ctitle{font-weight:600}.badges{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cia{font:500 11px var(--f-mono);border:1px solid var(--line);border-radius:3px;padding:0 5px;color:var(--muted)}.cia.on{background:var(--action);border-color:var(--action);color:#fff}
+.card-in{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.card-in label.f{display:block}.card-in label.f input,.card-in label.f textarea{margin-top:4px;font-weight:400;color:var(--text)}
+span.f{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.ctlbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin:0 0 10px}.ctlbar input[type=search]{max-width:300px}.addc{display:flex;gap:6px}.addc input{width:220px}
 .levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
 .levels textarea{min-height:76px;font-size:13px}
 @media (max-width:760px){.levels{grid-template-columns:1fr}}
@@ -56,7 +62,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <header><div class="in">
   <h1>TRA question bank editor</h1>
-  <p>Add, edit and delete the risk statements and the questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
+  <p>Add, edit and delete the risk statements, likelihood questions and MTM and IEC 62443 controls used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
 </div></header>
 <main>
   <div class="status" id="status" role="status">Loading the question bank…</div>
@@ -71,12 +77,14 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </form>
   <section id="statements"></section>
   <section id="questions"></section>
+  <section id="controls"></section>
 </main>
 <script>
 (function(){
 const CONTEXTS=['Safety','Financial','Reputation / Political','Legal','Engineering / Technical'];
 const LIK={1:'Rare',2:'Unlikely',3:'Possible',4:'Likely',5:'Almost certain'};
-let data=null,canEdit=false,authHeader=null; /* credentials are held in memory only */
+let data=null,canEdit=false,authHeader=null;
+const ctlOpen=new Set(),ctlQ={MTM:'',IEC:''}; /* which control editors are open, and the search text per set */ /* credentials are held in memory only */
 const authed=(h={})=>authHeader?Object.assign({authorization:authHeader},h):h;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
@@ -136,7 +144,33 @@ function render(){
       <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Threats this question rates</span>${threatBoxes('thr',q.threats)}</div>
       <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" data-dkind="question" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
     </form>`).join(''):`<div class="card empty">No questions yet. If the database steps in likelihood-steps.txt haven't been run, run them in the D1 Console first.</div>`);
+  renderControls();
 }
+
+const SET_INFO={MTM:['MTM controls (IT)','MTM key controls from the MTM security standards. In the TRA they are the IT control set.'],IEC:['IEC 62443-3-3 controls (OT)','System requirements and enhancements for OT systems. In the TRA they are filtered by the system\'s SL-T.']};
+function ctlCard(c){return `<details class="card ctl" data-cid="${esc(c.id)}" data-find="${esc((c.code+' '+c.title+' '+c.domain).toLowerCase())}" ${ctlOpen.has(c.id)?'open':''}>
+  <summary><span class="id">${esc(c.code)}</span><strong class="ctitle">${esc(c.title)}</strong><span class="badges">${['C','I','A'].map(x=>`<span class="cia ${c.cia.includes(x)?'on':''}" title="${x==='C'?'Confidentiality':x==='I'?'Integrity':'Availability'}">${x}</span>`).join('')}${c.set==='IEC'?`<span class="tag">SL-T ${esc(c.sl.join(', ')||'none')}</span>`:''}<span class="tag">${c.threats.length} threat${c.threats.length===1?'':'s'}</span></span></summary>
+  <form data-kind="control" data-id="${esc(c.id)}" data-set="${esc(c.set)}" class="card-in">
+    <div class="grid">
+      <div><label class="f">Title<input type="text" name="title" value="${esc(c.title)}" maxlength="200" ${dis()}></label></div>
+      <div><label class="f">${c.set==='MTM'?'Standard':'Foundational requirement (FR)'}<input type="text" name="domain" value="${esc(c.domain)}" list="dl_${esc(c.set)}" maxlength="120" ${dis()}></label></div>
+    </div>
+    <label class="f" style="margin-top:8px">Description<textarea name="description" maxlength="1000" ${dis()}>${esc(c.description)}</textarea></label>
+    <div class="grid" style="margin-top:8px">
+      <div><span class="f">CIA (the risk statements this control can reduce)</span><div class="chips">${[['C','Confidentiality'],['I','Integrity'],['A','Availability']].map(([k,n])=>`<label><input type="checkbox" name="cia" value="${k}" ${c.cia.includes(k)?'checked':''} ${dis()}> ${n}</label>`).join('')}</div></div>
+      ${c.set==='IEC'?`<div><span class="f">SL-T (security levels this requirement applies to)</span><div class="chips">${[1,2,3,4].map(n=>`<label><input type="checkbox" name="sl" value="${n}" ${c.sl.includes(n)?'checked':''} ${dis()}> SL-T ${n}</label>`).join('')}</div></div>`:''}
+    </div>
+    <div style="margin-top:8px"><span class="f">Threats this control mitigates</span>${threatBoxes('thr',c.threats)}</div>
+    <div class="actions"><button type="submit" ${dis()}>Save ${esc(c.code)}</button><button type="button" class="del" data-del="${esc(c.id)}" data-dkind="control" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
+  </form></details>`;}
+function renderControls(){const cs=Array.isArray(data.controls)?data.controls:[];
+  const sec=set=>{const list=cs.filter(c=>c.set===set),doms=[...new Set(list.map(c=>c.domain).filter(Boolean))],[label,hint]=SET_INFO[set];
+    return `<div class="sethead"><h2>${label}</h2><span class="tag">${list.length} controls</span></div><p class="sub">${hint} Open a control to edit its title, description, CIA, threats${set==='IEC'?' and SL-T':''}.</p>
+    <div class="ctlbar"><input type="search" data-ctlq="${set}" value="${esc(ctlQ[set])}" placeholder="Search ID, title or ${set==='MTM'?'standard':'FR'}" aria-label="Search ${label}">${canEdit?`<span class="addc"><input type="text" data-newcode="${set}" maxlength="40" placeholder="New control ID, e.g. ${set==='MTM'?'NS.9':'SR 8.1'}" aria-label="New ${set} control ID"><button type="button" class="sec" data-addctl="${set}">+ Add control</button></span>`:''}</div>
+    <datalist id="dl_${set}">${doms.map(d=>`<option value="${esc(d)}">`).join('')}</datalist>
+    <div data-ctllist="${set}">${list.length?list.map(ctlCard).join(''):`<div class="card empty">No ${set} controls yet. If the database steps in controls-steps.txt haven't been run, run them in the D1 Console first.</div>`}</div><p class="small" data-ctlnone="${set}" hidden>No controls match the search.</p>`;};
+  $('#controls').innerHTML=sec('MTM')+sec('IEC');applyCtlFilter();}
+function applyCtlFilter(){['MTM','IEC'].forEach(set=>{const q=ctlQ[set].trim().toLowerCase();let shown=0;document.querySelectorAll(`[data-ctllist="${set}"] details.ctl`).forEach(d=>{const ok=!q||d.dataset.find.includes(q);d.hidden=!ok;if(ok)shown++;});const n=document.querySelector(`[data-ctlnone="${set}"]`);if(n)n.hidden=!(q&&!shown);});}
 
 async function post(body){
   const r=await fetch('/api/admin/tra-questions',{method:'POST',headers:authed({'content-type':'application/json',accept:'application/json'}),body:JSON.stringify(body)});
@@ -149,18 +183,19 @@ async function post(body){
   return j;
 }
 
-document.addEventListener('input',e=>{const f=e.target.closest('form.card');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
+document.addEventListener('input',e=>{if(e.target.matches('[data-ctlq]')){ctlQ[e.target.dataset.ctlq]=e.target.value;applyCtlFilter();return;}const f=e.target.closest('form[data-kind]');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
   if(f.dataset.kind==='statement'){f.querySelector('[data-preview]').textContent='Risk of '+fv(f,'event').trim()+' due to '+fv(f,'hazard').trim()+'.';f.querySelector('[data-dims]').textContent=dimsText(fv(f,'tag'));}});
-document.addEventListener('change',e=>{const f=e.target.closest('form.card');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
+document.addEventListener('change',e=>{const f=e.target.closest('form[data-kind]');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
 
 document.addEventListener('submit',async e=>{
   if(e.target.id==='login'){e.preventDefault();const u=$('#lgUser').value.trim(),p=$('#lgPass').value;$('#lgMsg').textContent='';
     authHeader='Basic '+btoa(String.fromCharCode(...new TextEncoder().encode(u+':'+p)));$('#lgPass').value='';await load();return;}
-  const f=e.target.closest('form.card');if(!f)return;e.preventDefault();if(!canEdit)return;
+  const f=e.target.closest('form[data-kind]');if(!f)return;e.preventDefault();if(!canEdit)return;
   const msg=f.querySelector('.msg'),btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='msg';msg.textContent='Saving…';
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
     if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
+    else if(f.dataset.kind==='control')await post({action:'updateControl',id:f.dataset.id,title:fv(f,'title'),description:fv(f,'description'),domain:fv(f,'domain'),cia:checked('cia'),sl:checked('sl').map(Number),threats:checked('thr')});
     else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),guidance:fv(f,'guidance'),levels:[1,2,3,4,5].map(n=>fv(f,'level_'+n)),threats:checked('thr')});
     f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
   }catch(err){msg.className='msg err';msg.textContent=err.message;}
@@ -170,12 +205,17 @@ const confirmDel={};
 document.addEventListener('click',async e=>{
   const add=e.target.closest('[data-add]');
   if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question:'How likely is it that …?',guidance:'',levels:['Describe level 1','Describe level 2','Describe level 3','Describe level 4','Describe level 5'],threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
+  const addC=e.target.closest('[data-addctl]');
+  if(addC&&canEdit){const set=addC.dataset.addctl,inp=document.querySelector(`[data-newcode="${set}"]`),code=(inp.value||'').trim();if(!code){inp.focus();setStatus('Type the new control ID first, then press + Add control.',true);return;}
+    const doms=[...new Set((data.controls||[]).filter(c=>c.set===set).map(c=>c.domain).filter(Boolean))];addC.disabled=true;
+    try{const r=await post({action:'addControl',control_set:set,code,title:'New control',description:'',domain:doms[0]||'',cia:['C','I','A'],sl:[1,2,3,4],threats:[]});ctlOpen.add(r.saved);ctlQ[set]='';await load();const d=[...document.querySelectorAll('details.ctl')].find(x=>x.dataset.cid===r.saved);if(d){d.scrollIntoView({block:'center'});const t=d.querySelector('[name=title]');if(t){t.focus();t.select();}}}catch(err){setStatus(esc(err.message),true);addC.disabled=false;}return;}
   const addS=e.target.closest('[data-addstmt]');
   if(addS&&canEdit){addS.disabled=true;try{const r=await post({action:'addStatement',tag:'New risk',event:'new risk event',hazard:'the lack of cybersecurity guardrails',risk_contexts:['Engineering / Technical'],threats:[]});await load();const el=document.getElementById('tg_'+r.saved);if(el){el.scrollIntoView({block:'center'});el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);addS.disabled=false;}return;}
   const del=e.target.closest('[data-del]');
   if(del&&canEdit){const id=del.dataset.del;if(!confirmDel[id]){confirmDel[id]=1;del.textContent='Click again to delete '+id;setTimeout(()=>{delete confirmDel[id];if(del.isConnected)del.textContent='Delete';},4000);return;}
-    del.disabled=true;try{await post({action:del.dataset.dkind==='statement'?'deleteStatement':'deleteQuestion',id});await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
+    del.disabled=true;try{await post({action:{statement:'deleteStatement',control:'deleteControl'}[del.dataset.dkind]||'deleteQuestion',id});ctlOpen.delete(id);await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
 });
+document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.ctl')){if(d.open)ctlOpen.add(d.dataset.cid);else ctlOpen.delete(d.dataset.cid);}},true);
 window.addEventListener('beforeunload',e=>{if(document.querySelector('form.dirty')){e.preventDefault();e.returnValue='';}});
 load();
 })();
