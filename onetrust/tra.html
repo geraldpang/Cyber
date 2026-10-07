@@ -166,6 +166,7 @@ input:disabled,select:disabled,textarea:disabled{background:#f3f6f9;color:#5b6a7
 .ciachip{border:1px solid #cde3f4;background:var(--white);border-radius:6px;padding:6px 10px;text-align:center;min-width:72px}
 .tq{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:12px;background:var(--white)}
 .tq .head{display:flex;gap:10px;align-items:baseline}
+.ciatags{display:flex;gap:3px;margin-top:5px}.ciat{font-size:10px;font-weight:700;border:1px solid var(--line);border-radius:3px;padding:0 4px;color:#9aa6b5}.ciat.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .lqgrid{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;font-size:12.5px;table-layout:fixed}
 .lqgrid th{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
 .lqgrid th.lqq{width:25%}.lqgrid th.lqcm{width:15%}
@@ -704,7 +705,7 @@ let LQ=[
  {id:"Q5",text:"How likely is it that sensitive data leaks out?",guidance:'',threats:["T04"],levels:["No sensitive data, or encrypted with no way to export it", "Encrypted · export limited to a few people", "Staff can see it · some export routes (email, USB)", "Many users or third parties can see it · few export controls", "Exposed to the internet or public · unencrypted"]},
  {id:"Q6",text:"How likely is it that people are tricked, or malware arrives by USB, email, files or links?",guidance:'',threats:["T06", "T13"],levels:["No human users · ports disabled", "A few trained administrators · scanned transfer station only", "Staff use it · trained · email, web and USB scanned", "Many users · email, links or phone requests · partial scanning", "Public users or help desk with no identity checks · unrestricted USB and files"]},
  {id:"Q7",text:"How likely is it that the system is compromised through its supplier or custom software?",guidance:'',threats:["T08", "T09"],levels:["Off-the-shelf · no supplier access · MTM controls updates", "Configured product · supplier on-site and escorted", "Customised and tested by MTM · supplier uses jump host with MFA", "Bespoke, little testing · supplier hosts it or has always-on access", "Bespoke and untested · supplier connects and updates unmanaged"]}];
-let QB_SOURCE='built-in';
+let QB_SOURCE='built-in',CTL_SOURCE='built-in';
 const EXPOSURE_NONE_L=2; /* all exposure answers No: Limited Local Connectivity */
 const OLD_Q_MAP={Q3:'E1',Q4:'E2',Q2:'V1',Q6:'V1',Q5:'V2',Q8:'V3',Q9:'V4',Q10:'V5',Q7:'V6'};
 function migrateAnswers(t){const a=t&&t.answers;if(!a)return;const ks=Object.keys(a);if(!ks.some(k=>/^Q\d+$/.test(k))||ks.some(k=>/^[EV]\d+$/.test(k)))return;const n={};Object.entries(OLD_Q_MAP).forEach(([o,v])=>{if(a[o]&&!n[v])n[v]={a:a[o].a,notes:a[o].notes||''};});t.answers=n;}
@@ -719,6 +720,15 @@ const lqLevelHtml=txt=>String(txt||'').split(/ · |; /).map(e).join('<br>');
 async function loadQuestionBank(){try{const r=await fetch('/api/tra-questions',{headers:{accept:'application/json'}});if(!r.ok)return;const j=await r.json();const valid=new Set(TRA_THREATS.map(x=>x[0]));
  const lq=(Array.isArray(j.likelihood_questions)?j.likelihood_questions:[]).map(q=>({id:String(q.id),text:String(q.question||''),guidance:String(q.guidance||''),levels:(Array.isArray(q.levels)?q.levels:[]).slice(0,5).map(x=>String(x||'')),threats:(q.threats||[]).map(String).filter(x=>valid.has(x))})).filter(q=>/^Q\d+$/.test(q.id)&&q.text&&q.levels.length===5);
  if(lq.length){LQ=lq;QB_SOURCE='question bank';}
+ /* Control sets: the database decides which MTM and IEC controls exist and their title, description, domain, threats, CIA and (IEC) SL-T */
+ const dbC=(Array.isArray(j.controls)?j.controls:[]).filter(d=>d&&/^(MTM|IEC):/.test(String(d.id))&&d.title&&d.code);
+ if(dbC.length){const seen=new Set();dbC.forEach(d=>{const key=String(d.id),set=key.slice(0,3),thr=(Array.isArray(d.threats)?d.threats:[]).map(String).filter(x=>valid.has(x)).sort(),cia=(Array.isArray(d.cia)?d.cia:[]).map(x=>String(x).toLowerCase()).filter(x=>['c','i','a'].includes(x));
+   let c=CTRL[key];if(!c)c=CTRL[key]=set==='MTM'?{key,fw:'MTM',specs:[],evidence:[],std:'',url:'',refLabel:'',baseThreats:[]}:{key,fw:'IEC',specs:[],evidence:[],clause:'',types:['Preventive'],eff:{}};
+   c.id=String(d.code);c.name=String(d.title);c.statement=String(d.description||'');c.threats=thr;
+   if(set==='MTM'){c.source=d.domain?String(d.domain):'MTM';if(c.baseThreats)c.baseThreats=c.baseThreats.filter(x=>thr.includes(x));}
+   else{c.fr=String(d.domain||'');c.source='IEC 62443-3-3';const sl=(Array.isArray(d.sl)?d.sl:[]).map(Number).filter(n=>n>=1&&n<=4);c.sl=sl.length?sl:[1,2,3,4];}
+   c.cia=cia.length?cia:['c','i','a'];c.retired=false;seen.add(key);});
+  Object.values(CTRL).forEach(c=>{if((c.fw==='MTM'||c.fw==='IEC')&&!seen.has(c.key))c.retired=true;});CTL_SOURCE='control sets';}
  /* The database decides which risk statements exist: added ones appear, deleted ones disappear */
  const dbS=(j.risk_statements||[]).filter(d=>d&&/^R\d{2}$/.test(String(d.id))&&d.event);
  if(dbS.length){const list=dbS.map(d=>{const id=String(d.id),tag=String(d.tag||id),base=RESID_STATEMENTS.find(st=>st.id===id)||{};const ctx=(Array.isArray(d.risk_contexts)?d.risk_contexts:[]).flatMap(x=>String(x).split(',')).map(x=>x.trim()).filter(x=>RISK_CONTEXTS.includes(x));
@@ -865,6 +875,13 @@ const IEC_REQ=[{"id":"SR 1.1","title":"Human user identification and authenticat
 const CTRL={};
 MTM_KC.forEach(k=>{const base=k.specs.filter(s=>s[2]==='Baseline'),all=new Set(k.specs.flatMap(s=>s[4]));CTRL['MTM:'+k.id]={key:'MTM:'+k.id,fw:'MTM',id:k.id,name:k.section,statement:k.title===k.section?(k.desc||''):k.title,evidence:k.evidence||[],std:k.std,source:'MTM '+k.std.replace(/ Standard$/,'')+' Standard',url:k.url,refLabel:k.refLabel,specs:k.specs,baseThreats:[...new Set(base.flatMap(s=>s[4]))].sort(),threats:[...all].sort()};});
 IEC_REQ.forEach(r=>{CTRL['IEC:'+r.id]={key:'IEC:'+r.id,fw:'IEC',source:'IEC 62443-3-3',specs:r.specs.map(x=>[x[0],x[1],x[2],[],[]]),evidence:r.evidence||[],id:r.id,name:r.title,statement:r.notes,fr:r.fr,clause:r.clause,sl:r.sl,types:r.types,threats:Object.keys(r.threats).sort(),eff:r.threats};});
+  /* Default CIA per control: IEC by foundational requirement, MTM by the threats it mitigates. The control sets in the database can change it. */
+  const CIA_FR={'FR 1':['c','i'],'FR 2':['c','i'],'FR 3':['i'],'FR 4':['c'],'FR 5':['c','i','a'],'FR 6':['i','a'],'FR 7':['a']};
+  const CIA_THREATS={c:['T02','T04','T06','T11','T12','T13','T14'],i:['T01','T03','T07','T08','T09','T10'],a:['T05','T07','T13']};
+  function ctlDefaultCia(c){if(c.fw==='IEC')return (CIA_FR[String(c.fr||'').slice(0,4)]||['c','i','a']).slice();const d=['c','i','a'].filter(k=>CIA_THREATS[k].some(t=>c.threats.includes(t)));return d.length?d:['c','i','a'];}
+  Object.values(CTRL).forEach(c=>{c.cia=ctlDefaultCia(c);});
+  /* A control reduces a risk statement's residual risk only when its CIA covers the statement's C, I or A */
+  const ctlMatchesStmt=(c,st)=>!c.cia||!st.dims||c.cia.some(d=>st.dims.includes(d));
 const SYS_TYPES=[['IT','IT system'],['OT','OT system'],['Hybrid','Hybrid (IT and OT)']];
 const OWNER_R=['Implemented','Partially implemented','Not implemented','Not applicable'];
 const slFromBil=b=>b<=2?1:b===3?2:b===4?3:4;
@@ -880,7 +897,7 @@ const ctlDomain=c=>c.fw==='ADHOC'?'Ad-hoc controls':c.fw==='MTM'?c.source:c.fr;
 /* Ad-hoc controls are created within a TRA, stored on it (t.controls.adhoc) and registered in CTRL with a TRA-scoped key */
 function adhocToCtrl(t,a){return {key:'ADHOC:'+t.id+':'+a.id,fw:'ADHOC',tra:t.id,id:a.id,type:a.type||'IT',name:a.title,statement:a.desc,source:'Ad-hoc control'+(a.ref?' · '+a.ref:''),ref:a.ref||'',specs:(a.specs||[]).map((x,i)=>[a.id+'.'+String(i+1).padStart(2,'0'),x,'']),evidence:a.evidence||[],threats:(a.threats||[]).slice().sort(),sl:(a.sl&&a.sl.length?a.sl:[1,2,3,4]).slice().sort(),baseThreats:[],created:a.created,by:a.by};}
 function registerAdhoc(){Object.keys(CTRL).forEach(k=>{if(k.startsWith('ADHOC:'))delete CTRL[k];});Object.values((typeof DB!=='undefined'&&DB&&DB.tra)||{}).forEach(t=>Object.values(((t.controls||{}).adhoc)||{}).forEach(a=>{const c=adhocToCtrl(t,a);CTRL[c.key]=c;}));}
-const traUniverse=t=>Object.values(CTRL).filter(c=>c.fw!=='ADHOC'||c.tra===t.id);
+const traUniverse=t=>Object.values(CTRL).filter(c=>!c.retired&&(c.fw!=='ADHOC'||c.tra===t.id));
 function traAuto(t){return traUniverse(t).map(c=>({key:c.key,why:'Default'}));}
 function traSel(t){const c=t.controls||{added:[],removed:{}},auto=traAuto(t),rows=[];
  auto.forEach(x=>{if(!(x.key in (c.removed||{})))rows.push({key:x.key,src:'Auto',why:x.why});});
@@ -904,7 +921,8 @@ const slRange=a=>a.length===1?'SL '+a[0]:'SL '+a[0]+'–'+a[a.length-1];
 function ctrlSlt(c){return c.fw==='IEC'?slRange(c.sl):'All SL-T (not SL-rated)';}
 function sltFit(c,t){const sl=t?traSlt(t):null;if(c.fw!=='IEC'||!sl)return '';return c.sl.includes(sl)?`<span class="sltok">Applies at SL-T ${sl}</span>`:`<span class="sltabove">Above SL-T ${sl}</span>`;}
 function sltChips(c,t){const sl=t?traSlt(t):null;return `<span class="tchips" style="margin-top:4px">${ctlSlList(c).map(n=>`<span class="tchip ${n===sl?'on':''}" title="${c.fw==='MTM'?'MTM key controls are not SL-rated and apply at every SL-T':'Applies at SL-T '+n}">SL-T ${n}</span>`).join('')}</span>`;}
-function ctrlCells(c,ids,t){return `<td class="nowrap"><strong>${e(c.id)}</strong></td><td class="small">${e(c.source)}</td><td><strong>${e(c.name)}</strong><div class="cdesc">${e(c.statement||'—')}</div>${ctrlSpecs(c)}</td><td>${thrChips(c,ids)}</td><td>${sltChips(c,t)}</td>`;}
+const ciaTags=c=>c.cia?`<div class="ciatags">${['c','i','a'].map(k=>`<span class="ciat ${c.cia.includes(k)?'on':''}" title="${k==='c'?'Confidentiality':k==='i'?'Integrity':'Availability'}">${k.toUpperCase()}</span>`).join('')}</div>`:'';
+function ctrlCells(c,ids,t){return `<td class="nowrap"><strong>${e(c.id)}</strong>${ciaTags(c)}</td><td class="small">${e(c.source)}</td><td><strong>${e(c.name)}</strong><div class="cdesc">${e(c.statement||'—')}</div>${ctrlSpecs(c)}</td><td>${thrChips(c,ids)}</td><td>${sltChips(c,t)}</td>`;}
 const ctlSlList=c=>c.fw==='MTM'?[1,2,3,4]:c.sl;
 function ctlFilterMatch(t,c){const doms=V.ctlD||[],ths=V.ctlTh||[],sls=V.ctlSl||[];
  if(doms.length&&!doms.includes(ctlDomain(c)))return false;
@@ -1012,7 +1030,7 @@ function residualFor(t,stmt){if(traUpload(t)){const sv=(t.resid||{})[stmt.id]||{
  const saved=(t.resid||{})[stmt.id]||{},L=si.L,Ldefault=false;
  if(!causes.length)return {stmt,causes,none:true,L,Ldefault,ctx:si.ctx,notes:saved.notes||''};
  const I=si.I,acc=acceptedControls(t);
- const cov=(tid,fn)=>Math.max(0,...acc.filter(x=>fn(x.c)&&x.c.threats.includes(tid)).map(x=>x.f));
+ const cov=(tid,fn)=>Math.max(0,...acc.filter(x=>fn(x.c)&&x.c.threats.includes(tid)&&ctlMatchesStmt(x.c,stmt)).map(x=>x.f));
  const lcov=causes.map(r=>cov(r.id,ctlReducesLikelihood)),icov=causes.map(r=>cov(r.id,ctlReducesImpact));
  const LM=+(lcov.reduce((a,b)=>a+b,0)/causes.length*MIT_CAP.L).toFixed(2),IM=+(icov.reduce((a,b)=>a+b,0)/causes.length*MIT_CAP.I).toFixed(2);
  const cRL=LM===0?L:Math.max(1,Math.min(5,Math.round(L*(1-LM)))),cRI=IM===0?I:Math.max(1,Math.min(5,Math.round(I*(1-IM)))),rL=saved.rL||cRL,rI=saved.rI||cRI,changed=!!(saved.rL||saved.rI);
@@ -1172,9 +1190,12 @@ function runChecks(){const res=[],ok=(t,p,d)=>res.push({t,p,d}),ids=Object.keys(
  ok('Risk scores are impact × likelihood; expired acceptance and open actions show on the asset',Object.values(DB.risks).every(r=>riskScore(r.iI,r.iL)>=1&&riskScore(r.iI,r.iL)<=25)&&attention('OT-042').some(x=>/acceptance expired/i.test(x.text)),'OT-042 banner lists the expired acceptance');
  ok('VPDSS names direct or inherited source for all 12 standards; compact panel uses traffic lights',ids.every(id=>{const v=vpdssFor(id);return v.length===12&&v.every(x=>x.comps.length&&['green','amber','red'].includes(x.colour));}),'Grouped by source in both panels');
  {const t={bil:{C:2,I:4,A:3},answers:{}};const r=traInherent(t),sc=Object.fromEntries(r.map(x=>[x.id,x.score]));ok('TRA inherent risk follows the BIL mapping for all 14 threat vectors',r.length===14&&sc.T01===4&&sc.T02===2&&sc.T05===3&&sc.T07===3&&sc.T10===4&&sc.T06===4,'Test: C2 I4 A3 → T01 4, T02 2, T05 3, T07 3, T10 4, T06 4');}
- {const t={systemType:'OT',bil:{C:2,I:4,A:3},answers:{}};const n=traAuto(t).length;const t2={systemType:'IT',bil:{C:3,I:3,A:3},answers:{V4:{a:'Yes'}}};const k=traAuto(t2).map(x=>x.key);ok('Step 4 includes every MTM key control and IEC 62443-3-3 requirement by default',n===149&&k.length===149,`${n} controls (${MTM_KC.length} MTM + ${IEC_REQ.length} IEC) included by default`);}
+ {const t={systemType:'OT',bil:{C:2,I:4,A:3},answers:{}};const n=traAuto(t).length;const t2={systemType:'IT',bil:{C:3,I:3,A:3},answers:{V4:{a:'Yes'}}};const k=traAuto(t2).map(x=>x.key);ok('Control selection includes every control in the MTM and IEC 62443 control sets by default',n===traUniverse(t).length&&k.length===n&&n>0,`${n} controls included by default (${Object.values(CTRL).filter(c=>c.fw==='MTM'&&!c.retired).length} MTM + ${Object.values(CTRL).filter(c=>c.fw==='IEC'&&!c.retired).length} IEC)`);}
  {const t={id:'X',systemType:'OT',bil:{C:2,I:4,A:3},lq:{Q1:{s:4},Q2:{s:4},Q3:{s:4},Q4:{s:4},Q5:{s:4},Q6:{s:4},Q7:{s:4}},answers:{},controls:{removed:{}},s5:{status:'accepted',resp:{},review:{}}};const r=residStatements(t).map(s=>residualFor(t,s));ok('Residual risk uses every risk statement for IT and OT; with no accepted controls residual equals inherent',r.length===RESID_STATEMENTS.length&&r.length>0&&residStatements({systemType:'IT'}).length===r.length&&r.every(x=>x.none||x.residual.value===x.inherent.value)&&stmtDims('Confidentiality').join()==='c'&&stmtDims('Reliability').join()==='i,a','IT and OT see the same '+r.length+' statements; tag Confidentiality → BIL C, Reliability → BIL I and A');}
  {const t={id:'X',systemType:'IT',bil:{C:2,I:4,A:3},lq:{Q1:{s:4},Q2:{s:3},Q4:{s:2}},answers:{},controls:{removed:{}}};const conf={id:'X1',tag:'Confidentiality',dims:['c'],cons:'x',hazard:'y',ctx:[],thr:['T02','T04','T11','T12']},ransom={id:'X2',tag:'Availability',dims:['a'],cons:'x',hazard:'y',ctx:[],thr:['T07']};const a=stmtInherent(t,conf),b=stmtInherent(t,ransom),tl=traThreatL(t);ok('Likelihood questions: the 1–5 rating is each covered threat’s likelihood; 3 or more identifies it; a statement takes its highest identified threat',tl.T11.L===4&&tl.T02.L===3&&tl.T07.L===2&&a.L===4&&a.exL.by.join()==='T11'&&a.risk.value===8&&b.L===1&&b.exL.by.length===0,'Q1 = 4, Q2 = 3, Q4 = 2 → Confidentiality L4 from T11, risk 2 × 4 = 8; ransomware rated 2 is not identified, so a T07-only statement stays at 1');}
+  {const c=Object.values(CTRL).find(x=>x.fw==='MTM'&&!x.retired&&x.threats.includes('T02')),keep=c.cia,t={id:'X',systemType:'IT',bil:{C:4,I:4,A:4},lq:{Q2:{s:4}},answers:{},controls:{removed:{}},s5:{status:'accepted',resp:{[c.key]:{r:'Implemented',ev:'x'}},review:{}}},st={id:'X1',tag:'Confidentiality',dims:['c'],cons:'x',hazard:'y',ctx:[],thr:['T02']};
+  c.cia=['c'];const withC=residualFor(t,st).LM;c.cia=['a'];const withA=residualFor(t,st).LM;c.cia=keep;
+  ok('A control lowers a risk statement only when its CIA covers that statement',withC>0&&withA===0,`${c.id} mitigating T02: CIA C → likelihood reduced (${withC}); CIA A only → no reduction on the Confidentiality statement`);}
   res.push({t:'Sample data is labelled; forms save, reopen and keep their values',p:null,d:'Manual: change a form, reload the page and reopen it'});return res;}
 function reportsPage(){const ch=runChecks(),rows=[
  ['Asset register and summary','Asset inventory record with custom attributes, related records and a tabbed page layout.','Header grouping, tabs and register filters as specified.'],
