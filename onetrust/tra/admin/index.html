@@ -62,12 +62,18 @@ button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
 .levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
 .levels textarea{min-height:76px;font-size:13px}
 @media (max-width:760px){.levels{grid-template-columns:1fr}}
+.jump{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 16px;font-size:13px}.jump a{color:var(--action);font-weight:600;text-decoration:none}.jump a:hover{text-decoration:underline}
+.aqreqf{min-height:260px;font-size:13px;line-height:1.45}
+.aqtools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}.aqtools input[type=search]{max-width:260px}.aqtools label{display:flex;gap:5px;align-items:center;font-size:12.5px;cursor:pointer}
+.aqmap{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:4px;padding:6px 10px;margin-top:6px}
+.aqmap h4{font:600 13px var(--f-body);margin:10px 0 2px;color:var(--nav)}.aqgrp{margin:4px 0 8px}.aqgrp>b{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:4px}
+.cov{font-size:13px}.cov p{margin:4px 0}.cov .id{font-size:12px}
 </style>
 </head>
 <body>
 <header><div class="in">
   <h1>TRA question bank editor</h1>
-  <p>Add, edit and delete the risk statements, likelihood questions and MTM and IEC 62443 controls used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
+  <p>Add, edit and delete the risk statements, likelihood questions, MTM and IEC 62443 controls, and the control assurance questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
 </div></header>
 <main>
   <div class="status" id="status" role="status">Loading the question bank…</div>
@@ -80,8 +86,10 @@ button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
     </div>
     <p class="msg err" id="lgMsg" aria-live="polite" style="margin:8px 0 0"></p>
   </form>
+  <nav class="jump" aria-label="Sections"><a href="#statements">Risk statements</a><a href="#questions">Likelihood questions</a><a href="#assurance">Control assurance questions</a><a href="#controls">MTM and IEC controls</a></nav>
   <section id="statements"></section>
   <section id="questions"></section>
+  <section id="assurance"></section>
   <section id="controls"></section>
 </main>
 <script>
@@ -89,7 +97,7 @@ button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
 const CONTEXTS=['Safety','Financial','Reputation / Political','Legal','Engineering / Technical'];
 const LIK={1:'Rare',2:'Unlikely',3:'Possible',4:'Likely',5:'Almost certain'};
 let data=null,canEdit=false,authHeader=null;
-const ctlOpen=new Set(),ctlQ={MTM:'',IEC:''}; /* which control editors are open, and the search text per set */ /* credentials are held in memory only */
+const ctlOpen=new Set(),aqOpen=new Set(),ctlQ={MTM:'',IEC:''}; /* which control editors are open, and the search text per set */ /* credentials are held in memory only */
 const authed=(h={})=>authHeader?Object.assign({authorization:authHeader},h):h;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
@@ -149,6 +157,7 @@ function render(){
       <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Threats this question rates</span>${threatBoxes('thr',q.threats)}</div>
       <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" data-dkind="question" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
     </form>`).join(''):`<div class="card empty">No questions yet. If the database steps in likelihood-steps.txt haven't been run, run them in the D1 Console first.</div>`);
+  renderAssurance();
   renderControls();
 }
 
@@ -176,6 +185,32 @@ function ctlCard(c){return `<details class="card ctl" data-cid="${esc(c.id)}" da
     <div class="dblock"><div class="dhead"><span class="f">Supporting evidence (${(c.evidence||[]).length})</span><button type="button" class="sec mini" data-addev ${dis()}>+ Add evidence</button></div><div data-evs>${(c.evidence||[]).map(evRow).join('')}</div></div>`:`<p class="small" style="margin-top:10px">Specifications and supporting evidence can be edited here once they are loaded into the database (see the button above the MTM controls).</p>`}
     <div class="actions"><button type="submit" ${dis()}>Save ${esc(c.code)}</button><button type="button" class="del" data-del="${esc(c.id)}" data-dkind="control" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
   </form></details>`;}
+/* ---- Control assurance questions: one question per group of controls; the owner's answer applies to every control ticked here ---- */
+const AQ_FIELDS=[['topic','Topic',200],['question','Question',1000],['required','What is required? (shown to the owner in full: what to describe, proof required, how the response is assessed)',6000],['evidence','Recommended evidence (one item per line, starting with •)',3000],['applicability','Applicability guidance',1000]];
+const aqCount=q=>{const n=q.controls.filter(c=>c.startsWith('MTM:')).length;return n+' MTM · '+(q.controls.length-n)+' IEC';};
+function aqCard(q){return `<details class="card ctl aq" data-aqid="${esc(q.id)}" data-find="${esc((q.id+' '+q.topic+' '+q.question).toLowerCase())}" ${aqOpen.has(q.id)?'open':''}>
+  <summary><span class="id">${esc(q.id)}</span><strong class="ctitle">${esc(q.topic)}</strong><span class="badges"><span class="tag">${esc(aqCount(q))}</span></span></summary>
+  <form data-kind="assurance" data-id="${esc(q.id)}" class="card-in">${aqOpen.has(q.id)?aqBody(q):''}</form></details>`;}
+function aqBody(q){const cs=Array.isArray(data.controls)?data.controls:[],on=new Set(q.controls);
+  const grp=set=>{const list=cs.filter(c=>c.set===set),doms=[...new Set(list.map(c=>c.domain||'Other'))];return `<h4>${set==='MTM'?'MTM controls':'IEC 62443-3-3 requirements'}</h4>`+doms.map(d=>`<div class="aqgrp"><b>${esc(d)}</b><div class="thr">${list.filter(c=>(c.domain||'Other')===d).map(c=>`<label data-f="${esc((c.code+' '+c.title).toLowerCase())}"><input type="checkbox" name="aqc" value="${esc(c.id)}" ${on.has(c.id)?'checked':''} ${dis()}><b>${esc(c.code)}</b> ${esc(c.title)}</label>`).join('')}</div></div>`).join('');};
+  return `<div class="grid" style="grid-template-columns:minmax(0,1fr)">${AQ_FIELDS.map(([k,l,max])=>`<div><label class="f" for="aq_${k}_${esc(q.id)}">${esc(l)}</label>${k==='topic'?`<input type="text" id="aq_${k}_${esc(q.id)}" name="${k}" value="${esc(q[k])}" maxlength="${max}" ${dis()}>`:`<textarea id="aq_${k}_${esc(q.id)}" name="${k}" maxlength="${max}" class="${k==='required'?'aqreqf':''}" ${k==='evidence'?'style="min-height:120px"':''} ${dis()}>${esc(q[k])}</textarea>`}</div>`).join('')}</div>
+  <div class="dblock"><div class="dhead"><span class="f">Controls this question covers (<span data-aqn>${q.controls.length}</span> ticked)</span></div>
+  <div class="aqtools"><input type="search" data-aqfind placeholder="Filter by ID or title" aria-label="Filter controls for ${esc(q.id)}"><label><input type="checkbox" data-aqonly> Show ticked only</label></div>
+  ${cs.length?`<div class="aqmap">${grp('MTM')}${grp('IEC')}</div>`:'<p class="small">Load the control sets first (controls-steps.txt).</p>'}</div>
+  <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" data-dkind="assurance" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>`;}
+function aqFilter(f){const q=(f.querySelector('[data-aqfind]')||{}).value||'',only=(f.querySelector('[data-aqonly]')||{}).checked,t=q.trim().toLowerCase();
+  f.querySelectorAll('.aqmap label').forEach(l=>{l.hidden=!((!t||l.dataset.f.includes(t))&&(!only||l.querySelector('input').checked));});
+  f.querySelectorAll('.aqgrp').forEach(g=>{g.hidden=![...g.querySelectorAll('label')].some(l=>!l.hidden);});
+  const n=f.querySelector('[data-aqn]');if(n)n.textContent=f.querySelectorAll('input[name=aqc]:checked').length;}
+function covHtml(){const qs=data.assurance_questions||[],cs=Array.isArray(data.controls)?data.controls:[],cnt={};qs.forEach(q=>q.controls.forEach(c=>{cnt[c]=(cnt[c]||0)+1;}));const unm=cs.filter(c=>!cnt[c.id]),multi=cs.filter(c=>cnt[c.id]>1);
+  const codes=l=>l.map(c=>`<span class="id">${esc(c.set)} ${esc(c.code)}</span>`).join(', ');
+  return `<p><strong>${cs.length-unm.length} of ${cs.length}</strong> controls are covered by a question (saved mapping).</p>${unm.length?`<p>Not covered, so answered one by one in the TRA: ${codes(unm)}</p>`:''}${multi.length?`<p>Under more than one question (the weaker answer applies unless the owner overrides): ${codes(multi)}</p>`:''}`;}
+function renderAssurance(){const qs=Array.isArray(data.assurance_questions)?data.assurance_questions:[],cs=Array.isArray(data.controls)?data.controls:[];
+  const head=`<div class="sethead"><h2>Control assurance questions</h2>${data.assurance_ready&&qs.length?`<button type="button" class="sec" data-addaq ${dis()}>+ Add question</button>`:''}</div><p class="sub">In the TRA control assessment, the asset owner answers one question for each group of controls instead of every control. A question is shown when at least one control ticked here is selected in the TRA, and its answer applies to those controls (the owner can override single controls). Selected controls that no question covers are answered one by one.</p>`;
+  if(!data.assurance_ready){$('#assurance').innerHTML=head+`<div class="card empty">The assurance question tables do not exist yet. Run steps 1 and 2 of assurance-steps.txt in the D1 Console, then reload this page.</div>`;return;}
+  if(!qs.length){$('#assurance').innerHTML=head+`<div class="card note"><strong>No assurance questions in the database yet.</strong> <span class="small">The TRA is showing its built-in 20 questions. Load them once to edit them here.</span><div class="actions" style="margin-top:8px"><button type="button" data-importaq ${dis()}>Load the 20 built-in assurance questions</button><span class="msg" data-aqimpmsg aria-live="polite"></span></div></div>`;return;}
+  $('#assurance').innerHTML=head+`<div class="card cov" data-cov>${covHtml()}</div>`+qs.map(aqCard).join('');
+  document.querySelectorAll('form[data-kind=assurance]').forEach(f=>{if(f.children.length)aqFilter(f);});}
 function renderControls(){const cs=Array.isArray(data.controls)?data.controls:[];
   const sec=set=>{const list=cs.filter(c=>c.set===set),doms=[...new Set(list.map(c=>c.domain).filter(Boolean))],[label,hint]=SET_INFO[set];
     return `<div class="sethead"><h2>${label}</h2><span class="tag">${list.length} controls</span></div><p class="sub">${hint} Open a control to edit its title, description, CIA, threats${set==='IEC'?' and SL-T':''}.</p>
@@ -197,9 +232,9 @@ async function post(body){
   return j;
 }
 
-document.addEventListener('input',e=>{if(e.target.matches('[data-ctlq]')){ctlQ[e.target.dataset.ctlq]=e.target.value;applyCtlFilter();return;}const f=e.target.closest('form[data-kind]');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
+document.addEventListener('input',e=>{if(e.target.matches('[data-ctlq]')){ctlQ[e.target.dataset.ctlq]=e.target.value;applyCtlFilter();return;}if(e.target.matches('[data-aqfind]')){aqFilter(e.target.closest('form'));return;}const f=e.target.closest('form[data-kind]');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
   if(f.dataset.kind==='statement'){f.querySelector('[data-preview]').textContent='Risk of '+fv(f,'event').trim()+' due to '+fv(f,'hazard').trim()+'.';f.querySelector('[data-dims]').textContent=dimsText(fv(f,'tag'));}});
-document.addEventListener('change',e=>{const f=e.target.closest('form[data-kind]');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
+document.addEventListener('change',e=>{if(e.target.matches('[data-aqonly]')){aqFilter(e.target.closest('form'));return;}if(e.target.name==='aqc')aqFilter(e.target.closest('form'));const f=e.target.closest('form[data-kind]');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
 
 document.addEventListener('submit',async e=>{
   if(e.target.id==='login'){e.preventDefault();const u=$('#lgUser').value.trim(),p=$('#lgPass').value;$('#lgMsg').textContent='';
@@ -209,6 +244,8 @@ document.addEventListener('submit',async e=>{
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
     if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
+    else if(f.dataset.kind==='assurance'){const b={topic:fv(f,'topic'),question:fv(f,'question'),required:fv(f,'required'),evidence:fv(f,'evidence'),applicability:fv(f,'applicability'),controls:checked('aqc')};await post(Object.assign({action:'updateAssurance',id:f.dataset.id},b));
+      const q=(data.assurance_questions||[]).find(x=>x.id===f.dataset.id);if(q){Object.assign(q,b);const d=f.closest('details');d.querySelector('.ctitle').textContent=q.topic;d.querySelector('.badges .tag').textContent=aqCount(q);const c=document.querySelector('[data-cov]');if(c)c.innerHTML=covHtml();}}
     else if(f.dataset.kind==='control')await post(Object.assign({action:'updateControl',id:f.dataset.id,title:fv(f,'title'),description:fv(f,'description'),domain:fv(f,'domain'),cia:checked('cia'),sl:checked('sl').map(Number),threats:checked('thr')},readDetails(f)));
     else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),guidance:fv(f,'guidance'),levels:[1,2,3,4,5].map(n=>fv(f,'level_'+n)),threats:checked('thr')});
     f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
@@ -227,6 +264,12 @@ document.addEventListener('click',async e=>{
       for(let i=0;i<all.length;i+=5){msg.className='msg';msg.textContent='Loading… '+Math.min(i+5,all.length)+' of '+all.length+' controls';const j=await post({action:'importControlDetails',items:all.slice(i,i+5)});loaded+=j.loaded;skipped+=j.skipped;}
       msg.className='msg ok';msg.textContent='Loaded '+loaded+' controls'+(skipped?' ('+skipped+' skipped because they already had details or are not in the control sets)':'')+'.';await load();setStatus('Specifications and supporting evidence loaded for '+loaded+' controls.');}
     catch(err){msg.className='msg err';msg.textContent=err.message;imp.disabled=false;}return;}
+  const addQ=e.target.closest('[data-addaq]');
+  if(addQ&&canEdit){addQ.disabled=true;try{const r=await post({action:'addAssurance',topic:'New topic',question:'How is … in place for this asset?',required:'What you must describe\n• \n\nProof required\n\nHow the AI assesses your response\n',evidence:'• ',applicability:'',controls:[]});aqOpen.add(r.saved);await load();const d=document.querySelector(`details.aq[data-aqid="${r.saved}"]`);if(d){d.scrollIntoView({block:'center'});const t=d.querySelector('[name=topic]');if(t){t.focus();t.select();}}}catch(err){setStatus(esc(err.message),true);addQ.disabled=false;}return;}
+  const impQ=e.target.closest('[data-importaq]');
+  if(impQ&&canEdit){impQ.disabled=true;const msg=document.querySelector('[data-aqimpmsg]');msg.className='msg';msg.textContent='Loading…';
+    try{const r=await fetch('assurance-questions.json',{headers:{accept:'application/json'}});if(!r.ok)throw new Error('assurance-questions.json was not found next to this page (HTTP '+r.status+').');const j=await post({action:'importAssurance',questions:await r.json()});await load();setStatus('Loaded '+j.loaded+' assurance questions with '+j.links+' control mappings'+(j.skipped?' ('+j.skipped+' mappings skipped because those controls are not in the control sets)':'')+'.');}
+    catch(err){msg.className='msg err';msg.textContent=err.message;impQ.disabled=false;}return;}
   const addC=e.target.closest('[data-addctl]');
   if(addC&&canEdit){const set=addC.dataset.addctl,inp=document.querySelector(`[data-newcode="${set}"]`),code=(inp.value||'').trim();if(!code){inp.focus();setStatus('Type the new control ID first, then press + Add control.',true);return;}
     const doms=[...new Set((data.controls||[]).filter(c=>c.set===set).map(c=>c.domain).filter(Boolean))];addC.disabled=true;
@@ -235,9 +278,9 @@ document.addEventListener('click',async e=>{
   if(addS&&canEdit){addS.disabled=true;try{const r=await post({action:'addStatement',tag:'New risk',event:'new risk event',hazard:'the lack of cybersecurity guardrails',risk_contexts:['Engineering / Technical'],threats:[]});await load();const el=document.getElementById('tg_'+r.saved);if(el){el.scrollIntoView({block:'center'});el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);addS.disabled=false;}return;}
   const del=e.target.closest('[data-del]');
   if(del&&canEdit){const id=del.dataset.del;if(!confirmDel[id]){confirmDel[id]=1;del.textContent='Click again to delete '+id;setTimeout(()=>{delete confirmDel[id];if(del.isConnected)del.textContent='Delete';},4000);return;}
-    del.disabled=true;try{await post({action:{statement:'deleteStatement',control:'deleteControl'}[del.dataset.dkind]||'deleteQuestion',id});ctlOpen.delete(id);await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
+    del.disabled=true;try{await post({action:{statement:'deleteStatement',control:'deleteControl',assurance:'deleteAssurance'}[del.dataset.dkind]||'deleteQuestion',id});ctlOpen.delete(id);aqOpen.delete(id);await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
 });
-document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.ctl')){if(d.open)ctlOpen.add(d.dataset.cid);else ctlOpen.delete(d.dataset.cid);}},true);
+document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches('details.aq')){const id=d.dataset.aqid;if(d.open){aqOpen.add(id);const f=d.querySelector('form');if(!f.children.length){const q=(data.assurance_questions||[]).find(x=>x.id===id);if(q){f.innerHTML=aqBody(q);aqFilter(f);}}}else aqOpen.delete(id);return;}if(d.matches&&d.matches('details.ctl')){if(d.open)ctlOpen.add(d.dataset.cid);else ctlOpen.delete(d.dataset.cid);}},true);
 window.addEventListener('beforeunload',e=>{if(document.querySelector('form.dirty')){e.preventDefault();e.returnValue='';}});
 load();
 })();
