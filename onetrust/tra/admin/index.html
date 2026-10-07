@@ -53,7 +53,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <header><div class="in">
   <h1>TRA question bank editor</h1>
-  <p>Edit the risk statements and the exposure and vulnerability questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
+  <p>Add, edit and delete the risk statements and the questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
 </div></header>
 <main>
   <div class="status" id="status" role="status">Loading the question bank…</div>
@@ -77,6 +77,9 @@ let data=null,canEdit=false,authHeader=null; /* credentials are held in memory o
 const authed=(h={})=>authHeader?Object.assign({authorization:authHeader},h):h;
 const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=s=>document.querySelector(s);
+/* Same rule as the TRA page: the tag decides which BIL rating sets the statement's impact */
+const dimsFor=tag=>{const t=String(tag||'').toLowerCase(),d=[];if(/confidential|privacy|disclos/.test(t))d.push('Confidentiality');if(/integr|reliab|maintain|accura/.test(t))d.push('Integrity');if(/availab|reliab|maintain|continu|disrupt/.test(t))d.push('Availability');return d.length?d:['Confidentiality','Integrity','Availability'];};
+const dimsText=tag=>'Impact in the TRA comes from the BIL '+dimsFor(tag).join(' / ')+' rating (based on the tag).';
 const fv=(f,n)=>{const el=f.querySelector('[name="'+n+'"]');return el?el.value:'';};
 function setStatus(html,err){const el=$('#status');el.innerHTML=html;el.classList.toggle('err',!!err);}
 
@@ -105,18 +108,19 @@ const threatBoxes=(name,sel)=>`<div class="thr">${data.threats.map(t=>`<label><i
 const dis=()=>canEdit?'':'disabled';
 
 function render(){
-  $('#statements').innerHTML=`<h2>Risk statements</h2><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>". All 6 statements apply to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to each.</p>`+
-  data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
-    <div class="card-h"><span class="id">${esc(s.id)}</span><span class="tag">${esc(s.tag)}</span></div>
-    <div class="grid">
+  $('#statements').innerHTML=`<div class="sethead"><h2>Risk statements</h2><button type="button" class="sec" data-addstmt ${dis()}>+ Add risk statement</button></div><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>" and applies to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to it.</p>`+
+  (data.risk_statements.length?data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
+    <div class="card-h"><span class="id">${esc(s.id)}</span><span class="tag" data-dims>${esc(dimsText(s.tag))}</span></div>
+    <div class="grid" style="grid-template-columns:minmax(160px,220px) repeat(auto-fit,minmax(240px,1fr))">
+      <div><label class="f" for="tg_${esc(s.id)}">Tag</label><input type="text" id="tg_${esc(s.id)}" name="tag" value="${esc(s.tag)}" maxlength="40" ${dis()}></div>
       <div><label class="f" for="ev_${esc(s.id)}">Event</label><input type="text" id="ev_${esc(s.id)}" name="event" value="${esc(s.event)}" maxlength="1000" ${dis()}></div>
       <div><label class="f" for="hz_${esc(s.id)}">Hazard</label><input type="text" id="hz_${esc(s.id)}" name="hazard" value="${esc(s.hazard)}" maxlength="1000" ${dis()}></div>
     </div>
     <div class="preview" data-preview>${esc(s.statement)}</div>
     <div style="margin-top:10px"><span class="f" style="font-size:12px;font-weight:600;color:var(--muted)">Risk contexts</span><div class="chips">${CONTEXTS.map(c=>`<label><input type="checkbox" name="ctx" value="${esc(c)}" ${s.risk_contexts.includes(c)?'checked':''} ${dis()}> ${esc(c)}</label>`).join('')}</div></div>
     <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',s.threats)}</div>
-    <div class="actions"><button type="submit" ${dis()}>Save ${esc(s.id)}</button><span class="msg" aria-live="polite"></span></div>
-  </form>`).join('');
+    <div class="actions"><button type="submit" ${dis()}>Save ${esc(s.id)}</button><button type="button" class="del" data-del="${esc(s.id)}" data-dkind="statement" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
+  </form>`).join(''):`<div class="card empty">No risk statements yet.</div>`);
   const set=(key,label,hint)=>{const qs=data.questions[key]||[];return `<div class="sethead"><h2>${label}</h2><button type="button" class="sec" data-add="${key}" ${dis()}>+ Add ${key} question</button></div><p class="sub">${hint}</p>`+
     (qs.length?qs.map(q=>`<form class="card" data-kind="question" data-id="${esc(q.id)}">
       <div class="card-h"><span class="id">${esc(q.id)}</span></div>
@@ -125,7 +129,7 @@ function render(){
         <div><label class="f" for="ql_${esc(q.id)}">Likelihood${key==='exposure'?' if Yes':''}</label><select id="ql_${esc(q.id)}" name="likelihood" ${dis()}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${q.likelihood===n?'selected':''}>${n} – ${LIK[n]}</option>`).join('')}</select></div>
       </div>
       <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',q.threats)}</div>
-      <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
+      <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" data-dkind="question" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
     </form>`).join(''):`<div class="card empty">No ${key} questions yet.</div>`);};
   $('#questions').innerHTML=set('exposure','Exposure questions','How the system can be reached. In the TRA, the highest likelihood among exposure questions answered Yes sets the starting inherent likelihood.')+
     set('vulnerability','Vulnerability questions','Weaknesses in the system. A Yes identifies the ticked threats. Likelihood is recorded for reference.');
@@ -143,7 +147,7 @@ async function post(body){
 }
 
 document.addEventListener('input',e=>{const f=e.target.closest('form.card');if(!f)return;f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';
-  if(f.dataset.kind==='statement'){f.querySelector('[data-preview]').textContent='Risk of '+fv(f,'event').trim()+' due to '+fv(f,'hazard').trim()+'.';}});
+  if(f.dataset.kind==='statement'){f.querySelector('[data-preview]').textContent='Risk of '+fv(f,'event').trim()+' due to '+fv(f,'hazard').trim()+'.';f.querySelector('[data-dims]').textContent=dimsText(fv(f,'tag'));}});
 document.addEventListener('change',e=>{const f=e.target.closest('form.card');if(f){f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';}});
 
 document.addEventListener('submit',async e=>{
@@ -153,7 +157,7 @@ document.addEventListener('submit',async e=>{
   const msg=f.querySelector('.msg'),btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='msg';msg.textContent='Saving…';
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
-    if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
+    if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
     else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),likelihood:Number(fv(f,'likelihood')),threats:checked('thr')});
     f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
   }catch(err){msg.className='msg err';msg.textContent=err.message;}
@@ -163,9 +167,11 @@ const confirmDel={};
 document.addEventListener('click',async e=>{
   const add=e.target.closest('[data-add]');
   if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question_set:add.dataset.add,question:'New question',likelihood:3,threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
+  const addS=e.target.closest('[data-addstmt]');
+  if(addS&&canEdit){addS.disabled=true;try{const r=await post({action:'addStatement',tag:'New risk',event:'new risk event',hazard:'the lack of cybersecurity guardrails',risk_contexts:['Engineering / Technical'],threats:[]});await load();const el=document.getElementById('tg_'+r.saved);if(el){el.scrollIntoView({block:'center'});el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);addS.disabled=false;}return;}
   const del=e.target.closest('[data-del]');
   if(del&&canEdit){const id=del.dataset.del;if(!confirmDel[id]){confirmDel[id]=1;del.textContent='Click again to delete '+id;setTimeout(()=>{delete confirmDel[id];if(del.isConnected)del.textContent='Delete';},4000);return;}
-    del.disabled=true;try{await post({action:'deleteQuestion',id});await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
+    del.disabled=true;try{await post({action:del.dataset.dkind==='statement'?'deleteStatement':'deleteQuestion',id});await load();}catch(err){const m=del.parentNode.querySelector('.msg');m.className='msg err';m.textContent=err.message;del.disabled=false;}}
 });
 window.addEventListener('beforeunload',e=>{if(document.querySelector('form.dirty')){e.preventDefault();e.returnValue='';}});
 load();
