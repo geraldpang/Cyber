@@ -166,16 +166,21 @@ input:disabled,select:disabled,textarea:disabled{background:#f3f6f9;color:#5b6a7
 .ciachip{border:1px solid #cde3f4;background:var(--white);border-radius:6px;padding:6px 10px;text-align:center;min-width:72px}
 .tq{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:12px;background:var(--white)}
 .tq .head{display:flex;gap:10px;align-items:baseline}
-fieldset.lq{min-width:0}fieldset.lq legend{padding:0;float:left;width:100%}fieldset.lq legend+*{clear:both}
-.likert{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px;clear:both}
-.lk{position:relative;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:6px;padding:8px 9px;cursor:pointer;background:var(--white);font-size:12.5px}
-.lk input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.lk:hover{border-color:var(--blue)}.lk:focus-within{outline:2px solid var(--blue);outline-offset:1px}
-.lk .lkn{font-weight:700;font-size:16px;line-height:1}.lk .lkl{font-weight:600}.lk .lkd{color:var(--muted);font-size:12px;line-height:1.35;margin-top:2px}
-.lk.on{border-color:var(--blue);background:var(--note-bg);box-shadow:inset 0 0 0 1px var(--blue)}
-.lk.l1 .lkn{color:var(--green)}.lk.l3 .lkn{color:var(--amber)}.lk.l4 .lkn,.lk.l5 .lkn{color:var(--red)}
-.lkfoot{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-top:8px}
-@media(max-width:760px){.likert{grid-template-columns:1fr}}
+.lqgrid{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;font-size:12.5px;table-layout:fixed}
+.lqgrid th{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+.lqgrid th.lqq{width:25%}.lqgrid th.lqcm{width:15%}
+.lqgrid td{vertical-align:top;border-bottom:1px solid var(--line);padding:8px 4px}
+.lqgrid td.lqq{padding-right:10px;font-size:13px;line-height:1.4}
+.lqgrid th.l1{color:var(--green)}.lqgrid th.l3{color:var(--amber)}.lqgrid th.l4,.lqgrid th.l5{color:var(--red)}
+.lqc label{position:relative;display:block;min-height:64px;border:1px solid var(--line);border-radius:5px;padding:6px 7px;cursor:pointer;background:var(--white)}
+.lqc input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.lqc label:hover{border-color:var(--blue)}.lqc label:focus-within{outline:2px solid var(--blue);outline-offset:1px}
+.lqc.on label{border-color:var(--blue);background:var(--note-bg);box-shadow:inset 0 0 0 1px var(--blue)}
+.lqc .lqn{display:none;font-weight:700;font-size:12.5px}
+.lqc .lkd{display:block;color:var(--ink);font-size:12px;line-height:1.35}.lqc:not(.on) .lkd{color:var(--muted)}
+.lqcm textarea{width:100%;min-height:64px;font-family:inherit;font-size:12.5px;line-height:1.35;border:1px solid var(--line);border-radius:5px;padding:6px 7px;resize:vertical}
+.lqclr{font-size:11.5px;margin-left:4px}
+@media(max-width:760px){.lqgrid,.lqgrid tbody,.lqgrid tr,.lqgrid td{display:block;width:100%}.lqgrid thead{display:none}.lqgrid tr{border:1px solid var(--line);border-radius:6px;padding:10px;margin-top:10px}.lqgrid td{border:0;padding:3px 0}.lqc .lqn{display:block}.lqc label{min-height:0;height:auto}.lqgrid td.lqc{padding:3px 0}}
 .response-grid{display:grid;grid-template-columns:180px minmax(0,1fr);gap:12px;margin-top:10px}
 .cbrow{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:6px}
 .tchips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
@@ -832,13 +837,13 @@ function traStep2(a,t){const df=t.dataFlow||{},ans=t.answers||{},ids=traIdentifi
  ${evtPorts(t)}
  ${evtVulns(t)}
  ${(()=>{const eol=(t.components||[]).filter(r=>r.support==='End of life');
-  const qcard=q=>{const x=(t.lq||{})[q.id]||{},sc=lqScore(t,q.id),on=sc>=LQ_IDENT;return `<fieldset class="tq lq"><legend class="head"><strong>${e(q.id)}</strong><span>${e(q.text)}</span></legend>${q.guidance?`<p class="small" style="margin-top:4px">${e(q.guidance)}</p>`:''}${eol.length&&q.threats.includes('T07')?`<p class="small" style="margin-top:6px;color:var(--amber)">Components marked end of life: ${e(eol.map(r=>r.name||'unnamed').join(', '))}. Consider a rating of 4 or 5.</p>`:''}
-  <div class="likert">${[1,2,3,4,5].map(n=>`<label class="lk l${n} ${sc===n?'on':''}"><input type="radio" name="lq_${e(q.id)}" value="${n}" data-tra-live ${sc===n?'checked':''}><span class="lkn">${n}</span><span class="lkl">${LIKELIHOOD_LABELS[n]}</span><span class="lkd">${lqLevelHtml(q.levels[n-1])}</span></label>`).join('')}</div>
-  <div class="lkfoot"><label class="small"><input type="radio" name="lq_${e(q.id)}" value="" data-tra-live ${sc?'':'checked'}> Not rated</label>${sc?`<span class="small">Likelihood <strong>${sc} – ${LIKELIHOOD_LABELS[sc]}</strong> applies to ${e(q.threats.join(', ')||'no threats')}${on?'':' (below 3, so not identified)'}</span>`:''}</div>
-  <div class="response-grid" style="grid-template-columns:minmax(0,1fr)">${field('tn_'+q.id,'Evidence and notes (optional)',ta('tn_'+q.id,x.notes||'','placeholder="What supports this rating, e.g. network diagram, vendor access arrangement, patch report"'))}</div>
-  <div class="tchips">${q.threats.map(tid=>`<span class="tchip ${on?'on':''}" title="${e(THREAT_NAME[tid]||tid)}">${e(tid)}</span>`).join('')}<span class="small">${on?'Identified threats':'Threats identified at 3 or more'}</span></div></fieldset>`;};
-  return `<div class="panel section"><h2>Likelihood questions</h2><p class="sub">Rate each question from 1 (Rare) to 5 (Almost certain), using the description that best matches the evidence. The rating becomes the likelihood of the threats listed; 3 or more identifies them.</p>
-  ${LQ.map(qcard).join('')}
+  const row=q=>{const x=(t.lq||{})[q.id]||{},sc=lqScore(t,q.id),on=sc>=LQ_IDENT;return `<tr>
+   <td class="lqq"><strong>${e(q.id)}</strong> ${e(q.text)}${q.guidance?`<div class="small" style="margin-top:3px">${e(q.guidance)}</div>`:''}${eol.length&&q.threats.includes('T07')?`<div class="small" style="margin-top:3px;color:var(--amber)">End-of-life components: ${e(eol.map(r=>r.name||'unnamed').join(', '))}. Consider 4 or 5.</div>`:''}
+    <div class="tchips" style="margin-top:6px">${q.threats.map(tid=>`<span class="tchip ${on?'on':''}" title="${e(THREAT_NAME[tid]||tid)}">${e(tid)}</span>`).join('')}${sc?`<button type="button" class="linkbtn lqclr" data-lqclear="${e(q.id)}">Clear</button>`:''}</div></td>
+   ${[1,2,3,4,5].map(n=>`<td class="lqc l${n} ${sc===n?'on':''}"><label><input type="radio" name="lq_${e(q.id)}" value="${n}" data-tra-live data-lqr ${sc===n?'checked':''} aria-label="${e(q.id)}: ${n} – ${LIKELIHOOD_LABELS[n]}"><span class="lqn">${n} · ${LIKELIHOOD_LABELS[n]}</span><span class="lkd">${lqLevelHtml(q.levels[n-1])}</span></label></td>`).join('')}
+   <td class="lqcm"><textarea id="tn_${e(q.id)}" aria-label="Comments for ${e(q.id)}" placeholder="Evidence or comments">${e(x.notes||'')}</textarea></td></tr>`;};
+  return `<div class="panel section"><h2>Likelihood questions</h2><p class="sub">Click the description that best matches the system; click it again to clear. The rating is the likelihood of the threats listed under the question, and 3 or more identifies them.</p>
+  <table class="lqgrid"><thead><tr><th class="lqq">Question</th>${[1,2,3,4,5].map(n=>`<th class="lqc l${n}">${n} · ${LIKELIHOOD_LABELS[n]}</th>`).join('')}<th class="lqcm">Comments</th></tr></thead><tbody>${LQ.map(row).join('')}</tbody></table>
   <p class="small" style="margin-top:8px">Questions from the ${e(QB_SOURCE)}${QB_SOURCE==='built-in'?' set (the online question bank could not be reached)':''}.</p></div>`;})()}
  <div class="panel section"><h2>Threats to consider</h2><p class="sub">Threats identified by the questions and vulnerabilities above are ticked. Tick or untick to decide which threats are considered in the risk assessment.</p><div class="table-scroll" style="margin-top:10px"><table class="mini"><thead><tr><th>Consider</th><th>Threat</th><th>Likelihood</th><th>Identified by</th></tr></thead><tbody>${(()=>{const tl=traThreatL(t);return traInherent(t).map(r=>{const L=(tl[r.id]||{}).L||0;return `<tr class="${r.cons?'':'dim'}"><td><input type="checkbox" id="cons_${r.id}" data-tra-live ${r.cons?'checked':''} aria-label="Consider ${r.id}"></td><td><strong>${r.id}</strong> · ${e(r.name)}</td><td>${L?`${L} – ${LIKELIHOOD_LABELS[L]}`:'<span class="small">Not rated</span>'}</td><td>${r.by.length?e(r.by.join(', ')):'<span class="small">Not identified</span>'}</td></tr>`;}).join('');})()}</tbody></table></div>
  <p class="err" id="traErr" role="alert"></p><div class="btnrow"><button class="secondary" data-act="traGo" data-step="1" data-id="${e(t.id)}">← Step 2</button><button class="secondary" data-act="traSave" data-id="${e(t.id)}">Save draft</button><button class="primary" data-act="traGo" data-step="3" data-id="${e(t.id)}">Next: Inherent risk →</button></div></div>`;}
@@ -1307,7 +1312,11 @@ const VIEWS={register,asset:detail,person:personPage,bil:bilPage,cmap:cmapPage,c
 function render(){let html;try{html=(VIEWS[V.view]||register)();}catch(err){console.error(err);html=`<div class="panel section"><h2>This record could not be shown</h2><p class="sub">${e(err.message)}</p><div class="btnrow"><button class="primary" data-go="register">Back to asset register</button></div></div>`;}
  $('#app').innerHTML=html;const grp={assessments:'assessments',allrisks:'allrisks',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
  if(V.view==='register')regRows();if($('#bilPreview'))updateBilPreview();if($('#inhPrev'))updateRiskPreview();if($('#hcProgress'))updateHealthProgress();if($('#vScope'))updateVendorScope();if($('#ctlResults'))renderCtlResults();document.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=true);}
+document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('td.lqc');if(!c)return;const r=c.querySelector('input[data-lqr]');if(r)r.dataset.was=r.checked?'1':'';},true);
+function lqClear(id){if(V.view!=='traEdit')return;document.querySelectorAll(`[name="lq_${id}"]`).forEach(x=>{x.checked=false;});const tr=DB.tra[V.b];readTra(tr);save();const y=window.scrollY;render();window.scrollTo(0,y);}
 document.addEventListener('click',ev=>{const t=ev.target;
+ if(t.matches&&t.matches('input[data-lqr]')&&t.dataset.was==='1'){t.dataset.was='';lqClear(t.name.slice(3));return;}
+ {const c=t.closest&&t.closest('[data-lqclear]');if(c){lqClear(c.dataset.lqclear);return;}}
  const act=t.closest('[data-act]');if(act){ev.preventDefault();const f=ACT[act.dataset.act];if(f)f(act);return;}
  const nav=t.closest('[data-nav]');if(nav){go(nav.dataset.nav);return;}
  const per=t.closest('[data-person]');if(per){go('person',per.dataset.person,per.dataset.a);return;}
