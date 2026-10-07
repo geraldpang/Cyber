@@ -1,6 +1,7 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
 // Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) likelihood questions rated 1–5 (add, edit, delete),
-// and the MTM and IEC 62443 control sets (add, edit, delete; threats, CIA, IEC SL-T, specifications and evidence).
+// the MTM and IEC 62443 control sets (add, edit, delete; threats, CIA, IEC SL-T, specifications and evidence),
+// and the control assurance questions with the controls each one covers (add, edit, delete, load the built-in set).
 // Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
 // secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
 // (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
@@ -10,6 +11,7 @@ const THREAT_RE = /^T\d{2}$/;
 const STATEMENT_RE = /^R\d{2}$/;
 const QUESTION_RE = /^Q\d{1,2}$/;
 const MAX_LEVEL = 300;
+const AQ_RE = /^Q\d{2,3}$/;
 const CONTROL_ID_RE = /^(MTM|IEC):[A-Za-z0-9 .\-()]{1,40}$/;
 const CODE_RE = /^[A-Za-z0-9 .\-()]{1,40}$/;
 const CONTEXTS = ["Safety", "Financial", "Reputation / Political", "Legal", "Engineering / Technical"];
@@ -196,6 +198,70 @@ export async function onRequestPost({ request, env }) {
         return json({ ok: true, deleted: id, by: auth.email });
       }
 
+      case "updateAssurance": {
+        const id = String(body.id || "");
+        if (!AQ_RE.test(id)) throw bad("Unknown assurance question ID.");
+        const f = assuranceFields(body);
+        const ctl = await assuranceControls(env, body.controls);
+        const exists = await env.DB.prepare("SELECT id FROM assurance_questions WHERE id = ?").bind(id).first();
+        if (!exists) throw bad("Assurance question " + id + " was not found.");
+        await env.DB.batch([
+          env.DB.prepare("UPDATE assurance_questions SET topic = ?, question = ?, required = ?, evidence = ?, applicability = ?, updated_at = datetime('now') WHERE id = ?").bind(f.topic, f.question, f.required, f.evidence, f.applicability, id),
+          env.DB.prepare("DELETE FROM assurance_question_controls WHERE question_id = ?").bind(id),
+          ...multiInsert(env, "assurance_question_controls", ["question_id", "control_id"], ctl.map((c) => [id, c])),
+        ]);
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "addAssurance": {
+        const f = assuranceFields(body);
+        const ctl = await assuranceControls(env, body.controls || []);
+        const rows = (await env.DB.prepare("SELECT id, sort_order FROM assurance_questions").all()).results;
+        const n = rows.reduce((m, r) => Math.max(m, Number(String(r.id).slice(1)) || 0), 0) + 1;
+        const id = "Q" + String(n).padStart(2, "0");
+        if (!AQ_RE.test(id)) throw bad("No more assurance question IDs are available.");
+        const order = rows.reduce((m, r) => Math.max(m, r.sort_order || 0), 0) + 1;
+        await env.DB.batch([
+          env.DB.prepare("INSERT INTO assurance_questions (id, sort_order, topic, question, required, evidence, applicability) VALUES (?, ?, ?, ?, ?, ?, ?)").bind(id, order, f.topic, f.question, f.required, f.evidence, f.applicability),
+          ...multiInsert(env, "assurance_question_controls", ["question_id", "control_id"], ctl.map((c) => [id, c])),
+        ]);
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "deleteAssurance": {
+        const id = String(body.id || "");
+        if (!AQ_RE.test(id)) throw bad("Unknown assurance question ID.");
+        await env.DB.batch([
+          env.DB.prepare("DELETE FROM assurance_question_controls WHERE question_id = ?").bind(id),
+          env.DB.prepare("DELETE FROM assurance_questions WHERE id = ?").bind(id),
+        ]);
+        return json({ ok: true, deleted: id, by: auth.email });
+      }
+
+      case "importAssurance": {
+        // Loads the built-in assurance questions into empty tables. Mapped controls that are not in the control sets are skipped.
+        const items = Array.isArray(body.questions) ? body.questions : [];
+        if (!items.length || items.length > 60) throw bad("Send between 1 and 60 assurance questions.");
+        const count = (await env.DB.prepare("SELECT COUNT(*) AS n FROM assurance_questions").first()).n;
+        if (count > 0) throw bad("The assurance question table already has " + count + " questions. Delete them first to reload the built-in set.");
+        const known = new Set((await env.DB.prepare("SELECT id FROM controls").all()).results.map((r) => r.id));
+        const seen = new Set(), qs = [], links = [];
+        let skipped = 0;
+        items.forEach((x, i) => {
+          const id = String((x && x.id) || "");
+          if (!AQ_RE.test(id) || seen.has(id)) throw bad("Question " + (i + 1) + " has a missing or repeated ID.");
+          seen.add(id);
+          const f = assuranceFields(x || {});
+          qs.push([id, i + 1, f.topic, f.question, f.required, f.evidence, f.applicability]);
+          [...new Set((Array.isArray(x.controls) ? x.controls : []).map(String))].forEach((c) => { if (known.has(c)) links.push([id, c]); else skipped++; });
+        });
+        await env.DB.batch([
+          ...multiInsert(env, "assurance_questions", ["id", "sort_order", "topic", "question", "required", "evidence", "applicability"], qs),
+          ...multiInsert(env, "assurance_question_controls", ["question_id", "control_id"], links),
+        ]);
+        return json({ ok: true, loaded: qs.length, links: links.length, skipped, by: auth.email });
+      }
+
       default:
         throw bad("Unknown action.");
     }
@@ -204,6 +270,7 @@ export async function onRequestPost({ request, env }) {
     const detail = String((err && err.message) || err);
     if (/no such table: control_(specs|evidence)/i.test(detail)) return json({ error: "The specification and evidence tables have not been created yet. Run details-steps.txt in the D1 Console." }, 500);
     if (/no such table: control/i.test(detail)) return json({ error: "The control tables have not been created yet. Run controls-steps.txt in the D1 Console." }, 500);
+    if (/no such table: assurance_question/i.test(detail)) return json({ error: "The assurance question tables have not been created yet. Run assurance-steps.txt in the D1 Console." }, 500);
     if (/no such table: likelihood_question/i.test(detail)) return json({ error: "The likelihood question tables have not been created yet. Run likelihood-steps.txt in the D1 Console." }, 500);
     return json({ error: "Could not save the change.", detail }, 500);
   }
@@ -300,6 +367,30 @@ function questionFields(body) {
     return s;
   });
   return { question, guidance, levels };
+}
+const AQ_LIMITS = { topic: 200, question: 1000, required: 6000, evidence: 3000, applicability: 1000 };
+function assuranceFields(body) {
+  const out = {};
+  for (const [k, max] of Object.entries(AQ_LIMITS)) {
+    const v = String(body[k] == null ? "" : body[k]).replace(/\r\n/g, "\n").trim();
+    const label = { topic: "Topic", question: "Question", required: "What is required?", evidence: "Recommended evidence", applicability: "Applicability guidance" }[k];
+    if ((k === "topic" || k === "question") && !v) throw bad(label + " cannot be empty.");
+    if (v.length > max) throw bad(label + " is too long (maximum " + max + " characters).");
+    out[k] = v;
+  }
+  return out;
+}
+// Control IDs a question covers; every one must be in the control sets.
+async function assuranceControls(env, list) {
+  if (!Array.isArray(list)) throw bad("controls must be a list of control IDs.");
+  const ids = [...new Set(list.map(String))];
+  if (ids.length > 300) throw bad("A question can cover at most 300 controls.");
+  if (ids.some((x) => !CONTROL_ID_RE.test(x))) throw bad("Unknown control ID in the mapping.");
+  if (!ids.length) return ids;
+  const known = new Set((await env.DB.prepare("SELECT id FROM controls").all()).results.map((r) => r.id));
+  const unknown = ids.filter((x) => !known.has(x));
+  if (unknown.length) throw bad("These controls are not in the control sets: " + unknown.join(", "));
+  return ids;
 }
 function bad(msg) { const e = new Error(msg); e.userError = true; return e; }
 function text(v, label) {
