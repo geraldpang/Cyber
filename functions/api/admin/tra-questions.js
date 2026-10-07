@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
-// Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) and questions (add, edit, delete).
+// Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) and likelihood questions rated 1–5 (add, edit, delete).
 // Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
 // secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
 // (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
@@ -7,7 +7,8 @@
 
 const THREAT_RE = /^T\d{2}$/;
 const STATEMENT_RE = /^R\d{2}$/;
-const QUESTION_RE = /^[EV]\d{1,2}$/;
+const QUESTION_RE = /^Q\d{1,2}$/;
+const MAX_LEVEL = 300;
 const CONTEXTS = ["Safety", "Financial", "Reputation / Political", "Legal", "Engineering / Technical"];
 const MAX_TEXT = 1000;
 const MAX_TAG = 40;
@@ -84,36 +85,30 @@ export async function onRequestPost({ request, env }) {
       case "updateQuestion": {
         const id = String(body.id || "");
         if (!QUESTION_RE.test(id)) throw bad("Unknown question ID.");
-        const question = text(body.question, "Question");
-        const likelihood = level(body.likelihood);
+        const { question, guidance, levels } = questionFields(body);
         const thr = threats(body.threats);
-        const exists = await env.DB.prepare("SELECT id FROM questions WHERE id = ?").bind(id).first();
+        const exists = await env.DB.prepare("SELECT id FROM likelihood_questions WHERE id = ?").bind(id).first();
         if (!exists) throw bad("Question " + id + " was not found.");
         await env.DB.batch([
-          env.DB.prepare("UPDATE questions SET question = ?, likelihood = ?, updated_at = datetime('now') WHERE id = ?").bind(question, likelihood, id),
-          env.DB.prepare("DELETE FROM question_threats WHERE question_id = ?").bind(id),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          env.DB.prepare("UPDATE likelihood_questions SET question = ?, guidance = ?, level_1 = ?, level_2 = ?, level_3 = ?, level_4 = ?, level_5 = ?, updated_at = datetime('now') WHERE id = ?").bind(question, guidance, ...levels, id),
+          env.DB.prepare("DELETE FROM likelihood_question_threats WHERE question_id = ?").bind(id),
+          ...thr.map((t) => env.DB.prepare("INSERT INTO likelihood_question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
 
       case "addQuestion": {
-        const set = body.question_set === "exposure" ? "exposure" : body.question_set === "vulnerability" ? "vulnerability" : null;
-        if (!set) throw bad("question_set must be exposure or vulnerability.");
-        const question = text(body.question, "Question");
-        const likelihood = level(body.likelihood);
+        const { question, guidance, levels } = questionFields(body);
         const thr = threats(body.threats || []);
-        const prefix = set === "exposure" ? "E" : "V";
-        const rows = (await env.DB.prepare("SELECT id, sort_order FROM questions WHERE question_set = ?").bind(set).all()).results;
-        let n = rows.length + 1;
-        const ids = new Set(rows.map((r) => r.id));
-        while (ids.has(prefix + n)) n++;
-        const id = prefix + n;
-        if (!QUESTION_RE.test(id)) throw bad("No more question IDs are available in this set.");
+        const rows = (await env.DB.prepare("SELECT id, sort_order FROM likelihood_questions").all()).results;
+        // Always the next number after the highest ever used here, so a deleted question's answers never attach to a new one
+        const n = rows.reduce((m, r) => Math.max(m, Number(String(r.id).slice(1)) || 0), 0) + 1;
+        const id = "Q" + n;
+        if (!QUESTION_RE.test(id)) throw bad("No more question IDs are available.");
         const order = rows.reduce((m, r) => Math.max(m, r.sort_order || 0), 0) + 1;
         await env.DB.batch([
-          env.DB.prepare("INSERT INTO questions (id, question_set, sort_order, question, likelihood) VALUES (?, ?, ?, ?, ?)").bind(id, set, order, question, likelihood),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          env.DB.prepare("INSERT INTO likelihood_questions (id, sort_order, question, guidance, level_1, level_2, level_3, level_4, level_5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, order, question, guidance, ...levels),
+          ...thr.map((t) => env.DB.prepare("INSERT INTO likelihood_question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -122,8 +117,8 @@ export async function onRequestPost({ request, env }) {
         const id = String(body.id || "");
         if (!QUESTION_RE.test(id)) throw bad("Unknown question ID.");
         await env.DB.batch([
-          env.DB.prepare("DELETE FROM question_threats WHERE question_id = ?").bind(id),
-          env.DB.prepare("DELETE FROM questions WHERE id = ?").bind(id),
+          env.DB.prepare("DELETE FROM likelihood_question_threats WHERE question_id = ?").bind(id),
+          env.DB.prepare("DELETE FROM likelihood_questions WHERE id = ?").bind(id),
         ]);
         return json({ ok: true, deleted: id, by: auth.email });
       }
@@ -133,7 +128,9 @@ export async function onRequestPost({ request, env }) {
     }
   } catch (err) {
     if (err && err.userError) return json({ error: err.message }, 400);
-    return json({ error: "Could not save the change.", detail: String((err && err.message) || err) }, 500);
+    const detail = String((err && err.message) || err);
+    if (/no such table: likelihood_question/i.test(detail)) return json({ error: "The likelihood question tables have not been created yet. Run likelihood-steps.txt in the D1 Console." }, 500);
+    return json({ error: "Could not save the change.", detail }, 500);
   }
 }
 
@@ -155,17 +152,24 @@ function statementFields(body) {
   if (!ctx.length) throw bad("Choose at least one risk context.");
   return { tag, event, hazard, ctx };
 }
+function questionFields(body) {
+  const question = text(body.question, "Question");
+  const guidance = String(body.guidance == null ? "" : body.guidance).trim();
+  if (guidance.length > MAX_TEXT) throw bad("Description is too long (maximum " + MAX_TEXT + " characters).");
+  if (!Array.isArray(body.levels) || body.levels.length !== 5) throw bad("Give a description for each level, 1 to 5.");
+  const levels = body.levels.map((v, i) => {
+    const s = text(v, "Level " + (i + 1) + " description");
+    if (s.length > MAX_LEVEL) throw bad("Level " + (i + 1) + " description is too long (maximum " + MAX_LEVEL + " characters).");
+    return s;
+  });
+  return { question, guidance, levels };
+}
 function bad(msg) { const e = new Error(msg); e.userError = true; return e; }
 function text(v, label) {
   const s = String(v == null ? "" : v).trim();
   if (!s) throw bad(label + " cannot be empty.");
   if (s.length > MAX_TEXT) throw bad(label + " is too long (maximum " + MAX_TEXT + " characters).");
   return s;
-}
-function level(v) {
-  const n = Number(v);
-  if (!Number.isInteger(n) || n < 1 || n > 5) throw bad("Likelihood must be a whole number from 1 to 5.");
-  return n;
 }
 
 // ---- Cloudflare Access token check ----
