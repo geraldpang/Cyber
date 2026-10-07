@@ -136,11 +136,13 @@ export async function onRequestPost({ request, env }) {
         const thr = threats(body.threats);
         const exists = await env.DB.prepare("SELECT id FROM controls WHERE id = ?").bind(id).first();
         if (!exists) throw bad("Control " + id + " was not found.");
+        const qLinks = await controlQuestions(env, id, body.questions);
         await env.DB.batch([
           env.DB.prepare("UPDATE controls SET title = ?, description = ?, domain = ?, sl = ?, cia = ?, updated_at = datetime('now') WHERE id = ?").bind(f.title, f.description, f.domain, f.sl, f.cia, id),
           env.DB.prepare("DELETE FROM control_threats WHERE control_id = ?").bind(id),
           ...multiInsert(env, "control_threats", ["control_id", "threat_id"], thr.map((t) => [id, t])),
           ...(body.specs !== undefined || body.evidence !== undefined ? detailStatements(env, id, details(body)) : []),
+          ...qLinks,
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -155,11 +157,13 @@ export async function onRequestPost({ request, env }) {
         const thr = threats(body.threats || []);
         const exists = await env.DB.prepare("SELECT id FROM controls WHERE id = ?").bind(id).first();
         if (exists) throw bad("Control " + code + " already exists in the " + set + " set.");
+        const qLinks = await controlQuestions(env, id, body.questions);
         const order = ((await env.DB.prepare("SELECT MAX(sort_order) AS m FROM controls").first()).m || 0) + 1;
         await env.DB.batch([
           env.DB.prepare("INSERT INTO controls (id, control_set, code, sort_order, title, description, domain, sl, cia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, set, code, order, f.title, f.description, f.domain, f.sl, f.cia),
           ...multiInsert(env, "control_threats", ["control_id", "threat_id"], thr.map((t) => [id, t])),
           ...(body.specs !== undefined || body.evidence !== undefined ? detailStatements(env, id, details(body)) : []),
+          ...qLinks,
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -379,6 +383,20 @@ function assuranceFields(body) {
     out[k] = v;
   }
   return out;
+}
+// The assurance questions a control sits under, set from the control's own editor (only when "questions" is sent).
+async function controlQuestions(env, id, list) {
+  if (list === undefined) return [];
+  if (!Array.isArray(list)) throw bad("questions must be a list of assurance question IDs.");
+  const ids = [...new Set(list.map(String))];
+  if (ids.some((x) => !AQ_RE.test(x))) throw bad("Unknown assurance question ID.");
+  const known = new Set((await env.DB.prepare("SELECT id FROM assurance_questions").all()).results.map((r) => r.id));
+  const unknown = ids.filter((x) => !known.has(x));
+  if (unknown.length) throw bad("These assurance questions were not found: " + unknown.join(", "));
+  return [
+    env.DB.prepare("DELETE FROM assurance_question_controls WHERE control_id = ?").bind(id),
+    ...multiInsert(env, "assurance_question_controls", ["question_id", "control_id"], ids.map((q) => [q, id])),
+  ];
 }
 // Control IDs a question covers; every one must be in the control sets.
 async function assuranceControls(env, list) {
