@@ -4,7 +4,7 @@
 //
 // likelihood_questions: the questions the TRA asks, each rated 1 (Rare) to 5 (Almost certain),
 //   with a description for every level and the threats the answer applies to.
-// controls: the MTM and IEC 62443 control sets, with threats, CIA and (IEC) SL-T.
+// controls: the MTM and IEC 62443 control sets, with threats, CIA, (IEC) SL-T, specifications and evidence.
 // questions: the older exposure / vulnerability (Yes/No) questions, kept for pages not yet updated.
 
 export async function onRequestGet({ env }) {
@@ -33,7 +33,7 @@ export async function onRequestGet({ env }) {
         updated_at: s.updated_at,
       })),
       likelihood_questions: await likelihoodQuestions(env),
-      controls: await controlSets(env),
+      ...(await controlSets(env)),
       questions: await legacyQuestions(env),
     });
   } catch (err) {
@@ -63,16 +63,39 @@ async function likelihoodQuestions(env) {
   }
 }
 
-// MTM and IEC 62443 controls with their threats, CIA and (IEC) SL-T. Returns [] until the control tables exist.
+// MTM and IEC 62443 controls with their threats, CIA, (IEC) SL-T, specifications and supporting evidence.
+// controls is [] until the control tables exist. control_details is true once specifications or evidence
+// have been loaded into the database; until then the TRA keeps its built-in specifications and evidence.
 async function controlSets(env) {
+  const list = (v) => String(v || "").split(",").map((x) => x.trim()).filter(Boolean);
+  let cs, links;
   try {
-    const [cs, links] = await env.DB.batch([
+    [cs, links] = await env.DB.batch([
       env.DB.prepare("SELECT id, control_set, code, title, description, domain, sl, cia, updated_at FROM controls WHERE active = 1 ORDER BY control_set DESC, sort_order"),
       env.DB.prepare("SELECT control_id, threat_id FROM control_threats ORDER BY threat_id"),
     ]);
-    const byC = links.results.reduce((m, r) => ((m[r.control_id] ||= []).push(r.threat_id), m), {});
-    const list = (v) => String(v || "").split(",").map((x) => x.trim()).filter(Boolean);
-    return cs.results.map((c) => ({
+  } catch (err) {
+    if (/no such table/i.test(String(err && err.message))) return { controls: [], control_details: false };
+    throw err;
+  }
+  let specs = [], evidence = [], details = false;
+  try {
+    const [sp, ev] = await env.DB.batch([
+      env.DB.prepare("SELECT control_id, code, text, level, scope, threats FROM control_specs ORDER BY control_id, sort_order"),
+      env.DB.prepare("SELECT control_id, text FROM control_evidence ORDER BY control_id, sort_order"),
+    ]);
+    specs = sp.results;
+    evidence = ev.results;
+    details = specs.length > 0 || evidence.length > 0;
+  } catch (err) {
+    if (!/no such table/i.test(String(err && err.message))) throw err;
+  }
+  const byC = links.results.reduce((m, r) => ((m[r.control_id] ||= []).push(r.threat_id), m), {});
+  const spByC = specs.reduce((m, r) => ((m[r.control_id] ||= []).push({ code: r.code, text: r.text, level: r.level, scope: list(r.scope), threats: list(r.threats) }), m), {});
+  const evByC = evidence.reduce((m, r) => ((m[r.control_id] ||= []).push(r.text), m), {});
+  return {
+    control_details: details,
+    controls: cs.results.map((c) => ({
       id: c.id,
       set: c.control_set,
       code: c.code,
@@ -82,12 +105,10 @@ async function controlSets(env) {
       sl: list(c.sl).map(Number).filter((n) => n >= 1 && n <= 4),
       cia: list(c.cia).filter((x) => ["C", "I", "A"].includes(x)),
       threats: byC[c.id] || [],
+      ...(details ? { specs: spByC[c.id] || [], evidence: evByC[c.id] || [] } : {}),
       updated_at: c.updated_at,
-    }));
-  } catch (err) {
-    if (/no such table/i.test(String(err && err.message))) return [];
-    throw err;
-  }
+    })),
+  };
 }
 
 async function legacyQuestions(env) {
