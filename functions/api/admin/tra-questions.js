@@ -1,5 +1,6 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
-// Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) and likelihood questions rated 1–5 (add, edit, delete).
+// Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) likelihood questions rated 1–5 (add, edit, delete),
+// and the MTM and IEC 62443 control sets (add, edit, delete; threats, CIA and, for IEC, SL-T).
 // Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
 // secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
 // (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
@@ -9,6 +10,8 @@ const THREAT_RE = /^T\d{2}$/;
 const STATEMENT_RE = /^R\d{2}$/;
 const QUESTION_RE = /^Q\d{1,2}$/;
 const MAX_LEVEL = 300;
+const CONTROL_ID_RE = /^(MTM|IEC):[A-Za-z0-9 .\-()]{1,40}$/;
+const CODE_RE = /^[A-Za-z0-9 .\-()]{1,40}$/;
 const CONTEXTS = ["Safety", "Financial", "Reputation / Political", "Legal", "Engineering / Technical"];
 const MAX_TEXT = 1000;
 const MAX_TAG = 40;
@@ -123,12 +126,57 @@ export async function onRequestPost({ request, env }) {
         return json({ ok: true, deleted: id, by: auth.email });
       }
 
+      case "updateControl": {
+        const id = String(body.id || "");
+        if (!CONTROL_ID_RE.test(id)) throw bad("Unknown control ID.");
+        const set = id.slice(0, 3);
+        const f = controlFields(body, set);
+        const thr = threats(body.threats);
+        const exists = await env.DB.prepare("SELECT id FROM controls WHERE id = ?").bind(id).first();
+        if (!exists) throw bad("Control " + id + " was not found.");
+        await env.DB.batch([
+          env.DB.prepare("UPDATE controls SET title = ?, description = ?, domain = ?, sl = ?, cia = ?, updated_at = datetime('now') WHERE id = ?").bind(f.title, f.description, f.domain, f.sl, f.cia, id),
+          env.DB.prepare("DELETE FROM control_threats WHERE control_id = ?").bind(id),
+          ...thr.map((t) => env.DB.prepare("INSERT INTO control_threats (control_id, threat_id) VALUES (?, ?)").bind(id, t)),
+        ]);
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "addControl": {
+        const set = body.control_set === "MTM" || body.control_set === "IEC" ? body.control_set : null;
+        if (!set) throw bad("control_set must be MTM or IEC.");
+        const code = String(body.code || "").trim();
+        if (!CODE_RE.test(code)) throw bad("Control ID must be 1 to 40 letters, numbers, spaces, dots, dashes or brackets.");
+        const id = set + ":" + code;
+        const f = controlFields(body, set);
+        const thr = threats(body.threats || []);
+        const exists = await env.DB.prepare("SELECT id FROM controls WHERE id = ?").bind(id).first();
+        if (exists) throw bad("Control " + code + " already exists in the " + set + " set.");
+        const order = ((await env.DB.prepare("SELECT MAX(sort_order) AS m FROM controls").first()).m || 0) + 1;
+        await env.DB.batch([
+          env.DB.prepare("INSERT INTO controls (id, control_set, code, sort_order, title, description, domain, sl, cia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, set, code, order, f.title, f.description, f.domain, f.sl, f.cia),
+          ...thr.map((t) => env.DB.prepare("INSERT INTO control_threats (control_id, threat_id) VALUES (?, ?)").bind(id, t)),
+        ]);
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "deleteControl": {
+        const id = String(body.id || "");
+        if (!CONTROL_ID_RE.test(id)) throw bad("Unknown control ID.");
+        await env.DB.batch([
+          env.DB.prepare("DELETE FROM control_threats WHERE control_id = ?").bind(id),
+          env.DB.prepare("DELETE FROM controls WHERE id = ?").bind(id),
+        ]);
+        return json({ ok: true, deleted: id, by: auth.email });
+      }
+
       default:
         throw bad("Unknown action.");
     }
   } catch (err) {
     if (err && err.userError) return json({ error: err.message }, 400);
     const detail = String((err && err.message) || err);
+    if (/no such table: control/i.test(detail)) return json({ error: "The control tables have not been created yet. Run controls-steps.txt in the D1 Console." }, 500);
     if (/no such table: likelihood_question/i.test(detail)) return json({ error: "The likelihood question tables have not been created yet. Run likelihood-steps.txt in the D1 Console." }, 500);
     return json({ error: "Could not save the change.", detail }, 500);
   }
@@ -151,6 +199,23 @@ function statementFields(body) {
   if (badCtx.length) throw bad("Unknown risk contexts: " + badCtx.join(", "));
   if (!ctx.length) throw bad("Choose at least one risk context.");
   return { tag, event, hazard, ctx };
+}
+function controlFields(body, set) {
+  const title = text(body.title, "Title");
+  if (title.length > 200) throw bad("Title is too long (maximum 200 characters).");
+  const description = String(body.description == null ? "" : body.description).trim();
+  if (description.length > MAX_TEXT) throw bad("Description is too long (maximum " + MAX_TEXT + " characters).");
+  const domain = String(body.domain == null ? "" : body.domain).trim();
+  if (domain.length > 120) throw bad("Domain is too long (maximum 120 characters).");
+  const cia = Array.isArray(body.cia) ? ["C", "I", "A"].filter((x) => body.cia.includes(x)) : [];
+  if (!cia.length) throw bad("Tick at least one of C, I and A.");
+  let sl = "";
+  if (set === "IEC") {
+    const levels = Array.isArray(body.sl) ? [1, 2, 3, 4].filter((n) => body.sl.map(Number).includes(n)) : [];
+    if (!levels.length) throw bad("Tick at least one SL-T level for an IEC 62443 control.");
+    sl = levels.join(",");
+  }
+  return { title, description, domain, sl, cia: cia.join(",") };
 }
 function questionFields(body) {
   const question = text(body.question, "Question");
