@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
 // Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) likelihood questions rated 1–5 (add, edit, delete),
-// and the MTM and IEC 62443 control sets (add, edit, delete; threats, CIA and, for IEC, SL-T).
+// and the MTM and IEC 62443 control sets (add, edit, delete; threats, CIA, IEC SL-T, specifications and evidence).
 // Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
 // secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
 // (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
@@ -47,7 +47,7 @@ export async function onRequestPost({ request, env }) {
         await env.DB.batch([
           env.DB.prepare("UPDATE risk_statements SET tag = ?, event = ?, hazard = ?, risk_contexts = ?, updated_at = datetime('now') WHERE id = ?").bind(tag, event, hazard, ctx.join(", "), id),
           env.DB.prepare("DELETE FROM risk_statement_threats WHERE statement_id = ?").bind(id),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO risk_statement_threats (statement_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "risk_statement_threats", ["statement_id", "threat_id"], thr.map((t) => [id, t])),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -66,7 +66,7 @@ export async function onRequestPost({ request, env }) {
         // system_type is no longer used (statements apply to IT and OT); the column still requires a value.
         await env.DB.batch([
           env.DB.prepare("INSERT INTO risk_statements (id, sort_order, system_type, tag, event, hazard, risk_contexts) VALUES (?, ?, 'IT', ?, ?, ?, ?)").bind(id, order, tag, event, hazard, ctx.join(", ")),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO risk_statement_threats (statement_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "risk_statement_threats", ["statement_id", "threat_id"], thr.map((t) => [id, t])),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -95,7 +95,7 @@ export async function onRequestPost({ request, env }) {
         await env.DB.batch([
           env.DB.prepare("UPDATE likelihood_questions SET question = ?, guidance = ?, level_1 = ?, level_2 = ?, level_3 = ?, level_4 = ?, level_5 = ?, updated_at = datetime('now') WHERE id = ?").bind(question, guidance, ...levels, id),
           env.DB.prepare("DELETE FROM likelihood_question_threats WHERE question_id = ?").bind(id),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO likelihood_question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "likelihood_question_threats", ["question_id", "threat_id"], thr.map((t) => [id, t])),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -111,7 +111,7 @@ export async function onRequestPost({ request, env }) {
         const order = rows.reduce((m, r) => Math.max(m, r.sort_order || 0), 0) + 1;
         await env.DB.batch([
           env.DB.prepare("INSERT INTO likelihood_questions (id, sort_order, question, guidance, level_1, level_2, level_3, level_4, level_5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, order, question, guidance, ...levels),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO likelihood_question_threats (question_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "likelihood_question_threats", ["question_id", "threat_id"], thr.map((t) => [id, t])),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -137,7 +137,8 @@ export async function onRequestPost({ request, env }) {
         await env.DB.batch([
           env.DB.prepare("UPDATE controls SET title = ?, description = ?, domain = ?, sl = ?, cia = ?, updated_at = datetime('now') WHERE id = ?").bind(f.title, f.description, f.domain, f.sl, f.cia, id),
           env.DB.prepare("DELETE FROM control_threats WHERE control_id = ?").bind(id),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO control_threats (control_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "control_threats", ["control_id", "threat_id"], thr.map((t) => [id, t])),
+          ...(body.specs !== undefined || body.evidence !== undefined ? detailStatements(env, id, details(body)) : []),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
       }
@@ -155,9 +156,34 @@ export async function onRequestPost({ request, env }) {
         const order = ((await env.DB.prepare("SELECT MAX(sort_order) AS m FROM controls").first()).m || 0) + 1;
         await env.DB.batch([
           env.DB.prepare("INSERT INTO controls (id, control_set, code, sort_order, title, description, domain, sl, cia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(id, set, code, order, f.title, f.description, f.domain, f.sl, f.cia),
-          ...thr.map((t) => env.DB.prepare("INSERT INTO control_threats (control_id, threat_id) VALUES (?, ?)").bind(id, t)),
+          ...multiInsert(env, "control_threats", ["control_id", "threat_id"], thr.map((t) => [id, t])),
+          ...(body.specs !== undefined || body.evidence !== undefined ? detailStatements(env, id, details(body)) : []),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "importControlDetails": {
+        // Loads specifications and evidence for up to 5 controls at a time (to stay within D1's per-request query limit). Controls that already
+        // have specifications or evidence are left alone unless overwrite is true.
+        const items = Array.isArray(body.items) ? body.items : [];
+        if (!items.length || items.length > 5) throw bad("Send between 1 and 5 controls at a time.");
+        const ids = items.map((x) => String((x && x.id) || ""));
+        if (ids.some((x) => !CONTROL_ID_RE.test(x))) throw bad("Unknown control ID in the import.");
+        const known = new Set((await env.DB.prepare("SELECT id FROM controls").all()).results.map((r) => r.id));
+        const filled = new Set([
+          ...(await env.DB.prepare("SELECT DISTINCT control_id FROM control_specs").all()).results.map((r) => r.control_id),
+          ...(await env.DB.prepare("SELECT DISTINCT control_id FROM control_evidence").all()).results.map((r) => r.control_id),
+        ]);
+        const stmts = [];
+        let loaded = 0, skipped = 0;
+        items.forEach((x, i) => {
+          const id = ids[i];
+          if (!known.has(id) || (filled.has(id) && !body.overwrite)) { skipped++; return; }
+          stmts.push(...detailStatements(env, id, details(x)));
+          loaded++;
+        });
+        if (stmts.length) await env.DB.batch(stmts);
+        return json({ ok: true, loaded, skipped, by: auth.email });
       }
 
       case "deleteControl": {
@@ -176,6 +202,7 @@ export async function onRequestPost({ request, env }) {
   } catch (err) {
     if (err && err.userError) return json({ error: err.message }, 400);
     const detail = String((err && err.message) || err);
+    if (/no such table: control_(specs|evidence)/i.test(detail)) return json({ error: "The specification and evidence tables have not been created yet. Run details-steps.txt in the D1 Console." }, 500);
     if (/no such table: control/i.test(detail)) return json({ error: "The control tables have not been created yet. Run controls-steps.txt in the D1 Console." }, 500);
     if (/no such table: likelihood_question/i.test(detail)) return json({ error: "The likelihood question tables have not been created yet. Run likelihood-steps.txt in the D1 Console." }, 500);
     return json({ error: "Could not save the change.", detail }, 500);
@@ -199,6 +226,51 @@ function statementFields(body) {
   if (badCtx.length) throw bad("Unknown risk contexts: " + badCtx.join(", "));
   if (!ctx.length) throw bad("Choose at least one risk context.");
   return { tag, event, hazard, ctx };
+}
+const MAX_SPECS = 80, MAX_SPEC_TEXT = 2000, MAX_EVIDENCE = 40, MAX_EVIDENCE_TEXT = 500;
+const SCOPE_RE = /^[A-Za-z /&-]{1,40}$/;
+// Specifications ({code, text, level, scope[], threats[]}) and supporting evidence (text) for one control.
+function details(body) {
+  const specsIn = Array.isArray(body.specs) ? body.specs : [];
+  const evIn = Array.isArray(body.evidence) ? body.evidence : [];
+  if (specsIn.length > MAX_SPECS) throw bad("A control can have at most " + MAX_SPECS + " specifications.");
+  if (evIn.length > MAX_EVIDENCE) throw bad("A control can have at most " + MAX_EVIDENCE + " evidence items.");
+  const specs = specsIn.map((x, i) => {
+    const t = String((x && x.text) || "").trim();
+    if (!t) throw bad("Specification " + (i + 1) + " has no text.");
+    if (t.length > MAX_SPEC_TEXT) throw bad("Specification " + (i + 1) + " is too long (maximum " + MAX_SPEC_TEXT + " characters).");
+    const code = String((x && x.code) || "").trim().slice(0, 40);
+    const level = String((x && x.level) || "").trim().slice(0, 40);
+    const scope = (Array.isArray(x && x.scope) ? x.scope : []).map((v) => String(v).trim()).filter((v) => SCOPE_RE.test(v)).slice(0, 20);
+    const thr = (Array.isArray(x && x.threats) ? x.threats : []).map(String).filter((v) => THREAT_RE.test(v));
+    return { code, text: t, level, scope: scope.join(", "), threats: [...new Set(thr)].join(",") };
+  });
+  const evidence = evIn.map((v, i) => {
+    const t = String(v == null ? "" : v).trim();
+    if (!t) throw bad("Evidence item " + (i + 1) + " is empty.");
+    if (t.length > MAX_EVIDENCE_TEXT) throw bad("Evidence item " + (i + 1) + " is too long (maximum " + MAX_EVIDENCE_TEXT + " characters).");
+    return t;
+  });
+  return { specs, evidence };
+}
+// One INSERT per chunk of rows, keeping each query within D1's limit of 100 bound values.
+// Fewer statements also keeps each save within the free plan's 50 queries per request.
+function multiInsert(env, table, cols, rows) {
+  const per = Math.max(1, Math.floor(100 / cols.length)), out = [];
+  for (let i = 0; i < rows.length; i += per) {
+    const chunk = rows.slice(i, i + per);
+    const sql = "INSERT INTO " + table + " (" + cols.join(", ") + ") VALUES " + chunk.map(() => "(" + cols.map(() => "?").join(", ") + ")").join(", ");
+    out.push(env.DB.prepare(sql).bind(...chunk.flat()));
+  }
+  return out;
+}
+function detailStatements(env, id, d) {
+  return [
+    env.DB.prepare("DELETE FROM control_specs WHERE control_id = ?").bind(id),
+    env.DB.prepare("DELETE FROM control_evidence WHERE control_id = ?").bind(id),
+    ...multiInsert(env, "control_specs", ["control_id", "sort_order", "code", "text", "level", "scope", "threats"], d.specs.map((x, i) => [id, i + 1, x.code, x.text, x.level, x.scope, x.threats])),
+    ...multiInsert(env, "control_evidence", ["control_id", "sort_order", "text"], d.evidence.map((t, i) => [id, i + 1, t])),
+  ];
 }
 function controlFields(body, set) {
   const title = text(body.title, "Title");
