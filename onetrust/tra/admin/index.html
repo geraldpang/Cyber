@@ -53,6 +53,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .cia{font:500 11px var(--f-mono);border:1px solid var(--line);border-radius:3px;padding:0 5px;color:var(--muted)}.cia.on{background:var(--action);border-color:var(--action);color:#fff}
 .card-in{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.card-in label.f{display:block}.card-in label.f input,.card-in label.f textarea{margin-top:4px;font-weight:400;color:var(--text)}
 span.f{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.dblock{margin-top:12px}.dhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.srow{display:grid;grid-template-columns:110px minmax(0,1fr) 120px 30px;gap:6px;align-items:start;margin-bottom:6px}.srow textarea{min-height:44px;font-size:13px}
+.erow{display:grid;grid-template-columns:minmax(0,1fr) 30px;gap:6px;margin-bottom:6px}
+button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)!important}.addc{width:100%}.addc input{flex:1;width:auto;min-width:0}.ctlbar input[type=search]{max-width:none}.srow{grid-template-columns:1fr 30px}.srow .stext,.srow .slevel{grid-column:1}}
 .ctlbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin:0 0 10px}.ctlbar input[type=search]{max-width:300px}.addc{display:flex;gap:6px}.addc input{width:220px}
 .levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
 .levels textarea{min-height:76px;font-size:13px}
@@ -148,6 +153,12 @@ function render(){
 }
 
 const SET_INFO={MTM:['MTM controls (IT)','MTM key controls from the MTM security standards. In the TRA they are the IT control set.'],IEC:['IEC 62443-3-3 controls (OT)','System requirements and enhancements for OT systems. In the TRA they are filtered by the system\'s SL-T.']};
+/* Specification rows keep scope and per-specification threats (from the MTM standards) as hidden data, so editing the text does not lose them */
+const specRow=(x={})=>`<div class="srow" data-scope="${esc((x.scope||[]).join('|'))}" data-sthr="${esc((x.threats||[]).join('|'))}"><input type="text" class="scode" value="${esc(x.code||'')}" maxlength="40" placeholder="ID" aria-label="Specification ID" ${dis()}><textarea class="stext" maxlength="2000" aria-label="Specification text" ${dis()}>${esc(x.text||'')}</textarea><input type="text" class="slevel" value="${esc(x.level||'')}" list="dl_levels" maxlength="40" placeholder="Level" aria-label="Specification level" ${dis()}><button type="button" class="del mini" data-rmrow ${dis()} aria-label="Remove specification">✕</button></div>`;
+const evRow=(t='')=>`<div class="erow"><input type="text" class="etext" value="${esc(t)}" maxlength="500" aria-label="Supporting evidence" ${dis()}><button type="button" class="del mini" data-rmrow ${dis()} aria-label="Remove evidence">✕</button></div>`;
+function readDetails(f){if(!f.querySelector('[data-specs]'))return {};
+  const specs=[...f.querySelectorAll('[data-specs] .srow')].map(r=>({code:r.querySelector('.scode').value.trim(),text:r.querySelector('.stext').value.trim(),level:r.querySelector('.slevel').value.trim(),scope:(r.dataset.scope||'').split('|').filter(Boolean),threats:(r.dataset.sthr||'').split('|').filter(Boolean)})).filter(x=>x.text||x.code);
+  const evidence=[...f.querySelectorAll('[data-evs] .etext')].map(i=>i.value.trim()).filter(Boolean);return {specs,evidence};}
 function ctlCard(c){return `<details class="card ctl" data-cid="${esc(c.id)}" data-find="${esc((c.code+' '+c.title+' '+c.domain).toLowerCase())}" ${ctlOpen.has(c.id)?'open':''}>
   <summary><span class="id">${esc(c.code)}</span><strong class="ctitle">${esc(c.title)}</strong><span class="badges">${['C','I','A'].map(x=>`<span class="cia ${c.cia.includes(x)?'on':''}" title="${x==='C'?'Confidentiality':x==='I'?'Integrity':'Availability'}">${x}</span>`).join('')}${c.set==='IEC'?`<span class="tag">SL-T ${esc(c.sl.join(', ')||'none')}</span>`:''}<span class="tag">${c.threats.length} threat${c.threats.length===1?'':'s'}</span></span></summary>
   <form data-kind="control" data-id="${esc(c.id)}" data-set="${esc(c.set)}" class="card-in">
@@ -161,6 +172,8 @@ function ctlCard(c){return `<details class="card ctl" data-cid="${esc(c.id)}" da
       ${c.set==='IEC'?`<div><span class="f">SL-T (security levels this requirement applies to)</span><div class="chips">${[1,2,3,4].map(n=>`<label><input type="checkbox" name="sl" value="${n}" ${c.sl.includes(n)?'checked':''} ${dis()}> SL-T ${n}</label>`).join('')}</div></div>`:''}
     </div>
     <div style="margin-top:8px"><span class="f">Threats this control mitigates</span>${threatBoxes('thr',c.threats)}</div>
+    ${data.control_details?`<div class="dblock"><div class="dhead"><span class="f">Specification (${(c.specs||[]).length})</span><button type="button" class="sec mini" data-addspec ${dis()}>+ Add specification</button></div><div data-specs>${(c.specs||[]).map(specRow).join('')}</div></div>
+    <div class="dblock"><div class="dhead"><span class="f">Supporting evidence (${(c.evidence||[]).length})</span><button type="button" class="sec mini" data-addev ${dis()}>+ Add evidence</button></div><div data-evs>${(c.evidence||[]).map(evRow).join('')}</div></div>`:`<p class="small" style="margin-top:10px">Specifications and supporting evidence can be edited here once they are loaded into the database (see the button above the MTM controls).</p>`}
     <div class="actions"><button type="submit" ${dis()}>Save ${esc(c.code)}</button><button type="button" class="del" data-del="${esc(c.id)}" data-dkind="control" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
   </form></details>`;}
 function renderControls(){const cs=Array.isArray(data.controls)?data.controls:[];
@@ -169,7 +182,8 @@ function renderControls(){const cs=Array.isArray(data.controls)?data.controls:[]
     <div class="ctlbar"><input type="search" data-ctlq="${set}" value="${esc(ctlQ[set])}" placeholder="Search ID, title or ${set==='MTM'?'standard':'FR'}" aria-label="Search ${label}">${canEdit?`<span class="addc"><input type="text" data-newcode="${set}" maxlength="40" placeholder="New control ID, e.g. ${set==='MTM'?'NS.9':'SR 8.1'}" aria-label="New ${set} control ID"><button type="button" class="sec" data-addctl="${set}">+ Add control</button></span>`:''}</div>
     <datalist id="dl_${set}">${doms.map(d=>`<option value="${esc(d)}">`).join('')}</datalist>
     <div data-ctllist="${set}">${list.length?list.map(ctlCard).join(''):`<div class="card empty">No ${set} controls yet. If the database steps in controls-steps.txt haven't been run, run them in the D1 Console first.</div>`}</div><p class="small" data-ctlnone="${set}" hidden>No controls match the search.</p>`;};
-  $('#controls').innerHTML=sec('MTM')+sec('IEC');applyCtlFilter();}
+  const imp=cs.length&&!data.control_details?`<div class="card note"><strong>Specifications and supporting evidence are not in the database yet.</strong> <span class="small">The TRA is showing its built-in copy. Load it once to edit them here.</span><div class="actions" style="margin-top:8px"><button type="button" data-importdet ${dis()}>Load built-in specifications and evidence</button><span class="msg" data-impmsg aria-live="polite"></span></div></div>`:'';
+  $('#controls').innerHTML=imp+sec('MTM')+sec('IEC')+`<datalist id="dl_levels">${['Baseline','Recommended','SL 1–4','SL 2–4','SL 3–4','SL 4'].map(v=>`<option value="${v}">`).join('')}</datalist>`;applyCtlFilter();}
 function applyCtlFilter(){['MTM','IEC'].forEach(set=>{const q=ctlQ[set].trim().toLowerCase();let shown=0;document.querySelectorAll(`[data-ctllist="${set}"] details.ctl`).forEach(d=>{const ok=!q||d.dataset.find.includes(q);d.hidden=!ok;if(ok)shown++;});const n=document.querySelector(`[data-ctlnone="${set}"]`);if(n)n.hidden=!(q&&!shown);});}
 
 async function post(body){
@@ -195,7 +209,7 @@ document.addEventListener('submit',async e=>{
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
     if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
-    else if(f.dataset.kind==='control')await post({action:'updateControl',id:f.dataset.id,title:fv(f,'title'),description:fv(f,'description'),domain:fv(f,'domain'),cia:checked('cia'),sl:checked('sl').map(Number),threats:checked('thr')});
+    else if(f.dataset.kind==='control')await post(Object.assign({action:'updateControl',id:f.dataset.id,title:fv(f,'title'),description:fv(f,'description'),domain:fv(f,'domain'),cia:checked('cia'),sl:checked('sl').map(Number),threats:checked('thr')},readDetails(f)));
     else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),guidance:fv(f,'guidance'),levels:[1,2,3,4,5].map(n=>fv(f,'level_'+n)),threats:checked('thr')});
     f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
   }catch(err){msg.className='msg err';msg.textContent=err.message;}
@@ -205,6 +219,14 @@ const confirmDel={};
 document.addEventListener('click',async e=>{
   const add=e.target.closest('[data-add]');
   if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question:'How likely is it that …?',guidance:'',levels:['Describe level 1','Describe level 2','Describe level 3','Describe level 4','Describe level 5'],threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
+  const as=e.target.closest('[data-addspec]'),ae=e.target.closest('[data-addev]'),rm=e.target.closest('[data-rmrow]');
+  if((as||ae||rm)&&canEdit){const f=e.target.closest('form[data-kind]');if(as)f.querySelector('[data-specs]').insertAdjacentHTML('beforeend',specRow());if(ae)f.querySelector('[data-evs]').insertAdjacentHTML('beforeend',evRow());if(rm)rm.parentNode.remove();f.classList.add('dirty');const m=f.querySelector('.msg');m.textContent='';m.className='msg';if(as||ae){const els=f.querySelectorAll(as?'[data-specs] .stext':'[data-evs] .etext');const el=els[els.length-1];if(el)el.focus();}return;}
+  const imp=e.target.closest('[data-importdet]');
+  if(imp&&canEdit){imp.disabled=true;const msg=document.querySelector('[data-impmsg]');
+    try{const r=await fetch('control-details.json',{headers:{accept:'application/json'}});if(!r.ok)throw new Error('control-details.json was not found next to this page (HTTP '+r.status+').');const all=await r.json();let loaded=0,skipped=0;
+      for(let i=0;i<all.length;i+=5){msg.className='msg';msg.textContent='Loading… '+Math.min(i+5,all.length)+' of '+all.length+' controls';const j=await post({action:'importControlDetails',items:all.slice(i,i+5)});loaded+=j.loaded;skipped+=j.skipped;}
+      msg.className='msg ok';msg.textContent='Loaded '+loaded+' controls'+(skipped?' ('+skipped+' skipped because they already had details or are not in the control sets)':'')+'.';await load();setStatus('Specifications and supporting evidence loaded for '+loaded+' controls.');}
+    catch(err){msg.className='msg err';msg.textContent=err.message;imp.disabled=false;}return;}
   const addC=e.target.closest('[data-addctl]');
   if(addC&&canEdit){const set=addC.dataset.addctl,inp=document.querySelector(`[data-newcode="${set}"]`),code=(inp.value||'').trim();if(!code){inp.focus();setStatus('Type the new control ID first, then press + Add control.',true);return;}
     const doms=[...new Set((data.controls||[]).filter(c=>c.set===set).map(c=>c.domain).filter(Boolean))];addC.disabled=true;
