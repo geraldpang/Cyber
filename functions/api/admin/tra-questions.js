@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: POST /api/admin/tra-questions
-// Edits the TRA question bank in the D1 database bound as "DB".
+// Edits the TRA question bank in the D1 database bound as "DB": risk statements (add, edit, delete) and questions (add, edit, delete).
 // Sign-in: a shared editor ID and password, checked against the ADMIN_USER and ADMIN_PASSWORD
 // secrets set on the Pages project (never stored in page code). If Cloudflare Access is set up later
 // (ACCESS_TEAM_DOMAIN and ACCESS_AUD variables), the Access token is checked instead.
@@ -10,6 +10,9 @@ const STATEMENT_RE = /^R\d{2}$/;
 const QUESTION_RE = /^[EV]\d{1,2}$/;
 const CONTEXTS = ["Safety", "Financial", "Reputation / Political", "Legal", "Engineering / Technical"];
 const MAX_TEXT = 1000;
+const MAX_TAG = 40;
+// R07 was merged into R02; never reuse it, so saved TRAs that still mention R07 map correctly
+const RESERVED_STATEMENT_IDS = new Set(["R07"]);
 
 export async function onRequestPost({ request, env }) {
   const auth = await verifyAccess(request, env);
@@ -33,21 +36,49 @@ export async function onRequestPost({ request, env }) {
       case "updateStatement": {
         const id = String(body.id || "");
         if (!STATEMENT_RE.test(id)) throw bad("Unknown risk statement ID.");
-        const event = text(body.event, "Event");
-        const hazard = text(body.hazard, "Hazard");
-        const ctx = Array.isArray(body.risk_contexts) ? [...new Set(body.risk_contexts.map(String))] : [];
-        const badCtx = ctx.filter((c) => !CONTEXTS.includes(c));
-        if (badCtx.length) throw bad("Unknown risk contexts: " + badCtx.join(", "));
-        if (!ctx.length) throw bad("Choose at least one risk context.");
+        const { tag, event, hazard, ctx } = statementFields(body);
         const thr = threats(body.threats);
         const exists = await env.DB.prepare("SELECT id FROM risk_statements WHERE id = ?").bind(id).first();
         if (!exists) throw bad("Risk statement " + id + " was not found.");
         await env.DB.batch([
-          env.DB.prepare("UPDATE risk_statements SET event = ?, hazard = ?, risk_contexts = ?, updated_at = datetime('now') WHERE id = ?").bind(event, hazard, ctx.join(", "), id),
+          env.DB.prepare("UPDATE risk_statements SET tag = ?, event = ?, hazard = ?, risk_contexts = ?, updated_at = datetime('now') WHERE id = ?").bind(tag, event, hazard, ctx.join(", "), id),
           env.DB.prepare("DELETE FROM risk_statement_threats WHERE statement_id = ?").bind(id),
           ...thr.map((t) => env.DB.prepare("INSERT INTO risk_statement_threats (statement_id, threat_id) VALUES (?, ?)").bind(id, t)),
         ]);
         return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "addStatement": {
+        const { tag, event, hazard, ctx } = statementFields(body);
+        const thr = threats(body.threats || []);
+        const rows = (await env.DB.prepare("SELECT id, sort_order FROM risk_statements").all()).results;
+        const ids = new Set(rows.map((r) => r.id));
+        let n = 1;
+        const idFor = (k) => "R" + String(k).padStart(2, "0");
+        while (ids.has(idFor(n)) || RESERVED_STATEMENT_IDS.has(idFor(n))) n++;
+        const id = idFor(n);
+        if (!STATEMENT_RE.test(id)) throw bad("No more risk statement IDs are available.");
+        const order = rows.reduce((m, r) => Math.max(m, r.sort_order || 0), 0) + 1;
+        // system_type is no longer used (statements apply to IT and OT); the column still requires a value.
+        await env.DB.batch([
+          env.DB.prepare("INSERT INTO risk_statements (id, sort_order, system_type, tag, event, hazard, risk_contexts) VALUES (?, ?, 'IT', ?, ?, ?, ?)").bind(id, order, tag, event, hazard, ctx.join(", ")),
+          ...thr.map((t) => env.DB.prepare("INSERT INTO risk_statement_threats (statement_id, threat_id) VALUES (?, ?)").bind(id, t)),
+        ]);
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
+      case "deleteStatement": {
+        const id = String(body.id || "");
+        if (!STATEMENT_RE.test(id)) throw bad("Unknown risk statement ID.");
+        const count = (await env.DB.prepare("SELECT COUNT(*) AS n FROM risk_statements").first()).n;
+        const exists = await env.DB.prepare("SELECT id FROM risk_statements WHERE id = ?").bind(id).first();
+        if (!exists) throw bad("Risk statement " + id + " was not found.");
+        if (count <= 1) throw bad("Keep at least one risk statement.");
+        await env.DB.batch([
+          env.DB.prepare("DELETE FROM risk_statement_threats WHERE statement_id = ?").bind(id),
+          env.DB.prepare("DELETE FROM risk_statements WHERE id = ?").bind(id),
+        ]);
+        return json({ ok: true, deleted: id, by: auth.email });
       }
 
       case "updateQuestion": {
@@ -113,6 +144,17 @@ export async function onRequestGet({ request, env }) {
   return json({ ok: true, email: auth.email });
 }
 
+function statementFields(body) {
+  const tag = text(body.tag, "Tag");
+  if (tag.length > MAX_TAG) throw bad("Tag is too long (maximum " + MAX_TAG + " characters).");
+  const event = text(body.event, "Event");
+  const hazard = text(body.hazard, "Hazard");
+  const ctx = Array.isArray(body.risk_contexts) ? [...new Set(body.risk_contexts.map(String))] : [];
+  const badCtx = ctx.filter((c) => !CONTEXTS.includes(c));
+  if (badCtx.length) throw bad("Unknown risk contexts: " + badCtx.join(", "));
+  if (!ctx.length) throw bad("Choose at least one risk context.");
+  return { tag, event, hazard, ctx };
+}
 function bad(msg) { const e = new Error(msg); e.userError = true; return e; }
 function text(v, label) {
   const s = String(v == null ? "" : v).trim();
