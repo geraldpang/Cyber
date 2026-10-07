@@ -726,6 +726,9 @@ async function loadQuestionBank(){try{const r=await fetch('/api/tra-questions',{
    c.id=String(d.code);c.name=String(d.title);c.statement=String(d.description||'');c.threats=thr;
    if(set==='MTM'){c.source=d.domain?String(d.domain):'MTM';if(c.baseThreats)c.baseThreats=c.baseThreats.filter(x=>thr.includes(x));}
    else{c.fr=String(d.domain||'');c.source='IEC 62443-3-3';const sl=(Array.isArray(d.sl)?d.sl:[]).map(Number).filter(n=>n>=1&&n<=4);c.sl=sl.length?sl:[1,2,3,4];}
+   /* Specifications and supporting evidence come from the database once they have been loaded there */
+   if(j.control_details===true&&Array.isArray(d.specs)){c.specs=d.specs.map(x=>[String(x.code||''),String(x.text||''),String(x.level||''),(Array.isArray(x.scope)?x.scope:[]).map(String),(Array.isArray(x.threats)?x.threats:[]).map(String).filter(t=>valid.has(t))]).filter(x=>x[1]);if(set==='MTM')c.baseThreats=[...new Set(c.specs.filter(x=>x[2]==='Baseline').flatMap(x=>x[4]))].filter(t=>thr.includes(t)).sort();}
+   if(j.control_details===true&&Array.isArray(d.evidence))c.evidence=d.evidence.map(String).filter(Boolean);
    c.cia=cia.length?cia:['c','i','a'];c.retired=false;seen.add(key);});
   Object.values(CTRL).forEach(c=>{if((c.fw==='MTM'||c.fw==='IEC')&&!seen.has(c.key))c.retired=true;});CTL_SOURCE='control sets';}
  /* The database decides which risk statements exist: added ones appear, deleted ones disappear */
