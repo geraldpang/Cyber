@@ -166,6 +166,7 @@ input:disabled,select:disabled,textarea:disabled{background:#f3f6f9;color:#5b6a7
 .ciachip{border:1px solid #cde3f4;background:var(--white);border-radius:6px;padding:6px 10px;text-align:center;min-width:72px}
 .tq{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:12px;background:var(--white)}
 .tq .head{display:flex;gap:10px;align-items:baseline}
+.xfbar{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:12px;background:var(--tint)}.xfbar .fgroup{margin:0 0 8px}.xfsum{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13px}
 .xfer{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);gap:12px;margin-top:12px;align-items:stretch}
 .xcol{display:flex;flex-direction:column;gap:6px;min-width:0}.xcol label{font-weight:700;font-size:13px}
 .xcol select{width:100%;min-height:380px;border:1px solid var(--line);border-radius:6px;padding:4px;font-size:12.5px;background:var(--white)}
@@ -956,15 +957,10 @@ function traStep4(a,t){ const st=traSysType(t),ids=traIdentifiedIds(t),{rows,rem
  return `<div class="panel section"><h2>Control selection</h2><p class="sub">All controls are included by default. Untick what is not required.</p>
  <div class="facts" style="margin-top:14px"><div class="fact"><label>System type (Step 1)</label><strong>${e(st)}</strong>${st!=='IT'?`<span class="small">Highest BIL ${hb} → SL-T ${sl}</span>`:''}</div><div class="fact"><label>IT · MTM key controls</label><strong>${cnt('MTM',true)} included</strong><span class="small">${cnt('MTM',false)} excluded</span></div><div class="fact"><label>OT · IEC 62443-3-3</label><strong>${cnt('IEC',true)} included</strong><span class="small">${cnt('IEC',false)} excluded</span></div><div class="fact"><label>Considered threats not mitigated</label><strong class="${unc.length?'badt':''}">${unc.length?e(unc.join(', ')):'None'}</strong></div></div>
  ${changed?`<div class="notice warn" style="margin-top:12px">The selection has changed since it was confirmed. Review and confirm it again; owner responses are kept for controls that remain selected.</div>`:''}</div>
- <div class="panel section"><h2>Select controls</h2><p class="sub">Tick a group to include all its controls; untick to exclude them. Then adjust individual controls below.</p>
-  <div class="fgroup" style="margin-top:10px"><span class="lab">Type</span><div class="fchips">${gchip('type','IT','IT · MTM key controls')}${gchip('type','OT','OT · IEC 62443-3-3')}</div></div>
-  <div class="fgroup"><span class="lab">Domains</span><div class="fchips">${doms.map(d=>gchip('dom',d,d)).join('')}</div></div>
-  <div class="fgroup"><span class="lab">Threats mitigated</span><div class="fchips">${TRA_THREATS.map(([tid,n])=>gchip('th',tid,tid+(ids.includes(tid)?' ●':''),n)).join('')}</div><p class="small" style="margin-top:4px">● considered in Step 3</p></div>
-  <div class="fgroup"><span class="lab">IEC security level <span class="small">(IEC requirements applicable at that level)</span></span><div class="fchips">${[1,2,3,4].map(n=>gchip('sl',n,'SL-T='+n+(n===sl?' (this asset)':''))).join('')}</div></div>
-</div>
  ${adhocForm(t)}
  <div class="panel section"><div class="section-head"><h2>Controls</h2><div class="btnrow" style="margin:0"><span class="small">${vis.filter(r=>r.on).length} of ${vis.length} selected</span>${V.adhocEdit?'':`<button class="primary" style="padding:6px 12px" data-act="adhocNew" data-id="${e(t.id)}">+ Add ad-hoc control</button>`}</div></div>
- <p class="sub">Move controls between the lists. Click to pick one, Ctrl or Shift-click to pick several, or double-click to move a single control. » and « move every control currently shown in that list. ● marks controls that mitigate a threat considered in Step 3.</p>
+ <p class="sub">Use the filters to narrow both lists, then » to select every control shown or « to remove them. Click to pick one control, Ctrl or Shift-click to pick several, or double-click to move one. ● marks controls that mitigate a threat considered in Step 3.</p>
+ ${xferFilterBar(t)}
  <div class="xfer">
   <div class="xcol"><label for="xL">Available controls <span class="small" id="xLn"></span></label><input type="search" id="xqL" data-xq="L" value="${e((V.xq||{}).L||'')}" placeholder="Search ID, title, standard or FR" aria-label="Search available controls"><select multiple id="xL" size="18" aria-label="Available controls">${xferOptions(t,'L')}</select></div>
   <div class="xbtns" role="group" aria-label="Move controls"><button type="button" class="secondary" data-xfer="allR" title="Select all shown" aria-label="Move all shown available controls to selected"><span>»</span></button><button type="button" class="secondary" data-xfer="R" title="Select" aria-label="Move highlighted controls to selected"><span>›</span></button><button type="button" class="secondary" data-xfer="L" title="Remove" aria-label="Move highlighted controls back to available"><span>‹</span></button><button type="button" class="secondary" data-xfer="allL" title="Remove all shown" aria-label="Move all shown selected controls back to available"><span>«</span></button></div>
@@ -976,11 +972,30 @@ function traStep4(a,t){ const st=traSysType(t),ids=traIdentifiedIds(t),{rows,rem
  </tbody></table></div><p class="small" style="margin-top:8px">Threat codes highlighted in blue are the threats considered in Step 3.</p></details></div>
  <div class="panel section"><p class="err" id="traErr" role="alert"></p><div class="btnrow" style="margin-top:0"><button class="secondary" data-act="traGo" data-step="3" data-id="${e(t.id)}">← Step 4</button><button class="secondary" data-act="traSave" data-id="${e(t.id)}">Save draft</button><button class="primary" data-act="ctlConfirm" data-id="${e(t.id)}">Confirm selection → Control assessment</button></div></div>`;}
 /* Two-list control selection: options grouped by control set and standard / FR */
+/* Filters: AND across categories, OR within a category. SL-T applies to IEC controls (and OT ad-hoc controls) only. */
+const XF_KEYS=['set','sl','cia','th'];
+function xfActive(){const f=V.xf||{};return XF_KEYS.some(k=>(f[k]||[]).length);}
+function xfMatch(c){const f=V.xf||{},has=k=>(f[k]||[]).length;
+ if(has('set')&&!f.set.includes(c.fw==='ADHOC'?'ADHOC':c.fw))return false;
+ if(has('sl')){const ot=c.fw==='IEC'||(c.fw==='ADHOC'&&c.type==='OT');if(!ot||!f.sl.some(n=>(c.sl||[]).includes(n)))return false;}
+ if(has('cia')&&!f.cia.some(x=>(c.cia||['c','i','a']).includes(x)))return false;
+ if(has('th')&&!f.th.some(x=>c.threats.includes(x)))return false;
+ return true;}
+function xferFilterBar(t){const f=V.xf||{},ids=traIdentifiedIds(t),uni=traUniverse(t),on=(k,v)=>(f[k]||[]).includes(v);
+ const chip=(k,v,label,title)=>`<label class="fchip ${on(k,v)?'on':''}"${title?` title="${e(title)}"`:''}><input type="checkbox" data-xf="${k}" value="${e(String(v))}" ${on(k,v)?'checked':''}> ${e(label)}</label>`;
+ const sets=[['MTM','MTM'],['IEC','IEC 62443-3-3']].concat(uni.some(c=>c.fw==='ADHOC')?[['ADHOC','Ad-hoc']]:[]);
+ const n=uni.filter(xfMatch).length;
+ return `<div class="xfbar"><div class="fgroup"><span class="lab">Set</span><div class="fchips">${sets.map(([v,l])=>chip('set',v,l)).join('')}</div></div>
+  <div class="fgroup"><span class="lab">SL-T <span class="small">(IEC only)</span></span><div class="fchips">${[1,2,3,4].map(n=>chip('sl',n,'SL-T '+n+(n===traSlt(t)?' ★':''),n===traSlt(t)?'This system\'s SL-T':'')).join('')}</div></div>
+  <div class="fgroup"><span class="lab">CIA</span><div class="fchips">${[['c','C','Confidentiality'],['i','I','Integrity'],['a','A','Availability']].map(([v,l,ti])=>chip('cia',v,l,ti)).join('')}</div></div>
+  <div class="fgroup"><span class="lab">Threats <span class="small">(● considered in Step 3)</span></span><div class="fchips">${TRA_THREATS.map(([tid,nm])=>chip('th',tid,tid+(ids.includes(tid)?' ●':''),nm)).join('')}</div></div>
+  <div class="xfsum"><span id="xfCount">${xfActive()?`<strong>${n}</strong> of ${uni.length} controls match`:`No filters: showing all ${uni.length} controls`}</span>${xfActive()?`<button type="button" class="linkbtn" data-xfclear>Clear filters</button>`:''}${ids.length?`<button type="button" class="linkbtn" data-xfconsidered>Tick the threats considered in Step 3</button>`:''}</div></div>`;}
 function xferOptions(t,side){const q=String((V.xq||{})[side]||'').trim().toLowerCase(),ids=traIdentifiedIds(t),{rows,removed}=traSel(t),order=Object.keys(CTRL);
  const keys=(side==='R'?rows:removed).map(r=>r.key).filter(k=>CTRL[k]).sort((x,y)=>order.indexOf(x)-order.indexOf(y));
- const groups=new Map();keys.forEach(k=>{const c=CTRL[k];if(q&&!(c.id+' '+c.name+' '+ctlDomain(c)).toLowerCase().includes(q))return;const g=c.fw==='MTM'?ctlDomain(c):c.fw==='IEC'?'IEC 62443-3-3 · '+ctlDomain(c):'Ad-hoc · '+ctlDomain(c);if(!groups.has(g))groups.set(g,[]);groups.get(g).push(c);});
+ const groups=new Map();keys.forEach(k=>{const c=CTRL[k];if(!xfMatch(c))return;if(q&&!(c.id+' '+c.name+' '+ctlDomain(c)).toLowerCase().includes(q))return;const g=c.fw==='MTM'?ctlDomain(c):c.fw==='IEC'?'IEC 62443-3-3 · '+ctlDomain(c):'Ad-hoc · '+ctlDomain(c);if(!groups.has(g))groups.set(g,[]);groups.get(g).push(c);});
  return [...groups].map(([g,cs])=>`<optgroup label="${e(g)}">${cs.map(c=>`<option value="${e(c.key)}" title="${e(c.id+' · '+c.name)}">${c.threats.some(x=>ids.includes(x))?'● ':''}${e(c.id)} · ${e(c.name)}</option>`).join('')}</optgroup>`).join('');}
-function xferCounts(){['L','R'].forEach(sd=>{const el=document.getElementById('x'+sd),n=document.getElementById('x'+sd+'n');if(el&&n){const tot=el.options.length;n.textContent='('+tot+((V.xq||{})[sd]?' shown':'')+')';}});}
+function xferCounts(){['L','R'].forEach(sd=>{const el=document.getElementById('x'+sd),n=document.getElementById('x'+sd+'n');if(el&&n){const tot=el.options.length;n.textContent='('+tot+((V.xq||{})[sd]||xfActive()?' shown':'')+')';}});}
+function xferRefresh(){const t=DB.tra[V.b];readTra(t);save();const y=window.scrollY;render();window.scrollTo(0,y);}
 function xferMove(keys,toSelected){if(!keys.length)return;const tr=DB.tra[V.b];readTra(tr);const c=ensureCtl(tr);keys.forEach(k=>{if(toSelected)delete c.removed[k];else c.removed[k]=c.removed[k]||'';});save();toast(`${keys.length} control${keys.length===1?'':'s'} ${toSelected?'selected':'removed'}`);const y=window.scrollY;render();window.scrollTo(0,y);
  const back=document.getElementById(toSelected?'xR':'xL');if(back)[...back.options].forEach(o=>{o.selected=keys.includes(o.value);});}
 function renderCtlResults(){const box=$('#ctlResults');if(!box)return;const t=DB.tra[V.b];const fw=val('ctlFw')||'MTM',q=(val('ctlQ')||'').toLowerCase();V.ctlFw=fw;V.ctlQ=val('ctlQ');const sel=new Set(traSel(t).rows.map(r=>r.key)),ids=traIdentifiedIds(t);
@@ -1359,9 +1374,12 @@ function render(){let html;try{html=(VIEWS[V.view]||register)();}catch(err){cons
  if(V.view==='register')regRows();if($('#bilPreview'))updateBilPreview();if($('#inhPrev'))updateRiskPreview();if($('#hcProgress'))updateHealthProgress();if($('#vScope'))updateVendorScope();if($('#ctlResults'))renderCtlResults();if($('#xL'))xferCounts();document.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=true);}
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('td.lqc');if(!c)return;const r=c.querySelector('input[data-lqr]');if(r)r.dataset.was=r.checked?'1':'';},true);
 function lqClear(id){if(V.view!=='traEdit')return;document.querySelectorAll(`[name="lq_${id}"]`).forEach(x=>{x.checked=false;});const tr=DB.tra[V.b];readTra(tr);save();const y=window.scrollY;render();window.scrollTo(0,y);}
+document.addEventListener('change',ev=>{const x=ev.target;if(!(x.matches&&x.matches('[data-xf]'))||V.view!=='traEdit')return;const k=x.dataset.xf,v=k==='sl'?Number(x.value):x.value;const f=Object.assign({},V.xf||{});const cur=new Set(f[k]||[]);x.checked?cur.add(v):cur.delete(v);f[k]=[...cur];V.xf=f;xferRefresh();});
 document.addEventListener('dblclick',ev=>{const o=ev.target.closest&&ev.target.closest('#xL option,#xR option');if(o&&V.view==='traEdit')xferMove([o.value],o.closest('select').id==='xL');});
 document.addEventListener('toggle',ev=>{if(ev.target.matches&&ev.target.matches('[data-xdet]'))V.xdet=ev.target.open;},true);
 document.addEventListener('click',ev=>{const t=ev.target;
+ if(t.closest&&t.closest('[data-xfclear]')&&V.view==='traEdit'){V.xf={};xferRefresh();return;}
+ if(t.closest&&t.closest('[data-xfconsidered]')&&V.view==='traEdit'){V.xf=Object.assign({},V.xf||{},{th:traIdentifiedIds(DB.tra[V.b])});xferRefresh();return;}
  {const xb=t.closest&&t.closest('[data-xfer]');if(xb&&V.view==='traEdit'){const d=xb.dataset.xfer,src=document.getElementById(d==='R'||d==='allR'?'xL':'xR');const keys=[...src.options].filter(o=>d.startsWith('all')||o.selected).map(o=>o.value);if(!keys.length){toast(d.startsWith('all')?'No controls shown in that list':'Pick one or more controls first');return;}xferMove(keys,d==='R'||d==='allR');return;}}
  if(t.matches&&t.matches('input[data-lqr]')&&t.dataset.was==='1'){t.dataset.was='';lqClear(t.name.slice(3));return;}
  {const c=t.closest&&t.closest('[data-lqclear]');if(c){lqClear(c.dataset.lqclear);return;}}
