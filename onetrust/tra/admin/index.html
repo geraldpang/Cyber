@@ -48,6 +48,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .dirty .msg::before{content:"Unsaved changes";color:var(--ot)}
 .sethead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
 .empty{color:var(--muted);padding:20px;text-align:center}
+.levels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.levels textarea{min-height:76px;font-size:13px}
+@media (max-width:760px){.levels{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -121,18 +124,18 @@ function render(){
     <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',s.threats)}</div>
     <div class="actions"><button type="submit" ${dis()}>Save ${esc(s.id)}</button><button type="button" class="del" data-del="${esc(s.id)}" data-dkind="statement" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
   </form>`).join(''):`<div class="card empty">No risk statements yet.</div>`);
-  const set=(key,label,hint)=>{const qs=data.questions[key]||[];return `<div class="sethead"><h2>${label}</h2><button type="button" class="sec" data-add="${key}" ${dis()}>+ Add ${key} question</button></div><p class="sub">${hint}</p>`+
+  const qs=data.likelihood_questions||[];
+  $('#questions').innerHTML=`<div class="sethead"><h2>Likelihood questions</h2><button type="button" class="sec" data-add ${dis()}>+ Add question</button></div><p class="sub">The analyst answers each question on a 1–5 scale, from Rare to Almost certain. The answer becomes the likelihood of every threat ticked on the question. Describe what each level looks like so answers are consistent.</p>`+
     (qs.length?qs.map(q=>`<form class="card" data-kind="question" data-id="${esc(q.id)}">
       <div class="card-h"><span class="id">${esc(q.id)}</span></div>
-      <div class="grid" style="grid-template-columns:minmax(0,1fr) 200px">
+      <div class="grid" style="grid-template-columns:minmax(0,1fr)">
         <div><label class="f" for="qt_${esc(q.id)}">Question</label><textarea id="qt_${esc(q.id)}" name="question" maxlength="1000" ${dis()}>${esc(q.question)}</textarea></div>
-        <div><label class="f" for="ql_${esc(q.id)}">Likelihood${key==='exposure'?' if Yes':''}</label><select id="ql_${esc(q.id)}" name="likelihood" ${dis()}>${[1,2,3,4,5].map(n=>`<option value="${n}" ${q.likelihood===n?'selected':''}>${n} – ${LIK[n]}</option>`).join('')}</select></div>
+        <div><label class="f" for="qg_${esc(q.id)}">Description (optional guidance shown under the question)</label><textarea id="qg_${esc(q.id)}" name="guidance" maxlength="1000" style="min-height:40px" ${dis()}>${esc(q.guidance||'')}</textarea></div>
       </div>
-      <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Relevant threats</span>${threatBoxes('thr',q.threats)}</div>
+      <div class="levels">${[1,2,3,4,5].map(n=>`<div><label class="f" for="lv${n}_${esc(q.id)}">${n} · ${LIK[n]}</label><textarea id="lv${n}_${esc(q.id)}" name="level_${n}" maxlength="300" ${dis()}>${esc((q.levels||[])[n-1]||'')}</textarea></div>`).join('')}</div>
+      <div style="margin-top:10px"><span style="font-size:12px;font-weight:600;color:var(--muted)">Threats this question rates</span>${threatBoxes('thr',q.threats)}</div>
       <div class="actions"><button type="submit" ${dis()}>Save ${esc(q.id)}</button><button type="button" class="del" data-del="${esc(q.id)}" data-dkind="question" ${dis()}>Delete</button><span class="msg" aria-live="polite"></span></div>
-    </form>`).join(''):`<div class="card empty">No ${key} questions yet.</div>`);};
-  $('#questions').innerHTML=set('exposure','Exposure questions','How the system can be reached. In the TRA, the highest likelihood among exposure questions answered Yes sets the starting inherent likelihood.')+
-    set('vulnerability','Vulnerability questions','Weaknesses in the system. A Yes identifies the ticked threats. Likelihood is recorded for reference.');
+    </form>`).join(''):`<div class="card empty">No questions yet. If the database steps in likelihood-steps.txt haven't been run, run them in the D1 Console first.</div>`);
 }
 
 async function post(body){
@@ -158,7 +161,7 @@ document.addEventListener('submit',async e=>{
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
     if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
-    else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),likelihood:Number(fv(f,'likelihood')),threats:checked('thr')});
+    else await post({action:'updateQuestion',id:f.dataset.id,question:fv(f,'question'),guidance:fv(f,'guidance'),levels:[1,2,3,4,5].map(n=>fv(f,'level_'+n)),threats:checked('thr')});
     f.classList.remove('dirty');msg.className='msg ok';msg.textContent='Saved';
   }catch(err){msg.className='msg err';msg.textContent=err.message;}
   btn.disabled=false;});
@@ -166,7 +169,7 @@ document.addEventListener('submit',async e=>{
 const confirmDel={};
 document.addEventListener('click',async e=>{
   const add=e.target.closest('[data-add]');
-  if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question_set:add.dataset.add,question:'New question',likelihood:3,threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
+  if(add&&canEdit){add.disabled=true;try{const r=await post({action:'addQuestion',question:'How likely is it that …?',guidance:'',levels:['Describe level 1','Describe level 2','Describe level 3','Describe level 4','Describe level 5'],threats:[]});await load();const el=document.getElementById('qt_'+r.saved);if(el){el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);add.disabled=false;}return;}
   const addS=e.target.closest('[data-addstmt]');
   if(addS&&canEdit){addS.disabled=true;try{const r=await post({action:'addStatement',tag:'New risk',event:'new risk event',hazard:'the lack of cybersecurity guardrails',risk_contexts:['Engineering / Technical'],threats:[]});await load();const el=document.getElementById('tg_'+r.saved);if(el){el.scrollIntoView({block:'center'});el.focus();el.select();}}catch(err){setStatus(esc(err.message),true);addS.disabled=false;}return;}
   const del=e.target.closest('[data-del]');
