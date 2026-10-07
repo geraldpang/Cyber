@@ -118,7 +118,7 @@ async function controlSets(env) {
 async function assuranceQuestions(env) {
   try {
     const [qs, links] = await env.DB.batch([
-      env.DB.prepare("SELECT id, topic, question, required, evidence, applicability, updated_at FROM assurance_questions WHERE active = 1 ORDER BY sort_order"),
+      env.DB.prepare("SELECT id, topic, question, required, evidence, updated_at FROM assurance_questions WHERE active = 1 ORDER BY sort_order"),
       env.DB.prepare("SELECT l.question_id, l.control_id FROM assurance_question_controls l JOIN controls c ON c.id = l.control_id WHERE c.active = 1 ORDER BY c.control_set DESC, c.sort_order"),
     ]);
     const byQ = links.results.reduce((m, r) => ((m[r.question_id] ||= []).push(r.control_id), m), {});
@@ -130,7 +130,6 @@ async function assuranceQuestions(env) {
         question: q.question,
         required: q.required || "",
         evidence: q.evidence || "",
-        applicability: q.applicability || "",
         controls: byQ[q.id] || [],
         updated_at: q.updated_at,
       })),
