@@ -5,6 +5,8 @@
 // likelihood_questions: the questions the TRA asks, each rated 1 (Rare) to 5 (Almost certain),
 //   with a description for every level and the threats the answer applies to.
 // controls: the MTM and IEC 62443 control sets, with threats, CIA, (IEC) SL-T, specifications and evidence.
+// assurance_questions: the control assurance questions for the control assessment step, each with the
+//   MTM and IEC controls it covers. assurance_ready is false until their tables exist.
 // questions: the older exposure / vulnerability (Yes/No) questions, kept for pages not yet updated.
 
 export async function onRequestGet({ env }) {
@@ -34,6 +36,7 @@ export async function onRequestGet({ env }) {
       })),
       likelihood_questions: await likelihoodQuestions(env),
       ...(await controlSets(env)),
+      ...(await assuranceQuestions(env)),
       questions: await legacyQuestions(env),
     });
   } catch (err) {
@@ -109,6 +112,33 @@ async function controlSets(env) {
       updated_at: c.updated_at,
     })),
   };
+}
+
+// Control assurance questions with the controls each one covers (MTM first, then IEC, in control order).
+async function assuranceQuestions(env) {
+  try {
+    const [qs, links] = await env.DB.batch([
+      env.DB.prepare("SELECT id, topic, question, required, evidence, applicability, updated_at FROM assurance_questions WHERE active = 1 ORDER BY sort_order"),
+      env.DB.prepare("SELECT l.question_id, l.control_id FROM assurance_question_controls l JOIN controls c ON c.id = l.control_id WHERE c.active = 1 ORDER BY c.control_set DESC, c.sort_order"),
+    ]);
+    const byQ = links.results.reduce((m, r) => ((m[r.question_id] ||= []).push(r.control_id), m), {});
+    return {
+      assurance_ready: true,
+      assurance_questions: qs.results.map((q) => ({
+        id: q.id,
+        topic: q.topic,
+        question: q.question,
+        required: q.required || "",
+        evidence: q.evidence || "",
+        applicability: q.applicability || "",
+        controls: byQ[q.id] || [],
+        updated_at: q.updated_at,
+      })),
+    };
+  } catch (err) {
+    if (/no such table/i.test(String(err && err.message))) return { assurance_ready: false, assurance_questions: [] };
+    throw err;
+  }
 }
 
 async function legacyQuestions(env) {
