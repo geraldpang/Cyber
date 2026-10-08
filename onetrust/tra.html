@@ -296,6 +296,10 @@ button.danger{color:var(--red);border-color:var(--red)}button.primary.danger{bac
 .lkhead.ia,.lkrow.ia{grid-template-columns:minmax(0,1fr) 264px 264px}.lkside{display:flex;flex-direction:column;gap:2px}.lkside .grp{display:none;font-size:12px;font-weight:700;color:var(--muted)}.lkhead.ia .grp{display:none}
 .lkgh{display:flex;flex-direction:column;gap:2px}.lkgh .gt{text-align:center;color:var(--ink)}
 @media(max-width:900px){.lkhead{display:none}.lkrow,.lkrow.ia{grid-template-columns:minmax(0,1fr)}.lkcells{justify-content:start;grid-template-columns:repeat(6,minmax(36px,44px))}.lkside .grp{display:block}}
+
+.lkhead.ia2,.lkrow.ia2{grid-template-columns:minmax(0,1fr) 264px 300px}.iascope{display:flex;flex-wrap:wrap;gap:4px}.scp{display:flex;gap:5px;align-items:center;border:1px solid var(--field);border-radius:14px;padding:3px 9px;font-size:12.5px;font-weight:600;cursor:pointer;background:var(--white)}.scp.on{border-color:var(--blue);background:#eef5fb;color:var(--blue-dk)}.scp:focus-within{outline:2px solid var(--blue);outline-offset:1px}
+.ia2nd{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;border-left:3px solid var(--blue);padding:4px 0 4px 10px;margin-top:2px}.ia2nd .lkcells{justify-content:start}.ia2nd[hidden]{display:none}
+@media(max-width:900px){.lkhead.ia2,.lkrow.ia2{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -3170,13 +3174,33 @@ function LikertHead(labels,title){return `<div class="lkhead" aria-hidden="true"
 /* Confidentiality grid (VPDSF consequences) */
 function ConfidentialityGrid(r,em,lock){const qs=BIL_CFG.questions.filter(q=>q.dim==='C'),ch=r.choices||{};
  return `<div class="lkgrid">${LikertHead(BIL_CFG.levels.map(l=>l.category),'Question')}${qs.map(q=>`<div class="lkrow ${em[q.id]?'invalid':''}" id="f_${e(q.id)}"><div class="lkq" id="lq_${e(q.id)}"><span class="qid">${e(q.id)}</span> ${e(q.question)}<div class="small qmeta">${Term('VPDSF')} · ${e(q.vpdsfCategory)} · ${e(q.vpdsfSubCategory)}</div></div>${LikertCells(q,ch[q.id],lock)}<div class="lkdesc" id="ds_${e(q.id)}" aria-live="polite">${lkDesc(q,ch[q.id])}</div><p class="ferr" id="er_${e(q.id)}" ${em[q.id]?'':'hidden'}>${e(em[q.id]||'')}</p></div>`).join('')}</div>`;}
-/* Integrity and Availability side by side: both use the MTM Integrated Risk Procedure scale for the same seven categories */
-function IntegrityAvailabilityGrid(r,em,lock){const ch=r.choices||{},order=BIL_CFG.riskContext.order,Q=id=>BIL_CFG.questions.find(q=>q.id===id);
- return `<div class="lkgrid ia"><div class="lkhead ia" aria-hidden="true"><span>Category</span>${['Integrity','Availability'].map(g=>`<div class="lkgh"><span class="gt">${g}</span><div class="lkcells">${[0,1,2,3,4,5].map(s=>`<span>${s}</span>`).join('')}</div></div>`).join('')}</div>
- ${order.map((cat,k)=>{const qi=Q('I'+(k+1)),qa=Q('A'+(k+1));return `<div class="lkrow ia ${em[qi.id]||em[qa.id]?'invalid':''}"><div class="lkq"><strong>${e(cat)}</strong><div class="small"><span id="lq_${e(qi.id)}"><span class="qid">${e(qi.id)}</span> ${e(qi.question)}</span><br><span id="lq_${e(qa.id)}"><span class="qid">${e(qa.id)}</span> ${e(qa.question)}</span></div></div>
-  <div class="lkside" id="f_${e(qi.id)}"><span class="grp">Integrity</span>${LikertCells(qi,ch[qi.id],lock)}</div><div class="lkside" id="f_${e(qa.id)}"><span class="grp">Availability</span>${LikertCells(qa,ch[qa.id],lock)}</div>
-  <div class="lkdesc"><div id="ds_${e(qi.id)}" aria-live="polite"><span class="small">I</span> ${lkDesc(qi,ch[qi.id])}</div><div id="ds_${e(qa.id)}" aria-live="polite"><span class="small">A</span> ${lkDesc(qa,ch[qa.id])}</div></div>
-  <p class="ferr" id="er_${e(qi.id)}" ${em[qi.id]?'':'hidden'}>${e(em[qi.id]||'')}</p><p class="ferr" id="er_${e(qa.id)}" ${em[qa.id]?'':'hidden'}>${e(em[qa.id]||'')}</p></div>`;}).join('')}</div>`;}
+/* Integrity and Availability in one grid. Both use the MTM Integrated Risk Procedure scale for the same seven categories, so each
+   category gets one rating plus where it applies: Integrity, Availability, both, or different ratings for each.
+   The other dimension of a one-sided answer is recorded as 0 (no impact), so the form's separate I and A ratings are always complete. */
+const IA_SCOPES=[['I','Integrity'],['A','Availability'],['B','Both'],['D','Different ratings']];
+/* The grid state of one category, worked out from the saved I and A choices when the record has none */
+function iaState(r,k){const st=(r.ia||{})[k];if(st)return st;const ch=r.choices||{},qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),I=lkSel(qi,ch['I'+k]),A=lkSel(qa,ch['A'+k]);
+ if(I==null&&A==null)return {r:null,s:'',r2:null};if(I==null||A==null)return {r:I!=null?I:A,s:I!=null?'I':'A',r2:null,partial:true};
+ if(I===A)return {r:I,s:I===0?'':'B',r2:null};if(I===0)return {r:A,s:'A',r2:null};if(A===0)return {r:I,s:'I',r2:null};return {r:I,s:'D',r2:A};}
+/* I and A choices (option indexes) for one category; undefined while the category is incomplete */
+function iaChoices(st,k){const qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),o=(q,s)=>s==null?undefined:lkOpt(q,s)<0?undefined:lkOpt(q,s);
+ if(st.r==null)return {};if(st.r===0)return {I:o(qi,0),A:o(qa,0)};
+ if(st.s==='B')return {I:o(qi,st.r),A:o(qa,st.r)};if(st.s==='I')return {I:o(qi,st.r),A:o(qa,0)};if(st.s==='A')return {I:o(qi,0),A:o(qa,st.r)};if(st.s==='D')return {I:o(qi,st.r),A:o(qa,st.r2)};return {};}
+function iaCells(k,name,data,cur,q,lock,descId){return `<div class="lkcells" role="radiogroup" aria-label="${e(name==='ia2'?'Availability rating':'Rating')} for ${e(BIL_CFG.riskContext.order[k-1])}">${[0,1,2,3,4,5].map(s=>{const i=lkOpt(q,s);if(i<0)return `<span class="lk na" title="Rating ${s} is not offered for this category">–</span>`;const o=q.options[i],id=`${name}_${k}_${s}`;
+  return `<label class="lk ${cur===s?'on':''}" for="${e(id)}" title="${e(s+' · '+o.text)}" data-lkq="${e(q.id)}" data-lkd="${e(descId)}"><input class="vh" type="radio" id="${e(id)}" name="${e(name)}_${k}" value="${s}" ${data}="${k}" ${cur===s?'checked':''} ${lock?'disabled':''} aria-label="${e('Rating '+s+': '+o.text)}"><span class="lkn" aria-hidden="true">${s}</span></label>`;}).join('')}</div>`;}
+function iaDesc(st,k){const q=BIL_CFG.questions.find(x=>x.id==='I'+k),t=s=>`<strong>${s}</strong> · ${e(q.options[lkOpt(q,s)].text)}`;
+ if(st.r==null)return '<span class="small">Not answered · hover or focus a rating to read its consequence</span>';
+ if(st.r===0)return t(0)+' <span class="small">· no impact on Integrity or Availability</span>';
+ const sc={I:'Integrity (Availability 0)',A:'Availability (Integrity 0)',B:'Integrity and Availability',D:'Integrity'}[st.s];return t(st.r)+(sc?` <span class="small">· applies to ${sc}</span>`:' <span class="small">· choose where it applies</span>');}
+function IntegrityAvailabilityGrid(r,em,lock){const order=BIL_CFG.riskContext.order;
+ return `<div class="lkgrid ia2"><div class="lkhead ia2" aria-hidden="true"><span>Category</span><div class="lkcells">${[0,1,2,3,4,5].map(s=>`<span>${s}</span>`).join('')}</div><span>Applies to</span></div>
+ ${order.map((cat,i)=>{const k=i+1,st=iaState(r,k),qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),err=em['IA'+k];
+  return `<div class="lkrow ia2 ${err?'invalid':''}" id="f_IA${k}"><div class="lkq"><strong>${e(cat)}</strong><div class="small qmeta"><span class="qid">${e(qi.id)}</span> ${e(qi.question)}<br><span class="qid">${e(qa.id)}</span> ${e(qa.question)}</div></div>
+  ${iaCells(k,'ia','data-iar',st.r,qi,lock,'dsIA'+k)}
+  <div class="iascope" role="radiogroup" aria-label="Where the ${e(cat)} rating applies">${IA_SCOPES.map(([v,l])=>`<label class="scp ${st.s===v?'on':''}"><input type="radio" name="ias_${k}" value="${v}" data-ias="${k}" ${st.s===v?'checked':''} ${lock?'disabled':''}> ${l}</label>`).join('')}</div>
+  <div class="lkdesc" id="dsIA${k}" aria-live="polite">${iaDesc(st,k)}</div>
+  <div class="ia2nd" id="ia2_${k}" ${st.s==='D'?'':'hidden'}><span class="small"><strong>Availability rating</strong> (the rating above is for Integrity)</span>${iaCells(k,'ia2','data-iar2',st.r2,qa,lock,'dsIA2'+k)}<div class="lkdesc" id="dsIA2${k}">${st.r2==null?'<span class="small">Choose the Availability rating</span>':`<strong>${st.r2}</strong> · ${e(qa.options[lkOpt(qa,st.r2)].text)}`}</div></div>
+  <p class="ferr" id="er_IA${k}" ${err?'':'hidden'}>${e(err||'')}</p></div>`;}).join('')}</div>`;}
 const zeroBtn=(sec,label)=>`<button type="button" class="secondary" data-act="bilZero" data-sec="${sec}">Set unanswered to 0 · no impact…</button><span class="small">${e(label)}</span>`;
 
 /* One impact question: legend, choices and its inline error */
@@ -3242,7 +3266,11 @@ function closeDialog(){document.querySelectorAll('.dlg-back').forEach(x=>x.remov
 const BIL_YN=['A1','A2','B5','B10','B17','B18','B19','B20','B21','B22'];
 const BIL_PI=['B11','B12','B13','B14','B15','B16'];
 function bilDraft(id){if(!V.bilDraft||V.bilDraft.id!==id){V.bilDraft={id,rec:JSON.parse(JSON.stringify(DB.bil[id])),reset:false};V.bilDirty=false;V.bilShowErr=false;}return V.bilDraft.rec;}
-function bilFormErrors(r){const errs=BilStore.validate(r).slice();
+function bilFormErrors(r){const errs=BilStore.validate(r).filter(x=>!/^[IA]\d$/.test(x.field));
+ BIL_CFG.riskContext.order.forEach((cat,i)=>{const k=i+1,st=iaState(r,k),f='IA'+k;
+  if(st.r==null)errs.push({field:f,message:`${cat} · Choose a rating from 0 to 5 for Integrity and Availability.`});
+  else if(st.r>0&&!st.s)errs.push({field:f,message:`${cat} · Choose whether rating ${st.r} applies to Integrity, Availability, both, or different ratings.`});
+  else if(st.s==='D'&&st.r2==null)errs.push({field:f,message:`${cat} · Choose the Availability rating.`});});
  if(!String(r.name||'').trim())errs.push({field:'name',message:'Assessment name is required.'});
  if(!r.assessor)errs.push({field:'assessor',message:'Choose the assessor.'});
  if(r.ownerApproval!=='Yes')errs.push({field:'AP1',message:r.ownerApproval==='No'?'AP1 · Get the business or technical data owner\'s approval before submitting (Section 3 of the form).':'AP1 · Answer whether the data owner has approved the assessment.'});
@@ -3250,7 +3278,7 @@ function bilFormErrors(r){const errs=BilStore.validate(r).slice();
 const BIL_SOCI=['B17','B18','B19','B20','B21','B22'];
 const bilNeedsSoci=r=>{const x=BilStore.result(r);return x.osv!==null&&x.osv>=4;};
 const BIL_SECTIONS=[['Preliminary',r=>{const full=BilCalc.fullAssessmentNeeded(r.prelim||{});return ['A1','A2'].concat(full===false?[]:['B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'].concat((r.prelim||{}).B10==='Yes'?['B11']:[]));}],
- ['Confidentiality',()=>BIL_CFG.questions.filter(q=>q.dim==='C').map(q=>q.id).concat(['C13'])],['Integrity and Availability',()=>BIL_CFG.questions.filter(q=>q.dim!=='C').map(q=>q.id)],
+ ['Confidentiality',()=>BIL_CFG.questions.filter(q=>q.dim==='C').map(q=>q.id).concat(['C13'])],['Integrity and Availability',()=>BIL_CFG.riskContext.order.map((c,i)=>'IA'+(i+1))],
  ['Results and approval',r=>(bilNeedsSoci(r)?BIL_SOCI:[]).concat(['name','assessor','AP1'])]];
 function bilSteps(r){const errs=bilFormErrors(r),bad=new Set(errs.map(x=>x.field));return BIL_SECTIONS.map(([label,f])=>{const ids=f(r);return {label,total:ids.length,done:ids.filter(id=>!bad.has(id)).length,errors:V.bilShowErr?ids.filter(id=>bad.has(id)).length:0};});}
 
@@ -3261,7 +3289,7 @@ function bilFormPage(a,r,ap){const lock=false,showErr=V.bilShowErr,errs=showErr?
  const secC=`<section class="panel section" id="bil-s2" aria-labelledby="bil-h2"><h2 id="bil-h2">Section 2 · Confidentiality</h2><p class="sub">Consider the impact of unauthorised <strong>disclosure</strong> of the information. The consequences are based on the ${Term('VPDSF')} business impact levels. Pick a rating from 0 to 5 for each question: hover over or focus a rating to read its consequence, and choose the lowest that applies. The highest rating sets the ${Term('BIL','BIL')} for Confidentiality.</p>
   <div class="btnrow lktools">${zeroBtn('C','For questions where disclosure would have no impact.')}</div>${ConfidentialityGrid(r,em,lock)}
   ${YesNoCard('C13','',r.cabinet,em.C13,lock,`${Term('CIC','Cabinet-in-Confidence')}: <span class="pre">${e(BIL_CFG.cabinet.question)}</span>`).replace(/data-bilp="C13"/g,'data-bilcab="1"')}</section>`;
- const secIA=`<section class="panel section" id="bil-s3" aria-labelledby="bil-h3"><h2 id="bil-h3">Section 2 · Integrity and Availability</h2><p class="sub">For each category, rate the impact of unauthorised <strong>modification or deletion</strong> (Integrity) and of the information being <strong>unavailable</strong> (Availability). The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}, from 0 to 5. The highest rating in each column sets the ${Term('BIL','BIL')} for Integrity and for Availability.</p>
+ const secIA=`<section class="panel section" id="bil-s3" aria-labelledby="bil-h3"><h2 id="bil-h3">Section 2 · Integrity and Availability</h2><p class="sub">For each category, give one rating from 0 to 5 for the impact of unauthorised <strong>modification or deletion</strong> (Integrity) or the information being <strong>unavailable</strong> (Availability), then choose where it applies. A one-sided answer records the other as 0 (no impact); choose <em>Different ratings</em> if both have an impact at different levels. The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}. The highest Integrity rating sets the ${Term('BIL','BIL')} for Integrity, and the highest Availability rating sets it for Availability.</p>
   <div class="btnrow lktools">${zeroBtn('IA','For categories with no impact.')}</div>${IntegrityAvailabilityGrid(r,em,lock)}</section>`;
  const body=`<div id="bilValBox">${ValidationSummary(errs)}</div>
  <div class="notice">Answer every question. Each consequence carries a rating from 0 to 5. The ${Term('BIL','BIL')} for each of ${Term('CIA','Confidentiality, Integrity and Availability')} is the highest rating in that section; 0 means no business impact. Confidentiality consequences come from the ${Term('VPDSF')}; Integrity and Availability consequences come from the ${Term('MIRP','MTM Integrated Risk Procedure')}. Results are calculated from your answers exactly as in the MTM BIL Assessment Form (${e(BIL_CFG.source.version)}) and cannot be overridden. Save a draft at any point.</div>
@@ -3290,7 +3318,11 @@ function bilReadForm(r){r.prelim=r.prelim||{};
  document.querySelectorAll('[data-bilp]').forEach(el=>{const id=el.dataset.bilp;if(el.type==='radio'){if(el.checked)r.prelim[id]=el.value;}else r.prelim[id]=el.value.trim();});
  ['name','evidence','rationale'].forEach(k=>{const el=document.getElementById('bp_'+k);if(el){r[k]=el.value.trim();delete r.prelim[k];}});
  BIL_PI.forEach(id=>{r.prelim[id]=[...document.querySelectorAll(`[data-bilpi="${id}"]:checked`)].map(x=>x.value);});
- const ch={};document.querySelectorAll('[data-bilq]:checked').forEach(el=>{ch[el.dataset.bilq]=Number(el.value);});r.choices=ch;
+ const ch={};document.querySelectorAll('[data-bilq]:checked').forEach(el=>{ch[el.dataset.bilq]=Number(el.value);});
+ if(document.querySelector('[data-iar]')){r.ia={};BIL_CFG.riskContext.order.forEach((c,i)=>{const k=i+1,g=sel2=>{const el=document.querySelector(sel2+':checked');return el?el.value:null;};
+  const rv=g(`[data-iar="${k}"]`),sv=g(`[data-ias="${k}"]`),r2=g(`[data-iar2="${k}"]`),st={r:rv==null?null:Number(rv),s:sv||'',r2:r2==null?null:Number(r2)};r.ia[k]=st;const x=iaChoices(st,k);if(x.I!==undefined)ch['I'+k]=x.I;if(x.A!==undefined)ch['A'+k]=x.A;});}
+ else BIL_CFG.questions.filter(q=>q.dim!=='C').forEach(q=>{const v=(r.choices||{})[q.id];if(v!=null)ch[q.id]=v;});
+ r.choices=ch;
  const cab=document.querySelector('[data-bilcab]:checked');r.cabinet=cab?cab.value:(r.cabinet||'');
  const apv=document.querySelector('[data-bilap]:checked');r.ownerApproval=apv?apv.value:(r.ownerApproval||'');
  r.imm=[...document.querySelectorAll('[data-bilimm]:checked')].map(x=>x.value);
@@ -3304,7 +3336,7 @@ function bilLiveUpdate(){if(!V.bilDraft||!document.getElementById('bilStepper'))
  const full=BilCalc.fullAssessmentNeeded(r.prelim||{}),fn=document.getElementById('bilFullNote');if(fn)fn.innerHTML=full===false?`<div class="notice warn">${e(BIL_CFG.prelimRule.text)}</div>`:'';
  const sb=document.querySelector('[data-act="bilSubmit"]');if(sb){sb.disabled=full===false;}
  document.querySelectorAll('.impopt,.ynopt,.lk').forEach(l=>{const i=l.querySelector('input');l.classList.toggle('on',!!(i&&i.checked));});
- BIL_CFG.questions.forEach(q=>{const d=document.getElementById('ds_'+q.id);if(d)d.innerHTML=(q.dim!=='C'?`<span class="small">${q.dim}</span> `:'')+lkDesc(q,(r.choices||{})[q.id]);});
+ bilRenderDescs(r);document.querySelectorAll('.scp').forEach(l=>{const i=l.querySelector('input');l.classList.toggle('on',!!(i&&i.checked));});
  const so=document.getElementById('bilSoci');if(so)so.hidden=!bilNeedsSoci(r);
  const dn=document.getElementById('bilDirtyNote');if(dn)dn.hidden=false;
  if(V.bilShowErr)bilShowErrors(r,false);}
@@ -3352,11 +3384,13 @@ const BIL_ACT={
  bilStart(b){const r=BilStore.create(b.dataset.a);V.bilDraft=null;go('bil',r.assetId,'form');},
  bilSave(b){bilReadForm(V.bilDraft.rec);const r=bilCommit('Draft saved');toast('Draft saved');const y=window.scrollY;render();window.scrollTo(0,y);},
  bilReset(b){ConfirmDialog({title:'Reset this assessment?',message:'All answers in this draft will be cleared: preliminary questions, impact responses, Cabinet-in-Confidence, markers and data owner approval. The assessment name and assessor are kept. Nothing is saved until you choose Save draft.',cancel:1,focus:1,buttons:[
-  {label:'Reset answers',kind:'primary danger',fn:()=>{const r=V.bilDraft.rec;r.prelim={};r.choices={};r.cabinet='';r.imm=[];r.ownerApproval='';V.bilDraft.reset=true;V.bilDirty=true;V.bilShowErr=false;render();toast('Answers cleared · save the draft to keep this change');}},{label:'Cancel',kind:'secondary'}]});},
- bilZero(b){const d=V.bilDraft;bilReadForm(d.rec);const sec=b.dataset.sec,qs=BIL_CFG.questions.filter(q=>sec==='C'?q.dim==='C':q.dim!=='C'),open=qs.filter(q=>lkSel(q,(d.rec.choices||{})[q.id])==null);
+  {label:'Reset answers',kind:'primary danger',fn:()=>{const r=V.bilDraft.rec;r.prelim={};r.choices={};r.ia={};r.cabinet='';r.imm=[];r.ownerApproval='';V.bilDraft.reset=true;V.bilDirty=true;V.bilShowErr=false;render();toast('Answers cleared · save the draft to keep this change');}},{label:'Cancel',kind:'secondary'}]});},
+ bilZero(b){const d=V.bilDraft;bilReadForm(d.rec);const sec=b.dataset.sec;let open,label;
+  if(sec==='C'){open=BIL_CFG.questions.filter(q=>q.dim==='C'&&lkSel(q,(d.rec.choices||{})[q.id])==null).map(q=>q.id);label=open.join(', ');}
+  else{open=BIL_CFG.riskContext.order.map((c,i)=>[c,i+1]).filter(([c,k])=>iaState(d.rec,k).r==null);label=open.map(x=>x[0]).join(', ');}
   if(!open.length){toast('Every question in this section is already answered');return;}
-  ConfirmDialog({title:`Set ${open.length} unanswered question${open.length>1?'s':''} to 0?`,message:`${open.map(q=>q.id).join(', ')} will be rated 0 (no impact). Questions you have already answered are not changed. Check each one before submitting; the audit trail records this action.`,cancel:1,focus:1,buttons:[
-   {label:'Set to 0',kind:'primary',fn:()=>{open.forEach(q=>{const el=document.getElementById(`bq_${q.id}_0`);if(el)el.checked=true;});(d.bulk=d.bulk||[]).push(open.map(q=>q.id).join(', '));bilLiveUpdate();toast(`${open.length} question${open.length>1?'s':''} set to 0`);}},{label:'Cancel',kind:'secondary'}]});},
+  ConfirmDialog({title:`Set ${open.length} unanswered ${sec==='C'?'question':'categor'}${open.length>1?(sec==='C'?'s':'ies'):(sec==='C'?'':'y')} to 0?`,message:`${label} will be rated 0 (no impact${sec==='C'?'':' on Integrity or Availability'}). Answers you have already given are not changed. Check each one before submitting; the audit trail records this action.`,cancel:1,focus:1,buttons:[
+   {label:'Set to 0',kind:'primary',fn:()=>{open.forEach(x=>{const el=sec==='C'?document.getElementById(`bq_${x}_0`):document.getElementById(`ia_${x[1]}_0`);if(el)el.checked=true;});(d.bulk=d.bulk||[]).push(sec==='C'?label:'Integrity and Availability: '+label);bilLiveUpdate();toast(`${open.length} set to 0`);}},{label:'Cancel',kind:'secondary'}]});},
  bilSubmit(b){const d=V.bilDraft;bilReadForm(d.rec);V.bilShowErr=true;const errs=bilShowErrors(d.rec,true);$('#bilStepper').innerHTML=ProgressStepper(bilSteps(d.rec));if(errs.length)return;
   const r=bilCommit('Draft saved');const x=BilStore.result(r);if(!x.complete)return;r.status='awaiting';r.submittedOn=TODAY;r.assessmentDate=TODAY;r.result=BilStore.snapshot(r);BilStore.log(r,'Submitted for approval',r.assessor);save();V.bilShowErr=false;V.bilDraft=null;toast('Submitted · the BIL awaits approval');go('bil',r.assetId,'view');},
  bilApprove(b){const r=DB.bil[b.dataset.id],ap=val('bApprover');if(!ap)return showErr('bilErr','Choose the approver.');if(ap===r.assessor)return showErr('bilErr','The approver must be a different person from the assessor.');
@@ -3373,9 +3407,12 @@ document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.activeEl
 window.addEventListener('beforeunload',ev=>{if(V.bilDirty&&V.view==='bil'){ev.preventDefault();ev.returnValue='';}});
 
 /* Likert grid: show the consequence of the rating under the pointer or keyboard focus; fall back to the selected one */
-function lkPreview(lab,on){const qid=lab.dataset.lkq,d=document.getElementById('ds_'+qid),q=BIL_CFG.questions.find(x=>x.id===qid);if(!d||!q)return;const r=V.bilDraft&&V.bilDraft.rec;
- if(on){const i=Number(lab.querySelector('input').value),o=q.options[i];d.innerHTML=(q.dim!=='C'?`<span class="small">${q.dim}</span> `:'')+`<strong>${o.score}</strong> · ${e(o.text)}${lab.classList.contains('on')?'':' <span class="small">(not selected)</span>'}`;}
- else d.innerHTML=(q.dim!=='C'?`<span class="small">${q.dim}</span> `:'')+lkDesc(q,r?(r.choices||{})[qid]:null);}
+function bilRenderDescs(r){if(!r)return;BIL_CFG.questions.filter(q=>q.dim==='C').forEach(q=>{const d=document.getElementById('ds_'+q.id);if(d)d.innerHTML=lkDesc(q,(r.choices||{})[q.id]);});
+ BIL_CFG.riskContext.order.forEach((c,i)=>{const k=i+1,st=iaState(r,k),d=document.getElementById('dsIA'+k),d2=document.getElementById('dsIA2'+k),box=document.getElementById('ia2_'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k);
+  if(d)d.innerHTML=iaDesc(st,k);if(box)box.hidden=st.s!=='D';if(d2)d2.innerHTML=st.r2==null?'<span class="small">Choose the Availability rating</span>':`<strong>${st.r2}</strong> · ${e(qa.options[lkOpt(qa,st.r2)].text)}`;});}
+function lkPreview(lab,on){const qid=lab.dataset.lkq,d=document.getElementById(lab.dataset.lkd||('ds_'+qid)),q=BIL_CFG.questions.find(x=>x.id===qid);if(!d||!q)return;
+ if(on){const inp=lab.querySelector('input'),s=inp.dataset.bilq?q.options[Number(inp.value)].score:Number(inp.value),o=q.options[lkOpt(q,s)];d.innerHTML=`<strong>${o.score}</strong> · ${e(o.text)}${lab.classList.contains('on')?'':' <span class="small">(not selected)</span>'}`;}
+ else bilRenderDescs(V.bilDraft&&V.bilDraft.rec);}
 document.addEventListener('mouseover',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l)lkPreview(l,true);});
 document.addEventListener('mouseout',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l&&!l.contains(ev.relatedTarget))lkPreview(l,false);});
 document.addEventListener('focusin',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l)lkPreview(l,true);});
