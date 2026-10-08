@@ -274,6 +274,7 @@ body.proto header.top{display:none}
 .qcard.invalid{border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}.ferr{color:var(--red);font-weight:700;font-size:13px;margin:6px 0 0}.qmeta{margin:2px 0 8px}.pre{white-space:pre-line;font-weight:400}
 .impsel{display:grid;gap:6px}.impopt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:400}.impopt:hover{background:var(--hover)}.impopt.on{border-color:var(--blue);background:#eef5fb}.impopt input{margin-top:3px;flex:none}.impopt:focus-within{outline:2px solid var(--blue);outline-offset:1px}.imptext{flex:1;min-width:0}
 .ynrow{display:flex;gap:10px;flex-wrap:wrap}.ynopt{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:600}.ynopt.on{border-color:var(--blue);background:#eef5fb}.ynopt:focus-within{outline:2px solid var(--blue);outline-offset:1px}
+.rchip{flex:none;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font:700 13px Arial,sans-serif;border:1.5px solid var(--field);color:var(--ink);background:var(--white)}.impopt.on .rchip{border-color:var(--blue);background:var(--blue);color:#fff}
 .bilb{display:inline-block;flex:none;min-width:48px;text-align:center;font:700 11px/1.6 Arial,sans-serif;border-radius:10px;padding:1px 7px;background:#eef2f6;color:#3d4b5c}.bilb.b0{background:#eef2f6;color:#5b6a7b}.bilb.b1{background:#e8f6ec;color:#1d6b3f}.bilb.b2{background:#eef7d9;color:#4d6a12}.bilb.b3{background:#fff1dd;color:#8a5410}.bilb.b4{background:#fde4d6;color:#9b3d0e}.bilb.b5{background:#fce9e8;color:var(--red)}.bilb.none{background:transparent;border:1px dashed var(--field);color:var(--muted)}
 .valsum{border:2px solid var(--red);background:#fdf3f3;border-radius:8px;padding:12px 16px;margin:0 0 14px}.valsum h2{font-size:16px;margin:0 0 6px;color:var(--red)}.valsum ul{margin:0;padding-left:20px}.valsum a{color:var(--red)}
 .rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.rcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;background:var(--white)}.rlab{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}.rval{font-size:24px;font-weight:700}
@@ -3097,7 +3098,7 @@ const BilStore={
   return {at:nowStamp(),config:BIL_CFG.source.version,fingerprint:BilCalc.fingerprint(x),C:x.C,I:x.I,A:x.A,osv:x.osv,marking:x.marking,
    vpdsf:x.vpdsf.primary&&x.vpdsf.primary.name,vpdsfSub:x.vpdsf.sub&&x.vpdsf.sub.name,riskContext:x.riskContext.overall&&x.riskContext.overall.name,
    rpo:x.rpo,rto:x.rto,tier:x.tier,targetTier:x.targetTier,soci:x.soci,imm:(r.imm||[]).slice(),
-   responses:Object.fromEntries(q.map(qq=>{const i=(r.choices||{})[qq.id],o=i==null||i===''?null:qq.options[Number(i)];return [qq.id,o?{bil:o.score,text:o.text}:null];})),cabinet:r.cabinet};},
+   responses:Object.fromEntries(q.map(qq=>{const i=(r.choices||{})[qq.id],o=i==null||i===''?null:qq.options[Number(i)];return [qq.id,o?{rating:o.score,text:o.text}:null];})),cabinet:r.cabinet};},
  /* Recalculate from the saved responses and compare with the saved result */
  verify(r){if(!r.result)return null;const now=BilCalc.fingerprint(BilStore.result(r));return {same:now===r.result.fingerprint,config:r.result.config,current:BIL_CFG.source.version};},
  /* Records saved by the earlier form held scores only; map each score to the first option with that score */
@@ -3127,6 +3128,7 @@ const BIL_TERMS={
  RTO:BIL_CFG.definitions.RTO, RPO:BIL_CFG.definitions.RPO,
  SOCI:'Security of Critical Infrastructure Act 2018 (Cth). Some systems must be reported to the Cyber and Infrastructure Security Centre (CISC).',
  CTX:'Primary MTM risk context: the MTM Enterprise Risk Management Framework impact category with the highest rating.',
+ MIRP:'MTM Integrated Risk Procedure: the MTM Enterprise Risk Management Framework impact categories and severity levels. Integrity and Availability are rated against it.',
  PI:'Personal information: information about an identifiable person, including sensitive information such as health, race or criminal record.'
 };
 let bilTtSeq=0;
@@ -3134,15 +3136,17 @@ function Term(key,label){const d=BIL_TERMS[key];if(!d)return e(label||key);const
 
 const BILBadge=(bil,opt)=>bil==null||bil===''?`<span class="bilb none">${e((opt&&opt.empty)||'Not answered')}</span>`:`<span class="bilb b${Number(bil)}" title="${e((BIL_CFG.levels[Number(bil)]||{}).category||'')}">BIL ${Number(bil)}</span>`;
 
+/* An option's rating (0 to 5). It is not a BIL: the BIL is the highest rating in a section. */
+const RatingChip=n=>`<span class="rchip r${Number(n)}" aria-label="Rating ${Number(n)}">${Number(n)}</span>`;
 /* Radio group of the consequence options for one question */
 function ImpactSelector(q,choice,lock){const name='bq_'+q.id;
  return `<div class="impsel" role="radiogroup" aria-labelledby="lg_${e(q.id)}">${q.options.map((o,i)=>{const id=`${name}_${i}`,on=choice!=null&&choice!==''&&Number(choice)===i;
-  return `<label class="impopt ${on?'on':''}" for="${e(id)}"><input type="radio" id="${e(id)}" name="${e(name)}" value="${i}" data-bilq="${e(q.id)}" ${on?'checked':''} ${lock?'disabled':''} aria-describedby="er_${e(q.id)}">${BILBadge(o.score)}<span class="imptext">${e(o.text)}</span></label>`;}).join('')}</div>`;}
+  return `<label class="impopt ${on?'on':''}" for="${e(id)}"><input type="radio" id="${e(id)}" name="${e(name)}" value="${i}" data-bilq="${e(q.id)}" ${on?'checked':''} ${lock?'disabled':''} aria-describedby="er_${e(q.id)}">${RatingChip(o.score)}<span class="imptext">${e(o.text)}</span></label>`;}).join('')}</div>`;}
 
 /* One impact question: legend, choices and its inline error */
 function QuestionCard(q,choice,err,lock){
  return `<fieldset class="qcard ${err?'invalid':''}" id="f_${e(q.id)}"><legend id="lg_${e(q.id)}"><span class="qid">${e(q.id)}</span> ${e(q.question)}</legend>
- <p class="small qmeta">${Term('VPDSF')} ${e(q.vpdsfCategory)} · ${e(q.vpdsfSubCategory)}${q.riskContext?` · MTM risk context: ${e(q.riskContext)}`:''}</p>
+ <p class="small qmeta">${q.dim==='C'?`${Term('VPDSF')} · ${e(q.vpdsfCategory)} · ${e(q.vpdsfSubCategory)}`:`${Term('MIRP','MTM Integrated Risk Procedure')} · ${e(BIL_CFG.riskContext.order[Number(q.id.slice(1))-1]||'')}`}</p>
  ${ImpactSelector(q,choice,lock)}<p class="ferr" id="er_${e(q.id)}" ${err?'':'hidden'}>${e(err||'')}</p></fieldset>`;}
 
 /* Yes / No question used for preliminary questions, C13 and AP1 */
@@ -3216,11 +3220,11 @@ function bilFormPage(a,r,ap){const lock=false,showErr=V.bilShowErr,errs=showErr?
  const p=r.prelim||{},pq=Object.fromEntries(BIL_CFG.prelim.map(x=>[x.id,x.question])),x=BilStore.result(r),full=BilCalc.fullAssessmentNeeded(p);
  const yn=id=>YesNoCard(id,pq[id],p[id],em[id],lock);
  const piBox=id=>`<details class="pibox" ${(p[id]||[]).length?'open':''}><summary><span class="qid">${e(id)}</span> ${e(pq[id])} <span class="small">(${(p[id]||[]).length} selected)</span></summary><div class="pigrid">${BIL_CFG.piAttributes[id].map((o,i)=>`<label><input type="checkbox" data-bilpi="${e(id)}" value="${e(o.attribute)}" ${(p[id]||[]).includes(o.attribute)?'checked':''}> ${e(o.attribute)} <span class="small">${e(o.category)}</span></label>`).join('')}</div></details>`;
- const dimSec=(k,n,i)=>`<section class="panel section" id="bil-s${i}" aria-labelledby="bil-h${i}"><h2 id="bil-h${i}">Section 2 · ${n}</h2><p class="sub">${k==='C'?'Consider the impact of unauthorised <strong>disclosure</strong> of the information.':k==='I'?'Consider the impact of unauthorised <strong>modification or deletion</strong> of the information.':'Consider the impact of the information being <strong>unavailable</strong>.'} Choose the lowest level that applies. The highest answer sets the ${Term('BIL','BIL')} for ${n}.</p>
+ const dimSec=(k,n,i)=>`<section class="panel section" id="bil-s${i}" aria-labelledby="bil-h${i}"><h2 id="bil-h${i}">Section 2 · ${n}</h2><p class="sub">${k==='C'?`Consider the impact of unauthorised <strong>disclosure</strong> of the information. The consequences are based on the ${Term('VPDSF')} business impact levels.`:k==='I'?`Consider the impact of unauthorised <strong>modification or deletion</strong> of the information. The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}.`:`Consider the impact of the information being <strong>unavailable</strong>. The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}.`} Each consequence carries a rating from 0 to 5. Choose the lowest consequence that applies. The highest rating in this section sets the ${Term('BIL','BIL')} for ${n}.</p>
   ${BIL_CFG.questions.filter(q=>q.dim===k).map(q=>QuestionCard(q,(r.choices||{})[q.id],em[q.id],lock)).join('')}
   ${k==='C'?YesNoCard('C13','',r.cabinet,em.C13,lock,`${Term('CIC','Cabinet-in-Confidence')}: <span class="pre">${e(BIL_CFG.cabinet.question)}</span>`).replace(/data-bilp="C13"/g,'data-bilcab="1"'):''}</section>`;
  const body=`<div id="bilValBox">${ValidationSummary(errs)}</div>
- <div class="notice">Answer every question. The ${Term('BIL','BIL')} for each of ${Term('CIA','Confidentiality, Integrity and Availability')} is the highest answer in that section; 0 means no business impact. Results are calculated from your answers exactly as in the MTM BIL Assessment Form (${e(BIL_CFG.source.version)}) and cannot be overridden. Save a draft at any point.</div>
+ <div class="notice">Answer every question. Each consequence carries a rating from 0 to 5. The ${Term('BIL','BIL')} for each of ${Term('CIA','Confidentiality, Integrity and Availability')} is the highest rating in that section; 0 means no business impact. Confidentiality consequences come from the ${Term('VPDSF')}; Integrity and Availability consequences come from the ${Term('MIRP','MTM Integrated Risk Procedure')}. Results are calculated from your answers exactly as in the MTM BIL Assessment Form (${e(BIL_CFG.source.version)}) and cannot be overridden. Save a draft at any point.</div>
  <section class="panel section" id="bil-s1" aria-labelledby="bil-h1"><h2 id="bil-h1">Section 1 · Preliminary questions</h2>
   ${yn('A1')}${yn('A2')}<div id="bilFullNote">${full===false?`<div class="notice warn">${e(BIL_CFG.prelimRule.text)}</div>`:''}</div>
   ${TextCard('B1',pq.B1,p.B1,em.B1)}${TextCard('B2',pq.B2,p.B2,em.B2,{area:1})}${TextCard('B3',pq.B3,p.B3,em.B3,{options:BIL_CFG.groups})}${TextCard('B4',pq.B4,p.B4,em.B4)}${yn('B5')}
@@ -3274,7 +3278,7 @@ function bilCommit(action,by){const d=V.bilDraft;if(!d)return null;const r=DB.bi
 
 /* Read-only record: summary, reproducibility check, audit record, responses and history */
 function bilRecordView(r,tag){const x=BilStore.result(r),v=BilStore.verify(r),p=r.prelim||{};
- const resp=k=>BIL_CFG.questions.filter(q=>q.dim===k).map(q=>{const i=(r.choices||{})[q.id],o=i==null||i===''?null:q.options[Number(i)];return `<tr><td class="nowrap"><strong>${e(q.id)}</strong></td><td>${e(q.question)}</td><td>${o?BILBadge(o.score):BILBadge(null)}</td><td>${o?e(o.text):'<em>Not answered</em>'}</td></tr>`;}).join('');
+ const resp=k=>BIL_CFG.questions.filter(q=>q.dim===k).map(q=>{const i=(r.choices||{})[q.id],o=i==null||i===''?null:q.options[Number(i)];return `<tr><td class="nowrap"><strong>${e(q.id)}</strong></td><td>${e(q.question)}</td><td>${o?RatingChip(o.score):'—'}</td><td>${o?e(o.text):'<em>Not answered</em>'}</td></tr>`;}).join('');
  const audit=[['Assessment ID',r.id],['Assessment name',r.name],['Asset name',r.assetName||(DB.assets[r.assetId]||{}).name],['Assessor',pname(r.assessor)],['Assessment date',fd(r.assessmentDate)],['Status',{draft:'Draft',awaiting:'Awaiting approval',approved:'Approved'}[r.status]||r.status],['Creation date',fd(r.created)],['Last modified',fd(r.updated)],
   ['Confidentiality',x.C==null?'—':'BIL '+x.C],['Integrity',x.I==null?'—':'BIL '+x.I],['Availability',x.A==null?'—':'BIL '+x.A],['Overall Security Value',x.osv==null?'—':'BIL '+x.osv],['Protective marking',x.marking||'—'],['Primary VPDSF consideration',(x.vpdsf.primary||{}).name||'—'],['Information Management Markers',(r.imm||[]).join(', ')||'None selected'],
   ['Approver',r.approver?pname(r.approver):'—'],['Approved',fd(r.reviewDate)],['Next review',fd(r.nextDue)],['Data owner approval (AP1)',r.ownerApproval||'—'],['Methodology',BIL_CFG.source.version]];
@@ -3282,7 +3286,7 @@ function bilRecordView(r,tag){const x=BilStore.result(r),v=BilStore.verify(r),p=
  ${v?`<p class="small" style="margin-top:10px">${v.same?`✓ Recalculated from the saved responses: matches the result saved on ${e(r.result.at)}.`:`<strong class="badt">Recalculating from the saved responses gives a different result from the one saved on ${e(r.result.at)}.</strong> The result was saved under ${e(v.config)}; the form is now ${e(v.current)}. Reassess to bring it up to date.`}</p>`:''}</div>
  <div class="panel section"><h2>Assessment record</h2><div class="kv">${audit.map(([k,v2])=>`<div><strong>${e(k)}</strong><span>${e(v2||'—')}</span></div>`).join('')}</div></div>
  <div class="panel section"><h2>Preliminary answers</h2><div class="kv">${BIL_CFG.prelim.map(q=>{const val2=p[q.id];return `<div><strong>${e(q.id)}</strong><span>${e(Array.isArray(val2)?(val2.join(', ')||'None'):(val2||'—'))}</span></div>`;}).join('')}<div><strong>C13 Cabinet-in-Confidence</strong><span>${e(r.cabinet||'—')}</span></div></div></div>
- <div class="panel section"><h2>Impact responses</h2>${[['C','Confidentiality'],['I','Integrity'],['A','Availability']].map(([k,n])=>`<h3 class="dimhead">${n}</h3><div class="table-scroll"><table class="mini"><thead><tr><th>ID</th><th>Question</th><th>Selected BIL</th><th>Consequence selected</th></tr></thead><tbody>${resp(k)}</tbody></table></div>`).join('')}</div>
+ <div class="panel section"><h2>Impact responses</h2>${[['C','Confidentiality'],['I','Integrity'],['A','Availability']].map(([k,n])=>`<h3 class="dimhead">${n}</h3><div class="table-scroll"><table class="mini"><thead><tr><th>ID</th><th>Question</th><th>Rating selected</th><th>Consequence selected</th></tr></thead><tbody>${resp(k)}</tbody></table></div>`).join('')}</div>
  <div class="panel section"><h2>Audit trail</h2><div class="table-scroll"><table class="mini"><thead><tr><th>When</th><th>Action</th><th>By</th><th>Note</th></tr></thead><tbody>${(r.audit||[]).slice().reverse().map(a2=>`<tr><td class="nowrap">${e(a2.at)}</td><td>${e(a2.action)}</td><td>${e(a2.by?pname(a2.by):'—')}</td><td class="small">${e(a2.note||'')}</td></tr>`).join('')||'<tr><td colspan="4">No entries.</td></tr>'}</tbody></table></div></div>`;}
 
 function bilPage(){const a=assetOf(),ap=BilStore.approved(a.id),w=BilStore.working(a.id),mode=V.b||(w&&w.status==='draft'?'form':'view');
