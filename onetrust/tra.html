@@ -268,7 +268,7 @@ body.proto header.top{display:none}
 .bil-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start}.bil-side{position:sticky;top:12px}.bil-main{min-width:0}
 @media(max-width:900px){.bil-layout{grid-template-columns:minmax(0,1fr)}.bil-side{position:static}}
 .stepper{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:12px}.stepper ol{list-style:none;margin:0;padding:0}.stepper li a{display:flex;gap:10px;align-items:flex-start;padding:7px 6px;border-radius:6px;color:var(--ink);text-decoration:none}.stepper li a:hover,.stepper li a:focus-visible{background:var(--hover)}
-.stepper li a>span:last-child{display:flex;flex-direction:column}.snum{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:2px solid var(--field);color:var(--muted)}.stepper li.done .snum{background:var(--green);border-color:var(--green);color:#fff}.stepper li.part .snum{border-color:var(--amber);color:var(--amber)}
+.stepper li a>span:last-child{display:flex;flex-direction:column}.snum{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:2px solid var(--field);color:var(--muted)}.stepper li.done .snum{background:var(--green);border-color:var(--green);color:#fff}.stepper li.part .snum{border-color:var(--amber);color:var(--amber)}.stepper li.opt .snum{border-style:dashed}
 .pbar{height:8px;background:var(--pale);border-radius:4px;overflow:hidden}.pbar span{display:block;height:100%;background:var(--green)}
 .qcard{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin:10px 0 0;background:var(--white);min-width:0}.qcard legend,.qcard>label{font-weight:700;padding:0;max-width:100%}.qcard legend{float:left;width:100%;margin-bottom:6px}.qcard legend+*{clear:both}.qcard.txt>label{display:block;margin-bottom:6px;padding:0}.qcard input:not([type=radio]):not([type=checkbox]),.qcard select,.qcard textarea{width:100%;padding:8px 10px;border:1px solid var(--field);border-radius:4px;font:inherit}
 .qcard.invalid{border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}.ferr{color:var(--red);font-weight:700;font-size:13px;margin:6px 0 0}.qmeta{margin:2px 0 8px}.pre{white-space:pre-line;font-weight:400}
@@ -300,6 +300,25 @@ button.danger{color:var(--red);border-color:var(--red)}button.primary.danger{bac
 .lkhead.ia2,.lkrow.ia2{grid-template-columns:minmax(0,1fr) 264px 300px}.iascope{display:flex;flex-wrap:wrap;gap:4px}.scp{display:flex;gap:5px;align-items:center;border:1px solid var(--field);border-radius:14px;padding:3px 9px;font-size:12.5px;font-weight:600;cursor:pointer;background:var(--white)}.scp.on{border-color:var(--blue);background:#eef5fb;color:var(--blue-dk)}.scp:focus-within{outline:2px solid var(--blue);outline-offset:1px}
 .ia2nd{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;border-left:3px solid var(--blue);padding:4px 0 4px 10px;margin-top:2px}.ia2nd .lkcells{justify-content:start}.ia2nd[hidden]{display:none}
 @media(max-width:900px){.lkhead.ia2,.lkrow.ia2{grid-template-columns:minmax(0,1fr)}}
+
+.lkstem{font-weight:700;margin:4px 0 8px}.lkgrid2{border:1px solid var(--line);border-radius:8px;background:var(--white)}
+.lkhead2{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding:8px 12px;background:var(--pale);font-size:11.5px;font-weight:700;color:var(--muted);position:sticky;top:0;z-index:2;border-radius:8px 8px 0 0}
+.lkrow2{padding:10px 12px;border-top:1px solid var(--line)}.lkrow2.invalid{box-shadow:inset 3px 0 0 var(--red);background:#fdf6f6}
+.lkq2{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px;font-weight:700}.lkqt{flex:1 1 220px}
+.lkcells2{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.lk2{position:relative;display:flex;flex-direction:column;gap:3px;border:1.5px solid var(--field);border-radius:6px;padding:6px 8px;cursor:pointer;background:var(--white);font-size:12px;line-height:1.3;min-height:58px}
+.lk2 .lkn{font-weight:700;font-size:14px}.lk2:hover{background:var(--hover)}.lk2.on{background:var(--blue);border-color:var(--blue);color:#fff}.lk2:focus-within{outline:3px solid var(--blue);outline-offset:1px}
+.lk2.na{border-style:dashed;color:var(--muted);background:var(--pale);cursor:not-allowed}
+.lkhelp{display:inline-block}.lkhelp>summary{list-style:none;cursor:pointer;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);display:grid;place-items:center;font-size:12px;font-weight:700}.lkhelp>summary::-webkit-details-marker{display:none}.lkhelp[open]>summary{background:var(--blue);color:#fff}
+.lkhelp[open]{flex-basis:100%;order:9}.lkhelpin{margin-top:6px;padding:8px 12px;background:var(--pale);border-radius:6px;font-weight:400;font-size:12.5px}.lkfull{margin:4px 0 8px 0;padding-left:0;list-style:none}.lkfull li{margin:3px 0}
+.iasel{display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:600;margin-left:auto}.iasel select{padding:5px 8px;border:1px solid var(--field);border-radius:4px;font:inherit}
+.iamix{color:var(--amber);margin:6px 0 0}
+@media(max-width:760px){.lkhead2{display:none}.lkcells2{grid-template-columns:repeat(3,minmax(0,1fr))}.iasel{margin-left:0}}
+@media(max-width:420px){.lkcells2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.psub{border:1px solid var(--line);border-radius:8px;margin:10px 0 0;background:var(--white)}.psub>summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;list-style:none}.psub>summary::-webkit-details-marker{display:none}.psub>summary::after{content:'▸';margin-left:auto;color:var(--muted)}.psub[open]>summary::after{content:'▾'}
+.psn{font:700 12px Arial,sans-serif;background:var(--note-bg);color:var(--note-ink);border-radius:4px;padding:2px 6px}.psin{padding:0 14px 12px}.psin>.qcard:first-child{margin-top:0}
+.regdl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;margin:0}.regdl dt{font-size:12px;color:var(--muted);font-weight:700}.regdl dd{margin:2px 0 0;font-weight:600}.regedit{margin-top:10px}.regedit>summary{cursor:pointer;color:var(--blue);font-weight:600;font-size:13px}.regedit .formgrid{margin-top:8px}
 </style>
 </head>
 <body>
@@ -2634,11 +2653,42 @@ const BIL_CFG={
   "RTO": "RTO - Recovery time objective (RTO) - The maximum time to recover a system after an outage or disruption."
  },
  "decisions": [
+  "A1 and A2 (whether a full assessment is needed) are not asked: a full assessment is always completed. B4 (system) is captured together with B1. Decision of the form endorser.",
   "Unanswered questions are never scored as 0; every impact question must be answered before submission (the workbook scores blanks as 0).",
   "Cabinet-in-Confidence marking uses the Overall Security Value, as in the workbook formula (Working Sheet I81/J81). Kept as-is by decision.",
   "Information Management Markers are selected by the assessor; the workbook has no rule for them."
  ]
 };
+/* Plain-language summaries for the grids; the full A10057 wording stays authoritative */
+const BIL_PLAIN={
+ "note": "Plain-language summaries shown in the grids. They do not replace the A10057 wording: the full wording is shown behind each help icon and is what the record saves. Summaries are keyed by option position in bil-config.json.",
+ "cStem": "If this information were disclosed without authorisation, what would the impact be on…",
+ "iaStem": "If this data were changed, deleted or unavailable without authorisation, what would the impact be on…",
+ "C": {
+  "C4": {"q": "Individuals' safety, dignity, finances, liberty or identity", "o": ["N/A", "None", "Personal information breach; distress, non-life-threatening injury or financial hardship", "Life-threatening injury or a fatality; severe financial hardship", "Fatalities in critical roles; widespread fatalities or hardship", "Widespread loss of life nationally"]},
+  "C5": {"q": "Reputation and confidence in MTM or government", "o": ["N/A", "No public concern", "Local public concern, embarrassment or local media", "Broad public concern; external inquiry; mainstream media", "Widespread concern; loss of trust in the government", "International conflict or grave damage to foreign relations"]},
+  "C6": {"q": "Material assets (infrastructure, cultural or environmental)", "o": ["N/A", "A non-critical asset compromised", "A physical or material asset compromised", "Critical assets compromised; major harm locally", "Critical assets compromised; serious harm across the state", "Collapse of national infrastructure"]},
+  "C7": {"q": "MTM service delivery", "o": ["N/A", "No disruption to MTM operations", "Non-critical services degraded; functions impeded", "Critical services degraded; a primary function lost", "Critical services degraded; MTM cannot perform any function", "Not applicable"]},
+  "C3": {"q": "Legal, contract, confidentiality or legal privilege obligations", "o": ["N/A", "None", "Contract, privilege or secrecy breach; under 2 years jail; internal investigation", "Contract, privilege or secrecy breach; under 2 years jail; internal or external investigation", "Contract, privilege or secrecy breach; over 2 years jail", "Not applicable"]},
+  "C9": {"q": "Crime prevention, defence or intelligence operations", "o": ["N/A", "No damage to crime fighting", "Hinders a summary offence matter", "Hinders an indictable offence matter", "Hinders a serious indictable offence matter", "Affects Australian or allied forces' operations"]},
+  "C2": {"q": "MTM's operating budget", "o": ["N/A", "None", "Undermines MTM's financial viability", "Undermines MTM's short-term financial viability", "Undermines MTM's long-term viability and destabilises an industry sector", "Collapse of the Australian economy"]},
+  "C1": {"q": "A public entity's operating budget (e.g. DTP)", "o": ["N/A", "Under 1% of annual budget lost", "1% to 10% of annual budget lost", "10% to 20% lost; short-term impact on State finances", "20% or more lost; long-term damage to State finances", "Collapse of the Australian economy"]},
+  "C12": {"q": "Emergency services", "o": ["N/A", "None", "Re-prioritisation of emergency services locally", "Re-prioritisation of emergency services across the State", "Re-prioritisation at State or national level", "Not applicable"]},
+  "C10": {"q": "Judicial proceedings", "o": ["N/A", "None", "Summary prosecutions or convictions affected", "Indictable prosecutions or convictions affected", "Serious indictable prosecutions or convictions affected", "Collapse of political stability in Australia or friendly countries"]},
+  "C11": {"q": "Public order", "o": ["N/A", "None", "Disruption to the community", "Protests and community disruption", "Riots and community disruption", "Collapse of political stability in Australia or friendly countries"]},
+  "C8": {"q": "Relations with other governments", "o": ["N/A", "No damage to relations", "Damage or disruption to relations", "Disadvantages Victoria in national negotiations", "Widespread instability; formal protests or sanctions", "International conflict or grave damage to foreign relations"]}
+ },
+ "IA": {
+  "1": {"q": "Safety", "o": ["Potential first aid injury", "1 to 19 minor injuries", "20 to 199 minor or 1 to 9 serious injuries", "200+ minor or 10 to 19 serious injuries, or 1 fatality", "21 to 39 serious injuries or 2 to 3 fatalities", "40+ serious injuries or 4+ fatalities"]},
+  "2": {"q": "Finances (income or expense)", "o": ["Under $100K", "$100K to $500K", "$500K to $2M", "$2M to $10M", "$10M to $50M", "$50M or more"]},
+  "3": {"q": "Reputation or political standing", "o": ["N/A", "Limited local media", "State media; Fair Work appearance", "Regulator prosecution; call-in event", "National media; contract breach or cure plan", "Sustained (inter)national media; step-in or termination"]},
+  "4": {"q": "Legal position", "o": ["N/A", "Minor legal issues or breaches", "Minor breaches with investigation or minor litigation", "Serious breach; prosecution or fines", "Significant prosecution and fines; class actions", "Possible prison terms; multiple class actions"]},
+  "5": {"q": "Engineering or technical performance", "o": ["N/A", "Minimal; can be managed", "Minor performance drop; waivers likely", "Moderate drop; some key requirements missed", "Significant degradation; waivers unlikely", "Critical requirements not met"]},
+  "6": {"q": "Environment or heritage", "o": ["N/A", "Short-term effects; limited significance", "Medium-term effects; some significance", "Long-term impairment; high significance", "Permanent impairment; high significance"]},
+  "7": {"q": "Industrial relations", "o": ["N/A", "Short-term industrial action", "System-wide short stoppages", "Protracted action; alternative services available", "Protracted action; limited services", "Protracted action; system cannot operate"]}
+ }
+}
+;
 /* BilCalc — calculation logic for the MTM Business Impact Level assessment (A10057).
    Pure functions: no DOM, no storage. Every result is reproduced from saved responses and the
    configuration generated from the workbook (bil-config.json).
@@ -2685,9 +2735,9 @@ const BIL_CFG={
     const YN = ['A1', 'A2', 'B5', 'B10', 'B17', 'B18', 'B19', 'B20', 'B21', 'B22'];
     const req = (id, label) => { if (!String(p[id] == null ? '' : p[id]).trim()) errs.push({ field: id, message: `${id} · ${YN.includes(id) ? 'Choose Yes or No' : id === 'B3' ? 'Choose from the list' : 'Enter an answer'}: ${label}` }); };
     const pq = Object.fromEntries(cfg.prelim.map((x) => [x.id, x.question]));
-    ['A1', 'A2'].forEach((id) => req(id, short(pq[id])));
-    if (fullAssessmentNeeded(p) === false) return errs; // A1 = No and A2 = Yes: the form says a full assessment may not be needed
-    ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10'].forEach((id) => req(id, short(pq[id])));
+    // A1 and A2 (whether a full assessment is needed) are not asked: a full assessment is always completed. B4 (system) is captured with B1.
+    const lab = { B1: 'Information asset and system name' };
+    ['B1', 'B2', 'B3', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10'].forEach((id) => req(id, lab[id] || short(pq[id])));
     if (p.B9 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(p.B9).trim())) errs.push({ field: 'B9', message: 'B9 · Enter a valid email address for the technical data owner or custodian.' });
     if (p.B10 === 'Yes' && !['B11', 'B12', 'B13', 'B14', 'B15', 'B16'].some((k) => Array.isArray(p[k]) && p[k].length))
       errs.push({ field: 'B11', message: 'B10 is Yes · Select at least one personal information attribute (B11 to B16).' });
@@ -3109,7 +3159,7 @@ const BilStore={
  log(r,action,by,note){(r.audit=r.audit||[]).push({at:nowStamp(),by:by||'',action,note:note||''});},
  touch(r){r.updated=TODAY;BilStore.syncAnswers(r);},
  create(aid){const a=DB.assets[aid],prev=BilStore.approved(aid),ver=((BilStore.forAsset(aid)[0]||{}).version||0)+1,id=nid('BIL');
-  const base=prev?JSON.parse(JSON.stringify({prelim:prev.prelim,choices:prev.choices,cabinet:prev.cabinet,imm:prev.imm,evidence:prev.evidence})):{prelim:{B1:a.name,B4:a.name,B6:a.org||'',B7:(P(a.ownerId)||{}).title||'',B8:(P(a.custodianId)||{}).title||'',B9:(P(a.custodianId)||{}).email||''},choices:{},cabinet:'',imm:[],evidence:''};
+  const base=prev?JSON.parse(JSON.stringify({prelim:prev.prelim,choices:prev.choices,cabinet:prev.cabinet,imm:prev.imm,evidence:prev.evidence})):{prelim:{B1:a.name,B4:a.name,B6:a.org||'',B7:(P(a.ownerId)||{}).title||'',B8:(P(a.custodianId)||{}).title||'',B9:(P(a.custodianId)||{}).email||''},choices:{},cabinet:BIL_CFG.cabinet.default||'No',imm:[],evidence:''};
   const r=Object.assign(base,{id,name:`BIL assessment · ${a.name} · v${ver}`,assetId:aid,assetName:a.name,version:ver,status:'draft',assessor:'',approver:'',ownerApproval:'',rationale:'',created:TODAY,updated:TODAY,assessmentDate:null,submittedOn:null,reviewDate:null,nextDue:null,result:null,audit:[]});
   BilStore.syncAnswers(r);BilStore.log(r,prev?`Created from approved ${prev.id} v${prev.version}`:'Created');DB.bil[id]=r;save();return r;},
  /* Everything the audit record needs, worked out from the saved responses */
@@ -3162,45 +3212,43 @@ function ImpactSelector(q,choice,lock){const name='bq_'+q.id;
  return `<div class="impsel" role="radiogroup" aria-labelledby="lg_${e(q.id)}">${q.options.map((o,i)=>{const id=`${name}_${i}`,on=choice!=null&&choice!==''&&Number(choice)===i;
   return `<label class="impopt ${on?'on':''}" for="${e(id)}"><input type="radio" id="${e(id)}" name="${e(name)}" value="${i}" data-bilq="${e(q.id)}" ${on?'checked':''} ${lock?'disabled':''} aria-describedby="er_${e(q.id)}">${RatingChip(o.score)}<span class="imptext">${e(o.text)}</span></label>`;}).join('')}</div>`;}
 
-/* ---- Likert grid: one row per question, one column per rating 0-5 ----
-   Each cell selects the first consequence in the form with that rating; ratings a question does not offer are shown as unavailable. */
+/* ---- Likert grid: each row is a question, each cell a rating 0-5 with a plain-language summary ----
+   The summaries (BIL_PLAIN) are shortened wording only. The full A10057 wording is behind the help icon of each row and is what the
+   record saves. A cell selects the first consequence in the form with that rating; ratings a question does not offer are shown as unavailable. */
 const lkOpt=(q,s)=>q.options.findIndex(o=>o.score===s);
 const lkSel=(q,choice)=>choice==null||choice===''||!q.options[Number(choice)]?null:q.options[Number(choice)].score;
-function LikertCells(q,choice,lock){const cur=lkSel(q,choice);
- return `<div class="lkcells" role="radiogroup" aria-labelledby="lq_${e(q.id)}">${[0,1,2,3,4,5].map(s=>{const i=lkOpt(q,s);if(i<0)return `<span class="lk na" title="Rating ${s} is not offered for this question">–</span>`;const o=q.options[i],id=`bq_${q.id}_${s}`;
-  return `<label class="lk ${cur===s?'on':''}" for="${e(id)}" title="${e(s+' · '+o.text)}" data-lkq="${e(q.id)}"><input class="vh" type="radio" id="${e(id)}" name="bq_${e(q.id)}" value="${i}" data-bilq="${e(q.id)}" ${cur===s?'checked':''} ${lock?'disabled':''} aria-label="${e('Rating '+s+': '+o.text)}"><span class="lkn" aria-hidden="true">${s}</span></label>`;}).join('')}</div>`;}
-const lkDesc=(q,choice)=>{const s=lkSel(q,choice);return s==null?'<span class="small">Not answered · hover or focus a rating to read its consequence</span>':`<strong>${s}</strong> · ${e(q.options[Number(choice)].text)}`;};
-function LikertHead(labels,title){return `<div class="lkhead" aria-hidden="true"><span>${e(title||'')}</span><div class="lkcells">${[0,1,2,3,4,5].map(s=>`<span>${s}${labels&&labels[s]?`<small>${e(labels[s])}</small>`:''}</span>`).join('')}</div></div>`;}
+const plainC=(q,i)=>((BIL_PLAIN.C[q.id]||{}).o||[])[i]||q.options[i].text;
+/* Six rating cells. kind 'C' stores the option index (data-bilq); kind 'IA' stores the rating (data-iar) */
+function LikertCells(o){return `<div class="lkcells2" role="radiogroup" aria-labelledby="${e(o.labelId)}">${[0,1,2,3,4,5].map(s=>{const i=lkOpt(o.q,s);if(i<0)return `<span class="lk2 na"><span class="lkn">${s}</span><span class="lkt">Not offered</span></span>`;
+  const id=`${o.name}_${s}`,txt=o.text(i,s),on=o.cur===s;
+  return `<label class="lk2 ${on?'on':''}" for="${e(id)}"><input class="vh" type="radio" id="${e(id)}" name="${e(o.name)}" value="${o.kind==='C'?i:s}" ${o.attr} ${on?'checked':''} ${o.lock?'disabled':''} aria-label="${e('Rating '+s+': '+txt)}"><span class="lkn" aria-hidden="true">${s}</span><span class="lkt" aria-hidden="true">${e(txt)}</span></label>`;}).join('')}</div>`;}
+/* Help icon: expands the full wording of the question and of every rating */
+function LikertHelp(id,blocks){return `<details class="lkhelp"><summary aria-label="Show the full wording for ${e(id)}" title="Full wording">?</summary><div class="lkhelpin">${blocks.map(b=>`<p><strong>${e(b.title)}</strong></p><ol start="0" class="lkfull">${b.q.options.map(o=>`<li value="${o.score}"><strong>${o.score}</strong> · ${e(o.text)}</li>`).join('')}</ol>`).join('')}</div></details>`;}
+function LikertHead(labels){return `<div class="lkhead2" aria-hidden="true">${[0,1,2,3,4,5].map(s=>`<span>${s}${labels&&labels[s]?` · ${e(labels[s])}`:''}</span>`).join('')}</div>`;}
 /* Confidentiality grid (VPDSF consequences) */
-function ConfidentialityGrid(r,em,lock){const qs=BIL_CFG.questions.filter(q=>q.dim==='C'),ch=r.choices||{};
- return `<div class="lkgrid">${LikertHead(BIL_CFG.levels.map(l=>l.category),'Question')}${qs.map(q=>`<div class="lkrow ${em[q.id]?'invalid':''}" id="f_${e(q.id)}"><div class="lkq" id="lq_${e(q.id)}"><span class="qid">${e(q.id)}</span> ${e(q.question)}<div class="small qmeta">${Term('VPDSF')} · ${e(q.vpdsfCategory)} · ${e(q.vpdsfSubCategory)}</div></div>${LikertCells(q,ch[q.id],lock)}<div class="lkdesc" id="ds_${e(q.id)}" aria-live="polite">${lkDesc(q,ch[q.id])}</div><p class="ferr" id="er_${e(q.id)}" ${em[q.id]?'':'hidden'}>${e(em[q.id]||'')}</p></div>`).join('')}</div>`;}
-/* Integrity and Availability in one grid. Both use the MTM Integrated Risk Procedure scale for the same seven categories, so each
-   category gets one rating plus where it applies: Integrity, Availability, both, or different ratings for each.
-   The other dimension of a one-sided answer is recorded as 0 (no impact), so the form's separate I and A ratings are always complete. */
-const IA_SCOPES=[['I','Integrity'],['A','Availability'],['B','Both'],['D','Different ratings']];
-/* The grid state of one category, worked out from the saved I and A choices when the record has none */
-function iaState(r,k){const st=(r.ia||{})[k];if(st)return st;const ch=r.choices||{},qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),I=lkSel(qi,ch['I'+k]),A=lkSel(qa,ch['A'+k]);
- if(I==null&&A==null)return {r:null,s:'',r2:null};if(I==null||A==null)return {r:I!=null?I:A,s:I!=null?'I':'A',r2:null,partial:true};
- if(I===A)return {r:I,s:I===0?'':'B',r2:null};if(I===0)return {r:A,s:'A',r2:null};if(A===0)return {r:I,s:'I',r2:null};return {r:I,s:'D',r2:A};}
-/* I and A choices (option indexes) for one category; undefined while the category is incomplete */
-function iaChoices(st,k){const qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),o=(q,s)=>s==null?undefined:lkOpt(q,s)<0?undefined:lkOpt(q,s);
+/* Questions shown in number order (C1, C2 … C12); the calculation does not depend on order */
+const bilByNum=(a,b)=>a.id[0]===b.id[0]?Number(a.id.slice(1))-Number(b.id.slice(1)):0;
+function ConfidentialityGrid(r,em,lock){const qs=BIL_CFG.questions.filter(q=>q.dim==='C').sort(bilByNum),ch=r.choices||{};
+ return `<p class="lkstem">${e(BIL_PLAIN.cStem)}</p><div class="lkgrid2">${LikertHead(BIL_CFG.levels.map(l=>l.category))}${qs.map(q=>{const p=BIL_PLAIN.C[q.id]||{};return `<div class="lkrow2 ${em[q.id]?'invalid':''}" id="f_${e(q.id)}"><div class="lkq2"><span class="qid">${e(q.id)}</span> <span id="lq_${e(q.id)}" class="lkqt">${e(p.q||q.question)}</span>${LikertHelp(q.id,[{title:q.question,q}])}</div>
+  ${LikertCells({q,name:'bq_'+q.id,kind:'C',attr:`data-bilq="${e(q.id)}"`,cur:lkSel(q,ch[q.id]),lock,labelId:'lq_'+q.id,text:i=>plainC(q,i)})}<p class="ferr" id="er_${e(q.id)}" ${em[q.id]?'':'hidden'}>${e(em[q.id]||'')}</p></div>`;}).join('')}</div>`;}
+
+/* Integrity and Availability: one rating per category and where it applies. The other dimension of a one-sided answer is recorded as 0 (no impact). */
+const IA_SCOPES=[['I','Integrity'],['A','Availability'],['B','Both']];
+/* Grid state of one category, worked out from the saved I and A choices when the record has none */
+function iaState(r,k){const st=(r.ia||{})[k];if(st&&st.s!=='D')return st;const ch=r.choices||{},qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),I=lkSel(qi,ch['I'+k]),A=lkSel(qa,ch['A'+k]);
+ if(I==null&&A==null)return {r:null,s:''};if(I==null||A==null)return {r:I!=null?I:A,s:I!=null?'I':'A'};
+ if(I===A)return {r:I,s:I===0?'':'B'};if(I===0)return {r:A,s:'A'};if(A===0)return {r:I,s:'I'};
+ return {r:Math.max(I,A),s:'B',mixed:{I,A}};}
+function iaChoices(st,k){const qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),o=(q,s)=>s==null||lkOpt(q,s)<0?undefined:lkOpt(q,s);
  if(st.r==null)return {};if(st.r===0)return {I:o(qi,0),A:o(qa,0)};
- if(st.s==='B')return {I:o(qi,st.r),A:o(qa,st.r)};if(st.s==='I')return {I:o(qi,st.r),A:o(qa,0)};if(st.s==='A')return {I:o(qi,0),A:o(qa,st.r)};if(st.s==='D')return {I:o(qi,st.r),A:o(qa,st.r2)};return {};}
-function iaCells(k,name,data,cur,q,lock,descId){return `<div class="lkcells" role="radiogroup" aria-label="${e(name==='ia2'?'Availability rating':'Rating')} for ${e(BIL_CFG.riskContext.order[k-1])}">${[0,1,2,3,4,5].map(s=>{const i=lkOpt(q,s);if(i<0)return `<span class="lk na" title="Rating ${s} is not offered for this category">–</span>`;const o=q.options[i],id=`${name}_${k}_${s}`;
-  return `<label class="lk ${cur===s?'on':''}" for="${e(id)}" title="${e(s+' · '+o.text)}" data-lkq="${e(q.id)}" data-lkd="${e(descId)}"><input class="vh" type="radio" id="${e(id)}" name="${e(name)}_${k}" value="${s}" ${data}="${k}" ${cur===s?'checked':''} ${lock?'disabled':''} aria-label="${e('Rating '+s+': '+o.text)}"><span class="lkn" aria-hidden="true">${s}</span></label>`;}).join('')}</div>`;}
-function iaDesc(st,k){const q=BIL_CFG.questions.find(x=>x.id==='I'+k),t=s=>`<strong>${s}</strong> · ${e(q.options[lkOpt(q,s)].text)}`;
- if(st.r==null)return '<span class="small">Not answered · hover or focus a rating to read its consequence</span>';
- if(st.r===0)return t(0)+' <span class="small">· no impact on Integrity or Availability</span>';
- const sc={I:'Integrity (Availability 0)',A:'Availability (Integrity 0)',B:'Integrity and Availability',D:'Integrity'}[st.s];return t(st.r)+(sc?` <span class="small">· applies to ${sc}</span>`:' <span class="small">· choose where it applies</span>');}
+ if(st.s==='B')return {I:o(qi,st.r),A:o(qa,st.r)};if(st.s==='I')return {I:o(qi,st.r),A:o(qa,0)};if(st.s==='A')return {I:o(qi,0),A:o(qa,st.r)};return {};}
 function IntegrityAvailabilityGrid(r,em,lock){const order=BIL_CFG.riskContext.order;
- return `<div class="lkgrid ia2"><div class="lkhead ia2" aria-hidden="true"><span>Category</span><div class="lkcells">${[0,1,2,3,4,5].map(s=>`<span>${s}</span>`).join('')}</div><span>Applies to</span></div>
- ${order.map((cat,i)=>{const k=i+1,st=iaState(r,k),qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),err=em['IA'+k];
-  return `<div class="lkrow ia2 ${err?'invalid':''}" id="f_IA${k}"><div class="lkq"><strong>${e(cat)}</strong><div class="small qmeta"><span class="qid">${e(qi.id)}</span> ${e(qi.question)}<br><span class="qid">${e(qa.id)}</span> ${e(qa.question)}</div></div>
-  ${iaCells(k,'ia','data-iar',st.r,qi,lock,'dsIA'+k)}
-  <div class="iascope" role="radiogroup" aria-label="Where the ${e(cat)} rating applies">${IA_SCOPES.map(([v,l])=>`<label class="scp ${st.s===v?'on':''}"><input type="radio" name="ias_${k}" value="${v}" data-ias="${k}" ${st.s===v?'checked':''} ${lock?'disabled':''}> ${l}</label>`).join('')}</div>
-  <div class="lkdesc" id="dsIA${k}" aria-live="polite">${iaDesc(st,k)}</div>
-  <div class="ia2nd" id="ia2_${k}" ${st.s==='D'?'':'hidden'}><span class="small"><strong>Availability rating</strong> (the rating above is for Integrity)</span>${iaCells(k,'ia2','data-iar2',st.r2,qa,lock,'dsIA2'+k)}<div class="lkdesc" id="dsIA2${k}">${st.r2==null?'<span class="small">Choose the Availability rating</span>':`<strong>${st.r2}</strong> · ${e(qa.options[lkOpt(qa,st.r2)].text)}`}</div></div>
-  <p class="ferr" id="er_IA${k}" ${err?'':'hidden'}>${e(err||'')}</p></div>`;}).join('')}</div>`;}
+ return `<p class="lkstem">${e(BIL_PLAIN.iaStem)}</p><div class="lkgrid2">${order.map((cat,i)=>{const k=i+1,st=iaState(r,k),qi=BIL_CFG.questions.find(q=>q.id==='I'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k),err=em['IA'+k],p=BIL_PLAIN.IA[k]||{};
+  return `<div class="lkrow2 ${err?'invalid':''}" id="f_IA${k}"><div class="lkq2"><span class="qid">${e(qi.id)} / ${e(qa.id)}</span> <span id="lqIA${k}" class="lkqt">${e(p.q||cat)}</span>${LikertHelp(cat,[{title:qi.question+' (Integrity)',q:qi},{title:qa.question+' (Availability)',q:qa}])}
+   <label class="iasel">Applies to <select id="ias_${k}" data-ias="${k}" ${lock?'disabled':''} aria-label="Where the ${e(cat)} rating applies"><option value="">${st.r===0?'Not needed for 0':'Choose…'}</option>${IA_SCOPES.map(([v,l])=>`<option value="${v}" ${st.s===v?'selected':''}>${l}</option>`).join('')}</select></label></div>
+   ${LikertCells({q:qi,name:'ia_'+k,kind:'IA',attr:`data-iar="${k}"`,cur:st.r,lock,labelId:'lqIA'+k,text:i=>((p.o||[])[i])||qi.options[i].text})}
+   <p class="small iamix" id="iamix_${k}" ${st.mixed?'':'hidden'}>${st.mixed?`Saved earlier as Integrity ${st.mixed.I} and Availability ${st.mixed.A}. Saving now records Both at ${st.r}; choose another option if that is not right.`:''}</p>
+   <p class="ferr" id="er_IA${k}" ${err?'':'hidden'}>${e(err||'')}</p></div>`;}).join('')}</div>`;}
 const zeroBtn=(sec,label)=>`<button type="button" class="secondary" data-act="bilZero" data-sec="${sec}">Set unanswered to 0 · no impact…</button><span class="small">${e(label)}</span>`;
 
 /* One impact question: legend, choices and its inline error */
@@ -3220,11 +3268,23 @@ function TextCard(id,label,value,err,opt){opt=opt||{};const ctl=opt.area?`<texta
   :`<input id="bp_${e(id)}" data-bilp="${e(id)}" value="${e(value||'')}" ${opt.type?`type="${opt.type}"`:''} aria-describedby="er_${e(id)}" ${err?'aria-invalid="true"':''} ${opt.lock?'disabled':''}>`;
  return `<div class="qcard txt ${err?'invalid':''}" id="f_${e(id)}"><label for="bp_${e(id)}">${/^[A-C]\d/.test(id)?`<span class="qid">${e(id)}</span> `:''}${e(label)}</label>${ctl}<p class="ferr" id="er_${e(id)}" ${err?'':'hidden'}>${e(err||'')}</p></div>`;}
 
+/* Collapsible sub-section of Section 1 with its own completion count */
+function PrelimSub(n,title,ids,r,em,body){const need=ids.filter(id=>id!=='B11'||(r.prelim||{}).B10==='Yes'),bad=need.filter(id=>em[id]||!bilAnswered(r,id)).length,done=need.length-bad;
+ return `<details class="psub" id="ps_${n}" ${bad?'open':''}><summary><span class="psn">${e(n)}</span> <strong>${e(title)}</strong> <span class="small psc" data-psc="${e(ids.join(','))}">${done} of ${need.length}${bad?'':' ✓'}</span></summary><div class="psin">${body}</div></details>`;}
+function bilAnswered(r,id){const v=(r.prelim||{})[id];if(id==='B11')return BIL_PI.some(k=>Array.isArray((r.prelim||{})[k])&&(r.prelim||{})[k].length);return Array.isArray(v)?v.length>0:!!String(v==null?'':v).trim();}
+/* B6 to B9 from the asset and people records: shown as one card, editable when a value is missing or wrong */
+const REG_FIELDS=[['B6','Business division'],['B7','Business data owner (title)'],['B8','Technical data owner / custodian (title)'],['B9','Custodian email']];
+function RegisterCard(p,em){const miss=REG_FIELDS.some(([k])=>!String(p[k]||'').trim()||em[k]);
+ return `<div class="qcard regcard"><dl class="regdl">${REG_FIELDS.map(([k,l])=>`<div id="f_${k}"><dt><span class="qid">${k}</span> ${e(l)}</dt><dd data-regv="${k}">${p[k]?e(p[k]):'<em class="badt">Not in the asset register</em>'}</dd><p class="ferr" id="er_${k}" ${em[k]?'':'hidden'}>${e(em[k]||'')}</p></div>`).join('')}</dl>
+ <details class="regedit" ${miss?'open':''}><summary>Edit these details</summary><div class="formgrid">${REG_FIELDS.map(([k,l])=>`<div class="field"><label for="bp_${k}">${e(l)}</label><input id="bp_${k}" data-bilp="${k}" value="${e(p[k]||'')}" ${k==='B9'?'type="email"':''} aria-describedby="er_${k}"></div>`).join('')}</div><p class="small">Changes here are saved with this assessment; update the asset register separately.</p></details></div>`;}
+function bilPrelimRefresh(r){const p=r.prelim||{};REG_FIELDS.forEach(([k])=>{const d=document.querySelector(`[data-regv="${k}"]`);if(d)d.innerHTML=p[k]?e(p[k]):'<em class="badt">Not in the asset register</em>';});
+ p.B4=p.B1||'';/* B4 (system) is captured in B1 */
+ document.querySelectorAll('[data-psc]').forEach(s=>{const ids=s.dataset.psc.split(',').filter(id=>id!=='B11'||p.B10==='Yes');const errs=V.bilShowErr?new Set(bilFormErrors(r).map(x=>x.field)):new Set();const bad=ids.filter(id=>errs.has(id)||!bilAnswered(r,id)).length;s.textContent=`${ids.length-bad} of ${ids.length}${bad?'':' ✓'}`;});}
 /* Steps through the form; each shows how many required items are complete */
 function ProgressStepper(steps){const done=steps.reduce((n,s)=>n+s.done,0),tot=steps.reduce((n,s)=>n+s.total,0),pct=tot?Math.round(done/tot*100):0;
  return `<nav class="stepper" aria-label="Assessment progress"><div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Required items complete"><span style="width:${pct}%"></span></div>
- <p class="small" style="margin:4px 0 8px">${done} of ${tot} required items complete</p>
- <ol>${steps.map((s,i)=>{const st=s.total&&s.done===s.total?'done':s.done?'part':'todo';return `<li class="${st}"><a href="#bil-s${i+1}"><span class="snum" aria-hidden="true">${st==='done'?'✓':i+1}</span><span><strong>${e(s.label)}</strong><span class="small">${s.done} of ${s.total}${s.errors?` · ${s.errors} to fix`:''}</span></span></a></li>`;}).join('')}</ol></nav>`;}
+ <p class="small" style="margin:4px 0 8px">${done} of ${tot} impact questions answered</p>
+ <ol>${steps.map((s,i)=>{const st=!s.total?'opt':s.done===s.total?'done':s.done?'part':'todo';return `<li class="${st}"><a href="#bil-s${i+1}"><span class="snum" aria-hidden="true">${st==='done'?'✓':i+1}</span><span><strong>${e(s.label)}</strong><span class="small">${s.total?`${s.done} of ${s.total}${s.errors?` · ${s.errors} to fix`:''}`:'Optional'}</span></span></a></li>`;}).join('')}</ol></nav>`;}
 
 /* Every problem that blocks submission, linked to its field */
 function ValidationSummary(errs){if(!errs||!errs.length)return '';
@@ -3266,39 +3326,36 @@ function closeDialog(){document.querySelectorAll('.dlg-back').forEach(x=>x.remov
 const BIL_YN=['A1','A2','B5','B10','B17','B18','B19','B20','B21','B22'];
 const BIL_PI=['B11','B12','B13','B14','B15','B16'];
 function bilDraft(id){if(!V.bilDraft||V.bilDraft.id!==id){V.bilDraft={id,rec:JSON.parse(JSON.stringify(DB.bil[id])),reset:false};V.bilDirty=false;V.bilShowErr=false;}return V.bilDraft.rec;}
-function bilFormErrors(r){const errs=BilStore.validate(r).filter(x=>!/^[IA]\d$/.test(x.field));
+function bilFormErrors(r){const cn=f=>/^C\d+$/.test(f)?Number(f.slice(1)):null,errs=BilStore.validate(r).filter(x=>/^C\d+$/.test(x.field)).sort((a,b)=>cn(a.field)!=null&&cn(b.field)!=null?cn(a.field)-cn(b.field):0);
  BIL_CFG.riskContext.order.forEach((cat,i)=>{const k=i+1,st=iaState(r,k),f='IA'+k;
   if(st.r==null)errs.push({field:f,message:`${cat} · Choose a rating from 0 to 5 for Integrity and Availability.`});
-  else if(st.r>0&&!st.s)errs.push({field:f,message:`${cat} · Choose whether rating ${st.r} applies to Integrity, Availability, both, or different ratings.`});
-  else if(st.s==='D'&&st.r2==null)errs.push({field:f,message:`${cat} · Choose the Availability rating.`});});
- if(!String(r.name||'').trim())errs.push({field:'name',message:'Assessment name is required.'});
- if(!r.assessor)errs.push({field:'assessor',message:'Choose the assessor.'});
- if(r.ownerApproval!=='Yes')errs.push({field:'AP1',message:r.ownerApproval==='No'?'AP1 · Get the business or technical data owner\'s approval before submitting (Section 3 of the form).':'AP1 · Answer whether the data owner has approved the assessment.'});
+  else if(st.r>0&&!st.s)errs.push({field:f,message:`${cat} · Choose whether rating ${st.r} applies to Integrity, Availability or both.`});});
+ /* Prototype: only the impact questions are required, because the BIL cannot be calculated without them. Everything else is optional. */
  return errs;}
 const BIL_SOCI=['B17','B18','B19','B20','B21','B22'];
 const bilNeedsSoci=r=>{const x=BilStore.result(r);return x.osv!==null&&x.osv>=4;};
-const BIL_SECTIONS=[['Preliminary',r=>{const full=BilCalc.fullAssessmentNeeded(r.prelim||{});return ['A1','A2'].concat(full===false?[]:['B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'].concat((r.prelim||{}).B10==='Yes'?['B11']:[]));}],
+const BIL_SECTIONS=[['Preliminary',()=>[]],
  ['Confidentiality',()=>BIL_CFG.questions.filter(q=>q.dim==='C').map(q=>q.id).concat(['C13'])],['Integrity and Availability',()=>BIL_CFG.riskContext.order.map((c,i)=>'IA'+(i+1))],
- ['Results and approval',r=>(bilNeedsSoci(r)?BIL_SOCI:[]).concat(['name','assessor','AP1'])]];
+ ['Results and approval',()=>[]]];
 function bilSteps(r){const errs=bilFormErrors(r),bad=new Set(errs.map(x=>x.field));return BIL_SECTIONS.map(([label,f])=>{const ids=f(r);return {label,total:ids.length,done:ids.filter(id=>!bad.has(id)).length,errors:V.bilShowErr?ids.filter(id=>bad.has(id)).length:0};});}
 
 function bilFormPage(a,r,ap){const lock=false,showErr=V.bilShowErr,errs=showErr?bilFormErrors(r):[],em=Object.fromEntries(errs.map(x=>[x.field,x.message]));
- const p=r.prelim||{},pq=Object.fromEntries(BIL_CFG.prelim.map(x=>[x.id,x.question])),x=BilStore.result(r),full=BilCalc.fullAssessmentNeeded(p);
- const yn=id=>YesNoCard(id,pq[id],p[id],em[id],lock);
+ const p=r.prelim||{},pq=Object.fromEntries(BIL_CFG.prelim.map(x=>[x.id,x.question.replace(/(named in )(row )?B4/g,'$1B1')])),x=BilStore.result(r);
+ const yn=id=>YesNoCard(id,String(pq[id]||'').replace(/named in row B4|named in B4/g,'named in B1'),p[id],em[id],lock);
  const piBox=id=>`<details class="pibox" ${(p[id]||[]).length?'open':''}><summary><span class="qid">${e(id)}</span> ${e(pq[id])} <span class="small">(${(p[id]||[]).length} selected)</span></summary><div class="pigrid">${BIL_CFG.piAttributes[id].map((o,i)=>`<label><input type="checkbox" data-bilpi="${e(id)}" value="${e(o.attribute)}" ${(p[id]||[]).includes(o.attribute)?'checked':''}> ${e(o.attribute)} <span class="small">${e(o.category)}</span></label>`).join('')}</div></details>`;
- const secC=`<section class="panel section" id="bil-s2" aria-labelledby="bil-h2"><h2 id="bil-h2">Section 2 · Confidentiality</h2><p class="sub">Consider the impact of unauthorised <strong>disclosure</strong> of the information. The consequences are based on the ${Term('VPDSF')} business impact levels. Pick a rating from 0 to 5 for each question: hover over or focus a rating to read its consequence, and choose the lowest that applies. The highest rating sets the ${Term('BIL','BIL')} for Confidentiality.</p>
+ const secC=`<section class="panel section" id="bil-s2" aria-labelledby="bil-h2"><h2 id="bil-h2">Section 2 · Confidentiality</h2><p class="sub">Consider the impact of unauthorised <strong>disclosure</strong>. The consequences are based on the ${Term('VPDSF')} business impact levels, summarised in each cell; select ? for the full wording. Choose the lowest rating that applies. The highest rating sets the ${Term('BIL','BIL')} for Confidentiality.</p>
   <div class="btnrow lktools">${zeroBtn('C','For questions where disclosure would have no impact.')}</div>${ConfidentialityGrid(r,em,lock)}
   ${YesNoCard('C13','',r.cabinet,em.C13,lock,`${Term('CIC','Cabinet-in-Confidence')}: <span class="pre">${e(BIL_CFG.cabinet.question)}</span>`).replace(/data-bilp="C13"/g,'data-bilcab="1"')}</section>`;
- const secIA=`<section class="panel section" id="bil-s3" aria-labelledby="bil-h3"><h2 id="bil-h3">Section 2 · Integrity and Availability</h2><p class="sub">For each category, give one rating from 0 to 5 for the impact of unauthorised <strong>modification or deletion</strong> (Integrity) or the information being <strong>unavailable</strong> (Availability), then choose where it applies. A one-sided answer records the other as 0 (no impact); choose <em>Different ratings</em> if both have an impact at different levels. The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}. The highest Integrity rating sets the ${Term('BIL','BIL')} for Integrity, and the highest Availability rating sets it for Availability.</p>
+ const secIA=`<section class="panel section" id="bil-s3" aria-labelledby="bil-h3"><h2 id="bil-h3">Section 2 · Integrity and Availability</h2><p class="sub">For each category, choose one rating from 0 to 5 and say whether it applies to Integrity (data changed or deleted), Availability (data unavailable) or both. A one-sided answer records the other as 0 (no impact). If both are affected at different levels, choose Both with the higher rating. The consequences are based on the ${Term('MIRP','MTM Integrated Risk Procedure')}; select ? for the full wording.</p>
   <div class="btnrow lktools">${zeroBtn('IA','For categories with no impact.')}</div>${IntegrityAvailabilityGrid(r,em,lock)}</section>`;
  const body=`<div id="bilValBox">${ValidationSummary(errs)}</div>
- <div class="notice">Answer every question. Each consequence carries a rating from 0 to 5. The ${Term('BIL','BIL')} for each of ${Term('CIA','Confidentiality, Integrity and Availability')} is the highest rating in that section; 0 means no business impact. Confidentiality consequences come from the ${Term('VPDSF')}; Integrity and Availability consequences come from the ${Term('MIRP','MTM Integrated Risk Procedure')}. Results are calculated from your answers exactly as in the MTM BIL Assessment Form (${e(BIL_CFG.source.version)}) and cannot be overridden. Save a draft at any point.</div>
+ <div class="notice">Only the impact questions in Section 2 are needed to calculate the BIL; everything else is optional in this prototype. Each consequence carries a rating from 0 to 5. The ${Term('BIL','BIL')} for each of ${Term('CIA','Confidentiality, Integrity and Availability')} is the highest rating in that section; 0 means no business impact. Confidentiality consequences come from the ${Term('VPDSF')}; Integrity and Availability consequences come from the ${Term('MIRP','MTM Integrated Risk Procedure')}. Results are calculated from your answers exactly as in the MTM BIL Assessment Form (${e(BIL_CFG.source.version)}) and cannot be overridden. Save a draft at any point.</div>
  <section class="panel section" id="bil-s1" aria-labelledby="bil-h1"><h2 id="bil-h1">Section 1 · Preliminary questions</h2>
-  ${yn('A1')}${yn('A2')}<div id="bilFullNote">${full===false?`<div class="notice warn">${e(BIL_CFG.prelimRule.text)}</div>`:''}</div>
-  ${TextCard('B1',pq.B1,p.B1,em.B1)}${TextCard('B2',pq.B2,p.B2,em.B2,{area:1})}${TextCard('B3',pq.B3,p.B3,em.B3,{options:BIL_CFG.groups})}${TextCard('B4',pq.B4,p.B4,em.B4)}${yn('B5')}
-  ${TextCard('B6',pq.B6,p.B6,em.B6)}${TextCard('B7',pq.B7,p.B7,em.B7)}${TextCard('B8',pq.B8,p.B8,em.B8)}${TextCard('B9',pq.B9,p.B9,em.B9,{type:'email'})}
-  ${YesNoCard('B10',pq.B10,p.B10,em.B10,lock,`${e(pq.B10)} ${Term('PI','What counts as personal information?')}`)}
-  <div id="bilPI" ${p.B10==='Yes'?'':'hidden'}><div class="qcard ${em.B11?'invalid':''}" id="f_B11"><p class="small" style="margin:0 0 6px">Select every attribute the information asset holds (B11 to B16).</p>${BIL_PI.map(piBox).join('')}<p class="ferr" id="er_B11" ${em.B11?'':'hidden'}>${e(em.B11||'')}</p></div></div>
+  ${PrelimSub('1a','Information asset',['B1','B2','B3'],r,em,`${TextCard('B1','Information asset and system name: a generic name for the information (e.g. Contact details, Signalling telemetry) and the system it is held in (e.g. Ellipse)',p.B1,em.B1)}${TextCard('B2',pq.B2,p.B2,em.B2,{area:1})}${TextCard('B3',pq.B3,p.B3,em.B3,{options:BIL_CFG.groups})}`)}
+  ${PrelimSub('1b','Ownership (from the asset register)',['B6','B7','B8','B9'],r,em,RegisterCard(p,em))}
+  ${PrelimSub('1c','Business continuity',['B5'],r,em,yn('B5'))}
+  ${PrelimSub('1d','Personal information',['B10','B11'],r,em,`${YesNoCard('B10',pq.B10,p.B10,em.B10,lock,`${e(pq.B10)} ${Term('PI','What counts as personal information?')}`)}
+  <div id="bilPI" ${p.B10==='Yes'?'':'hidden'}><div class="qcard ${em.B11?'invalid':''}" id="f_B11"><p class="small" style="margin:0 0 6px">Select every attribute the information asset holds (B11 to B16).</p>${BIL_PI.map(piBox).join('')}<p class="ferr" id="er_B11" ${em.B11?'':'hidden'}>${e(em.B11||'')}</p></div></div>`)}
 </section>
  ${secC}${secIA}
  <section class="panel section" id="bil-s4" aria-labelledby="bil-h4"><h2 id="bil-h4">Results and approval</h2>
@@ -3309,7 +3366,7 @@ function bilFormPage(a,r,ap){const lock=false,showErr=V.bilShowErr,errs=showErr?
   <div class="qcard ${em.assessor?'invalid':''}" id="f_assessor"><label for="bp_assessor">Assessor</label>${sel('bp_assessor',personOpts(),r.assessor,`data-bilf="assessor" aria-describedby="er_assessor" ${em.assessor?'aria-invalid="true"':''}`)}<p class="ferr" id="er_assessor" ${em.assessor?'':'hidden'}>${e(em.assessor||'')}</p></div>
   ${TextCard('evidence','Evidence reference or link (optional)',r.evidence,null)}${TextCard('rationale','Assessor notes (optional)',r.rationale,null,{area:1})}
   ${YesNoCard('AP1','Has the business or technical data owner named in Section 1 approved the assessment?',r.ownerApproval,em.AP1,lock).replace(/data-bilp="AP1"/g,'data-bilap="1"')}
-  <div class="btnrow"><button class="secondary" data-act="bilSave" data-id="${e(r.id)}">Save draft</button><button class="secondary danger" data-act="bilReset" data-id="${e(r.id)}">Reset answers…</button><button class="primary" data-act="bilSubmit" data-id="${e(r.id)}" ${full===false?'disabled aria-disabled="true"':''}>Submit for approval</button><span class="small" id="bilDirtyNote" ${V.bilDirty?'':'hidden'}>Unsaved changes</span></div>
+  <div class="btnrow"><button class="secondary" data-act="bilSave" data-id="${e(r.id)}">Save draft</button><button class="secondary danger" data-act="bilReset" data-id="${e(r.id)}">Reset answers…</button><button class="primary" data-act="bilSubmit" data-id="${e(r.id)}">Submit for approval</button><span class="small" id="bilDirtyNote" ${V.bilDirty?'':'hidden'}>Unsaved changes</span></div>
   <p class="small" style="margin-top:8px">Outputs are indicative support for MTM's assessment process, not a certification or formal compliance determination.</p></section>`;
  return titlebar(ap?'Review BIL assessment':'Create BIL assessment',`${a.name} · ${BIL_CFG.source.document}`,`Draft · v${r.version}`)+AssessmentLayout({stepper:`<div id="bilStepper">${ProgressStepper(bilSteps(r))}</div>`,body});}
 
@@ -3320,23 +3377,23 @@ function bilReadForm(r){r.prelim=r.prelim||{};
  BIL_PI.forEach(id=>{r.prelim[id]=[...document.querySelectorAll(`[data-bilpi="${id}"]:checked`)].map(x=>x.value);});
  const ch={};document.querySelectorAll('[data-bilq]:checked').forEach(el=>{ch[el.dataset.bilq]=Number(el.value);});
  if(document.querySelector('[data-iar]')){r.ia={};BIL_CFG.riskContext.order.forEach((c,i)=>{const k=i+1,g=sel2=>{const el=document.querySelector(sel2+':checked');return el?el.value:null;};
-  const rv=g(`[data-iar="${k}"]`),sv=g(`[data-ias="${k}"]`),r2=g(`[data-iar2="${k}"]`),st={r:rv==null?null:Number(rv),s:sv||'',r2:r2==null?null:Number(r2)};r.ia[k]=st;const x=iaChoices(st,k);if(x.I!==undefined)ch['I'+k]=x.I;if(x.A!==undefined)ch['A'+k]=x.A;});}
+  const rv=g(`[data-iar="${k}"]`),se=document.querySelector(`[data-ias="${k}"]`),st={r:rv==null?null:Number(rv),s:se?se.value:''};r.ia[k]=st;const x=iaChoices(st,k);if(x.I!==undefined)ch['I'+k]=x.I;if(x.A!==undefined)ch['A'+k]=x.A;});}
  else BIL_CFG.questions.filter(q=>q.dim!=='C').forEach(q=>{const v=(r.choices||{})[q.id];if(v!=null)ch[q.id]=v;});
  r.choices=ch;
  const cab=document.querySelector('[data-bilcab]:checked');r.cabinet=cab?cab.value:(r.cabinet||'');
  const apv=document.querySelector('[data-bilap]:checked');r.ownerApproval=apv?apv.value:(r.ownerApproval||'');
  r.imm=[...document.querySelectorAll('[data-bilimm]:checked')].map(x=>x.value);
- const as=document.getElementById('bp_assessor');if(as)r.assessor=as.value;}
+ const as=document.getElementById('bp_assessor');if(as)r.assessor=as.value;
+ r.prelim.B4=r.prelim.B1||'';/* B4 (system) is captured in B1 */}
 
 /* After any change: refresh progress, results, errors and the unsaved-changes flag without redrawing the form */
 function bilLiveUpdate(){if(!V.bilDraft||!document.getElementById('bilStepper'))return;const r=V.bilDraft.rec;bilReadForm(r);V.bilDirty=true;
  const x=BilStore.result(r);$('#bilStepper').innerHTML=ProgressStepper(bilSteps(r));
  $('#bilResults').innerHTML=x.complete?AssessmentSummary(x,r,{tag:'Calculated · not yet approved'}):`<div class="notice">Results appear when every impact question and C13 are answered (${x.answered} of ${x.total} so far). Unanswered questions are never counted as 0.</div>`;
  const pi=document.getElementById('bilPI');if(pi)pi.hidden=(r.prelim||{}).B10!=='Yes';
- const full=BilCalc.fullAssessmentNeeded(r.prelim||{}),fn=document.getElementById('bilFullNote');if(fn)fn.innerHTML=full===false?`<div class="notice warn">${e(BIL_CFG.prelimRule.text)}</div>`:'';
- const sb=document.querySelector('[data-act="bilSubmit"]');if(sb){sb.disabled=full===false;}
+ bilPrelimRefresh(r);
  document.querySelectorAll('.impopt,.ynopt,.lk').forEach(l=>{const i=l.querySelector('input');l.classList.toggle('on',!!(i&&i.checked));});
- bilRenderDescs(r);document.querySelectorAll('.scp').forEach(l=>{const i=l.querySelector('input');l.classList.toggle('on',!!(i&&i.checked));});
+ document.querySelectorAll('.lk2').forEach(l=>{const i=l.querySelector('input');l.classList.toggle('on',!!(i&&i.checked));});BIL_CFG.riskContext.order.forEach((c,i)=>{const k=i+1,st=iaState(r,k),m=document.getElementById('iamix_'+k);if(m&&!st.mixed)m.hidden=true;const s=document.getElementById('ias_'+k);if(s&&s.options[0])s.options[0].text=st.r===0?'Not needed for 0':'Choose…';});
  const so=document.getElementById('bilSoci');if(so)so.hidden=!bilNeedsSoci(r);
  const dn=document.getElementById('bilDirtyNote');if(dn)dn.hidden=false;
  if(V.bilShowErr)bilShowErrors(r,false);}
@@ -3353,14 +3410,14 @@ function bilCommit(action,by){const d=V.bilDraft;if(!d)return null;const r=DB.bi
 
 /* Read-only record: summary, reproducibility check, audit record, responses and history */
 function bilRecordView(r,tag){const x=BilStore.result(r),v=BilStore.verify(r),p=r.prelim||{};
- const resp=k=>BIL_CFG.questions.filter(q=>q.dim===k).map(q=>{const i=(r.choices||{})[q.id],o=i==null||i===''?null:q.options[Number(i)];return `<tr><td class="nowrap"><strong>${e(q.id)}</strong></td><td>${e(q.question)}</td><td>${o?RatingChip(o.score):'—'}</td><td>${o?e(o.text):'<em>Not answered</em>'}</td></tr>`;}).join('');
+ const resp=k=>BIL_CFG.questions.filter(q=>q.dim===k).sort(bilByNum).map(q=>{const i=(r.choices||{})[q.id],o=i==null||i===''?null:q.options[Number(i)];return `<tr><td class="nowrap"><strong>${e(q.id)}</strong></td><td>${e(q.question)}</td><td>${o?RatingChip(o.score):'—'}</td><td>${o?e(o.text):'<em>Not answered</em>'}</td></tr>`;}).join('');
  const audit=[['Assessment ID',r.id],['Assessment name',r.name],['Asset name',r.assetName||(DB.assets[r.assetId]||{}).name],['Assessor',pname(r.assessor)],['Assessment date',fd(r.assessmentDate)],['Status',{draft:'Draft',awaiting:'Awaiting approval',approved:'Approved'}[r.status]||r.status],['Creation date',fd(r.created)],['Last modified',fd(r.updated)],
   ['Confidentiality',x.C==null?'—':'BIL '+x.C],['Integrity',x.I==null?'—':'BIL '+x.I],['Availability',x.A==null?'—':'BIL '+x.A],['Overall Security Value',x.osv==null?'—':'BIL '+x.osv],['Protective marking',x.marking||'—'],['Primary VPDSF consideration',(x.vpdsf.primary||{}).name||'—'],['Information Management Markers',(r.imm||[]).join(', ')||'None selected'],
   ['Approver',r.approver?pname(r.approver):'—'],['Approved',fd(r.reviewDate)],['Next review',fd(r.nextDue)],['Data owner approval (AP1)',r.ownerApproval||'—'],['Methodology',BIL_CFG.source.version]];
  return `<div class="panel section"><div class="section-head"><h2>Assessment outcome</h2>${tag?pill(r.status==='approved'?'green':'amber',tag):''}</div>${AssessmentSummary(x,r)}
  ${v?`<p class="small" style="margin-top:10px">${v.same?`✓ Recalculated from the saved responses: matches the result saved on ${e(r.result.at)}.`:`<strong class="badt">Recalculating from the saved responses gives a different result from the one saved on ${e(r.result.at)}.</strong> The result was saved under ${e(v.config)}; the form is now ${e(v.current)}. Reassess to bring it up to date.`}</p>`:''}</div>
  <div class="panel section"><h2>Assessment record</h2><div class="kv">${audit.map(([k,v2])=>`<div><strong>${e(k)}</strong><span>${e(v2||'—')}</span></div>`).join('')}</div></div>
- <div class="panel section"><h2>Preliminary answers</h2><div class="kv">${BIL_CFG.prelim.map(q=>{const val2=p[q.id];return `<div><strong>${e(q.id)}</strong><span>${e(Array.isArray(val2)?(val2.join(', ')||'None'):(val2||'—'))}</span></div>`;}).join('')}<div><strong>C13 Cabinet-in-Confidence</strong><span>${e(r.cabinet||'—')}</span></div></div></div>
+ <div class="panel section"><h2>Preliminary answers</h2><div class="kv">${BIL_CFG.prelim.filter(q=>!['A1','A2','B4'].includes(q.id)||String(p[q.id]||'').trim()&&q.id!=='B4').map(q=>{const val2=p[q.id];return `<div><strong>${e(q.id)}</strong><span>${e(Array.isArray(val2)?(val2.join(', ')||'None'):(val2||'—'))}</span></div>`;}).join('')}<div><strong>C13 Cabinet-in-Confidence</strong><span>${e(r.cabinet||'—')}</span></div></div></div>
  <div class="panel section"><h2>Impact responses</h2>${[['C','Confidentiality'],['I','Integrity'],['A','Availability']].map(([k,n])=>`<h3 class="dimhead">${n}</h3><div class="table-scroll"><table class="mini"><thead><tr><th>ID</th><th>Question</th><th>Rating selected</th><th>Consequence selected</th></tr></thead><tbody>${resp(k)}</tbody></table></div>`).join('')}</div>
  <div class="panel section"><h2>Audit trail</h2><div class="table-scroll"><table class="mini"><thead><tr><th>When</th><th>Action</th><th>By</th><th>Note</th></tr></thead><tbody>${(r.audit||[]).slice().reverse().map(a2=>`<tr><td class="nowrap">${e(a2.at)}</td><td>${e(a2.action)}</td><td>${e(a2.by?pname(a2.by):'—')}</td><td class="small">${e(a2.note||'')}</td></tr>`).join('')||'<tr><td colspan="4">No entries.</td></tr>'}</tbody></table></div></div>`;}
 
@@ -3402,21 +3459,11 @@ const BIL_ACT={
 /* Event wiring for the BIL form */
 document.addEventListener('input',ev=>{if(V.view==='bil'&&ev.target.closest&&ev.target.closest('.bil-main')&&ev.target.matches('input:not([type=radio]):not([type=checkbox]),textarea'))bilLiveUpdate();});
 document.addEventListener('change',ev=>{if(V.view==='bil'&&ev.target.closest&&ev.target.closest('.bil-main'))bilLiveUpdate();});
-document.addEventListener('click',ev=>{const a=ev.target.closest&&ev.target.closest('[data-bilfocus]');if(!a)return;ev.preventDefault();const box=document.getElementById('f_'+a.dataset.bilfocus);if(!box)return;box.scrollIntoView({block:'center'});const c=box.querySelector('input:not([disabled]),select,textarea,summary');if(c)c.focus();});
+document.addEventListener('click',ev=>{const a=ev.target.closest&&ev.target.closest('[data-bilfocus]');if(!a)return;ev.preventDefault();const box=document.getElementById('f_'+a.dataset.bilfocus);if(!box)return;box.scrollIntoView({block:'center'});let d=box.closest('details');while(d){d.open=true;d=d.parentElement&&d.parentElement.closest('details');}const ed=box.closest('.regcard');if(ed){const x=ed.querySelector('.regedit');if(x)x.open=true;const inp=document.getElementById('bp_'+a.dataset.bilfocus);if(inp){inp.focus();return;}}const c=box.querySelector('input:not([disabled]),select,textarea,summary');if(c)c.focus();});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains('term'))document.activeElement.blur();});
 window.addEventListener('beforeunload',ev=>{if(V.bilDirty&&V.view==='bil'){ev.preventDefault();ev.returnValue='';}});
 
 /* Likert grid: show the consequence of the rating under the pointer or keyboard focus; fall back to the selected one */
-function bilRenderDescs(r){if(!r)return;BIL_CFG.questions.filter(q=>q.dim==='C').forEach(q=>{const d=document.getElementById('ds_'+q.id);if(d)d.innerHTML=lkDesc(q,(r.choices||{})[q.id]);});
- BIL_CFG.riskContext.order.forEach((c,i)=>{const k=i+1,st=iaState(r,k),d=document.getElementById('dsIA'+k),d2=document.getElementById('dsIA2'+k),box=document.getElementById('ia2_'+k),qa=BIL_CFG.questions.find(q=>q.id==='A'+k);
-  if(d)d.innerHTML=iaDesc(st,k);if(box)box.hidden=st.s!=='D';if(d2)d2.innerHTML=st.r2==null?'<span class="small">Choose the Availability rating</span>':`<strong>${st.r2}</strong> · ${e(qa.options[lkOpt(qa,st.r2)].text)}`;});}
-function lkPreview(lab,on){const qid=lab.dataset.lkq,d=document.getElementById(lab.dataset.lkd||('ds_'+qid)),q=BIL_CFG.questions.find(x=>x.id===qid);if(!d||!q)return;
- if(on){const inp=lab.querySelector('input'),s=inp.dataset.bilq?q.options[Number(inp.value)].score:Number(inp.value),o=q.options[lkOpt(q,s)];d.innerHTML=`<strong>${o.score}</strong> · ${e(o.text)}${lab.classList.contains('on')?'':' <span class="small">(not selected)</span>'}`;}
- else bilRenderDescs(V.bilDraft&&V.bilDraft.rec);}
-document.addEventListener('mouseover',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l)lkPreview(l,true);});
-document.addEventListener('mouseout',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l&&!l.contains(ev.relatedTarget))lkPreview(l,false);});
-document.addEventListener('focusin',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l)lkPreview(l,true);});
-document.addEventListener('focusout',ev=>{const l=ev.target.closest&&ev.target.closest('.lk[data-lkq]');if(l)lkPreview(l,false);});
 
 
 /* ---- CMAP ---- */
