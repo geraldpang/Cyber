@@ -271,7 +271,21 @@ body.proto header.top{display:none}
 .stepper li a>span:last-child{display:flex;flex-direction:column}.snum{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:2px solid var(--field);color:var(--muted)}.stepper li.done .snum{background:var(--green);border-color:var(--green);color:#fff}.stepper li.part .snum{border-color:var(--amber);color:var(--amber)}.stepper li.opt .snum{border-style:dashed}
 .pbar{height:8px;background:var(--pale);border-radius:4px;overflow:hidden}.pbar span{display:block;height:100%;background:var(--green)}
 .attprog{display:flex;align-items:center;gap:10px;min-width:150px}.attprog .pbar{flex:1;min-width:90px}
-.attcounts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nvassets{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;max-height:180px;overflow:auto}span.attcount,button.attcount{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:5px 9px;cursor:pointer;font:inherit}button.attcount:hover{border-color:var(--action)}
+.attcounts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.nvassets{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;max-height:180px;overflow:auto}.dtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:12px;margin-bottom:16px}
+button.dtile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--white);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:7px;padding:12px 14px;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 1px 3px #1b314910}button.dtile:hover{border-color:var(--blue);background:var(--hover)}
+button.dtile.bad{border-left-color:var(--red)}button.dtile.warn{border-left-color:var(--amber)}.dtl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}.dtv{font-size:28px;font-weight:700;line-height:1.1}.dtv small{font-size:15px;color:var(--muted);font-weight:600}.dts{font-size:12px;color:var(--muted)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px;margin-bottom:16px}.dgrid>.panel{margin:0}
+.dheat{display:grid;grid-template-columns:44px repeat(3,minmax(0,1fr));gap:8px;align-items:stretch;margin-top:12px}.dh{text-align:center;align-self:end}.dhk{font-weight:700;align-self:center}
+button.dcell{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--tint);border:1px solid var(--line);border-radius:6px;padding:10px 6px;cursor:pointer;font:inherit}button.dcell:hover{border-color:var(--blue)}
+.dneeds{list-style:none;margin:10px 0 0;padding:0}.dneeds li{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.ddot{width:10px;height:10px;border-radius:50%;flex:none}.ddot.bad{background:var(--red)}.ddot.warn{background:var(--amber)}
+.dh3{font-size:13px;margin:14px 0 6px;color:var(--ink)}.dbar{display:flex;gap:2px;height:12px;border-radius:4px;overflow:hidden;background:var(--pale)}.dbar span{display:block;min-width:4px}
+.dleg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:12px;color:var(--muted)}.dleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}.dleg strong{color:var(--ink)}
+.d-good{background:var(--green)}.d-warn{background:#d39a3a}.d-bad{background:var(--red)}.d-info{background:var(--blue)}.d-none{background:#c3ccd8}
+.dstds{display:grid;gap:4px;margin-top:10px}button.dstd{display:grid;grid-template-columns:24px minmax(0,1fr) 120px 44px;gap:8px;align-items:center;background:none;border:0;border-bottom:1px solid var(--line);padding:5px 2px;cursor:pointer;font:inherit;color:var(--ink);text-align:left}button.dstd:hover{background:var(--hover)}.dstn{font-weight:700;color:var(--muted)}.dstx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.dchip{border:1px solid transparent;border-radius:12px;padding:2px 8px;font:600 11px Arial,sans-serif;cursor:pointer;white-space:nowrap}.dchip.t-green{background:#e3f1e8;color:#1d5c38}.dchip.t-amber{background:#fbefdc;color:#7a4b0e}.dchip.t-red,.dchip.t-solidred{background:#f9e1e2;color:#8e2a30}.dchip.t-blue{background:#e2eef8;color:#14507f}.dchip.t-gray{background:#eef1f5;color:#556476}
+table.dmatrix td{vertical-align:middle}
+@media(max-width:650px){.dgrid{grid-template-columns:1fr}button.dstd{grid-template-columns:24px minmax(0,1fr) 70px 40px}}
+span.attcount,button.attcount{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:5px 9px;cursor:pointer;font:inherit}button.attcount:hover{border-color:var(--action)}
 .attfilters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.attfilters .field{min-width:220px}
 .attbulk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}.attbulk select{max-width:280px}
 table.attel select,table.attstd select{max-width:230px}.atttag{font:600 10px 'IBM Plex Mono',monospace;background:var(--note-bg);color:var(--note-ink);border-radius:3px;padding:1px 5px}
@@ -336,7 +350,7 @@ button.danger{color:var(--red);border-color:var(--red)}button.primary.danger{bac
 <header class="top">
   <div class="brand">OneTrust <small>concept</small></div>
   <nav class="topnav" aria-label="Modules">
-    <button data-nav="register">Home</button>
+    <button data-nav="home">Home</button>
     <button data-nav="register" data-main="1">Asset governance</button>
     <button data-nav="bilreg">BIL</button>
     <button data-nav="trareg">TRA</button>
@@ -3086,7 +3100,7 @@ function assuranceRows(aid){const rows=[],ap=approvedBil(aid),w=workingBil(aid),
  return rows;}
 
 /* ================= Routing ================= */
-let V={view:'register',traAll:true,a:null,b:null,tab:'Overview',std:null,q:'',level:'All',type:'All',confirmReset:false};
+let V={view:'home',traAll:true,a:null,b:null,tab:'Overview',std:null,q:'',level:'All',type:'All',confirmReset:false};
 function go(view,a,b){if(bilGuard(()=>go(view,a,b)))return;V.view=view;V.a=a||null;V.b=b||null;
  if(view==='traEdit'&&b!==V.traId){V.traId=b;V.adhocEdit=null;V.traStep=null;V.ctlQ='';V.s5f='All';V.ctlF='All';V.ctlD=[];V.ctlTh=[];V.ctlSl=[];}
  if(view==='asset'){if(a!==V.lastAsset){V.tab=b||'Overview';V.std=null;}else if(b)V.tab=b;V.lastAsset=a;}
@@ -4643,8 +4657,71 @@ ACT.compAsset=b=>{const t=DB.tra[b.dataset.id];readTra(t);save();const r=(t.comp
 ACT.compTra=b=>{const t=DB.tra[b.dataset.id];readTra(t);const r=(t.components||[]).find(x=>x.id===b.dataset.k);if(!r||!r.assetId)return;const a=DB.assets[r.assetId],pa=DB.assets[t.assetId]||{};
  r.traId=newTraRecord(a.id,{title:`${a.name} (component of ${pa.name||t.assetId})`,scope:`Component of ${pa.name||t.assetId} identified in ${t.ref||t.id}.`});save();const y=window.scrollY;render();window.scrollTo(0,y);toast(`${r.traId} started for ${a.id}`);};
 
+/* ---- Home: governance dashboard. Every figure links to the page it comes from; nothing here is stored separately ---- */
+const dTile=(label,value,sub,go,tone)=>`<button class="dtile ${tone||''}" data-go="${e(go[0])}"${go[1]?` data-a="${e(go[1])}"`:''}><span class="dtl">${e(label)}</span><span class="dtv">${value}</span><span class="dts">${sub}</span></button>`;
+const dBar=(parts,total)=>`<div class="dbar" role="img" aria-label="${e(parts.map(p=>p[1]+' '+p[0]).join(', '))}">${parts.filter(p=>p[1]>0).map(p=>`<span class="${p[2]}" style="flex:${p[1]}" title="${e(p[0])}: ${p[1]}"></span>`).join('')||'<span class="d-none" style="flex:1"></span>'}</div><div class="dleg">${parts.map(p=>`<span><i class="${p[2]}"></i>${e(p[0])} <strong>${p[1]}</strong></span>`).join('')}</div>`;
+const pillTone=h=>{const m=/pill (\w+)/.exec(h||'');return m?m[1]:'gray';};
+const pillText=h=>String(h||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+function homePage(){const as=Object.values(DB.assets).sort((x,y)=>x.id.localeCompare(y.id)),n=as.length,ot=as.filter(a=>a.type==='OT').length;
+ /* BIL */
+ const bilAp=as.filter(a=>approvedBil(a.id)),bilOver=bilAp.filter(a=>daysTo(approvedBil(a.id).nextDue)<0).length,bilWip=as.filter(a=>workingBil(a.id)).length+BilStore.unlinked().length;
+ /* TRA */
+ const traDone=as.filter(a=>currentTra(a.id)).length,traWip=Object.values(DB.tra).filter(t=>t.mode==='new'&&(t.status==='Draft'||t.status==='In progress')).length;
+ /* Risk roll-up */
+ const R=riskRollup(),hi=[];['OT','IT'].forEach(k=>RISK_DIMS.forEach(([d])=>R.env[k][d].forEach(x=>{if(x.res.value>RISK_REG_THRESHOLD&&!hi.some(h=>h.a.id===x.a.id&&h.stmt.id===x.stmt.id))hi.push(x);})));
+ /* Actions */
+ const acts=as.flatMap(a=>actionsFor(a.id).map(x=>Object.assign({aid:a.id},x))),open=acts.filter(isOpen),od=open.filter(isOverdue);
+ /* CMAP */
+ const cm=Object.values(DB.cmapDefs).filter(d=>DB.assets[d.assetId]&&cmapRequired(d)).map(cmapState),cmc=s=>cm.filter(x=>x.state===s).length;
+ /* Attestation */
+ const els=attElList(),ec={};ATT_STATES.forEach(s=>ec[s]=0);els.forEach(x=>ec[attPeek(x.id).state||'Not started']++);
+ /* Third party */
+ const vs=Object.values(DB.vendors),dec=k=>vs.filter(v=>{const d=latestDecision(v.id);return d&&d.review.decision===k;}).length,noDec=vs.filter(v=>!latestDecision(v.id)).length;
+ /* Needs attention across assets */
+ const att=as.flatMap(a=>attention(a.id).map(x=>Object.assign({a},x))).sort((x,y)=>(x.sev==='bad'?0:1)-(y.sev==='bad'?0:1));
+ const extra=[];if(ec.Submitted)extra.push({sev:'warn',text:`${ec.Submitted} VPDSS element answer${ec.Submitted===1?'':'s'} awaiting coordinator review`,go:['assessments']});if(ec.Returned)extra.push({sev:'warn',text:`${ec.Returned} VPDSS element answer${ec.Returned===1?'':'s'} returned to owners`,go:['assessments']});
+ vs.forEach(v=>{const d=latestDecision(v.id),l=vaFor(v.id)[0];if(l&&l.status==='submitted')extra.push({sev:'warn',text:`${v.name}: supplier assessment awaiting review`,go:['va',l.id]});else if(d&&d.review.decision==='Rejected')extra.push({sev:'bad',text:`${v.name}: supplier assessment rejected`,go:['va',d.id]});});
+ const needs=extra.filter(x=>x.sev==='bad').concat(att.filter(x=>x.sev==='bad'),extra.filter(x=>x.sev!=='bad'),att.filter(x=>x.sev!=='bad'));
+ const goAttr=g=>`data-go="${e(g[0])}"${g[1]?` data-a="${e(g[1])}"`:''}${g[2]?` data-b="${e(g[2])}"`:''}`;
+ /* Risk heat grid */
+ const cell=(k,d,name)=>{const l=R.env[k][d],top=l[0];return `<button class="dcell" data-go="allrisks" title="${e(k+' '+name+': '+(top?'highest residual '+top.res.value:'no TRA risks'))}">${top?riskBox(top.res):'<span class="small">—</span>'}<span class="small">${l.length} TRA risk${l.length===1?'':'s'}</span></button>`;};
+ /* Assurance matrix */
+ const cols=['BIL','TRA','Risk','Actions','CMAP','Health','Malware','Monitor'];
+ const matrix=`<div class="table-scroll"><table class="mini dmatrix"><thead><tr><th>Asset</th>${cols.map(c=>`<th>${e(c)}</th>`).join('')}<th>Overall</th></tr></thead><tbody>${as.map(a=>{const rows=assuranceRows(a.id),lv=assuranceLevel(a.id);return `<tr><td><button class="open" data-go="asset" data-a="${e(a.id)}">${e(a.id)}</button><div class="small">${e(a.name)}</div></td>${rows.map(r=>{const t=pillTone(r.res),tx=pillText(r.res);return `<td><button class="dchip t-${e(t)}" ${goAttr(r.go||['asset',a.id])} title="${e(r.title+': '+tx)}" aria-label="${e(r.title+': '+tx)}">${e(tx.length>16?tx.slice(0,15)+'…':tx)}</button></td>`;}).join('')}<td>${pill(lv==='On track'?'green':lv==='Review due'?'amber':'red',lv)}</td></tr>`;}).join('')}</tbody></table></div>`;
+ /* VPDSS standards progress */
+ const std=Object.keys(VPDSS_EL).map(Number).map(k=>{const ru=attRollup(k);return `<button class="dstd" data-go="attestStd" data-a="${k}" title="Standard ${k}: ${ru.answered} of ${ru.total} answered${ru.status?' · '+ru.status:''}"><span class="dstn">${k}</span><span class="dstx">${e(VPDSS_SHORT[k])}</span><span class="pbar"><span style="width:${Math.round(ru.answered/ru.total*100)}%"></span></span><span class="small">${ru.answered}/${ru.total}</span></button>`;}).join('');
+ return titlebar('Home','Cyber governance at a glance: assets, BIL, TRA, risk, attestation and third parties. Select any figure to open its page.','Sample data · concept only')+
+ `<div class="dtiles">
+  ${dTile('Assets',n,`${n-ot} IT · ${ot} OT`,['register'])}
+  ${dTile('Approved BIL',`${bilAp.length}<small>/${n}</small>`,`${bilOver?bilOver+' review overdue · ':''}${bilWip} in progress`,['bilreg'],bilOver?'bad':'')}
+  ${dTile('Completed TRA',`${traDone}<small>/${n}</small>`,`${traWip} in progress`,['trareg'],traDone<n?'warn':'')}
+  ${dTile('Residual risks above 9',hi.length,'raise in risk register',['allrisks'],hi.length?'bad':'')}
+  ${dTile('Open actions',open.length,`${od.length} overdue`,['register'],od.length?'bad':'')}
+  ${dTile('CMAP attestations',`${cmc('current')}<small>/${cm.length}</small>`,`${cmc('overdue')} overdue · ${cmc('missing')} not performed`,['assessments'],cmc('overdue')+cmc('missing')?'bad':'')}
+  ${dTile('VPDSS elements answered',`${ec.Submitted+ec.Accepted}<small>/${els.length}</small>`,`${ec.Accepted} accepted · ${ec.Returned} returned`,['assessments'])}
+  ${dTile('Third parties',vs.length,`${dec('Conditional')} conditional · ${dec('Rejected')} rejected`,['thirdparty'],dec('Rejected')?'bad':'')}
+ </div>
+ <div class="dgrid">
+  <div class="panel section"><div class="section-head"><h2>Cyber risk · residual</h2><button class="open small" data-go="allrisks">Open Risks →</button></div><p class="small">Highest residual risk from completed TRAs, by environment and dimension.</p>
+   <div class="dheat"><span></span><span class="small dh">Confidentiality</span><span class="small dh">Integrity</span><span class="small dh">Availability</span>${['OT','IT'].map(k=>`<span class="dhk">${k}</span>${RISK_DIMS.map(([d,name])=>cell(k,d,name)).join('')}`).join('')}</div>
+   ${R.noTra.length||R.noBreak.length?`<p class="small" style="margin-top:8px">Not counted: ${R.noTra.length} asset${R.noTra.length===1?'':'s'} with no completed TRA${R.drafts.length?`, ${R.drafts.length} TRA${R.drafts.length===1?'':'s'} in progress`:''}.</p>`:''}</div>
+  <div class="panel section"><div class="section-head"><h2>Needs attention</h2><span class="small">${needs.length} item${needs.length===1?'':'s'}</span></div>
+   ${needs.length?`<ul class="dneeds">${needs.slice(0,10).map(x=>`<li><span class="ddot ${x.sev==='bad'?'bad':'warn'}" aria-hidden="true"></span><span class="vh">${x.sev==='bad'?'Overdue or failed':'Due or pending'}:</span><button class="open" ${goAttr(x.go)}>${x.a?e(x.a.id)+' · ':''}${e(x.text)}</button></li>`).join('')}</ul>${needs.length>10?`<p class="small">and ${needs.length-10} more on the asset pages.</p>`:''}`:'<p class="small">Nothing needs attention.</p>'}</div>
+ </div>
+ <div class="dgrid">
+  <div class="panel section"><div class="section-head"><h2>Work in progress</h2></div>
+   <h3 class="dh3">BIL assessments</h3>${dBar([['Approved',bilAp.length-bilOver,'d-good'],['Review overdue',bilOver,'d-bad'],['In progress',bilWip,'d-warn'],['Not assessed',n-bilAp.length-as.filter(a=>!approvedBil(a.id)&&workingBil(a.id)).length,'d-none']])}
+   <h3 class="dh3">Actions</h3>${dBar([['On track',open.length-od.length,'d-info'],['Overdue',od.length,'d-bad'],['Completed',acts.length-open.length,'d-good']])}
+   <h3 class="dh3">CMAP attestations</h3>${dBar([['Current',cmc('current'),'d-good'],['Due soon',cmc('soon'),'d-warn'],['Overdue',cmc('overdue'),'d-bad'],['Not performed',cmc('missing'),'d-none']])}
+   <h3 class="dh3">Third-party decisions</h3>${dBar([['Acceptable',dec('Acceptable'),'d-good'],['Conditional',dec('Conditional'),'d-warn'],['Rejected',dec('Rejected'),'d-bad'],['No decision',noDec,'d-none']])}</div>
+  <div class="panel section"><div class="section-head"><h2>VPDSS attestation ${e(DB.attest.id)}</h2><button class="open small" data-go="assessments">Open Attestation →</button></div><p class="small">Elements answered per standard · due ${fd(DB.attest.due)}</p><div class="dstds">${std}</div></div>
+ </div>
+ <div class="panel section"><div class="section-head"><h2>Asset assurance</h2><button class="open small" data-go="register">Open asset register →</button></div><p class="small">Status of each assurance record per asset. Select a cell to open it.</p>${matrix}</div>
+ <p class="small attdisc">Figures are indicative and come from the records in this concept; they are not a formal compliance determination or certification.</p>`;}
+Object.assign(VIEWS,{home:homePage});
+
 function render(){let html;try{html=(VIEWS[V.view]||register)();}catch(err){console.error(err);html=`<div class="panel section"><h2>This record could not be shown</h2><p class="sub">${e(err.message)}</p><div class="btnrow"><button class="primary" data-go="register">Back to asset register</button></div></div>`;}
- $('#app').innerHTML=html;const grp={bil:V.view==='bil'&&!V.a?'bilreg':undefined,bilreg:'bilreg',trareg:'trareg',traEdit:V.view==='traEdit'&&DB.tra[V.b]&&!DB.tra[V.b].assetId&&!PROTO?'trareg':undefined,thirdparty:'thirdparty',va:V.b?undefined:'thirdparty',assessments:'assessments',attestStd:'assessments',attestEl:'assessments',allrisks:'allrisks',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
+ $('#app').innerHTML=html;const grp={home:'home',bil:V.view==='bil'&&!V.a?'bilreg':undefined,bilreg:'bilreg',trareg:'trareg',traEdit:V.view==='traEdit'&&DB.tra[V.b]&&!DB.tra[V.b].assetId&&!PROTO?'trareg':undefined,thirdparty:'thirdparty',va:V.b?undefined:'thirdparty',assessments:'assessments',attestStd:'assessments',attestEl:'assessments',allrisks:'allrisks',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
  if(V.view==='register')regRows();if($('#inhPrev'))updateRiskPreview();if($('#hcProgress'))updateHealthProgress();if($('#vScope'))updateVendorScope();if($('#ctlResults'))renderCtlResults();if($('#xL'))xferCounts();document.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=true);}
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('td.lqc');if(!c)return;const r=c.querySelector('input[data-lqr]');if(r)r.dataset.was=r.checked?'1':'';},true);
 function lqClear(id){if(V.view!=='traEdit')return;document.querySelectorAll(`[name="lq_${id}"]`).forEach(x=>{x.checked=false;});const tr=DB.tra[V.b];readTra(tr);save();const y=window.scrollY;render();window.scrollTo(0,y);}
