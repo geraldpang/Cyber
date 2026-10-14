@@ -75,7 +75,7 @@ button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
 <body>
 <header><div class="in">
   <h1>TRA question bank editor</h1>
-  <p>Add, edit and delete the risk statements, likelihood questions, MTM and IEC 62443 controls, and the control assurance questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
+  <p>Edit the threats and their default wording, and add, edit and delete the risk statements, likelihood questions, MTM and IEC 62443 controls, and the control assurance questions used by the Threat Risk Assessment. Changes reach the TRA pages within a minute. <a href="../">Back to the TRA</a></p>
 </div></header>
 <main>
   <div class="status" id="status" role="status">Loading the question bank…</div>
@@ -88,7 +88,8 @@ button.mini{padding:3px 8px;font-size:12px}.note{background:var(--tint)}
     </div>
     <p class="msg err" id="lgMsg" aria-live="polite" style="margin:8px 0 0"></p>
   </form>
-  <nav class="jump" aria-label="Sections"><a href="#statements">Risk statements</a><a href="#questions">Likelihood questions</a><a href="#assurance">Control assurance questions</a><a href="#controls">MTM and IEC controls</a></nav>
+  <nav class="jump" aria-label="Sections"><a href="#threats">Threats</a><a href="#statements">Risk statements</a><a href="#questions">Likelihood questions</a><a href="#assurance">Control assurance questions</a><a href="#controls">MTM and IEC controls</a></nav>
+  <section id="threats"></section>
   <section id="statements"></section>
   <section id="questions"></section>
   <section id="assurance"></section>
@@ -134,6 +135,14 @@ const threatBoxes=(name,sel)=>`<div class="thr">${data.threats.map(t=>`<label><i
 const dis=()=>canEdit?'':'disabled';
 
 function render(){
+  const ts=data.threats||[],hasDesc=ts.some(t=>'description' in t);
+  $('#threats').innerHTML=`<div class="sethead"><h2>Threats</h2><span class="tag">${ts.length} threats</span></div><p class="sub">The name and default wording of each threat. The wording appears in the Cyber Risk Decision Brief (Step 8 of the TRA); an assessor can change it for one TRA without changing it here.</p>`+
+  (hasDesc?'':`<div class="card empty">The threats table has no wording column yet. Run threat-wording-steps.txt in the D1 Console, then reload this page.</div>`)+
+  ts.map(t=>`<form class="card" data-kind="threat" data-id="${esc(t.id)}"><div class="grid" style="grid-template-columns:70px minmax(180px,280px) minmax(240px,1fr);align-items:end">
+    <div><span class="id">${esc(t.id)}</span></div>
+    <div><label class="f" for="thn_${esc(t.id)}">Threat</label><input type="text" id="thn_${esc(t.id)}" name="name" value="${esc(t.name)}" maxlength="120" ${dis()}></div>
+    <div><label class="f" for="thd_${esc(t.id)}">Default wording</label><input type="text" id="thd_${esc(t.id)}" name="description" value="${esc(t.description||'')}" maxlength="500" placeholder="What this threat means, in plain words" ${dis()} ${hasDesc?'':'disabled'}></div>
+  </div><div class="actions"><button type="submit" ${dis()} ${hasDesc?'':'disabled'}>Save ${esc(t.id)}</button><span class="msg" aria-live="polite"></span></div></form>`).join('');
   $('#statements').innerHTML=`<div class="sethead"><h2>Risk statements</h2><button type="button" class="sec" data-addstmt ${dis()}>+ Add risk statement</button></div><p class="sub">Each statement reads "Risk of <em>event</em> due to <em>hazard</em>" and applies to IT, OT and hybrid systems. Tick the risk contexts and the threats that are relevant to it.</p>`+
   (data.risk_statements.length?data.risk_statements.map(s=>`<form class="card" data-kind="statement" data-id="${esc(s.id)}">
     <div class="card-h"><span class="id">${esc(s.id)}</span><span class="tag" data-dims>${esc(dimsText(s.tag))}</span></div>
@@ -257,7 +266,8 @@ document.addEventListener('submit',async e=>{
   const msg=f.querySelector('.msg'),btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='msg';msg.textContent='Saving…';
   const checked=n=>[...f.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
   try{
-    if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
+    if(f.dataset.kind==='threat'){const b={name:fv(f,'name').trim(),description:fv(f,'description').trim()};await post(Object.assign({action:'updateThreat',id:f.dataset.id},b));const th=(data.threats||[]).find(x=>x.id===f.dataset.id);if(th)Object.assign(th,b);}
+    else if(f.dataset.kind==='statement')await post({action:'updateStatement',id:f.dataset.id,tag:fv(f,'tag'),event:fv(f,'event'),hazard:fv(f,'hazard'),risk_contexts:checked('ctx'),threats:checked('thr')});
     else if(f.dataset.kind==='assurance'){const cs=Array.isArray(data.controls)?data.controls:[],b={topic:fv(f,'topic'),question:fv(f,'question'),required:fv(f,'required'),evidence:fv(f,'evidence'),controls:cs.map(c=>c.id).filter(id=>f._sel&&f._sel.has(id))};await post(Object.assign({action:'updateAssurance',id:f.dataset.id},b));
       const q=(data.assurance_questions||[]).find(x=>x.id===f.dataset.id);if(q){Object.assign(q,b);const d=f.closest('details');d.querySelector('.ctitle').textContent=q.topic;d.querySelector('.badges .tag').textContent=aqCount(q);const c=document.querySelector('[data-cov]');if(c)c.innerHTML=covHtml();}}
     else if(f.dataset.kind==='control'){const hasQ=!!f.querySelector('input[name=aqs]'),qsel=checked('aqs');await post(Object.assign({action:'updateControl',id:f.dataset.id,title:fv(f,'title'),description:fv(f,'description'),domain:fv(f,'domain'),cia:checked('cia'),sl:checked('sl').map(Number),threats:checked('thr')},readDetails(f),hasQ?{questions:qsel}:{}));
