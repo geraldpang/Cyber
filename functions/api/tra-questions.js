@@ -14,11 +14,14 @@ export async function onRequestGet({ env }) {
     return json({ error: "The D1 database is not bound to this Pages project as DB." }, 500);
   }
   try {
-    const [threats, statements, statementThreats] = await env.DB.batch([
-      env.DB.prepare("SELECT id, name FROM threats ORDER BY sort_order"),
+    const [statements, statementThreats] = await env.DB.batch([
       env.DB.prepare("SELECT id, tag, event, hazard, risk_contexts, updated_at FROM risk_statements ORDER BY sort_order"),
       env.DB.prepare("SELECT statement_id, threat_id FROM risk_statement_threats ORDER BY threat_id"),
     ]);
+    // Threats with their default wording for the Cyber Risk Decision Brief; works before the description column exists
+    let threats;
+    try { threats = await env.DB.prepare("SELECT id, name, description FROM threats ORDER BY sort_order").all(); }
+    catch { threats = await env.DB.prepare("SELECT id, name FROM threats ORDER BY sort_order").all(); }
     const group = (rows, key) => rows.reduce((m, r) => ((m[r[key]] ||= []).push(r.threat_id), m), {});
     const stThreats = group(statementThreats.results, "statement_id");
 
