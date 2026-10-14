@@ -266,12 +266,25 @@ export async function onRequestPost({ request, env }) {
         return json({ ok: true, loaded: qs.length, links: links.length, skipped, by: auth.email });
       }
 
+      case "updateThreat": {
+        // Name and default wording of a threat (the wording appears in the Cyber Risk Decision Brief and each TRA can change it)
+        const id = String(body.id || "");
+        if (!THREAT_RE.test(id) || !known.has(id)) throw bad("Unknown threat ID.");
+        const name = String(body.name || "").trim(), description = String(body.description || "").trim();
+        if (!name) throw bad("Enter the threat name.");
+        if (name.length > 120) throw bad("The threat name must be 120 characters or fewer.");
+        if (description.length > 500) throw bad("The wording must be 500 characters or fewer.");
+        await env.DB.prepare("UPDATE threats SET name = ?, description = ? WHERE id = ?").bind(name, description, id).run();
+        return json({ ok: true, saved: id, by: auth.email });
+      }
+
       default:
         throw bad("Unknown action.");
     }
   } catch (err) {
     if (err && err.userError) return json({ error: err.message }, 400);
     const detail = String((err && err.message) || err);
+    if (/no such column: description/i.test(detail)) return json({ error: "The threats table has no description column yet. Run threat-wording-steps.txt in the D1 Console." }, 500);
     if (/no such table: control_(specs|evidence)/i.test(detail)) return json({ error: "The specification and evidence tables have not been created yet. Run details-steps.txt in the D1 Console." }, 500);
     if (/no such table: control/i.test(detail)) return json({ error: "The control tables have not been created yet. Run controls-steps.txt in the D1 Console." }, 500);
     if (/no such table: assurance_question/i.test(detail)) return json({ error: "The assurance question tables have not been created yet. Run assurance-steps.txt in the D1 Console." }, 500);
