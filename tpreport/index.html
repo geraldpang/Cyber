@@ -294,7 +294,7 @@ const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 /* Turn the organisation names back into {ORG}/{ORGFULL} so saved wording works for any organisation name */
 function tokenise(s){let x=String(s);if(S.orgFull)x=x.split(S.orgFull).join('{ORGFULL}');if(S.org)x=x.replace(new RegExp('\\b'+reEsc(S.org)+'\\b','g'),'{ORG}');return x;}
 function renderDb(){const st=$('#dbStatus');st.textContent=DB_STATE==='db'?`Default wording: from the database (${DB_SAVED} saved item${DB_SAVED===1?'':'s'}).`:DB_STATE==='checking'?'Checking the default wording…':'Default wording: built-in.';$('#edDetails').hidden=DB_STATE!=='db';$('#edReq').hidden=!!EDITOR;
- $('#editorBox').innerHTML=DB_STATE!=='db'?'':EDITOR?`<div class="btnrow"><span class="hint" style="margin:0">Signed in as ${esc(EDITOR.user)}. "Save as default wording" shows beside edited text.</span><button type="button" class="btn small" id="edOut">Sign out</button></div>`:`<div class="grid" style="margin-top:0"><label class="f">Editor ID<input type="text" id="edUser" autocomplete="username"/></label><label class="f">Password<input type="password" id="edPass" autocomplete="current-password" style="font:inherit;font-size:.92rem;border:1px solid #cfd8dd;border-radius:8px;padding:9px 11px"/></label></div><div class="btnrow" style="margin-top:10px"><button type="button" class="btn small" id="edIn">Sign in as editor</button></div>`;}
+ $('#editorBox').innerHTML=DB_STATE!=='db'?'':EDITOR?`<div class="btnrow"><span class="hint" style="margin:0">Signed in as ${esc(EDITOR.user)}. "Save as default wording" shows beside edited text.</span><button type="button" class="btn small" id="edOut">Sign out</button></div><div class="btnrow" style="margin-top:10px"><button type="button" class="btn small" id="edAll">Save all current wording to the database</button></div><p class="hint">Writes the default wording shown to everyone (all 11 advisory items and the report sections) so the database holds the full set. Edits you made to this report only are not included.</p>`:`<div class="grid" style="margin-top:0"><label class="f">Editor ID<input type="text" id="edUser" autocomplete="username"/></label><label class="f">Password<input type="password" id="edPass" autocomplete="current-password" style="font:inherit;font-size:.92rem;border:1px solid #cfd8dd;border-radius:8px;padding:9px 11px"/></label></div><div class="btnrow" style="margin-top:10px"><button type="button" class="btn small" id="edIn">Sign in as editor</button></div>`;}
 async function loadDefaults(){if(!/^https?:$/.test(location.protocol)){DB_STATE='offline';renderDb();return;}
  try{const r=await fetch('/api/tp-report',{cache:'no-store'});const j=await r.json();
   if(!j||!j.ready){DB_STATE='notready';renderDb();return;}
@@ -309,7 +309,18 @@ async function saveDefault(payload,done){if(!EDITOR){toast('Sign in as editor fi
   if(!r.ok){toast(j.error||'The wording could not be saved');return;}
   done();DB_SAVED++;DB_STATE='db';persist();renderDb();renderSections();renderPreview();toast('Saved as the default wording for everyone');}
  catch(_){toast('The database could not be reached');}}
+async function saveAll(btn){if(!EDITOR)return;if(!confirm('Save all current default wording (11 advisory items and 7 report sections) to the database? Items already saved are overwritten with the wording shown as default now.'))return;
+ const jobs=[...ADV.map(a=>({action:'updateAdvisory',n:a.n,area:a.area,obs:a.obs,rec:a.rec,ev:a.ev,refs:a.refs||''})),...Object.keys(T).map(k=>({action:'updateText',key:k,body:T[k]}))];
+ btn.disabled=true;let done=0;
+ for(const p of jobs){btn.textContent=`Saving ${done+1} of ${jobs.length}…`;
+  try{const r=await fetch('/api/admin/tp-report',{method:'POST',headers:{'content-type':'application/json','authorization':'Basic '+b64(EDITOR.user+':'+EDITOR.pass)},body:JSON.stringify(p)});let j={};try{j=await r.json();}catch(_){}
+   if(r.status===401||r.status===403){EDITOR=null;renderDb();renderSections();renderPreview();toast(j.error||'Sign-in failed');return;}
+   if(!r.ok){toast((j.error||'Saving stopped')+` (${done} of ${jobs.length} saved)`);break;}done++;}
+  catch(_){toast(`The database could not be reached (${done} of ${jobs.length} saved)`);break;}}
+ if(done===jobs.length){DB_SAVED=jobs.length;toast(`All ${jobs.length} items saved to the database`);}
+ renderDb();}
 document.addEventListener('click',ev=>{const t=ev.target;
+ if(t.id==='edAll'){saveAll(t);return;}
  if(t.id==='edIn'){const u=$('#edUser').value.trim(),p=$('#edPass').value;if(!u||!p){toast('Enter the editor ID and password');return;}EDITOR={user:u,pass:p};renderDb();renderSections();renderPreview();toast('Signed in. Your password is checked when you first save.');return;}
  
  if(t.id==='edOut'){EDITOR=null;renderDb();renderSections();renderPreview();return;}
