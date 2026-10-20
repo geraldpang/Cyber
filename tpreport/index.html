@@ -31,6 +31,10 @@ main{max-width:980px;margin:0 auto;padding:28px 24px 80px;}
 .intro h1{font-family:'Source Serif 4',serif;font-weight:600;font-size:clamp(1.6rem,3.6vw,2.2rem);line-height:1.2;margin-bottom:8px;}
 .intro p{color:var(--text2);max-width:680px;font-size:.95rem;}
 h2[id]{scroll-margin-top:80px;}
+.edfoot{margin-top:10px;font-size:.75rem;color:var(--text2);display:flex;flex-direction:column;gap:6px;}
+.edfoot summary{cursor:pointer;display:inline;color:var(--text2);text-decoration:underline;}
+.edfoot details[open]{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-width:560px;}
+.edfoot details[open] summary{text-decoration:none;font-weight:600;color:var(--text);}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:18px;}
 .card h2{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.2rem;margin-bottom:4px;}
 .card .sub{color:var(--text2);font-size:.88rem;}
@@ -89,7 +93,7 @@ input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid v
 footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text2);}
 .empty{color:var(--text2);font-size:.88rem;margin-top:10px;}
 @media(max-width:640px){
-  nav{padding:0 14px;}
+  nav{padding:0 14px;}.nav-right{display:none;}
   main{padding:20px 16px 70px;}
   .card{padding:16px;}
   .risks{grid-template-columns:1fr;}
@@ -103,7 +107,7 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     <a href="/" class="back-link">◂ toolkit</a>
     <div class="nav-logo">assessment_report <span>// third-party</span></div>
   </div>
-  <div class="nav-right"><button type="button" class="back-link" data-gosignin style="background:none;cursor:pointer">Editor sign-in</button></div>
+  <div class="nav-right"><span class="dot"></span> runs in your browser</div>
 </nav>
 
 <main>
@@ -150,12 +154,6 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     <label class="f" style="margin-top:14px">Additional advisory notes (optional)<textarea id="advNotes" rows="3" placeholder="Anything specific to this vendor"></textarea></label>
   </section>
 
-  <section class="card" aria-labelledby="h-def">
-    <div class="card-head"><div><h2 id="h-def">Default wording</h2><p class="sub" id="dbStatus">Checking the database…</p></div></div>
-    <p class="hint">Edits above apply to this report only. Editors can sign in to save an edited advisory item, Conditions, Scope and Limitations or SOCI wording as the default for everyone. The password is kept in memory only and is not saved.</p>
-    <div id="editorBox" style="margin-top:10px"></div>
-  </section>
-
   <section class="card" aria-labelledby="h-prev">
     <div class="card-head"><div><h2 id="h-prev"><span class="step">5</span>Preview</h2><p class="sub">This is what the vendor receives.</p></div></div>
     <iframe class="preview" id="preview" title="Report preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
@@ -169,6 +167,7 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     </div>
   </div>
   <p class="disc">Outputs are indicative and are not a certification of the vendor or a formal compliance determination. Your entries are kept only in this browser.</p>
+  <div class="edfoot"><span id="dbStatus">Checking the default wording…</span><details id="edDetails"><summary>Sign in as editor</summary><p class="hint">Editors can save edited advisory items, Conditions, Scope and Limitations or SOCI wording as the default for everyone. The password is kept in memory only.</p><div id="editorBox"></div><p class="hint" id="edReq">No editor ID? <a id="reqLink" href="#">Request an editor ID and password</a>.</p></details></div>
 </main>
 
 <footer>Colaboree · Cyber Governance Toolkit · open-source, self-hosted tooling</footer>
@@ -221,7 +220,7 @@ function renderRisk(){document.querySelectorAll('[data-risk]').forEach(b=>b.setA
  $('#treat tbody').innerHTML=['High','Med','Low'].map(k=>`<tr class="${k.toLowerCase()}${S.risk===k?' on':''}"><th>${S.risk===k?'▶ ':''}${esc(RISK_LABEL[k])}</th><td><ul>${TREAT[k].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr>`).join('');}
 const DEF_KEYS=['cond','scope','soci'];
 /* Save control: needs the database, an editor sign-in and an edit */
-function saveCtl(ed,attr){if(DB_STATE!=='db')return '';if(!EDITOR)return `<button type="button" class="btn link" data-gosignin>Sign in as editor to save as default wording</button>`;return ed?`<button type="button" class="btn small" ${attr}>Save as default wording</button>`:'<span class="hint" style="margin:0">Edit the text to save it as the default wording</span>';}
+function saveCtl(ed,attr){if(DB_STATE!=='db')return '';if(!EDITOR)return '';return ed?`<button type="button" class="btn small" ${attr}>Save as default wording</button>`:'<span class="hint" style="margin:0">Edit the text to save it as the default wording</span>';}
 function metaHtml(k,ed){return (ed?`<button type="button" class="btn link" data-reset="${k}">Reset to generated</button>`:'<span>Generated text</span>')+(DEF_KEYS.includes(k)?saveCtl(ed,`data-savedef="${k}"`):'');}
 function secBlock(k,title,extra){const ed=S.sec[k]!=null;return `<div class="sec${k==='cond'?' cond':''}"><h3>${esc(title)}${extra||''}${ed?'<span class="edited">Edited</span>':''}</h3><textarea data-sec="${k}" rows="${k==='summary'?5:6}" aria-label="${esc(title)}">${esc(secText(k))}</textarea><div class="meta">${metaHtml(k,ed)}</div></div>`;}
 function renderSections(){const box=$('#sections');if(!S.risk){box.innerHTML='<p class="empty">Select the risk outcome to generate the report.</p>';$('#advCard').hidden=true;return;}
@@ -287,11 +286,14 @@ function downloadPdf(){const html=reportHtml();if(!html){toast('Select the risk 
  const d=f.contentWindow.document;d.open();d.write(html);d.close();toast('In the print dialog, choose "Save as PDF"');setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(_){toast('Printing is blocked in this browser');}},300);}
 /* ---------- Default wording in the database (GET /api/tp-report; editors save via POST /api/admin/tp-report) ---------- */
 let EDITOR=null,DB_STATE='checking',DB_SAVED=0;
+/* Where editor access requests go (change if needed) */
+const EDITOR_REQUEST_EMAIL='cybergrc@metrotrains.com.au';
+(function(){const a=document.getElementById('reqLink');if(a)a.href='mailto:'+EDITOR_REQUEST_EMAIL+'?subject='+encodeURIComponent('Request: editor access to the Third-Party Assessment Report')+'&body='+encodeURIComponent('Hello,\n\nPlease provide me with an editor ID and password for the Third-Party Assessment Report tool, so I can update the default report wording.\n\nName:\nRole:\nReason:\n\nThank you.');})();
 const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 /* Turn the organisation names back into {ORG}/{ORGFULL} so saved wording works for any organisation name */
 function tokenise(s){let x=String(s);if(S.orgFull)x=x.split(S.orgFull).join('{ORGFULL}');if(S.org)x=x.replace(new RegExp('\\b'+reEsc(S.org)+'\\b','g'),'{ORG}');return x;}
-function renderDb(){const st=$('#dbStatus');st.textContent=DB_STATE==='db'?`Loaded from the database. ${DB_SAVED} saved item${DB_SAVED===1?'':'s'}; anything not saved uses the built-in wording.`:DB_STATE==='notready'?'Built-in wording. The database tables have not been set up yet, so default wording cannot be saved.':DB_STATE==='checking'?'Checking the database…':'Built-in wording. The database could not be reached from here, so default wording cannot be saved.';
- $('#editorBox').innerHTML=DB_STATE!=='db'?'':EDITOR?`<div class="btnrow"><span class="hint" style="margin:0">Signed in as ${esc(EDITOR.user)}. "Save as default wording" now shows beside edited text.</span><button type="button" class="btn small" id="edOut">Sign out</button></div>`:`<div class="grid" style="margin-top:0"><label class="f">Editor ID<input type="text" id="edUser" autocomplete="username"/></label><label class="f">Password<input type="password" id="edPass" autocomplete="current-password" style="font:inherit;font-size:.92rem;border:1px solid #cfd8dd;border-radius:8px;padding:9px 11px"/></label></div><div class="btnrow" style="margin-top:10px"><button type="button" class="btn small" id="edIn">Sign in as editor</button></div>`;}
+function renderDb(){const st=$('#dbStatus');st.textContent=DB_STATE==='db'?`Default wording: from the database (${DB_SAVED} saved item${DB_SAVED===1?'':'s'}).`:DB_STATE==='checking'?'Checking the default wording…':'Default wording: built-in.';$('#edDetails').hidden=DB_STATE!=='db';$('#edReq').hidden=!!EDITOR;
+ $('#editorBox').innerHTML=DB_STATE!=='db'?'':EDITOR?`<div class="btnrow"><span class="hint" style="margin:0">Signed in as ${esc(EDITOR.user)}. "Save as default wording" shows beside edited text.</span><button type="button" class="btn small" id="edOut">Sign out</button></div>`:`<div class="grid" style="margin-top:0"><label class="f">Editor ID<input type="text" id="edUser" autocomplete="username"/></label><label class="f">Password<input type="password" id="edPass" autocomplete="current-password" style="font:inherit;font-size:.92rem;border:1px solid #cfd8dd;border-radius:8px;padding:9px 11px"/></label></div><div class="btnrow" style="margin-top:10px"><button type="button" class="btn small" id="edIn">Sign in as editor</button></div>`;}
 async function loadDefaults(){if(!/^https?:$/.test(location.protocol)){DB_STATE='offline';renderDb();return;}
  try{const r=await fetch('/api/tp-report',{cache:'no-store'});const j=await r.json();
   if(!j||!j.ready){DB_STATE='notready';renderDb();return;}
@@ -308,7 +310,7 @@ async function saveDefault(payload,done){if(!EDITOR){toast('Sign in as editor fi
  catch(_){toast('The database could not be reached');}}
 document.addEventListener('click',ev=>{const t=ev.target;
  if(t.id==='edIn'){const u=$('#edUser').value.trim(),p=$('#edPass').value;if(!u||!p){toast('Enter the editor ID and password');return;}EDITOR={user:u,pass:p};renderDb();renderSections();renderPreview();toast('Signed in. Your password is checked when you first save.');return;}
- if(t.closest('[data-gosignin]')){const u=$('#edUser');$('#h-def').scrollIntoView({behavior:'smooth',block:'start'});if(u)setTimeout(()=>u.focus(),400);return;}
+ 
  if(t.id==='edOut'){EDITOR=null;renderDb();renderSections();renderPreview();return;}
  const sd=t.closest('[data-savedef]');if(sd){const k=sd.dataset.savedef,body=tokenise(secText(k));saveDefault({action:'updateText',key:k,body},()=>{T[k]=body;delete S.sec[k];});return;}
  const as=t.closest('[data-advsave]');if(as){const a=ADV.find(x=>String(x.n)===as.dataset.advsave),p={action:'updateAdvisory',n:a.n,area:a.area};['obs','rec','ev','refs'].forEach(f=>p[f]=tokenise(advText(a,f)));saveDefault(p,()=>{['obs','rec','ev','refs'].forEach(f=>a[f]=p[f]);delete S.advEdit[a.n];});return;}
