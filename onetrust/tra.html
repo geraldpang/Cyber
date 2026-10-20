@@ -4967,7 +4967,7 @@ const TP_SUM={
  High:'The vendor may proceed with the engagement, subject to the conditions below.',
  cond:'No deviation to contract: the vendor must meet all applicable MTM contractual cybersecurity and data security requirements in full.',
  depart:'If the vendor cannot meet an applicable MTM contractual cybersecurity or data security requirement, the departure must be referred to the Cybersecurity team for further assessment. Any residual risk that cannot be adequately mitigated must be formally documented and accepted by the relevant Business Owner.'};
-const TP_COND='No deviation to contract - the vendor must meet all applicable MTM contractual cybersecurity and data security requirements in full. If the vendor cannot meet an applicable MTM contractual cybersecurity or data security requirement, the departure must be referred to the Cybersecurity team for further assessment. Any residual risk that cannot be adequately mitigated must be formally documented and accepted by the relevant Business Owner.\n\nMonitoring for security breach and incident - MTM will monitor for security breaches and incidents affecting the vendor. If MTM becomes aware of a breach or incident that may affect the vendor, MTM will contact the vendor, and the vendor is expected to work closely with MTM to assess the impact and respond.';
+let TP_COND='No deviation to contract - the vendor must meet all applicable MTM contractual cybersecurity and data security requirements in full. If the vendor cannot meet an applicable MTM contractual cybersecurity or data security requirement, the departure must be referred to the Cybersecurity team for further assessment. Any residual risk that cannot be adequately mitigated must be formally documented and accepted by the relevant Business Owner.\n\nMonitoring for security breach and incident - MTM will monitor for security breaches and incidents affecting the vendor. If MTM becomes aware of a breach or incident that may affect the vendor, MTM will contact the vendor, and the vendor is expected to work closely with MTM to assess the impact and respond.';
 function tpCondHtml(){return TP_COND.split('\n\n').map(x=>{const i=x.indexOf(' - ');return i>0?`<p><strong>${e(x.slice(0,i))}</strong>${e(x.slice(i))}</p>`:`<p>${e(x)}</p>`;}).join('');}
 function tpConditions(va){return tpRisk(va).level==='High'?[TP_COND]:[];}
 function tpConditionsText(va){return tpConditions(va).length?'Conditions\n\n'+TP_COND:'';}
@@ -5023,6 +5023,15 @@ function tpReportHtml(va,v){const s=tpSummary(va,v);if(!s)return '';const L=s.L,
 ACT.tpPdf=()=>{const va=tpPersist();if(!va)return;const v=DB.vendors[va.vendorId],html=tpReportHtml(va,v);if(!html){toast('Select the risk outcome in Step 4 first');return;}
  const old=document.getElementById('tpPrintFrame');if(old)old.remove();const f=document.createElement('iframe');f.id='tpPrintFrame';f.title='Vendor report';f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(f);
  const d=f.contentWindow.document;d.open();d.write(html);d.close();toast('In the print dialog, choose "Save as PDF"');setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(_){toast('Printing is blocked in this browser');}},300);};
+
+/* ---- Default report wording from the database (same source as the Third-Party Assessment Report tool) ---- */
+(function(){if(!/^https?:$/.test(location.protocol))return;
+ const f=v=>String(v).replace(/\{ORGFULL\}/g,'Metro Trains Melbourne').replace(/\{ORG\}/g,'MTM').replace(/\*\*([^*]+)\*\*/g,'$1');
+ fetch('/api/tp-report',{cache:'no-store'}).then(r=>r.json()).then(j=>{if(!j||!j.ready)return;
+  (j.advisory||[]).forEach(x=>{const a=TP_ADV.find(y=>y.n===Number(x.n));if(a)['area','obs','rec','ev','refs'].forEach(k=>{if(typeof x[k]==='string'&&x[k].trim())a[k]=f(x[k]);});});
+  const tx=j.text||{},ok=k=>tx[k]&&typeof tx[k].body==='string'&&tx[k].body.trim();
+  ['intro','Low','Med','High'].forEach(k=>{if(ok(k))TP_SUM[k]=f(tx[k].body);});if(ok('cond'))TP_COND=f(tx.cond.body);['scope','soci'].forEach(k=>{if(ok(k))TP_REP[k].text=f(tx[k].body);});
+  if(V.view==='va')render();}).catch(()=>{});})();
 
 /* ---- Home: governance dashboard. Every figure links to the page it comes from; nothing here is stored separately ---- */
 const dTile=(label,value,sub,go,tone)=>`<button class="dtile ${tone||''}" data-go="${e(go[0])}"${go[1]?` data-a="${e(go[1])}"`:''}><span class="dtl">${e(label)}</span><span class="dtv">${value}</span><span class="dts">${sub}</span></button>`;
