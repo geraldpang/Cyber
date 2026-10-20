@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!-- Colaboree — Cyber Governance Toolkit — Third-Party Assessment Report -->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Third-Party Assessment Report — Colaboree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --nav:#0F3D3E;--action:#118D8A;--accent:#4CC9C0;--bg:#F2F5F7;--surface:#FFFFFF;--text:#223037;--text2:#6B7C85;--line:#E1E7EA;
+  --accent-tint:rgba(76,201,192,0.12);--action-tint:rgba(17,141,138,0.08);
+  --low:#F7E96B;--med:#FFC000;--high:#ED7D31;--go:#2E8540;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5;}
+a{color:var(--action);}
+/* NAV */
+nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;height:56px;background:var(--nav);}
+.nav-left{display:flex;align-items:center;gap:14px;min-width:0;}
+.back-link{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.65);text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:3px;padding:2px 8px;white-space:nowrap;}
+.back-link:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+.nav-logo{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.05rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-logo span{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:.68rem;color:rgba(255,255,255,.55);margin-left:4px;}
+.nav-right{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.nav-right .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+/* LAYOUT */
+main{max-width:980px;margin:0 auto;padding:28px 24px 80px;}
+.intro .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--action);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.intro h1{font-family:'Source Serif 4',serif;font-weight:600;font-size:clamp(1.6rem,3.6vw,2.2rem);line-height:1.2;margin-bottom:8px;}
+.intro p{color:var(--text2);max-width:680px;font-size:.95rem;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:18px;}
+.card h2{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.2rem;margin-bottom:4px;}
+.card .sub{color:var(--text2);font-size:.88rem;}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.step{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--nav);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:.72rem;margin-right:8px;vertical-align:2px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 16px;margin-top:14px;}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:600;color:var(--text2);}
+label.f input,label.f textarea,label.f select{font-weight:400;}
+input[type=text],input[type=date],textarea,select{font:inherit;font-size:.92rem;color:var(--text);border:1px solid #cfd8dd;border-radius:8px;padding:9px 11px;background:#fff;width:100%;}
+textarea{resize:vertical;min-height:90px;line-height:1.5;}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+.btn{font:inherit;font-size:.86rem;font-weight:600;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid var(--action);background:#fff;color:var(--action);}
+.btn.primary{background:var(--action);color:#fff;}
+.btn.small{padding:5px 10px;font-size:.78rem;}
+.btn.link{border:0;background:none;padding:2px 0;text-decoration:underline;font-weight:500;}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+/* risk */
+.risks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+.risk{border:2px solid transparent;border-radius:10px;padding:14px 12px;cursor:pointer;font:inherit;text-align:left;color:#2b1d00;display:flex;flex-direction:column;gap:4px;}
+.risk strong{font-size:1rem;}
+.risk span{font-size:.8rem;opacity:.85;}
+.risk.low{background:var(--low);}.risk.med{background:var(--med);}.risk.high{background:var(--high);}
+.risk[aria-pressed=false]{opacity:.55;}
+.risk[aria-pressed=true]{border-color:var(--nav);box-shadow:0 0 0 2px #fff inset;opacity:1;}
+.treat{width:100%;border-collapse:collapse;margin-top:14px;font-size:.88rem;}
+.treat th,.treat td{border:1px solid #2b2b2b;padding:7px 10px;text-align:left;vertical-align:top;}
+.treat thead th{background:#fff;}
+.treat tr.low>*{background:var(--low);}.treat tr.med>*{background:var(--med);}.treat tr.high>*{background:var(--high);}
+.treat tbody tr:not(.on)>*{opacity:.45;}.treat tr.on>*{font-weight:600;}
+.treat ul{margin:0;padding-left:18px;}
+.note{background:var(--action-tint);border-left:3px solid var(--action);padding:8px 12px;border-radius:0 8px 8px 0;font-size:.85rem;margin-top:12px;}
+.pill{display:inline-block;padding:4px 14px;border-radius:999px;font-weight:700;font-size:.85rem;}
+.pill.go{background:var(--go);color:#fff;}.pill.cond{background:var(--high);color:#2b1400;}
+/* sections */
+.sec{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:14px;}
+.sec.cond{border-left:4px solid var(--high);}
+.sec h3{font-family:'Source Serif 4',serif;font-size:1.02rem;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sec .meta{font-size:.75rem;color:var(--text2);margin-top:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.edited{font-family:'IBM Plex Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;background:var(--accent-tint);color:var(--nav);padding:2px 6px;border-radius:4px;}
+.hint{font-size:.75rem;color:var(--text2);margin-top:4px;}
+/* advisory */
+.adv{border:1px solid var(--line);border-radius:10px;margin-top:8px;background:#fff;}
+.adv.on{border-left:4px solid var(--med);}
+.adv summary{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;list-style:none;flex-wrap:wrap;}
+.adv summary::-webkit-details-marker{display:none;}
+.adv .n{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;background:var(--nav);color:#fff;font-size:.72rem;font-family:'IBM Plex Mono',monospace;}
+.adv .body{padding:0 14px 14px;display:grid;gap:10px;}
+.adv input[type=checkbox]{width:18px;height:18px;accent-color:var(--action);}
+.chev{margin-left:auto;font-size:.75rem;color:var(--text2);}
+/* preview */
+.preview{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;min-height:400px;margin-top:14px;}
+.actions{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%,rgba(242,245,247,0));padding:18px 0 6px;margin-top:10px;}
+.disc{font-size:.75rem;color:var(--text2);margin-top:16px;}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--nav);color:#fff;padding:10px 16px;border-radius:8px;font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:99;max-width:90vw;}
+.toast.show{opacity:1;}
+footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text2);}
+.empty{color:var(--text2);font-size:.88rem;margin-top:10px;}
+@media(max-width:640px){
+  nav{padding:0 14px;}.nav-right{display:none;}
+  main{padding:20px 16px 70px;}
+  .card{padding:16px;}
+  .risks{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="back-link">◂ toolkit</a>
+    <div class="nav-logo">assessment_report <span>// third-party</span></div>
+  </div>
+  <div class="nav-right"><span class="dot"></span> runs in your browser</div>
+</nav>
+
+<main>
+  <section class="intro">
+    <div class="eyebrow">Third-party · vendor report</div>
+    <h1>Third-Party Assessment Report</h1>
+    <p>Select the risk outcome and the report is generated: assessment summary, conditions, scope and limitations, SOCI Act acknowledgement and recommended advisory. Every section can be edited before you download the PDF for the vendor.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-details">
+    <h2 id="h-details"><span class="step">1</span>Report details</h2>
+    <p class="sub">Shown in the report header.</p>
+    <div class="grid">
+      <label class="f">Vendor name<input type="text" id="vendor" placeholder="e.g. Acme Signalling Pty Ltd" autocomplete="off"/></label>
+      <label class="f">Engagement or service<input type="text" id="engagement" placeholder="e.g. Remote maintenance of depot CCTV" autocomplete="off"/></label>
+      <label class="f">Assessment reference<input type="text" id="ref" placeholder="e.g. TPA-2026-014" autocomplete="off"/></label>
+      <label class="f">Report date<input type="date" id="date"/></label>
+      <label class="f">Organisation (short name)<input type="text" id="org" autocomplete="off"/></label>
+      <label class="f">Organisation (full name)<input type="text" id="orgFull" autocomplete="off"/></label>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-risk">
+    <h2 id="h-risk"><span class="step">2</span>Risk outcome</h2>
+    <p class="sub">Select the risk from your assessment. The report shows only the outcome (Proceed or Conditional), never the risk rating.</p>
+    <div class="risks" role="group" aria-label="Risk outcome">
+      <button type="button" class="risk low" data-risk="Low" aria-pressed="false"><strong>Low Risk</strong><span>Strong hygiene and governance → Proceed</span></button>
+      <button type="button" class="risk med" data-risk="Med" aria-pressed="false"><strong>Med Risk</strong><span>Strong hygiene or governance → Proceed</span></button>
+      <button type="button" class="risk high" data-risk="High" aria-pressed="false"><strong>High Risk</strong><span>Weak hygiene and governance → Conditional</span></button>
+    </div>
+    <div style="overflow-x:auto"><table class="treat" id="treat"><thead><tr><th style="width:28%"></th><th>Treatment output</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-secs">
+    <h2 id="h-secs"><span class="step">3</span>Report sections</h2>
+    <p class="sub">Generated from the risk outcome. Edit any text; use "Reset to generated" to go back. A blank line starts a new paragraph. Write **text** for bold and [text](https://…) for a link.</p>
+    <div id="sections"><p class="empty">Select the risk outcome to generate the report.</p></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-adv" id="advCard" hidden>
+    <div class="card-head"><div><h2 id="h-adv"><span class="step">4</span>Recommended advisory</h2><p class="sub">Tick the advisory items to include. Open an item to edit its wording.</p></div>
+      <div class="btnrow"><button type="button" class="btn small" id="advAll">Select all</button><button type="button" class="btn small" id="advNone">Clear</button></div></div>
+    <div id="advList"></div>
+    <label class="f" style="margin-top:14px">Additional advisory notes (optional)<textarea id="advNotes" rows="3" placeholder="Anything specific to this vendor"></textarea></label>
+  </section>
+
+  <section class="card" aria-labelledby="h-prev">
+    <div class="card-head"><div><h2 id="h-prev"><span class="step">5</span>Preview</h2><p class="sub">This is what the vendor receives.</p></div></div>
+    <iframe class="preview" id="preview" title="Report preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+  </section>
+
+  <div class="actions">
+    <div class="btnrow">
+      <button type="button" class="btn primary" id="pdfBtn">Download PDF</button>
+      <button type="button" class="btn" id="copyBtn">Copy report text</button>
+      <button type="button" class="btn link" id="resetBtn">Start a new report</button>
+    </div>
+  </div>
+  <p class="disc">Outputs are indicative and are not a certification of the vendor or a formal compliance determination. Your entries are kept only in this browser.</p>
+</main>
+
+<footer>Colaboree · Cyber Governance Toolkit · open-source, self-hosted tooling</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ---------- Content ---------- */
+const OUTCOME={Low:'Proceed',Med:'Proceed',High:'Conditional'};
+const TREAT={High:['No deviation to contract','Recommended advisory','Monitoring for security breach and incident'],Med:['Recommended advisory'],Low:['No action required']};
+const RISK_LABEL={Low:'Low Risk',Med:'Med Risk',High:'High Risk'};
+const T={
+ intro:"Cybersecurity has assessed the vendor's cybersecurity posture against {ORG}'s cybersecurity requirements, using the vendor's responses to the Cybersecurity Questionnaire and the external cybersecurity intelligence available.",
+ Low:'The vendor may proceed with the engagement. This initial assessment found no material cybersecurity gaps that would prevent the vendor from proceeding. The vendor must continue to comply with the applicable {ORG} contractual cybersecurity and data security requirements.',
+ Med:'The vendor may proceed with the engagement, provided it continues to comply with the applicable {ORG} contractual cybersecurity and data security requirements. {ORG} will share a recommended advisory with the vendor, setting out where it should consider uplifting its security governance and security hygiene.',
+ High:'The vendor may proceed with the engagement, subject to the conditions below.',
+ cond:'**No deviation to contract** - the vendor must meet all applicable {ORG} contractual cybersecurity and data security requirements in full. If the vendor cannot meet an applicable {ORG} contractual cybersecurity or data security requirement, the departure must be referred to the Cybersecurity team for further assessment. Any residual risk that cannot be adequately mitigated must be formally documented and accepted by the relevant Business Owner.\n\n**Monitoring for security breach and incident** - {ORG} will monitor for security breaches and incidents affecting the vendor. If {ORG} becomes aware of a breach or incident that may affect the vendor, {ORG} will contact the vendor, and the vendor is expected to work closely with {ORG} to assess the impact and respond.',
+ scope:'This assessment is an initial cybersecurity assessment intended to provide assurance that the vendor/supplier has reasonable cybersecurity governance and security hygiene for the purpose of engagement with {ORGFULL}.\n\nIt is not a full Technical Risk Assessment (TRA) and does not assess or provide assurance over the security of a specific solution, system, application or technical implementation for {ORGFULL}. Where required, a separate TRA must be performed.',
+ soci:'{ORGFULL} is the Responsible Entity for the Melbourne metropolitan train network, a critical public transport asset. Where the vendor stores or processes Business Critical Data on a commercial basis for the asset, by entering into an agreement with {ORGFULL}, the vendor acknowledges the applicable requirements under subsection 12F of the [Security of Critical Infrastructure Act 2018](https://www.legislation.gov.au/C2018A00029/latest/text) and agrees to comply with those requirements.'
+};
+const REF_SOURCES="Reference sources: [VPDSS V2.0](https://ovic.vic.gov.au/information-security/standards/) \u00b7 [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) \u00b7 [ASD Information Security Manual](https://www.cyber.gov.au/business-government/asds-cyber-security-frameworks/ism)";
+/* Advisory items 1–10 map one-to-one to questionnaire Q1–Q10; item 11 applies when the third-party score is low */
+const ADV=[{"n": 1, "area": "Third-Party Security Accountability and Data Location", "obs": "The vendor has not confirmed or demonstrated that it takes responsibility for the security of systems it operates or maintains for {ORG}, or that it controls where {ORG} information is stored and processed, including by subcontractors and cloud providers.", "rec": "Define and document the security responsibilities for the systems and services provided to {ORG}, including any delivered by subcontractors or cloud providers. Confirm every location where {ORG} information is stored, processed, accessed or backed up, and keep a register of subcontractors and sub-processors. Ensure Passenger Services Personal Information, if any, is stored in Australia, and obtain assurance from hosting providers, such as current certifications or assurance reports and evidence of the hosting region.", "ev": "Responsibility matrix or agreed security responsibilities, hosting and data residency documentation, cloud region details, subcontractor or sub-processor register, and contractual security requirements.", "refs": "VPDSS V2.0: Standard 8 – Third Party Arrangements\nNIST SP 800-53 Rev. 5: SA-9, SA-9(5) External system services and processing locations; SR-3 Supply chain controls\nASD ISM: Guidelines for Procurement and Outsourcing (responsibilities, cloud services, subcontractors and contracts)"}, {"n": 2, "area": "Cybersecurity Governance, Risk and Compliance", "obs": "The vendor has not confirmed or demonstrated an established cybersecurity governance and risk management framework, compliance with the regulatory and contractual obligations that apply to its services, or regular independent cybersecurity assurance.", "rec": "Establish and maintain a cybersecurity governance and risk management framework aligned with a recognised standard, such as ISO/IEC 27001, the NIST Cybersecurity Framework, the ISM or IEC 62443. Identify and meet the regulatory and contractual obligations that apply to the services provided to {ORG}, which may include:\n1. Victorian Protective Data Security Framework and Standards (VPDSF)\n2. Security of Critical Infrastructure Act 2018 (Cth)\n3. Privacy Act 1988 (Cth)\n4. Privacy and Data Protection Act 2014 (Vic)\n\nObtain regular independent assurance, such as a SOC 2 Type II report or ISO/IEC 27001 certification audit, and remediate material findings within agreed risk-based timeframes.", "ev": "ISO/IEC 27001 certificate, SOC 2 Type II report, information security policy, risk management framework, Statement of Applicability, independent audit or assurance report, and regulatory compliance statement.", "refs": "VPDSS V2.0: Standard 1 – Information Security Management Framework; Standard 3 – Information Security Risk Management\nNIST SP 800-53 Rev. 5: PM-1, PM-9 Security program and risk management strategy; RA-3 Risk assessment; CA-2, CA-2(1) Control assessments and independent assessors\nASD ISM: Cyber security framework, risk management and security assurance"}, {"n": 3, "area": "Personnel Cybersecurity Responsibilities and Awareness", "obs": "The vendor has not confirmed or demonstrated that personnel with access to systems or information supporting {ORG} understand their cybersecurity responsibilities and receive appropriate awareness training.", "rec": "Define the cybersecurity responsibilities of employees, contractors and other personnel supporting {ORG}, and include them in onboarding and access agreements. Provide cybersecurity awareness training at onboarding and at least annually, with role-based training for privileged and technical staff, and keep completion records. Consider phishing simulations to test and reinforce awareness.", "ev": "Cybersecurity awareness policy, training completion records, onboarding materials, refresher training records, phishing simulation results, and role-specific security training.", "refs": "VPDSS V2.0: Standard 5 – Information Security Obligations; Standard 10 – Personnel Security (where relevant)\nNIST SP 800-53 Rev. 5: AT-2, AT-3, AT-4 Awareness, role-based training and training records; PS-6 Access agreements\nASD ISM: Guidelines for Personnel Security (responsibilities and awareness training)"}, {"n": 4, "area": "Identity and Access Management", "obs": "The vendor has not confirmed or demonstrated adequate physical and logical access controls to prevent unauthorised access to {ORG} information, systems and service locations.", "rec": "Implement physical and logical access controls that restrict access to {ORG} information, systems and service locations on a need-to-know and least-privilege basis. Use unique accounts and multi-factor authentication for remote and privileged access, manage privileged access separately, review user access regularly, and remove access promptly when it is no longer required.", "ev": "Access control policy, user access review records, privileged access management evidence, and physical access control procedures.", "refs": "VPDSS V2.0: Standard 4 – Information Access; Standard 11 – ICT Security; Standard 12 – Physical Security\nNIST SP 800-53 Rev. 5: AC-2, AC-3, AC-6 Accounts, access enforcement and least privilege; IA-2 Identification and authentication; PE-3 Physical access control\nASD ISM: Guidelines for Personnel Security (access to systems); Guidelines for Physical Security"}, {"n": 5, "area": "Encryption and Information Protection", "obs": "The vendor has not confirmed or demonstrated that {ORG} information is protected with appropriate encryption when stored and transmitted, or that cryptographic keys, certificates and credentials are securely managed.", "rec": "Encrypt {ORG} information in transit and at rest using current, industry-accepted algorithms and protocols, such as TLS 1.2 or later. Manage cryptographic keys, certificates and credentials through their full lifecycle, including secure generation, storage, rotation and revocation with restricted access, and keep an inventory of certificates and keys.", "ev": "Encryption or cryptography standard, product security configuration settings, key management procedure, certificate inventory, and key rotation or revocation records.", "refs": "VPDSS V2.0: Standard 11 – ICT Security\nNIST SP 800-53 Rev. 5: SC-8, SC-28 Protection of information in transit and at rest; SC-12, SC-13 Key management and cryptographic protection\nASD ISM: Guidelines for Cryptography (encryption, keys, certificates and communications)"}, {"n": 6, "area": "Malware and Removable Media Protection", "obs": "The vendor has not confirmed or demonstrated that systems and devices used to provide services to {ORG} are protected against malware, or that mobile devices and removable media are appropriately secured and controlled.", "rec": "Deploy and maintain anti-malware or endpoint detection and response (EDR) on all systems and devices used to deliver services to {ORG}, keep it current, and monitor detections centrally. Control the use of removable media and mobile devices, including encryption and restricted use, and securely sanitise or destroy media holding {ORG} information when it is no longer required.", "ev": "EDR or anti-malware deployment reports, malware protection policy, detection and update status, removable media and mobile device policy, and media sanitisation or destruction records.", "refs": "VPDSS V2.0: Standard 11 – ICT Security\nNIST SP 800-53 Rev. 5: SI-3 Malicious code protection; MP-6, MP-7 Media sanitization and media use; AC-19 Access control for mobile devices\nASD ISM: Guidelines for System Hardening; Guidelines for Media; Guidelines for Enterprise Mobility"}, {"n": 7, "area": "System Security, Vulnerability Management and Recovery", "obs": "The vendor has not confirmed or demonstrated that systems supporting {ORG} are securely configured and maintained, with effective vulnerability and patch management and regularly tested backup, business continuity and disaster recovery arrangements.", "rec": "Apply secure configuration (hardening) baselines to systems supporting {ORG}. Scan for vulnerabilities regularly, prioritise them by risk, and patch or remediate them within defined timeframes based on severity, tracking each to closure. Maintain backups and business continuity and disaster recovery plans with defined recovery objectives (RTO/RPO), test recovery at least annually, and remediate any gaps found.", "ev": "Secure configuration or hardening standard, vulnerability scan results, patch management records, remediation tracking, penetration test report, backup reports, BCP/DR plan, and recovery test results.", "refs": "VPDSS V2.0: Standard 11 – ICT Security; Standard 7 – Information Security Aspects of Business Continuity and Disaster Recovery\nNIST SP 800-53 Rev. 5: CM-6 Configuration settings; RA-5, SI-2 Vulnerability scanning and flaw remediation; CP-2, CP-4, CP-9, CP-10 Contingency planning, testing, backup and recovery\nASD ISM: Guidelines for System Hardening; Guidelines for System Management (patching, backups and testing)"}, {"n": 8, "area": "Application and Development Security", "obs": "The vendor has not confirmed or demonstrated that secure development practices are applied throughout the lifecycle of applications it develops, maintains or provides.", "rec": "Apply a secure software development lifecycle, including security requirements and design review, secure coding standards, peer code review, and security testing, such as SAST, DAST and application penetration testing, before release. Manage changes through a controlled change process and fix identified vulnerabilities before deployment to production.", "ev": "Secure SDLC policy, secure coding standard, code review records, SAST/DAST results, application penetration test report, change procedure, and security scan results.", "refs": "VPDSS V2.0: Standard 11 – ICT Security\nNIST SP 800-53 Rev. 5: SA-3 System development life cycle; SA-11 Developer testing and evaluation; SA-15 Development process, standards and tools\nASD ISM: Guidelines for Software Development (secure design, development and testing)"}, {"n": 9, "area": "Network Security Management", "obs": "The vendor has not confirmed or demonstrated appropriate network security controls to protect systems and services supporting {ORG} from unauthorised access and inappropriate network connectivity.", "rec": "Segment the networks that support {ORG} services and restrict traffic to what is required, using firewall rules and access control lists that are reviewed regularly. Secure remote access with multi-factor authentication and encrypted connections, and monitor network traffic for unauthorised or unusual activity.", "ev": "Network security policy, network diagram showing segmentation, firewall rule review records, remote access configuration, and network monitoring evidence.", "refs": "VPDSS V2.0: Standard 11 – ICT Security\nNIST SP 800-53 Rev. 5: SC-7 Boundary protection; AC-4 Information flow enforcement; AC-17 Remote access; SI-4 System monitoring\nASD ISM: Guidelines for Networking (segmentation, access and secure connectivity)"}, {"n": 10, "area": "Security Event Logging, Monitoring and Incident Management", "obs": "The vendor has not confirmed or demonstrated adequate security logging and monitoring, or a documented incident response process that includes notifying {ORG} of incidents affecting {ORG} information or services.", "rec": "Log security events on systems handling {ORG} information, protect logs from unauthorised access or change, and retain them for at least 12 months where required by {ORG}. Monitor logs for suspicious activity, for example through a SIEM or security operations service. Maintain and test an incident response plan covering detection, containment, investigation, recovery and notification, and notify {ORG} of incidents affecting its information or services in line with contractual and regulatory requirements.", "ev": "Logging and monitoring policy, SIEM or monitoring evidence, sample security logs, incident response plan, notification and escalation procedure, incident exercise records, and sample incident reports.", "refs": "VPDSS V2.0: Standard 11 – ICT Security; Standard 6 – Information Security Incident Management\nNIST SP 800-53 Rev. 5: AU-2, AU-6 Event logging and review; SI-4 System monitoring; IR-4, IR-6, IR-8 Incident handling, reporting and response plan\nASD ISM: Guidelines for System Monitoring; Guidelines for Cyber Security Incidents"}, {"n": 11, "area": "External Cybersecurity Intelligence", "obs": "The vendor's external cybersecurity assessment has identified one or more areas of concern within its externally observable cybersecurity posture.", "rec": "Review and strengthen cybersecurity controls across externally facing systems and services, including internet-facing services, email security, vulnerability management, secure configuration, and regular penetration testing of relevant externally accessible systems. Provide a recent penetration test report or executive summary, vulnerability assessment results, or updated external security assessment results.", "ev": "Recent penetration test report or executive summary, vulnerability assessment results, or updated external security assessment results.", "refs": "VPDSS V2.0: Standard 11 – ICT Security\nNIST SP 800-53 Rev. 5: RA-5 Vulnerability monitoring and scanning; CA-8 Penetration testing; SI-4 System monitoring\nASD ISM: Guidelines for System Hardening; Guidelines for Email; Guidelines for Gateways"}];
+
+/* ---------- Helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function safeUrl(u){try{const x=new URL(String(u).trim());return x.protocol==='http:'||x.protocol==='https:'?x.href:'';}catch(_){return '';}}
+const today=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+function fmtDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return '';const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});}
+/* Paragraphs on blank lines, line breaks kept, [label](https://…) links; everything escaped */
+function rich(s){return String(s||'').split(/\n{2,}/).filter(p=>p.trim()).map(par=>{let out='',last=0,m;const re=/\[([^\]]+)\]\(([^)\s]+)\)/g;while((m=re.exec(par))){out+=esc(par.slice(last,m.index));const u=safeUrl(m[2]);out+=u?`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(m[1])}</a>`:esc(m[0]);last=re.lastIndex;}out+=esc(par.slice(last));return `<p>${out.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</p>`;}).join('');}
+const plain=s=>String(s||'').replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'$1 ($2)').replace(/\*\*([^*]+)\*\*/g,'$1');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ---------- State (versioned key; kept only in this browser) ---------- */
+const KEY='tpReportV1';
+const blank=()=>({v:1,vendor:'',engagement:'',ref:'',date:today(),org:'MTM',orgFull:'Metro Trains Melbourne',risk:'',sec:{},soci:true,adv:{},advEdit:{},advNotes:''});
+let S=blank();
+try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&d.v===1)S=Object.assign(blank(),d);}}catch(_){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(_){}}
+const fill=s=>String(s).replace(/\{ORGFULL\}/g,S.orgFull||'the organisation').replace(/\{ORG\}/g,S.org||'the organisation');
+function gen(k){if(k==='summary')return fill(T.intro+'\n\n'+(T[S.risk]||''));return fill(T[k]);}
+const secText=k=>S.sec[k]!=null?S.sec[k]:gen(k);
+const advText=(a,f)=>{const e=S.advEdit[a.n]||{};return e[f]!=null?e[f]:fill(a[f]);};
+const advChosen=()=>S.risk&&S.risk!=='Low'?ADV.filter(a=>S.adv[a.n]):[];
+
+/* ---------- Render ---------- */
+function renderRisk(){document.querySelectorAll('[data-risk]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.risk===S.risk)));
+ $('#treat tbody').innerHTML=['High','Med','Low'].map(k=>`<tr class="${k.toLowerCase()}${S.risk===k?' on':''}"><th>${S.risk===k?'▶ ':''}${esc(RISK_LABEL[k])}</th><td><ul>${TREAT[k].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr>`).join('');}
+function secBlock(k,title,extra){const ed=S.sec[k]!=null;return `<div class="sec${k==='cond'?' cond':''}"><h3>${esc(title)}${extra||''}${ed?'<span class="edited">Edited</span>':''}</h3><textarea data-sec="${k}" rows="${k==='summary'?5:6}" aria-label="${esc(title)}">${esc(secText(k))}</textarea><div class="meta">${ed?`<button type="button" class="btn link" data-reset="${k}">Reset to generated</button>`:'<span>Generated text</span>'}</div></div>`;}
+function renderSections(){const box=$('#sections');if(!S.risk){box.innerHTML='<p class="empty">Select the risk outcome to generate the report.</p>';$('#advCard').hidden=true;return;}
+ box.innerHTML=secBlock('summary','Assessment summary',` <span class="pill ${S.risk==='High'?'cond':'go'}">${esc(OUTCOME[S.risk])}</span>`)
+  +(S.risk==='High'?secBlock('cond','Conditions'):'')
+  +secBlock('scope','Assessment Scope and Limitations')
+  +`<div class="sec"><h3>SOCI Act Acknowledgement${S.sec.soci!=null?'<span class="edited">Edited</span>':''}</h3><label style="display:flex;gap:8px;align-items:center;font-size:.85rem;margin-bottom:8px"><input type="checkbox" id="sociOn"${S.soci?' checked':''}/> Include in the report (vendor stores or processes Business Critical Data)</label>${S.soci?`<textarea data-sec="soci" rows="5" aria-label="SOCI Act Acknowledgement">${esc(secText('soci'))}</textarea><div class="meta">${S.sec.soci!=null?'<button type="button" class="btn link" data-reset="soci">Reset to generated</button>':'<span>Generated text</span>'}</div>`:''}</div>`;
+ const showAdv=S.risk!=='Low';$('#advCard').hidden=!showAdv;if(showAdv)renderAdv();}
+function renderAdv(){const open=new Set([...document.querySelectorAll('#advList details[open]')].map(d=>d.dataset.n));
+ $('#advList').innerHTML=ADV.map(a=>{const on=!!S.adv[a.n],ed=!!S.advEdit[a.n]&&Object.keys(S.advEdit[a.n]).length;return `<details class="adv${on?' on':''}" data-n="${a.n}"${open.has(String(a.n))?' open':''}><summary><input type="checkbox" data-adv="${a.n}"${on?' checked':''} aria-label="Include ${esc(a.area)}" onclick="event.stopPropagation()"/><span class="n">${a.n}</span><strong>${esc(a.area)}</strong>${ed?'<span class="edited">Edited</span>':''}<span class="chev">Edit wording ▾</span></summary>
+ <div class="body"><label class="f">Observation<textarea data-advf="${a.n}:obs" rows="2">${esc(advText(a,'obs'))}</textarea></label><label class="f">Recommendation<textarea data-advf="${a.n}:rec" rows="${a.n===2?8:4}">${esc(advText(a,'rec'))}</textarea></label><label class="f">Recommended evidence<textarea data-advf="${a.n}:ev" rows="2">${esc(advText(a,'ev'))}</textarea></label><label class="f">Industry references<textarea data-advf="${a.n}:refs" rows="3">${esc(advText(a,'refs'))}</textarea></label>${ed?`<div><button type="button" class="btn link" data-advreset="${a.n}">Reset this item's wording</button></div>`:''}</div></details>`;}).join('');
+ $('#advNotes').value=S.advNotes||'';}
+function reportHtml(){if(!S.risk)return '';const L=S.risk,adv=advChosen(),dt=S.date||today();const sec=(h,b,c)=>`<section${c?` class="${c}"`:''}><h2>${esc(h)}</h2>${b}</section>`;
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc('Third-party cybersecurity assessment - '+(S.vendor||'Vendor'))}</title><style>
+ @page{size:A4;margin:18mm 16mm}*{box-sizing:border-box}body{font-family:"IBM Plex Sans","Segoe UI",Arial,sans-serif;color:#223037;font-size:10.5pt;line-height:1.45;margin:0;padding:18px}
+ @media print{body{padding:0}}
+ header{border-bottom:3px solid #0F3D3E;padding-bottom:10px;margin-bottom:16px}.k{font-size:9pt;letter-spacing:.06em;text-transform:uppercase;color:#118D8A;font-weight:700}h1{font-family:"Source Serif 4",Georgia,serif;font-size:19pt;margin:4px 0 6px}
+ .meta{display:flex;flex-wrap:wrap;gap:4px 22px;font-size:9.5pt;color:#46566b}.meta b{color:#223037}
+ h2{font-family:"Source Serif 4",Georgia,serif;font-size:13pt;margin:18px 0 6px;color:#0F3D3E}section{break-inside:avoid-page}p{margin:6px 0}
+ .out{display:inline-block;padding:4px 14px;border-radius:999px;font-weight:700;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}.out.go{background:#2E8540;color:#fff}.out.cond{background:#ED7D31;color:#2b1400}
+ .cond{border-left:4px solid #ED7D31;padding-left:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.adv{border:1px solid #d5dde6;border-radius:6px;padding:8px 12px;margin:8px 0;break-inside:avoid}.adv h3{font-size:11pt;margin:0 0 4px}.adv .ev{font-size:9.5pt;color:#46566b}.refs{font-size:9.5pt;background:#F2F5F7;border-radius:4px;padding:6px 8px;margin-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.refs p{margin:2px 0 0}.srcs{font-size:9pt;color:#46566b;margin-top:8px}
+ a{color:#118D8A}footer{margin-top:22px;border-top:1px solid #d5dde6;padding-top:8px;font-size:8.5pt;color:#65748a}
+ </style></head><body>
+ <header><div class="k">${esc(S.orgFull||S.org||'')}${S.orgFull||S.org?' · ':''}Cybersecurity</div><h1>Third-party cybersecurity assessment</h1><div class="meta"><span><b>Vendor:</b> ${esc(S.vendor||'—')}</span>${S.engagement?`<span><b>Engagement:</b> ${esc(S.engagement)}</span>`:''}${S.ref?`<span><b>Reference:</b> ${esc(S.ref)}</span>`:''}<span><b>Date:</b> ${esc(fmtDate(dt))}</span></div></header>
+ ${sec('Assessment summary',`<p><span class="out ${L==='High'?'cond':'go'}">${esc(OUTCOME[L])}</span></p>${rich(secText('summary'))}`)}
+ ${L==='High'?`<section><h2>Conditions</h2><div class="cond">${rich(secText('cond'))}</div></section>`:''}
+ ${sec('Assessment Scope and Limitations',rich(secText('scope')))}
+ ${S.soci?sec('SOCI Act Acknowledgement',rich(secText('soci'))):''}
+ ${adv.length||(L!=='Low'&&S.advNotes)?`<section><h2>Recommended advisory</h2>${adv.map((a,i)=>`<div class="adv"><h3>${i+1}. ${esc(a.area)}</h3><p><b>Observation.</b> ${esc(advText(a,'obs'))}</p><div><b>Recommendation.</b>${rich(advText(a,'rec'))}</div><p class="ev"><b>Recommended evidence:</b> ${esc(advText(a,'ev'))}</p>${advText(a,'refs').trim()?`<div class="refs"><b>Industry references</b>${rich(advText(a,'refs'))}</div>`:''}</div>`).join('')}${S.advNotes?`<div class="adv"><h3>Additional notes</h3>${rich(S.advNotes)}</div>`:''}${adv.length?`<div class="srcs">${rich(REF_SOURCES)}</div>`:''}</section>`:''}
+ <footer>This assessment is indicative and is not a certification of the vendor or a formal compliance determination.</footer>
+ </body></html>`;}
+function reportText(){if(!S.risk)return '';const L=S.risk,adv=advChosen(),parts=[`Third-party cybersecurity assessment: ${S.vendor||'Vendor'}`,`Outcome: ${OUTCOME[L]}`,'ASSESSMENT SUMMARY\n'+plain(secText('summary'))];
+ if(L==='High')parts.push('CONDITIONS\n'+plain(secText('cond')));parts.push('ASSESSMENT SCOPE AND LIMITATIONS\n'+plain(secText('scope')));if(S.soci)parts.push('SOCI ACT ACKNOWLEDGEMENT\n'+plain(secText('soci')));
+ if(adv.length||(L!=='Low'&&S.advNotes))parts.push('RECOMMENDED ADVISORY\n'+adv.map((a,i)=>`${i+1}. ${a.area}\nObservation: ${advText(a,'obs')}\nRecommendation: ${advText(a,'rec')}\nRecommended evidence: ${advText(a,'ev')}${advText(a,'refs').trim()?'\nIndustry references:\n'+advText(a,'refs'):''}`).join('\n\n')+(adv.length?'\n\n'+plain(REF_SOURCES):'')+(S.advNotes?`\n\nAdditional notes: ${S.advNotes}`:''));
+ return parts.join('\n\n');}
+let pvT;function renderPreview(){clearTimeout(pvT);pvT=setTimeout(()=>{const f=$('#preview');const html=reportHtml()||'<!doctype html><html><body style="font-family:IBM Plex Sans,Arial,sans-serif;color:#6B7C85;padding:24px">Select the risk outcome to see the report.</body></html>';f.srcdoc=html;},120);}
+$('#preview').addEventListener('load',()=>{try{const d=$('#preview').contentDocument;$('#preview').style.height=Math.max(400,d.documentElement.scrollHeight+10)+'px';}catch(_){}});
+function renderAll(){renderRisk();renderSections();renderPreview();}
+
+/* ---------- Events ---------- */
+['vendor','engagement','ref','date','org','orgFull'].forEach(k=>{const el=$('#'+k);el.value=S[k]||'';el.addEventListener('input',()=>{S[k]=el.value;persist();if(k==='org'||k==='orgFull')renderSections();renderPreview();});});
+document.addEventListener('click',ev=>{const t=ev.target;
+ const r=t.closest('[data-risk]');if(r){const was=S.risk;S.risk=r.dataset.risk;if(was&&was!==S.risk&&S.sec.summary!=null){delete S.sec.summary;toast('Assessment summary regenerated for the new outcome');}persist();renderAll();return;}
+ const rs=t.closest('[data-reset]');if(rs){delete S.sec[rs.dataset.reset];persist();renderSections();renderPreview();toast('Generated text restored');return;}
+ const ar=t.closest('[data-advreset]');if(ar){delete S.advEdit[ar.dataset.advreset];persist();renderAdv();renderPreview();toast('Item wording restored');return;}
+ if(t.id==='advAll'){ADV.forEach(a=>S.adv[a.n]=true);persist();renderAdv();renderPreview();return;}
+ if(t.id==='advNone'){S.adv={};persist();renderAdv();renderPreview();return;}
+ if(t.id==='pdfBtn')return downloadPdf();
+ if(t.id==='copyBtn'){const txt=reportText();if(!txt){toast('Select the risk outcome first');return;}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast('Report text copied'),()=>toast('Copy failed: select the text in the preview instead'));else toast('Copy is not available in this browser');return;}
+ if(t.id==='resetBtn'){if(!confirm('Start a new report? This clears the current report from this browser.'))return;const keep={org:S.org,orgFull:S.orgFull};S=Object.assign(blank(),keep);persist();['vendor','engagement','ref','date','org','orgFull'].forEach(k=>$('#'+k).value=S[k]||'');renderAll();toast('New report started');}
+});
+document.addEventListener('input',ev=>{const t=ev.target;
+ if(t.dataset.sec){const k=t.dataset.sec;S.sec[k]=t.value===gen(k)?undefined:t.value;if(S.sec[k]===undefined)delete S.sec[k];persist();renderPreview();const box=t.closest('.sec'),h=box.querySelector('h3'),m=box.querySelector('.meta'),ed=S.sec[k]!=null,tag=h.querySelector('.edited');if(ed&&!tag)h.insertAdjacentHTML('beforeend','<span class="edited">Edited</span>');if(!ed&&tag)tag.remove();if(m)m.innerHTML=ed?`<button type="button" class="btn link" data-reset="${k}">Reset to generated</button>`:'<span>Generated text</span>';return;}
+ if(t.dataset.advf){const [n,f]=t.dataset.advf.split(':'),a=ADV.find(x=>String(x.n)===n);const e=S.advEdit[n]=S.advEdit[n]||{};if(t.value===fill(a[f]))delete e[f];else e[f]=t.value;if(!Object.keys(e).length)delete S.advEdit[n];persist();renderPreview();return;}
+ if(t.id==='advNotes'){S.advNotes=t.value;persist();renderPreview();}
+});
+document.addEventListener('change',ev=>{const t=ev.target;
+ if(t.dataset.adv){if(t.checked)S.adv[t.dataset.adv]=true;else delete S.adv[t.dataset.adv];t.closest('details').classList.toggle('on',t.checked);persist();renderPreview();return;}
+ if(t.id==='sociOn'){S.soci=t.checked;persist();renderSections();renderPreview();}
+});
+function downloadPdf(){const html=reportHtml();if(!html){toast('Select the risk outcome first');return;}
+ const old=document.getElementById('printFrame');if(old)old.remove();const f=document.createElement('iframe');f.id='printFrame';f.title='Report for printing';f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(f);
+ const d=f.contentWindow.document;d.open();d.write(html);d.close();toast('In the print dialog, choose "Save as PDF"');setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(_){toast('Printing is blocked in this browser');}},300);}
+renderAll();
+</script>
+</body>
+</html>
