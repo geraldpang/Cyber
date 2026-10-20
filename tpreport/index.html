@@ -31,7 +31,7 @@ main{max-width:980px;margin:0 auto;padding:28px 24px 80px;}
 .intro h1{font-family:'Source Serif 4',serif;font-weight:600;font-size:clamp(1.6rem,3.6vw,2.2rem);line-height:1.2;margin-bottom:8px;}
 .intro p{color:var(--text2);max-width:680px;font-size:.95rem;}
 h2[id]{scroll-margin-top:80px;}
-.edfoot{margin-top:10px;font-size:.75rem;color:var(--text2);display:flex;flex-direction:column;gap:6px;}
+.edfoot{margin-top:14px;font-size:.75rem;color:var(--text2);display:flex;flex-direction:column;gap:6px;}
 .edfoot summary{cursor:pointer;display:inline;color:var(--text2);text-decoration:underline;}
 .edfoot details[open]{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-width:560px;}
 .edfoot details[open] summary{text-decoration:none;font-weight:600;color:var(--text);}
@@ -117,6 +117,8 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     <p>Select the risk outcome and the report is generated: assessment summary, conditions, scope and limitations, SOCI Act acknowledgement and recommended advisory. Every section can be edited before you download the PDF for the vendor.</p>
   </section>
 
+  <div class="edfoot"><span id="dbStatus">Checking the default wording…</span><details id="edDetails"><summary>Sign in as editor</summary><p class="hint">Editors can save edited advisory items, Conditions, Scope and Limitations or SOCI wording as the default for everyone. The password is kept in memory only.</p><div id="editorBox"></div><p class="hint" id="edReq">No editor ID? <a id="reqLink" href="#">Request an editor ID and password</a>.</p></details></div>
+
   <section class="card" aria-labelledby="h-details">
     <h2 id="h-details"><span class="step">1</span>Report details</h2>
     <p class="sub">Shown in the report header.</p>
@@ -167,7 +169,6 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     </div>
   </div>
   <p class="disc">Outputs are indicative and are not a certification of the vendor or a formal compliance determination. Your entries are kept only in this browser.</p>
-  <div class="edfoot"><span id="dbStatus">Checking the default wording…</span><details id="edDetails"><summary>Sign in as editor</summary><p class="hint">Editors can save edited advisory items, Conditions, Scope and Limitations or SOCI wording as the default for everyone. The password is kept in memory only.</p><div id="editorBox"></div><p class="hint" id="edReq">No editor ID? <a id="reqLink" href="#">Request an editor ID and password</a>.</p></details></div>
 </main>
 
 <footer>Colaboree · Cyber Governance Toolkit · open-source, self-hosted tooling</footer>
