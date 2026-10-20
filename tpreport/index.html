@@ -30,6 +30,7 @@ main{max-width:980px;margin:0 auto;padding:28px 24px 80px;}
 .intro .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--action);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
 .intro h1{font-family:'Source Serif 4',serif;font-weight:600;font-size:clamp(1.6rem,3.6vw,2.2rem);line-height:1.2;margin-bottom:8px;}
 .intro p{color:var(--text2);max-width:680px;font-size:.95rem;}
+h2[id]{scroll-margin-top:80px;}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:18px;}
 .card h2{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.2rem;margin-bottom:4px;}
 .card .sub{color:var(--text2);font-size:.88rem;}
@@ -88,7 +89,7 @@ input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid v
 footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text2);}
 .empty{color:var(--text2);font-size:.88rem;margin-top:10px;}
 @media(max-width:640px){
-  nav{padding:0 14px;}.nav-right{display:none;}
+  nav{padding:0 14px;}
   main{padding:20px 16px 70px;}
   .card{padding:16px;}
   .risks{grid-template-columns:1fr;}
@@ -102,7 +103,7 @@ footer{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font
     <a href="/" class="back-link">◂ toolkit</a>
     <div class="nav-logo">assessment_report <span>// third-party</span></div>
   </div>
-  <div class="nav-right"><span class="dot"></span> runs in your browser</div>
+  <div class="nav-right"><button type="button" class="back-link" data-gosignin style="background:none;cursor:pointer">Editor sign-in</button></div>
 </nav>
 
 <main>
@@ -219,7 +220,9 @@ const advChosen=()=>S.risk&&S.risk!=='Low'?ADV.filter(a=>S.adv[a.n]):[];
 function renderRisk(){document.querySelectorAll('[data-risk]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.risk===S.risk)));
  $('#treat tbody').innerHTML=['High','Med','Low'].map(k=>`<tr class="${k.toLowerCase()}${S.risk===k?' on':''}"><th>${S.risk===k?'▶ ':''}${esc(RISK_LABEL[k])}</th><td><ul>${TREAT[k].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr>`).join('');}
 const DEF_KEYS=['cond','scope','soci'];
-function metaHtml(k,ed){return ed?`<button type="button" class="btn link" data-reset="${k}">Reset to generated</button>${EDITOR&&DEF_KEYS.includes(k)?`<button type="button" class="btn small" data-savedef="${k}">Save as default wording</button>`:''}`:'<span>Generated text</span>';}
+/* Save control: needs the database, an editor sign-in and an edit */
+function saveCtl(ed,attr){if(DB_STATE!=='db')return '';if(!EDITOR)return `<button type="button" class="btn link" data-gosignin>Sign in as editor to save as default wording</button>`;return ed?`<button type="button" class="btn small" ${attr}>Save as default wording</button>`:'<span class="hint" style="margin:0">Edit the text to save it as the default wording</span>';}
+function metaHtml(k,ed){return (ed?`<button type="button" class="btn link" data-reset="${k}">Reset to generated</button>`:'<span>Generated text</span>')+(DEF_KEYS.includes(k)?saveCtl(ed,`data-savedef="${k}"`):'');}
 function secBlock(k,title,extra){const ed=S.sec[k]!=null;return `<div class="sec${k==='cond'?' cond':''}"><h3>${esc(title)}${extra||''}${ed?'<span class="edited">Edited</span>':''}</h3><textarea data-sec="${k}" rows="${k==='summary'?5:6}" aria-label="${esc(title)}">${esc(secText(k))}</textarea><div class="meta">${metaHtml(k,ed)}</div></div>`;}
 function renderSections(){const box=$('#sections');if(!S.risk){box.innerHTML='<p class="empty">Select the risk outcome to generate the report.</p>';$('#advCard').hidden=true;return;}
  box.innerHTML=secBlock('summary','Assessment summary',` <span class="pill ${S.risk==='High'?'cond':'go'}">${esc(OUTCOME[S.risk])}</span>`)
@@ -229,7 +232,7 @@ function renderSections(){const box=$('#sections');if(!S.risk){box.innerHTML='<p
  const showAdv=S.risk!=='Low';$('#advCard').hidden=!showAdv;if(showAdv)renderAdv();}
 function renderAdv(){const open=new Set([...document.querySelectorAll('#advList details[open]')].map(d=>d.dataset.n));
  $('#advList').innerHTML=ADV.map(a=>{const on=!!S.adv[a.n],ed=!!S.advEdit[a.n]&&Object.keys(S.advEdit[a.n]).length;return `<details class="adv${on?' on':''}" data-n="${a.n}"${open.has(String(a.n))?' open':''}><summary><input type="checkbox" data-adv="${a.n}"${on?' checked':''} aria-label="Include ${esc(a.area)}" onclick="event.stopPropagation()"/><span class="n">${a.n}</span><strong>${esc(a.area)}</strong>${ed?'<span class="edited">Edited</span>':''}<span class="chev">Edit wording ▾</span></summary>
- <div class="body"><label class="f">Observation<textarea data-advf="${a.n}:obs" rows="2">${esc(advText(a,'obs'))}</textarea></label><label class="f">Recommendation<textarea data-advf="${a.n}:rec" rows="${a.n===2?8:4}">${esc(advText(a,'rec'))}</textarea></label><label class="f">Recommended evidence<textarea data-advf="${a.n}:ev" rows="2">${esc(advText(a,'ev'))}</textarea></label><label class="f">Industry references<textarea data-advf="${a.n}:refs" rows="3">${esc(advText(a,'refs'))}</textarea></label>${ed?`<div class="btnrow"><button type="button" class="btn link" data-advreset="${a.n}">Reset this item's wording</button>${EDITOR?`<button type="button" class="btn small" data-advsave="${a.n}">Save as default wording</button>`:''}</div>`:''}</div></details>`;}).join('');
+ <div class="body"><label class="f">Observation<textarea data-advf="${a.n}:obs" rows="2">${esc(advText(a,'obs'))}</textarea></label><label class="f">Recommendation<textarea data-advf="${a.n}:rec" rows="${a.n===2?8:4}">${esc(advText(a,'rec'))}</textarea></label><label class="f">Recommended evidence<textarea data-advf="${a.n}:ev" rows="2">${esc(advText(a,'ev'))}</textarea></label><label class="f">Industry references<textarea data-advf="${a.n}:refs" rows="3">${esc(advText(a,'refs'))}</textarea></label><div class="btnrow">${ed?`<button type="button" class="btn link" data-advreset="${a.n}">Reset this item's wording</button>`:''}${saveCtl(ed,`data-advsave="${a.n}"`)}</div></div></details>`;}).join('');
  $('#advNotes').value=S.advNotes||'';}
 function reportHtml(){if(!S.risk)return '';const L=S.risk,adv=advChosen(),dt=S.date||today();const sec=(h,b,c)=>`<section${c?` class="${c}"`:''}><h2>${esc(h)}</h2>${b}</section>`;
  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc('Third-party cybersecurity assessment - '+(S.vendor||'Vendor'))}</title><style>
@@ -272,7 +275,7 @@ document.addEventListener('click',ev=>{const t=ev.target;
 });
 document.addEventListener('input',ev=>{const t=ev.target;
  if(t.dataset.sec){const k=t.dataset.sec;S.sec[k]=t.value===gen(k)?undefined:t.value;if(S.sec[k]===undefined)delete S.sec[k];persist();renderPreview();const box=t.closest('.sec'),h=box.querySelector('h3'),m=box.querySelector('.meta'),ed=S.sec[k]!=null,tag=h.querySelector('.edited');if(ed&&!tag)h.insertAdjacentHTML('beforeend','<span class="edited">Edited</span>');if(!ed&&tag)tag.remove();if(m)m.innerHTML=metaHtml(k,ed);return;}
- if(t.dataset.advf){const [n,f]=t.dataset.advf.split(':'),a=ADV.find(x=>String(x.n)===n);const e=S.advEdit[n]=S.advEdit[n]||{};if(t.value===fill(a[f]))delete e[f];else e[f]=t.value;if(!Object.keys(e).length)delete S.advEdit[n];persist();renderPreview();return;}
+ if(t.dataset.advf){const [n,f]=t.dataset.advf.split(':'),a=ADV.find(x=>String(x.n)===n);const e=S.advEdit[n]=S.advEdit[n]||{};if(t.value===fill(a[f]))delete e[f];else e[f]=t.value;if(!Object.keys(e).length)delete S.advEdit[n];persist();renderPreview();const det=t.closest('details'),ed=!!S.advEdit[n];const sm=det.querySelector('summary'),tag=sm.querySelector('.edited');if(ed&&!tag)sm.querySelector('strong').insertAdjacentHTML('afterend','<span class="edited">Edited</span>');if(!ed&&tag)tag.remove();const row=det.querySelector('.body > .btnrow');if(row)row.innerHTML=(ed?`<button type="button" class="btn link" data-advreset="${n}">Reset this item's wording</button>`:'')+saveCtl(ed,`data-advsave="${n}"`);return;}
  if(t.id==='advNotes'){S.advNotes=t.value;persist();renderPreview();}
 });
 document.addEventListener('change',ev=>{const t=ev.target;
@@ -305,6 +308,7 @@ async function saveDefault(payload,done){if(!EDITOR){toast('Sign in as editor fi
  catch(_){toast('The database could not be reached');}}
 document.addEventListener('click',ev=>{const t=ev.target;
  if(t.id==='edIn'){const u=$('#edUser').value.trim(),p=$('#edPass').value;if(!u||!p){toast('Enter the editor ID and password');return;}EDITOR={user:u,pass:p};renderDb();renderSections();renderPreview();toast('Signed in. Your password is checked when you first save.');return;}
+ if(t.closest('[data-gosignin]')){const u=$('#edUser');$('#h-def').scrollIntoView({behavior:'smooth',block:'start'});if(u)setTimeout(()=>u.focus(),400);return;}
  if(t.id==='edOut'){EDITOR=null;renderDb();renderSections();renderPreview();return;}
  const sd=t.closest('[data-savedef]');if(sd){const k=sd.dataset.savedef,body=tokenise(secText(k));saveDefault({action:'updateText',key:k,body},()=>{T[k]=body;delete S.sec[k];});return;}
  const as=t.closest('[data-advsave]');if(as){const a=ADV.find(x=>String(x.n)===as.dataset.advsave),p={action:'updateAdvisory',n:a.n,area:a.area};['obs','rec','ev','refs'].forEach(f=>p[f]=tokenise(advText(a,f)));saveDefault(p,()=>{['obs','rec','ev','refs'].forEach(f=>a[f]=p[f]);delete S.advEdit[a.n];});return;}
