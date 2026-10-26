@@ -391,6 +391,12 @@ button.danger{color:var(--red);border-color:var(--red)}button.primary.danger{bac
 details.tpver summary{cursor:pointer}.tpsum{border-left:4px solid #203047}.tpcond{border-left-color:#ED7D31}.tprep{border-left-color:#8A9BB0}.tpinit{display:inline-block;margin-left:8px;font-size:11px;font-weight:600;background:#203047;color:#fff;border-radius:999px;padding:1px 7px;vertical-align:middle}.tpouttop{margin:0 0 10px!important}.tpout{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px}.tpout{font-size:14px;padding:5px 14px}.tpout.go{background:#2E8540;color:#fff}.tpout.cond{background:#ED7D31;color:#2b1400}.tpsum p{margin:8px 0;max-width:80ch}.tpsumh{font-size:15px;margin:14px 0 4px}.tpsum ul{margin:4px 0 8px 20px}.tpsum ul li{margin:4px 0}.tpsumnote{font-size:13.5px;color:var(--muted)}.tpadvlist{display:grid;gap:8px;margin:12px 0}.tpadv{border:1px solid var(--line);border-radius:8px;background:#fff}.tpadv.on{border-left:4px solid #FFC000}.tpadv summary{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;cursor:pointer}.tpadv summary label{display:flex}.tpadvn{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:50%;background:#203047;color:#fff;font-size:12px}.tpadvref{font-size:12.5px;background:#F2F5F7;border-radius:6px;padding:6px 10px;margin-top:6px}.tpadvref strong{display:block;margin-bottom:2px}.tpadvwhy{font-size:12px;background:#FFF3CD;color:#6b4e00;border-radius:999px;padding:2px 8px}.tpadvbody{padding:0 14px 12px 46px}.tpadvbody p{margin:6px 0}.tpadvbody ol{margin:4px 0 6px 18px}@media(max-width:600px){.tpadvbody{padding-left:14px}}.tpmatrix td{padding:0}.tppick{all:unset;display:block;width:100%;box-sizing:border-box;padding:10px;cursor:pointer;text-align:center}.tppick:focus-visible{outline:3px solid #203047;outline-offset:-3px}.tppick[disabled]{cursor:default}.tpmatrix td:not(.on):hover{opacity:.8}.tpsig{margin-top:6px}.tpsigbox{margin-top:10px;border:1px dashed var(--line);border-bottom:2px solid #203047;border-radius:6px 6px 0 0;padding:10px 14px;display:flex;flex-direction:column;gap:4px;max-width:520px;background:#fbfcfd}.tpsigbox.empty{border-bottom-color:var(--line)}.tpsigname{font-family:'Segoe Script','Brush Script MT','Snell Roundhand','Lucida Handwriting',cursive;font-style:italic;font-size:28px;line-height:1.2;color:#1b2a44;overflow-wrap:anywhere}.kv .tprisk{color:#2b2200;opacity:1}
 .comptable input,.comptable select{min-width:150px}.comptable td:nth-child(3) input{min-width:240px}.comptable td:nth-child(4) select{max-width:230px}
 .dvsum{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin:10px 0 12px;font-size:13px}.dvsum span{display:inline-flex;gap:6px;align-items:center}.dvsep{color:var(--muted);margin-left:8px}
+.denv{margin-top:12px}.denv .dh3{margin:0 0 6px}.dcia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dcl{font-size:12px;font-weight:600;color:var(--muted)}
+.crtie{margin-top:6px}.crtie-add{white-space:nowrap}button.crchip{display:inline-flex;align-items:center;gap:6px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;padding:2px 8px 2px 2px;cursor:pointer;font:inherit;font-size:12px;white-space:nowrap}button.crchip:hover{border-color:var(--action)}.crchip .rbox{min-width:22px;height:20px;font-size:11px;line-height:20px}.crid{font-weight:700}
+.crsum{display:flex;gap:12px;align-items:flex-start}.crmode{display:flex;flex-wrap:wrap;gap:8px 22px;margin:6px 0 12px}.crmode label{font-size:14px}.crgrid{margin-top:4px}
+.crthr{border:1px solid var(--line);border-radius:5px;padding:12px;margin:12px 0 0;min-width:0}.crthr legend{font-size:13px;font-weight:700}.crthrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px}.crthrgrid label{font-size:13px;margin:4px 0}
+.crlinks{margin:6px 0 0 18px}.crlinks li{margin:6px 0}tr.dim td{opacity:.55}
+@media(max-width:650px){.crgrid{grid-template-columns:1fr}.crsum{flex-direction:column}}
 </style>
 </head>
 <body>
@@ -2926,7 +2932,7 @@ const IMPL=['Not Applicable','Not Commenced','Partial (some)','Partial (most)','
 const MATURITY=['Not assessed','Basic','Core'];
 const DEC_LABEL={Acceptable:'Assessed',Conditional:'Assessed with conditions',Rejected:'Rejected'};
 const ACTION_STATUS=['Open','Planned','In progress','Completed'];
-const LS_KEY='mtmAssetGovV9', PREV8_KEY='mtmAssetGovV8', PREV7_KEY='mtmAssetGovV7', PREV6_KEY='mtmAssetGovV6', PREV5_KEY='mtmAssetGovV5', PREV4_KEY='mtmAssetGovV4', PREV3_KEY='mtmAssetGovV3', PREV_KEY='mtmAssetGovV2', OLD_KEY='mtmAssetGovV1';
+const LS_KEY='mtmAssetGovV10', PREV9_KEY='mtmAssetGovV9', PREV8_KEY='mtmAssetGovV8', PREV7_KEY='mtmAssetGovV7', PREV6_KEY='mtmAssetGovV6', PREV5_KEY='mtmAssetGovV5', PREV4_KEY='mtmAssetGovV4', PREV3_KEY='mtmAssetGovV3', PREV_KEY='mtmAssetGovV2', OLD_KEY='mtmAssetGovV1';
 
 /* ================= Utilities ================= */
 const $=s=>document.querySelector(s);
@@ -3050,8 +3056,9 @@ function migrateV6(d){/* V7: TRAs record risk statement results so the Risks pag
 function migrateV7(d){/* V8: TRAs use three CIA risk statements (R05, R06, R02); sample attached TRAs get matching sample results */
  d.schema=8;Object.values(d.tra||{}).forEach(t=>{if(t.mode==='attached'&&t.attached&&SAMPLE_TRA_RISKS[t.id])t.attached.risks=sampleTraRisks(t.id);});return d;}
 /* V9: third-party onboarding fields. Loads V9, otherwise runs the V8 chain below and migrates its result. */
-function load(){try{const raw=localStorage.getItem(LS_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===9&&d.assets)return d;}}catch(_){}
- const m=migrateV8(load8());try{localStorage.setItem(LS_KEY,JSON.stringify(m));localStorage.removeItem(PREV8_KEY);}catch(_){}return m;}
+function load(){try{const raw=localStorage.getItem(LS_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===10&&d.assets)return d;}}catch(_){}
+ const m=migrateV9(load9());try{localStorage.setItem(LS_KEY,JSON.stringify(m));localStorage.removeItem(PREV9_KEY);localStorage.removeItem(PREV8_KEY);}catch(_){}return m;}
+function load9(){try{const raw=localStorage.getItem(PREV9_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===9&&d.assets)return d;}}catch(_){}return migrateV8(load8());}
 function load8(){try{const raw=localStorage.getItem(PREV8_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===8&&d.assets)return d;}}catch(_){}
  try{const raw=localStorage.getItem(PREV7_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===7&&d.assets){const m=migrateV7(d);localStorage.setItem(PREV8_KEY,JSON.stringify(m));localStorage.removeItem(PREV7_KEY);return m;}}}catch(_){}
  try{const raw=localStorage.getItem(PREV6_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===6&&d.assets){const m=migrateV7(migrateV6(d));localStorage.setItem(PREV8_KEY,JSON.stringify(m));localStorage.removeItem(PREV6_KEY);return m;}}}catch(_){}
@@ -3611,8 +3618,8 @@ function updateRiskPreview(){const p=(i,l,id,lbl)=>{const x=$('#'+id);if(!x)retu
 /* ---- Action plan ---- */
 function actionsPage(){const a=assetOf(),acts=actionsFor(a.id).sort((x,y)=>(isOpen(y)-isOpen(x))||byPriority(x,y)),open=acts.filter(isOpen).length;
  return subCrumb(a,'Action Plan')+back('Back to system',['asset',a.id])+titlebar('System Action Plan',`${a.name} · Actions arising from findings and assessments`,`${open} open`)+
- `<div class="panel section"><div class="section-head"><h2>Required actions</h2><button class="primary" data-go="action" data-a="${e(a.id)}" data-b="new">+ Add action</button></div><p class="small" style="margin-bottom:12px">Actions from risks, CMAP, health check, malware, incidents, supplier decisions and VPDSS gaps appear here once per underlying issue. Open an action to set its owner, due date and progress. Derived actions close automatically when their source is resolved.</p>
- <div class="table-scroll"><table class="mini"><thead><tr><th>Action</th><th>Source</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead><tbody>${acts.length?acts.map(x=>`<tr><td><button class="open" data-go="action" data-a="${e(a.id)}" data-b="${e(x.key)}">${e(x.title)} →</button>${x.note?`<div class="small">${e(x.note)}</div>`:''}</td><td>${e(x.source)}</td><td>${e(pname(x.ownerId))}</td><td class="nowrap">${isDate(x.due)?(isOpen(x)?dueText(x.due):fd(x.due)):'—'}</td><td>${pill(x.status==='Completed'?'green':isOverdue(x)?'red':x.status==='In progress'?'blue':'amber',isOverdue(x)?x.status+' · overdue':x.status)}</td></tr>`).join(''):`<tr><td colspan="5" class="empty">No actions for this system.</td></tr>`}</tbody></table></div></div>`;}
+ `<div class="panel section"><div class="section-head"><h2>Required actions</h2><button class="primary" data-go="action" data-a="${e(a.id)}" data-b="new">+ Add action</button></div><p class="small" style="margin-bottom:12px">Actions from risks, CMAP, health check, malware, incidents, supplier decisions and VPDSS gaps appear here once per underlying issue. Open an action to set its owner, due date and progress. Derived actions close automatically when their source is resolved. Use “+ Cyber risk” to tie an action to an OT and/or IT cyber risk.</p>
+ <div class="table-scroll"><table class="mini"><thead><tr><th>Action</th><th>Source</th><th>Owner</th><th>Due</th><th>Status</th><th>Cyber risk</th></tr></thead><tbody>${acts.length?acts.map(x=>`<tr><td><button class="open" data-go="action" data-a="${e(a.id)}" data-b="${e(x.key)}">${e(x.title)} →</button>${x.note?`<div class="small">${e(x.note)}</div>`:''}</td><td>${e(x.source)}</td><td>${e(pname(x.ownerId))}</td><td class="nowrap">${isDate(x.due)?(isOpen(x)?dueText(x.due):fd(x.due)):'—'}</td><td>${pill(x.status==='Completed'?'green':isOverdue(x)?'red':x.status==='In progress'?'blue':'amber',isOverdue(x)?x.status+' · overdue':x.status)}</td><td>${crTieMini('ACT|'+a.id+'|'+x.key)}</td></tr>`).join(''):`<tr><td colspan="6" class="empty">No actions for this system.</td></tr>`}</tbody></table></div></div>`;}
 function actionForm(){const a=assetOf(),isNew=V.b==='new',x=isNew?{title:'',source:'Manual action',ownerId:a.ownerId,due:'',status:'Open',manual:true}:actionsFor(a.id).find(y=>y.key===V.b);if(!x)throw new Error('This action is no longer open; its source may have been resolved.');
  return subCrumb(a,'Action Plan')+back('Action Plan',['actions',a.id])+titlebar('System Action Plan',`${a.name} · Actions arising from findings and assessments`,isNew?'New action':'Update action')+
  `<div class="panel section"><h2>${isNew?'Add action':'Update action'}</h2><p class="sub">Source: ${e(x.source)}${x.risk?' · owner, due date and status are saved to the risk record':''}</p><div class="formgrid" style="margin-top:14px">${field('aTitle','Action required',x.manual?ta('aTitle',x.title):ta('aTitle',x.title,'disabled'),'full')}${field('aOwner','Owner',sel('aOwner',personOpts(),x.ownerId))}${field('aDue','Due date',inp('aDue',x.due||'','type="date"'))}${field('aStatus','Status',sel('aStatus',x.risk?['Planned','In progress','Completed']:ACTION_STATUS,x.status))}</div>
@@ -4160,7 +4167,7 @@ function traStep7(a,t){ const rows=secracRows(t),inc=rows.filter(r=>r.inc),cm=t.
  <div class="panel section"><div class="section-head"><h2>Action plan</h2><button class="secondary" data-act="apAdd" data-id="${e(t.id)}">+ Add action</button></div>
  <p class="small">Work that must be done for the residual risk to be valid, such as implementing a missing control or keeping vendor access behind the MTM jump host. Actions are proposed for each control gap in the control assessment; add others as needed.</p>
  ${rows.length?`<div class="table-scroll" style="margin-top:10px"><table class="mini sectable extable"><thead><tr><th>ID</th><th>What must be done</th><th>Responsible party</th><th>Approved party</th><th>Due date</th><th>Status</th><th>Related to</th><th></th></tr></thead><tbody>
- ${rows.map(r=>{const k=e(r.key);return `<tr><td><strong${r.status==='Not required'?' style="text-decoration:line-through"':''}>${r.num}</strong></td>
+ ${rows.map(r=>{const k=e(r.key);return `<tr><td><strong${r.status==='Not required'?' style="text-decoration:line-through"':''}>${r.num}</strong>${crTieMini('TAP|'+t.id+'|'+r.key)}</td>
   <td><textarea class="rnotes" style="min-width:300px" id="ap_a_${k}" aria-label="What must be done" placeholder="What must be done">${e(r.text)}</textarea></td>
   <td>${sel('ap_p_'+r.key,partyOpts,r.party,'aria-label="Responsible party"')}</td>
   <td>${sel('ap_v_'+r.key,APPROVER_PARTIES.map(x=>[x,x]),r.approver,'aria-label="Approved party"')}</td>
@@ -4176,7 +4183,7 @@ function traStep7(a,t){ const rows=secracRows(t),inc=rows.filter(r=>r.inc),cm=t.
  <div class="panel section"><div class="section-head"><h2>Exception / security debt</h2><button class="secondary" data-act="exAdd" data-id="${e(t.id)}">+ Add exception or security debt</button></div>
  <p class="small"><strong>Exception:</strong> a known gap against an MTM control or IEC 62443 requirement accepted for a limited time. It needs an expiry or review date and a linked action in the action plan. <strong>Security debt:</strong> a known gap recorded and carried, to be addressed later.</p>
  ${(t.exceptions||[]).length?`<div class="table-scroll" style="margin-top:10px"><table class="mini sectable extable"><thead><tr><th>ID</th><th>Type</th><th>Control gap</th><th>Description and reason</th><th>Compensating measures</th><th>Owner</th><th>Target date</th><th>Expiry / review date</th><th>Linked action</th><th>Status</th><th></th></tr></thead><tbody>
- ${t.exceptions.map((x,i)=>{const ex=(x.type||'Exception')==='Exception';return `<tr><td><strong>EX-${String(i+1).padStart(2,'0')}</strong></td>
+ ${t.exceptions.map((x,i)=>{const ex=(x.type||'Exception')==='Exception';return `<tr><td><strong>EX-${String(i+1).padStart(2,'0')}</strong>${crTieMini('EX|'+t.id+'|'+x.id)}</td>
   <td>${sel('ex_y_'+x.id,['Exception','Security debt'],x.type||'Exception','data-tra-live aria-label="Exception or security debt"')}</td>
   <td>${sel('ex_c_'+x.id,[['','Select control'],...secracProposals(t).map(p=>[p.c.id,`${p.c.id} · ${p.c.name} (${p.resp==='Not implemented'?'not':'partly'} implemented)`]),['Other','Other']],x.ctl||'','aria-label="Control gap" style="max-width:220px"')}</td>
   <td><textarea class="rnotes" id="ex_d_${e(x.id)}" aria-label="Description and reason" placeholder="What is not met and why">${e(x.desc||'')}</textarea></td>
@@ -4282,23 +4289,29 @@ function riskRollup(){const env={OT:{},IT:{}},noBreak=[],noTra=[],drafts=[];
   if(w&&(!t||String(w.created)>String(t.date)))drafts.push({a,t:w,items:traRiskItems(w)});
   if(!t){noTra.push(a);return;}const items=traRiskItems(t);if(!items.length){noBreak.push({a,t});return;}
   items.forEach(x=>{const it=Object.assign({a,t,res:matrixCell(x.rL,x.rI)},x);(x.stmt.dims||[]).forEach(d=>{if(env[k][d])env[k][d].push(it);});});});
+ /* Cyber risks tied to actions, exceptions, security debt and attestations: counted once per environment and dimension */
+ (typeof crAll==='function'?crAll():[]).filter(r=>r.status!=='Closed'&&r.L&&r.I).forEach(r=>{const it={cr:r,a:DB.assets[r.aid]||null,rL:r.L,rI:r.I,res:matrixCell(r.L,r.I)};(r.env||[]).forEach(k=>(r.dims||[]).forEach(d=>{if(env[k]&&env[k][d])env[k][d].push(it);}));});
  Object.values(env).forEach(o=>Object.values(o).forEach(l=>l.sort((x,y)=>y.res.value-x.res.value||y.rI-x.rI)));
  return {env,noBreak,noTra,drafts};}
 const traLink=(a,t)=>t.mode==='new'?`<button class="open" data-go="traEdit" data-a="${e(a.id)}" data-b="${e(t.id)}">${e(t.ref||t.id)} →</button>`:`<button class="open" data-go="tra" data-a="${e(a.id)}">${e(t.ref||t.id)} →</button>`;
 /* Same representation as the TRA residual risk: matrix box, I × L, and the risk register flag above 9 */
 const residCell=x=>`${riskBox(x.res)}<div class="small">I${e(x.rI)} × L${e(x.rL)}</div>${x.res.value>RISK_REG_THRESHOLD?'<div class="small" style="color:#b42318;font-weight:600;margin-top:4px;min-width:96px">Higher than 9: raise in risk register</div>':''}`;
-function riskDimRow(k,d,name,list){const top=list[0],assets=new Set(list.map(x=>x.a.id)).size,open=(V.riskOpen||{})[k+d];
- return `<details class="riskdim" data-riskdim="${k+d}" ${open?'open':''}><summary><span class="dimbadge">${d.toUpperCase()}</span><span class="rdname">${(st=>st?`<strong class="rdtitle">Risk of <span class="rp-cons">${e(st.cons)}</span> due to ${e(st.hazard||RISK_HAZARD_DEFAULT)}.</strong>`:`<strong class="rdtitle">${k} ${e(name)}</strong>`)(dimStmt(name))}<span class="small">${list.length?`${list.length} TRA risk${list.length===1?'':'s'} from ${assets} system${assets===1?'':'s'}`:'No TRA risks recorded'}</span></span>
+const riskCountTxt=list=>{const nt=list.filter(x=>!x.cr).length,nr=list.length-nt,assets=new Set(list.filter(x=>x.a).map(x=>x.a.id)).size;return list.length?[nt?`${nt} TRA risk${nt===1?'':'s'}`:'',nr?`${nr} raised risk${nr===1?'':'s'}`:''].filter(Boolean).join(' · ')+(assets?` from ${assets} system${assets===1?'':'s'}`:''):'No risks recorded';};
+/* One row of the dimension table: a TRA risk statement, or a cyber risk raised from an item */
+function riskConRow(x,k,d){if(x.cr){const r=x.cr;return `<tr><td>${x.a?`<button class="open" data-go="asset" data-a="${e(x.a.id)}">${e(x.a.id)}</button><div class="small">${e(x.a.name)}</div>`:'<span class="small">Not system-specific</span>'}</td><td><button class="open" data-act="crOpen" data-ref="" data-id="${e(r.id)}">${e(r.id)} →</button><div class="small">${(r.links||[]).map(l=>{const s=crSrc(l);return s?e(s.kind):'';}).filter(Boolean).join(', ')||'Raised directly'}</div></td><td><div>${e(r.stmt)}</div><div class="small">${e((r.threats||[]).map(t=>THREAT_NAME[t]||t).join(', '))}${r.driver?' · '+e(r.driver):''}</div>${r.status==='Accepted'?`<div class="small">${r.expiry&&r.expiry<TODAY?'<strong style="color:#b42318">Acceptance expired</strong>':'Accepted until '+fd(r.expiry)}</div>`:''}</td><td>${residCell(x)}</td><td>${[...(r.dims||[]).filter(z=>z!==d).map(z=>z.toUpperCase()),...(r.env||[]).filter(z=>z!==k)].join(', ')||'—'}</td></tr>`;}
+ return `<tr><td><button class="open" data-go="asset" data-a="${e(x.a.id)}">${e(x.a.id)}</button><div class="small">${e(x.a.name)}</div></td><td>${traLink(x.a,x.t)}<div class="small">${fd(x.t.date)}</div></td><td><span class="small">${e(x.stmt.id)} · ${e(x.stmt.tag||'')}</span><div>Risk of <span class="rp-cons">${e(x.stmt.cons)}</span> due to ${e(x.stmt.hazard||RISK_HAZARD_DEFAULT)}.</div>${x.t.mode==='new'?boLine(x.t,x.stmt.id):''}</td><td>${residCell(x)}</td><td>${(x.stmt.dims||[]).filter(z=>z!==d).map(z=>z.toUpperCase()).join(', ')||'—'}</td></tr>`;}
+function riskDimRow(k,d,name,list){const top=list[0],open=(V.riskOpen||{})[k+d];
+ return `<details class="riskdim" data-riskdim="${k+d}" ${open?'open':''}><summary><span class="dimbadge">${d.toUpperCase()}</span><span class="rdname">${(st=>st?`<strong class="rdtitle">Risk of <span class="rp-cons">${e(st.cons)}</span> due to ${e(st.hazard||RISK_HAZARD_DEFAULT)}.</strong>`:`<strong class="rdtitle">${k} ${e(name)}</strong>`)(dimStmt(name))}<span class="small">${riskCountTxt(list)}</span></span>
  <span class="rdval"><span class="small">Residual risk</span>${top?residCell(top):pill('gray','None')}</span></summary>
- ${list.length?`<div class="table-scroll"><table class="mini riskcon"><thead><tr><th>System</th><th>TRA</th><th>Risk statement</th><th>Residual risk</th><th>Also affects</th></tr></thead><tbody>${list.map(x=>`<tr><td><button class="open" data-go="asset" data-a="${e(x.a.id)}">${e(x.a.id)}</button><div class="small">${e(x.a.name)}</div></td><td>${traLink(x.a,x.t)}<div class="small">${fd(x.t.date)}</div></td><td><span class="small">${e(x.stmt.id)} · ${e(x.stmt.tag||'')}</span><div>Risk of <span class="rp-cons">${e(x.stmt.cons)}</span> due to ${e(x.stmt.hazard||RISK_HAZARD_DEFAULT)}.</div>${x.t.mode==='new'?boLine(x.t,x.stmt.id):''}</td><td>${residCell(x)}</td><td>${(x.stmt.dims||[]).filter(z=>z!==d).map(z=>z.toUpperCase()).join(', ')||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="small" style="margin:10px 0 0">No completed TRA for this environment records a risk affecting this dimension.</p>'}</details>`;}
+ ${list.length?`<div class="table-scroll"><table class="mini riskcon"><thead><tr><th>System</th><th>Source</th><th>Risk</th><th>Residual risk</th><th>Also affects</th></tr></thead><tbody>${list.map(x=>riskConRow(x,k,d)).join('')}</tbody></table></div>`:'<p class="small" style="margin:10px 0 0">No completed TRA or raised cyber risk for this environment affects this dimension.</p>'}</details>`;}
 function allRisksPage(){const R=riskRollup(),rs=Object.values(DB.risks).sort((a,b)=>riskScore(b.rI,b.rL)-riskScore(a.rI,a.rL));
  const envPanel=k=>{const n=Object.values(DB.assets).filter(a=>(a.type==='OT'?'OT':'IT')===k).length;return `<div class="panel section"><div class="section-head"><h2>${k==='OT'?'Operational technology (OT)':'Information technology (IT)'}</h2><span class="small">${n} system${n===1?'':'s'}</span></div>${RISK_DIMS.map(([d,name])=>riskDimRow(k,d,name,R.env[k][d])).join('')}</div>`;};
  const gaps=[R.noBreak.length?`<li><strong>Not broken down by C, I, A:</strong> ${R.noBreak.map(x=>`${traLink(x.a,x.t)} (${e(x.a.id)})`).join(', ')}. The attached report has no risk statement results recorded, so it is not counted.</li>`:'',R.noTra.length?`<li><strong>No completed TRA:</strong> ${R.noTra.map(a=>e(a.id)).join(', ')}. Not counted.</li>`:'',R.drafts.length?`<li><strong>TRA in progress (not counted until complete):</strong> ${R.drafts.map(x=>`${traLink(x.a,x.t)} (${e(x.a.id)}, ${x.items.length} draft risk${x.items.length===1?'':'s'})`).join(', ')}</li>`:''].filter(Boolean);
- return crumb(['Risks'])+titlebar('Risks','Overall cyber risk for OT and IT, by confidentiality, integrity and availability. Open a row to see the TRA risks that make it up.','Sample data · concept only')+
- envPanel('OT')+envPanel('IT')+
- `<div class="panel section"><h2>What is counted</h2><p class="sub">Each system contributes the risk statements from its latest completed TRA. A statement counts under every dimension it affects, so one statement can appear under more than one row. Each row shows the highest residual risk among them, in the same form as the TRA residual risk.</p>${gaps.length?`<ul class="riskgaps">${gaps.join('')}</ul>`:''}</div>
+ return crumb(['Risks'])+titlebar('Risks','Overall cyber risk for OT and IT, by confidentiality, integrity and availability. Open a row to see the TRA risks and the cyber risks raised from actions, exceptions, security debt and attestations that make it up.','Sample data · concept only')+
+ envPanel('OT')+envPanel('IT')+(typeof crListPanel==='function'?crListPanel():'')+
+ `<div class="panel section"><h2>What is counted</h2><p class="sub">Each system contributes the risk statements from its latest completed TRA. Cyber risks raised from actions, exceptions, security debt, CMAP and VPDSS attestations also count while open or accepted, in OT, IT or both. A risk counts under every dimension it affects, once however many items are tied to it, so one risk can appear under more than one row. Each row shows the highest residual risk among them, in the same form as the TRA residual risk.</p>${gaps.length?`<ul class="riskgaps">${gaps.join('')}</ul>`:''}</div>
  <div class="panel section"><h2>Other system risks (risk register)</h2><p class="sub">Risks raised directly on systems, outside a TRA. They are not part of the OT and IT figures above.</p><div class="table-scroll"><table class="mini"><thead><tr><th>Risk</th><th>System</th><th>Residual</th><th>Action status</th><th>Acceptance expiry</th></tr></thead><tbody>${rs.map(r=>`<tr><td><button class="open" data-go="risk" data-a="${e(r.assetId)}" data-b="${e(r.id)}">${e(r.id)} · ${e(r.statement)} →</button></td><td>${e(DB.assets[r.assetId].name)}</td><td>${riskBox(matrixCell(r.rL,r.rI))}<div class="small">I${e(r.rI)} × L${e(r.rL)}</div></td><td>${e(r.actionStatus)}</td><td>${r.acceptanceExpiry?(accExpired(r)?pill('red','Expired '+fd(r.acceptanceExpiry)):fd(r.acceptanceExpiry)):'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="small">No register risks.</td></tr>'}</tbody></table></div></div>
- <p class="small attdisc">Risk ratings are indicative and come from the TRA method in this concept; they are not a formal risk acceptance.</p>`;}
+ <p class="small attdisc">Risk ratings are indicative and use the TRA method in this concept; they are not a formal risk acceptance.</p>`;}
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d.matches&&d.matches('[data-riskdim]'))V.riskOpen=Object.assign({},V.riskOpen||{},{[d.dataset.riskdim]:d.open});},true);
 
 function runChecks(){const res=[],ok=(t,p,d)=>res.push({t,p,d}),ids=Object.keys(DB.assets);
@@ -4312,7 +4325,9 @@ function runChecks(){const res=[],ok=(t,p,d)=>res.push({t,p,d}),ids=Object.keys(
  const hi=ids.filter(id=>(impact(id).rating||0)>=3);
  ok('Approved BIL of 3 or more creates annual User Access Review and DR Test',hi.every(id=>['UAR','DR'].every(k=>cmapDefs(id).some(d=>d.auto===k&&d.months===12))),hi.join(', '));
  ok('Risk scores are impact × likelihood; expired acceptance and open actions show on the system',Object.values(DB.risks).every(r=>riskScore(r.iI,r.iL)>=1&&riskScore(r.iI,r.iL)<=25)&&attention('OT-042').some(x=>/acceptance expired/i.test(x.text)),'OT-042 banner lists the expired acceptance');
- {const R=riskRollup(),ot=R.env.OT;ok('Risks page rolls TRA risk statements up by OT/IT and C, I, A; each row is its highest residual',['OT','IT'].every(k=>RISK_DIMS.every(([d])=>R.env[k][d].every((x,i,l)=>x.stmt.dims.includes(d)&&(x.a.type==='OT')===(k==='OT')&&x.res.value<=l[0].res.value))),`OT C/I/A: ${RISK_DIMS.map(([d])=>ot[d].length).join('/')}; drafts not counted: ${R.drafts.length}`);}
+ {const R=riskRollup(),ot=R.env.OT;ok('Risks page rolls TRA risk statements up by OT/IT and C, I, A; each row is its highest residual',['OT','IT'].every(k=>RISK_DIMS.every(([d])=>R.env[k][d].every((x,i,l)=>(x.cr?x.cr.dims.includes(d)&&x.cr.env.includes(k):x.stmt.dims.includes(d)&&(x.a.type==='OT')===(k==='OT'))&&x.res.value<=l[0].res.value))),`OT C/I/A: ${RISK_DIMS.map(([d])=>ot[d].length).join('/')}; drafts not counted: ${R.drafts.length}`);}
+ {const R=riskRollup(),both=crAll().find(r=>r.status!=='Closed'&&r.env.length===2),cnt=(k,d,r)=>R.env[k][d].filter(x=>x.cr===r).length;ok('Cyber risks raised from items count once in every OT/IT and C, I, A cell they apply to; closed ones are not counted',!!both&&both.env.every(k=>both.dims.every(d=>cnt(k,d,both)===1))&&crAll().filter(r=>r.status==='Closed').every(r=>['OT','IT'].every(k=>RISK_DIMS.every(([d])=>!cnt(k,d,r)))),both?`${both.id}: ${crEnvTxt(both)} × ${both.dims.join('')}`:'no OT + IT sample');}
+ ok('Actions, SecRAC exceptions and actions, CMAP and VPDSS attestations offer a cyber risk tie',!!window.TRA_PROTO||['ACT|OT-042|MAL-VULN:OT-042','CMAP|CM-042-DR','ATT|E11.040'].every(r=>crPanel(r).includes('Cyber risk'))&&crTieMini('EX|x|y').includes('crOpen'),'');
  {const L=attElList(),ids12=Object.keys(VPDSS_EL).map(Number);ok('VPDSS Attestation lists elements for all 12 standards with unique IDs',ids12.length===12&&ids12.every(n=>VPDSS_EL[n].length&&VPDSS_EL[n].every(([id])=>id.startsWith('E'+n+'.')))&&new Set(L.map(x=>x.id)).size===L.length,`${L.length} elements`);
   const ru9=attRollup(9);ok('Standard rolls up from element answers; systems inherit it once every element is answered',ru9.complete&&ru9.status===attProgramComp(9).status&&attProgramComp(9).kind==='VPDSS attestation'&&!attRollup(6).complete&&attProgramComp(6).kind.startsWith('Program attestation'),`Std 9 ${ru9.status}; Std 6 ${attRollup(6).answered}/${attRollup(6).total}`);
   ok('Unanswered elements never count toward a result',attRollup(3).status===null&&attRollup(3).answered===0,'Standard 3 has no answers');}
@@ -5043,7 +5058,7 @@ function homePage(){const as=Object.values(DB.assets).sort((x,y)=>x.id.localeCom
  /* TRA */
  const traDone=as.filter(a=>currentTra(a.id)).length,traWip=Object.values(DB.tra).filter(t=>t.mode==='new'&&(t.status==='Draft'||t.status==='In progress')).length;
  /* Risk roll-up */
- const R=riskRollup(),hi=[];['OT','IT'].forEach(k=>RISK_DIMS.forEach(([d])=>R.env[k][d].forEach(x=>{if(x.res.value>RISK_REG_THRESHOLD&&!hi.some(h=>h.a.id===x.a.id&&h.stmt.id===x.stmt.id))hi.push(x);})));
+ const R=riskRollup(),hi=[];['OT','IT'].forEach(k=>RISK_DIMS.forEach(([d])=>R.env[k][d].forEach(x=>{const key=x.cr?'CR:'+x.cr.id:x.a.id+':'+x.stmt.id;if(x.res.value>RISK_REG_THRESHOLD&&!hi.some(h=>h.key===key))hi.push({key});})));
  /* Actions */
  const acts=as.flatMap(a=>actionsFor(a.id).map(x=>Object.assign({aid:a.id},x))),open=acts.filter(isOpen),od=open.filter(isOverdue);
  /* CMAP */
@@ -5056,10 +5071,11 @@ function homePage(){const as=Object.values(DB.assets).sort((x,y)=>x.id.localeCom
  const att=as.flatMap(a=>attention(a.id).map(x=>Object.assign({a},x))).sort((x,y)=>(x.sev==='bad'?0:1)-(y.sev==='bad'?0:1));
  const extra=[];if(ec.Submitted)extra.push({sev:'warn',text:`${ec.Submitted} VPDSS element answer${ec.Submitted===1?'':'s'} awaiting coordinator review`,go:['assessments']});if(ec.Returned)extra.push({sev:'warn',text:`${ec.Returned} VPDSS element answer${ec.Returned===1?'':'s'} returned to owners`,go:['assessments']});
  vs.forEach(v=>{const d=latestDecision(v.id),l=vaFor(v.id)[0];if(l&&l.status==='submitted')extra.push({sev:'warn',text:`${v.name}: supplier assessment awaiting review`,go:['va',l.id]});else if(d&&d.review.decision==='Rejected')extra.push({sev:'bad',text:`${v.name}: supplier assessment rejected`,go:['va',d.id]});});
+ (typeof crAll==='function'?crAll():[]).filter(r=>r.status==='Accepted'&&r.expiry&&r.expiry<TODAY).forEach(r=>extra.push({sev:'bad',text:`Cyber risk ${r.id}: acceptance expired ${fd(r.expiry)}`,go:['crisk','',r.id]}));
  const needs=extra.filter(x=>x.sev==='bad').concat(att.filter(x=>x.sev==='bad'),extra.filter(x=>x.sev!=='bad'),att.filter(x=>x.sev!=='bad'));
  const goAttr=g=>`data-go="${e(g[0])}"${g[1]?` data-a="${e(g[1])}"`:''}${g[2]?` data-b="${e(g[2])}"`:''}`;
  /* Risk heat grid */
- const cell=(k,d,name)=>{const l=R.env[k][d],top=l[0];return `<button class="dcell" data-go="allrisks" title="${e(k+' '+name+': '+(top?'highest residual '+top.res.value:'no TRA risks'))}">${top?riskBox(top.res):'<span class="small">—</span>'}<span class="small">${l.length} TRA risk${l.length===1?'':'s'}</span></button>`;};
+ const cell=(k,d,name)=>{const l=R.env[k][d],top=l[0];return `<button class="dcell" data-go="allrisks" title="${e(k+' '+name+': '+(top?'highest residual '+top.res.value:'no risks'))}"><span class="dcl">${e(name)}</span>${top?riskBox(top.res):'<span class="small">—</span>'}<span class="small">${l.length} risk${l.length===1?'':'s'}${l.some(x=>x.cr)?` · ${l.filter(x=>x.cr).length} raised`:''}</span></button>`;};
  /* Assurance matrix */
  /* VPDSS maturity result per standard (rolled up from the attestation element answers) */
  const ru=Object.keys(VPDSS_EL).map(Number).map(k=>attRollup(k));
@@ -5080,8 +5096,8 @@ function homePage(){const as=Object.values(DB.assets).sort((x,y)=>x.id.localeCom
   ${dTile('Third parties',vs.length,`${dec('Conditional')} conditional · ${dec('Rejected')} rejected`,['thirdparty'],dec('Rejected')?'bad':'')}
  </div>
  <div class="dgrid">
-  <div class="panel section"><div class="section-head"><h2>Cyber risk · residual</h2><button class="open small" data-go="allrisks">Open Risks →</button></div><p class="small">Highest residual risk from completed TRAs, by environment and dimension.</p>
-   <div class="dheat"><span></span><span class="small dh">Confidentiality</span><span class="small dh">Integrity</span><span class="small dh">Availability</span>${['OT','IT'].map(k=>`<span class="dhk">${k}</span>${RISK_DIMS.map(([d,name])=>cell(k,d,name)).join('')}`).join('')}</div>
+  <div class="panel section"><div class="section-head"><h2>Cyber Risk</h2><button class="open small" data-go="allrisks">Open Risks →</button></div><p class="small">Highest residual risk from completed TRAs and from cyber risks raised on actions, exceptions, security debt and attestations, by Confidentiality, Integrity and Availability for OT and IT.</p>
+   ${['OT','IT'].map(k=>`<div class="denv"><h3 class="dh3">${k==='OT'?'OT · Operational technology':'IT · Information technology'}</h3><div class="dcia">${RISK_DIMS.map(([d,name])=>cell(k,d,name)).join('')}</div></div>`).join('')}
    ${R.noTra.length||R.noBreak.length?`<p class="small" style="margin-top:8px">Not counted: ${R.noTra.length} system${R.noTra.length===1?'':'s'} with no completed TRA${R.drafts.length?`, ${R.drafts.length} TRA${R.drafts.length===1?'':'s'} in progress`:''}.</p>`:''}</div>
   <div class="panel section"><div class="section-head"><h2>Needs attention</h2><span class="small">${needs.length} item${needs.length===1?'':'s'}</span></div>
    ${needs.length?`<ul class="dneeds">${needs.slice(0,10).map(x=>`<li><span class="ddot ${x.sev==='bad'?'bad':'warn'}" aria-hidden="true"></span><span class="vh">${x.sev==='bad'?'Overdue or failed':'Due or pending'}:</span><button class="open" ${goAttr(x.go)}>${x.a?e(x.a.id)+' · ':''}${e(x.text)}</button></li>`).join('')}</ul>${needs.length>10?`<p class="small">and ${needs.length-10} more on the system pages.</p>`:''}`:'<p class="small">Nothing needs attention.</p>'}</div>
@@ -5330,6 +5346,123 @@ Object.assign(ACT,{
  thrShow(b){const t=DB.tra[b.dataset.id];readTra(t);t.brief=t.brief||{};t.brief.thrHide=(t.brief.thrHide||[]).filter(x=>x!==b.dataset.k);t.updated=TODAY;save();const y=window.scrollY;render();window.scrollTo(0,y);},
  thrDefault(b){const t=DB.tra[b.dataset.id];readTra(t);if(t.brief&&t.brief.thrDesc)delete t.brief.thrDesc[b.dataset.k];t.updated=TODAY;save();const y=window.scrollY;render();window.scrollTo(0,y);}
 });
+
+/* ---- Cyber risks tied to items ----
+   Any action (system Action Plan or TRA SecRAC), exception or security debt, CMAP attestation or VPDSS attestation result
+   can be tied to a cyber risk: raise a new one, or link to an existing one. A cyber risk applies to OT, IT or both, to one or
+   more of C, I, A, names its threats and risk driver, and is rated by residual likelihood × impact on the same matrix as the TRA.
+   Open and Accepted risks feed the OT/IT × CIA roll-up on the Risks page and Home, alongside TRA risks.
+   Record DB.crisks {id: {id, env [OT, IT], aid, dims [c,i,a], threats [Txx], driver, stmt, L, I, ownerId, status, expiry,
+   links [ref], origin, created, updated, audit [{at, action}]}}.
+   ref: ACT|aid|key · TAP|traId|rowKey · EX|traId|exId · CMAP|defId · ATT|elementId */
+const CR_DRIVERS=['Control not implemented','Control partially implemented','Approved exception to a control','Known security debt (end-of-life, deferred patch, known gap)','Overdue or missing assurance activity','Attestation shows a gap','Unpatched or unmanaged vulnerability','Weak, shared or unmanaged credentials','Third-party or supplier weakness','Security incident or malware finding','Other'];
+const CR_STATUS=['Open','Accepted','Closed'];
+const crAll=()=>Object.values(DB.crisks||{});
+const crOf=ref=>crAll().find(r=>(r.links||[]).includes(ref))||null;
+const crEnvTxt=r=>(r.env||[]).length===2?'OT + IT':(r.env||[]).join('')||'—';
+const crDimTxt=r=>RISK_DIMS.filter(([d])=>(r.dims||[]).includes(d)).map(([,n])=>n).join(', ')||'—';
+const crCell=r=>r.L&&r.I?matrixCell(r.L,r.I):null;
+/* Where a tied item lives: its kind, label, system and page */
+function crSrc(ref){const p=String(ref||'').split('|'),k=p[0];
+ try{
+  if(k==='ACT'){const a=DB.assets[p[1]],key=p.slice(2).join('|'),x=a&&actionsFor(a.id).find(y=>y.key===key);return {kind:'Action',label:x?x.title:'Action no longer open',aid:a?a.id:'',go:x?['action',a.id,key]:['actions',a?a.id:''],gone:!x};}
+  if(k==='TAP'||k==='EX'){const t=DB.tra[p[1]];if(!t)return null;const g=['traEdit',t.assetId||'',t.id],tr=t.ref||t.id;
+   if(k==='TAP'){const r=secracRows(t).find(y=>y.key===p[2]);return {kind:'TRA action',label:r?`${tr} ${r.num} · ${r.text||'Action'}`:`${tr} action removed`,aid:t.assetId||'',go:g,gone:!r};}
+   const xs=t.exceptions||[],i=xs.findIndex(y=>y.id===p[2]),x=xs[i];return {kind:x?(x.type||'Exception'):'Exception',label:x?`${tr} EX-${String(i+1).padStart(2,'0')} · ${x.desc||x.ctl||'No description yet'}`:`${tr} exception removed`,aid:t.assetId||'',go:g,gone:!x};}
+  if(k==='CMAP'){const d=DB.cmapDefs[p[1]];if(!d)return null;const a=DB.assets[d.assetId];return {kind:'CMAP attestation',label:`${d.title}${a?' · '+a.name:''}`,aid:d.assetId,go:['cmapItem',d.assetId,d.id]};}
+  if(k==='ATT'){const x=attElInfo(p[1]);if(!x)return null;const r=attPeek(x.id);return {kind:'VPDSS attestation',label:`${x.id} · ${x.t}${r.status?' ('+r.status+')':''}`,aid:'',go:['attestEl',x.id]};}
+ }catch(_){}
+ return null;}
+const crGoAttr=g=>`data-go="${e(g[0])}"${g[1]?` data-a="${e(g[1])}"`:''}${g[2]?` data-b="${e(g[2])}"`:''}`;
+const crSrcLink=ref=>{const s=crSrc(ref);return s?`<button class="open" ${crGoAttr(s.go)}>${e(s.kind)}: ${e(s.label.length>90?s.label.slice(0,90)+'…':s.label)}</button>`:'<span class="small">Item no longer exists</span>';};
+const crBadge=r=>{const c=crCell(r);return `${c?riskBox(c):''}<span class="crid">${e(r.id)}</span> <span class="small">${e(crEnvTxt(r))} · ${e((r.dims||[]).map(d=>d.toUpperCase()).join(''))}${r.status!=='Open'?' · '+e(r.status):''}</span>`;};
+/* Compact control for table rows */
+function crTieMini(ref){if(window.TRA_PROTO)return '';const r=crOf(ref);
+ return r?`<div class="crtie"><button class="crchip" data-act="crOpen" data-ref="${e(ref)}" data-id="${e(r.id)}" title="Cyber risk tied to this item">${crBadge(r)}</button></div>`:`<div class="crtie"><button class="linkbtn crtie-add" data-act="crOpen" data-ref="${e(ref)}">+ Cyber risk</button></div>`;}
+/* Panel for item pages */
+function crPanel(ref){if(window.TRA_PROTO||!crSrc(ref))return '';const r=crOf(ref);
+ return `<div class="panel section crpanel"><div class="section-head"><h2>Cyber risk</h2>${r?`<button class="secondary" data-act="crOpen" data-ref="${e(ref)}" data-id="${e(r.id)}">Edit cyber risk</button>`:''}</div>
+ ${r?`<div class="crsum">${crCell(r)?riskBox(crCell(r)):''}<div><div><strong>${e(r.id)}</strong> · ${e(crEnvTxt(r))} · ${e(crDimTxt(r))} · ${e(r.status)}${r.status==='Accepted'&&r.expiry?` until ${fd(r.expiry)}`:''}</div><p style="margin:4px 0">${e(r.stmt)}</p><div class="small">Threats: ${e((r.threats||[]).map(t=>t+' '+(THREAT_NAME[t]||'')).join('; ')||'—')} · Risk driver: ${e(r.driver||'—')} · I${e(r.I)} × L${e(r.L)}</div>${(r.links||[]).length>1?`<div class="small" style="margin-top:4px">Also tied to ${r.links.length-1} other item${r.links.length===2?'':'s'}.</div>`:''}</div></div>
+ <div class="btnrow"><button class="linkbtn" data-act="crUnlink" data-ref="${e(ref)}" data-id="${e(r.id)}">Remove link to this risk</button></div>`
+ :`<p class="sub">Tie this item to an OT and/or IT cyber risk so it counts in the overall cyber risk picture on the Risks page and Home. Raise a new risk, or link it to one that already exists.</p><div class="btnrow"><button class="secondary" data-act="crOpen" data-ref="${e(ref)}">+ Add cyber risk</button></div>`}</div>`;}
+
+/* ---- Cyber risk form ---- */
+function crDefaults(ref){const s=crSrc(ref)||{},k=String(ref).split('|')[0],a=DB.assets[s.aid];let drv='';
+ if(k==='CMAP')drv='Overdue or missing assurance activity';else if(k==='ATT')drv='Attestation shows a gap';
+ else if(k==='EX')drv=s.kind==='Security debt'?CR_DRIVERS[3]:CR_DRIVERS[2];
+ else if(/^ACT\|[^|]+\|(MAL|MON)/.test(ref))drv='Security incident or malware finding';else if(/^ACT\|[^|]+\|VEND/.test(ref))drv='Third-party or supplier weakness';
+ return {env:a?[a.type==='OT'?'OT':'IT']:[],aid:a?a.id:'',dims:[],threats:[],driver:drv,stmt:'',L:'',I:'',ownerId:a?a.ownerId:'',status:'Open',expiry:'',links:[]};}
+function crPage(){const ref=V.a||'',isNew=!V.b||V.b==='new',r=isNew?crDefaults(ref):DB.crisks[V.b];if(!r)throw new Error('Cyber risk not found.');
+ const s=ref?crSrc(ref):null,others=crAll().filter(x=>x.status!=='Closed'&&!(x.links||[]).includes(ref)),bk=V.crBack||(s?s.go:['allrisks']);
+ const box=(name,val,label,on)=>`<label><input type="checkbox" name="${e(name)}" value="${e(val)}" ${on?'checked':''}> ${e(label)}</label>`;
+ const score=(id,lab,v)=>sel(id,[['','Select 1–5'],...[1,2,3,4,5].map(n=>[n,n+' · '+lab[n]])],v||'','data-cr-score');
+ const c=crCell(r);
+ return crumb([['Risks','allrisks'],isNew?'New cyber risk':r.id])+`<button class="back" ${crGoAttr(bk)}>← Back</button>`+titlebar(isNew?'Add cyber risk':'Cyber risk '+r.id,'A cyber risk counts toward the overall OT and IT risk by Confidentiality, Integrity and Availability.',isNew?'New':r.status)+
+ (s?`<div class="notice"><strong>Tied item:</strong> ${e(s.kind)} · ${e(s.label)}</div>`:'')+
+ (isNew&&ref&&others.length?`<div class="panel section"><h2>How to tie this item</h2><div class="crmode"><label><input type="radio" name="crMode" value="new" data-crmode checked> Raise a new cyber risk</label><label><input type="radio" name="crMode" value="link" data-crmode> Link to an existing cyber risk</label></div>
+  <div id="crLinkBox" hidden>${field('crExisting','Existing cyber risk',sel('crExisting',[['','Select a cyber risk'],...others.map(x=>[x.id,`${x.id} · ${crEnvTxt(x)} · ${(x.dims||[]).map(d=>d.toUpperCase()).join('')} · ${crCell(x)?crCell(x).value:'—'} · ${String(x.stmt).slice(0,70)}`])],''),'full')}<p class="small">The item is added to that risk; no new risk is created. Review the risk's rating afterwards if this item changes it.</p></div></div>`:'')+
+ `<div id="crNewBox"><div class="panel section"><h2>Where the risk applies</h2>
+ <div class="checkgrid crgrid"><fieldset><legend>Environment</legend>${box('crEnv','OT','OT · Operational technology',(r.env||[]).includes('OT'))}${box('crEnv','IT','IT · Information technology',(r.env||[]).includes('IT'))}<p class="small">Select both when the risk spans OT and IT.</p></fieldset>
+ <fieldset><legend>CIA dimensions affected</legend>${RISK_DIMS.map(([d,n])=>box('crDim',d,n,(r.dims||[]).includes(d))).join('')}</fieldset></div>
+ <div class="formgrid" style="margin-top:14px">${field('crSys','System (optional)',sel('crSys',[['','Not system-specific (enterprise-wide)'],...Object.values(DB.assets).map(a=>[a.id,`${a.id} · ${a.name} (${a.type==='OT'?'OT':'IT'})`])],r.aid||''))}${field('crOwner','Risk owner',sel('crOwner',personOpts(),r.ownerId||''))}</div></div>
+ <div class="panel section"><h2>Threat and risk driver</h2><p class="sub">Select the threats that could realise this risk, and what is driving it.</p>
+ <fieldset class="crthr"><legend>Threats</legend><div class="crthrgrid">${TRA_THREATS.map(t=>box('crThr',t[0],t[0]+' · '+t[1],(r.threats||[]).includes(t[0]))).join('')}</div></fieldset>
+ <div class="formgrid" style="margin-top:14px">${field('crDrv','Risk driver',sel('crDrv',[['','Select risk driver'],...CR_DRIVERS],r.driver||''))}
+ ${field('crStmt','Risk statement',ta('crStmt',r.stmt||'','rows="3" placeholder="Risk of <consequence> due to <cause>."'),'full')}</div>
+ <p class="small">Describe the consequence and its cause in your own words, for example: Risk of disruption to signalling services due to an untested disaster recovery process.</p></div>
+ <div class="panel section"><h2>Rating</h2><p class="sub">Rate the risk as it stands today, with the controls already in place. Planned actions do not lower it until completed and reassessed.</p>
+ <div class="formgrid">${field('crL','Likelihood',score('crL',LIKELIHOOD_LABELS,r.L))}${field('crI','Impact',score('crI',IMPACT_LABELS,r.I))}
+ <div class="field"><span class="lab">Residual risk</span><div id="crPrev">${crPrevHtml(r.L,r.I)}</div></div></div>
+ <div class="formgrid" style="margin-top:14px">${field('crStatus','Status',sel('crStatus',CR_STATUS,r.status||'Open'))}${field('crExp','Acceptance expiry (when accepted)',inp('crExp',r.expiry||'','type="date"'))}</div></div></div>
+ ${!isNew?`<div class="panel section"><h2>Tied items</h2>${(r.links||[]).length?`<ul class="crlinks">${r.links.map(l=>`<li>${crSrcLink(l)} <button class="linkbtn" data-act="crUnlink" data-ref="${e(l)}" data-id="${e(r.id)}">Remove link</button></li>`).join('')}</ul>`:'<p class="small">No items tied to this risk.</p>'}
+  ${(r.audit||[]).length?`<h3 class="dh3" style="margin-top:14px">History</h3><ul class="atthist">${r.audit.slice().reverse().map(h=>`<li><span class="small">${e(h.at)}</span> ${e(h.action)}</li>`).join('')}</ul>`:''}</div>`:''}
+ <div class="panel section"><p class="err" id="crErr" role="alert"></p><div class="btnrow"><button class="primary" data-act="crSave" data-ref="${e(ref)}" data-id="${e(isNew?'':r.id)}">${isNew?'Save cyber risk':'Save changes'}</button><button class="secondary" ${crGoAttr(bk)}>Cancel</button></div>
+ <p class="small attdisc">Ratings are indicative and use the TRA matrix in this concept; recording a risk here is not a formal risk acceptance.</p></div>`;}
+const crPrevHtml=(L,I)=>{L=Number(L);I=Number(I);if(!L||!I)return '<span class="small">Select likelihood and impact</span>';const c=matrixCell(L,I);return `${riskBox(c)} <span class="small">I${I} × L${L}${c.value>RISK_REG_THRESHOLD?' · higher than 9':''}</span>`;};
+const crChecked=n=>[...document.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value);
+const crAudit=(r,a)=>{r.audit=r.audit||[];r.audit.push({at:TODAY,action:a});r.updated=TODAY;};
+function crBackTo(ref){const s=ref?crSrc(ref):null,g=V.crBack||(s?s.go:['allrisks']);V.crBack=null;go(g[0],g[1],g[2]);}
+Object.assign(ACT,{
+ crOpen(b){if(V.view==='traEdit'&&DB.tra[V.b]){const t=DB.tra[V.b];readTra(t);save();}V.crBack=V.view==='crisk'?V.crBack:[V.view,V.a,V.b];go('crisk',b.dataset.ref||'',b.dataset.id||'new');},
+ crSave(b){const ref=b.dataset.ref||'',id=b.dataset.id;DB.crisks=DB.crisks||{};
+  const m=document.querySelector('input[name="crMode"]:checked');
+  if(m&&m.value==='link'){const r=DB.crisks[val('crExisting')];if(!r)return showErr('crErr','Select the existing cyber risk to link to.');if(!r.links.includes(ref))r.links.push(ref);const s=crSrc(ref);crAudit(r,`Linked ${s?s.kind+': '+s.label:ref}`);save();toast(`Linked to ${r.id}. Check whether its rating needs to change.`);return crBackTo(ref);}
+  const env=crChecked('crEnv'),dims=crChecked('crDim'),L=Number(val('crL')),I=Number(val('crI')),stmt=val('crStmt'),status=val('crStatus')||'Open',expiry=val('crExp');
+  if(!env.length)return showErr('crErr','Select OT, IT or both.');if(!dims.length)return showErr('crErr','Select at least one of Confidentiality, Integrity or Availability.');
+  if(!stmt)return showErr('crErr','Write the risk statement.');if(!L||!I)return showErr('crErr','Select the likelihood and impact.');
+  if(status==='Accepted'&&!isDate(expiry))return showErr('crErr','An accepted risk needs an acceptance expiry date.');
+  const f={env,dims,aid:val('crSys'),threats:crChecked('crThr'),driver:val('crDrv'),stmt,L,I,ownerId:val('crOwner'),status,expiry:status==='Accepted'?expiry:''};
+  let r=id&&DB.crisks[id];
+  if(r){const was=`I${r.I}×L${r.L} ${r.status}`;Object.assign(r,f);crAudit(r,`Updated · ${was} → I${I}×L${L} ${status}`);}
+  else{const nid_=nid('CR');r=Object.assign({id:nid_,links:ref?[ref]:[],origin:ref,created:TODAY,audit:[]},f);DB.crisks[r.id]=r;const s=crSrc(ref);crAudit(r,'Raised'+(s?` from ${s.kind}: ${s.label}`:''));}
+  save();toast(`Cyber risk ${r.id} saved`);crBackTo(ref);},
+ crUnlink(b){const r=DB.crisks[b.dataset.id],ref=b.dataset.ref;if(!r)return;const last=r.links.length===1&&r.origin===ref;
+  ConfirmDialog({title:'Remove link to cyber risk?',message:last?`${r.id} was raised from this item and has no other tied items, so it will be closed as Withdrawn.`:`The item will no longer count toward ${r.id}. The risk stays open.`,buttons:[{label:'Cancel'},{label:'Remove link',kind:'primary',fn:()=>{r.links=r.links.filter(x=>x!==ref);const s=crSrc(ref);crAudit(r,`Link removed: ${s?s.kind+': '+s.label:ref}`);if(last){r.status='Closed';r.closed='Withdrawn';crAudit(r,'Closed · Withdrawn');}save();toast(last?`${r.id} closed as Withdrawn`:'Link removed');const y=window.scrollY;render();window.scrollTo(0,y);}}],cancel:0});}
+});
+document.addEventListener('change',ev=>{const t=ev.target;if(!t.matches)return;
+ if(t.matches('[data-cr-score]')){const p=document.getElementById('crPrev');if(p)p.innerHTML=crPrevHtml(val('crL'),val('crI'));}
+ if(t.matches('[data-crmode]')){const link=t.value==='link';const a=document.getElementById('crLinkBox'),n=document.getElementById('crNewBox');if(a)a.hidden=!link;if(n)n.hidden=link;}});
+
+/* ---- Item pages get the Cyber risk panel ---- */
+{const vAct=VIEWS.action,vCm=VIEWS.cmapItem,vAtt=VIEWS.attestEl;
+ VIEWS.action=()=>vAct()+(V.b&&V.b!=='new'?crPanel('ACT|'+V.a+'|'+V.b):'');
+ VIEWS.cmapItem=()=>vCm()+crPanel('CMAP|'+V.b);
+ if(vAtt)VIEWS.attestEl=()=>vAtt()+crPanel('ATT|'+V.a);
+ VIEWS.crisk=crPage;}
+
+/* ---- Risks page: list of cyber risks raised from items ---- */
+function crListPanel(){const rs=crAll().sort((x,y)=>(x.status==='Closed')-(y.status==='Closed')||((crCell(y)||{}).value||0)-((crCell(x)||{}).value||0));
+ return `<div class="panel section"><div class="section-head"><h2>Cyber risks raised from items</h2><button class="secondary" data-act="crOpen" data-ref="">+ Add cyber risk</button></div><p class="sub">Risks tied to actions, exceptions and security debt, CMAP attestations and VPDSS attestation results. Open and accepted risks count in the OT and IT rows above; closed risks do not.</p>
+ <div class="table-scroll"><table class="mini"><thead><tr><th>Risk</th><th>Applies to</th><th>Threats and driver</th><th>Tied items</th><th>Residual</th><th>Status</th></tr></thead><tbody>${rs.length?rs.map(r=>{const c=crCell(r);return `<tr${r.status==='Closed'?' class="dim"':''}><td><button class="open" data-act="crOpen" data-ref="" data-id="${e(r.id)}">${e(r.id)} →</button><div>${e(r.stmt)}</div></td><td class="nowrap">${e(crEnvTxt(r))}<div class="small">${e((r.dims||[]).map(d=>d.toUpperCase()).join(', '))}${DB.assets[r.aid]?' · '+e(r.aid):''}</div></td><td class="small">${e((r.threats||[]).map(t=>THREAT_NAME[t]||t).join(', ')||'—')}<div>${e(r.driver||'')}</div></td><td class="small">${(r.links||[]).map(crSrcLink).join('<br>')||'—'}</td><td>${c?riskBox(c):'—'}<div class="small">I${e(r.I)} × L${e(r.L)}</div></td><td>${pill(r.status==='Closed'?'gray':r.status==='Accepted'?(r.expiry&&r.expiry<TODAY?'red':'blue'):'amber',r.status==='Accepted'&&r.expiry?(r.expiry<TODAY?'Acceptance expired':'Accepted until '+fd(r.expiry)):r.status)}</td></tr>`;}).join(''):'<tr><td colspan="6" class="small">No cyber risks raised from items yet. Use “+ Cyber risk” on an action, exception, security debt or attestation.</td></tr>'}</tbody></table></div></div>`;}
+
+/* ---- V10 migration: cyber risks collection, with fictional samples ---- */
+function migrateV9(d){d.schema=10;d.crisks=d.crisks||{};
+ const a=d.assets||{},S=[
+  ['CR-0901',['OT'],'OT-042',['a','i'],['T05','T07'],'Overdue or missing assurance activity','Risk of extended disruption to signalling services due to the disaster recovery process for Signalling System A not having been tested.',3,4,'P-002','Open',['CMAP|CM-042-DR']],
+  ['CR-0902',['OT','IT'],'',['c','i','a'],['T11','T12','T09'],'Control partially implemented','Risk of compromise spreading across IT and OT networks due to vulnerabilities, patching and monitoring not being prioritised by risk.',3,3,'P-009','Open',['ATT|E11.040','ACT|OT-042|MAL-VULN:OT-042']],
+  ['CR-0903',['IT'],'IT-044',['c','a'],['T07','T02'],'Security incident or malware finding','Risk of staff personal information being disclosed or the rostering service being disrupted due to a recent malware infection not yet fully investigated.',4,3,'P-011','Open',['ACT|IT-044|MAL-INF:IT-044:2026-09-20']]];
+ S.forEach(([id,env,aid,dims,threats,driver,stmt,L,I,ownerId,status,links])=>{if(d.crisks[id]||(aid&&!a[aid]))return;d.crisks[id]={id,env,aid,dims,threats,driver,stmt,L,I,ownerId,status,expiry:'',links,origin:links[0],created:'2026-10-01',updated:'2026-10-01',audit:[{at:'2026-10-01',action:'Raised (sample)'}],sample:true};});
+ return d;}
 
 function render(){let html;try{html=(VIEWS[V.view]||register)();}catch(err){console.error(err);html=`<div class="panel section"><h2>This record could not be shown</h2><p class="sub">${e(err.message)}</p><div class="btnrow"><button class="primary" data-go="register">Back to system register</button></div></div>`;}
  $('#app').innerHTML=html;const grp={home:'home',hcportal:'hcportal',phc:'hcportal',chk:'hcportal',hc:V.hcFrom==='portal'?'hcportal':undefined,bil:V.view==='bil'&&!V.a?'bilreg':undefined,bilreg:'bilreg',trareg:'trareg',traEdit:V.view==='traEdit'&&DB.tra[V.b]&&!DB.tra[V.b].assetId&&!PROTO?'trareg':undefined,thirdparty:'thirdparty',va:V.b?undefined:'thirdparty',assessments:'assessments',attestStd:'assessments',attestEl:'assessments',allrisks:'allrisks',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
