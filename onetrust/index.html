@@ -397,6 +397,21 @@ details.tpver summary{cursor:pointer}.tpsum{border-left:4px solid #203047}.tpcon
 .crthr{border:1px solid var(--line);border-radius:5px;padding:12px;margin:12px 0 0;min-width:0}.crthr legend{font-size:13px;font-weight:700}.crthrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px}.crthrgrid label{font-size:13px;margin:4px 0}
 .crlinks{margin:6px 0 0 18px}.crlinks li{margin:6px 0}tr.dim td{opacity:.55}
 @media(max-width:650px){.crgrid{grid-template-columns:1fr}.crsum{flex-direction:column}}
+.inc-row{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-top:10px;background:var(--white)}
+.inc-row.aw{border-color:#f1c27d;background:#fffaf0}
+.inc-rowfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.inc-rowfoot label{display:flex;gap:6px;align-items:center;font-weight:700}
+.formgrid.inc-g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.inc-reghead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.inc-reghead .st{text-align:right;min-width:170px}
+.inc-chips{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:2px}.inc-chips label{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:400;color:inherit;margin:0}
+.inc-clist{list-style:none;margin:10px 0 0;padding:0;border:1px solid var(--line);border-radius:6px}
+.inc-clist li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}.inc-clist li:first-child{border-top:0}
+.inc-clist .due{margin-left:auto;font-size:12px;color:var(--muted);font-family:Consolas,monospace}
+.inc-rates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.inc-matrix{border-collapse:separate;border-spacing:3px;margin-top:10px;width:auto}.inc-matrix th{font-size:11px;color:var(--muted);padding:2px 6px;border:0;background:none}
+.inc-matrix td{width:44px;height:30px;text-align:center;font-weight:700;border-radius:4px;position:relative;border:0;padding:0}.inc-matrix td.on{outline:3px solid #172B33;outline-offset:-1px}
+.inc-matrix td .tag{position:absolute;top:-7px;right:-5px;background:#172B33;color:#fff;font-size:9px;border-radius:6px;padding:0 4px;line-height:14px}
+@media(max-width:760px){.formgrid.inc-g3,.inc-rates{grid-template-columns:1fr}.inc-reghead .st{text-align:left}}
 </style>
 </head>
 <body>
@@ -411,6 +426,7 @@ details.tpver summary{cursor:pointer}.tpsum{border-left:4px solid #203047}.tpcon
     <button data-nav="assessments">Attestation</button>
     <button data-nav="thirdparty">Third-party</button>
     <button data-nav="allrisks">Risks</button>
+    <button data-nav="incidents">Incidents</button>
     <button data-nav="reports">Reports</button>
   </nav>
   <div class="account" aria-label="Example user">G</div>
@@ -2932,7 +2948,7 @@ const IMPL=['Not Applicable','Not Commenced','Partial (some)','Partial (most)','
 const MATURITY=['Not assessed','Basic','Core'];
 const DEC_LABEL={Acceptable:'Assessed',Conditional:'Assessed with conditions',Rejected:'Rejected'};
 const ACTION_STATUS=['Open','Planned','In progress','Completed'];
-const LS_KEY='mtmAssetGovV10', PREV9_KEY='mtmAssetGovV9', PREV8_KEY='mtmAssetGovV8', PREV7_KEY='mtmAssetGovV7', PREV6_KEY='mtmAssetGovV6', PREV5_KEY='mtmAssetGovV5', PREV4_KEY='mtmAssetGovV4', PREV3_KEY='mtmAssetGovV3', PREV_KEY='mtmAssetGovV2', OLD_KEY='mtmAssetGovV1';
+const LS_KEY='mtmAssetGovV11', PREV10_KEY='mtmAssetGovV10', PREV9_KEY='mtmAssetGovV9', PREV8_KEY='mtmAssetGovV8', PREV7_KEY='mtmAssetGovV7', PREV6_KEY='mtmAssetGovV6', PREV5_KEY='mtmAssetGovV5', PREV4_KEY='mtmAssetGovV4', PREV3_KEY='mtmAssetGovV3', PREV_KEY='mtmAssetGovV2', OLD_KEY='mtmAssetGovV1';
 
 /* ================= Utilities ================= */
 const $=s=>document.querySelector(s);
@@ -3056,8 +3072,9 @@ function migrateV6(d){/* V7: TRAs record risk statement results so the Risks pag
 function migrateV7(d){/* V8: TRAs use three CIA risk statements (R05, R06, R02); sample attached TRAs get matching sample results */
  d.schema=8;Object.values(d.tra||{}).forEach(t=>{if(t.mode==='attached'&&t.attached&&SAMPLE_TRA_RISKS[t.id])t.attached.risks=sampleTraRisks(t.id);});return d;}
 /* V9: third-party onboarding fields. Loads V9, otherwise runs the V8 chain below and migrates its result. */
-function load(){try{const raw=localStorage.getItem(LS_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===10&&d.assets)return d;}}catch(_){}
- const m=migrateV9(load9());try{localStorage.setItem(LS_KEY,JSON.stringify(m));localStorage.removeItem(PREV9_KEY);localStorage.removeItem(PREV8_KEY);}catch(_){}return m;}
+function load(){try{const raw=localStorage.getItem(LS_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===11&&d.assets)return d;}}catch(_){}
+ const m=migrateV10(load10());try{localStorage.setItem(LS_KEY,JSON.stringify(m));localStorage.removeItem(PREV10_KEY);localStorage.removeItem(PREV9_KEY);localStorage.removeItem(PREV8_KEY);}catch(_){}return m;}
+function load10(){try{const raw=localStorage.getItem(PREV10_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===10&&d.assets)return d;}}catch(_){}return migrateV9(load9());}
 function load9(){try{const raw=localStorage.getItem(PREV9_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===9&&d.assets)return d;}}catch(_){}return migrateV8(load8());}
 function load8(){try{const raw=localStorage.getItem(PREV8_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===8&&d.assets)return d;}}catch(_){}
  try{const raw=localStorage.getItem(PREV7_KEY);if(raw){const d=JSON.parse(raw);if(d&&d.schema===7&&d.assets){const m=migrateV7(d);localStorage.setItem(PREV8_KEY,JSON.stringify(m));localStorage.removeItem(PREV7_KEY);return m;}}}catch(_){}
@@ -5370,6 +5387,7 @@ function crSrc(ref){const p=String(ref||'').split('|'),k=p[0];
    if(k==='TAP'){const r=secracRows(t).find(y=>y.key===p[2]);return {kind:'TRA action',label:r?`${tr} ${r.num} · ${r.text||'Action'}`:`${tr} action removed`,aid:t.assetId||'',go:g,gone:!r};}
    const xs=t.exceptions||[],i=xs.findIndex(y=>y.id===p[2]),x=xs[i];return {kind:x?(x.type||'Exception'):'Exception',label:x?`${tr} EX-${String(i+1).padStart(2,'0')} · ${x.desc||x.ctl||'No description yet'}`:`${tr} exception removed`,aid:t.assetId||'',go:g,gone:!x};}
   if(k==='CMAP'){const d=DB.cmapDefs[p[1]];if(!d)return null;const a=DB.assets[d.assetId];return {kind:'CMAP attestation',label:`${d.title}${a?' · '+a.name:''}`,aid:d.assetId,go:['cmapItem',d.assetId,d.id]};}
+  if(k==='INC'){const x=DB.incidents&&DB.incidents[p[1]];if(!x)return null;return {kind:'Incident',label:`${x.ov.ref||x.id} · ${x.ov.title||'Incident'}`,aid:(x.ov.assets||[])[0]||'',go:['incident',x.id]};}
   if(k==='ATT'){const x=attElInfo(p[1]);if(!x)return null;const r=attPeek(x.id);return {kind:'VPDSS attestation',label:`${x.id} · ${x.t}${r.status?' ('+r.status+')':''}`,aid:'',go:['attestEl',x.id]};}
  }catch(_){}
  return null;}
@@ -5388,7 +5406,7 @@ function crPanel(ref){if(window.TRA_PROTO||!crSrc(ref))return '';const r=crOf(re
 
 /* ---- Cyber risk form ---- */
 function crDefaults(ref){const s=crSrc(ref)||{},k=String(ref).split('|')[0],a=DB.assets[s.aid];let drv='';
- if(k==='CMAP')drv='Overdue or missing assurance activity';else if(k==='ATT')drv='Attestation shows a gap';
+ if(k==='CMAP')drv='Overdue or missing assurance activity';else if(k==='INC')drv='Security incident or malware finding';else if(k==='ATT')drv='Attestation shows a gap';
  else if(k==='EX')drv=s.kind==='Security debt'?CR_DRIVERS[3]:CR_DRIVERS[2];
  else if(/^ACT\|[^|]+\|(MAL|MON)/.test(ref))drv='Security incident or malware finding';else if(/^ACT\|[^|]+\|VEND/.test(ref))drv='Third-party or supplier weakness';
  return {env:a?[a.type==='OT'?'OT':'IT']:[],aid:a?a.id:'',dims:[],threats:[],driver:drv,stmt:'',L:'',I:'',ownerId:a?a.ownerId:'',status:'Open',expiry:'',links:[]};}
@@ -5452,7 +5470,7 @@ document.addEventListener('change',ev=>{const t=ev.target;if(!t.matches)return;
 
 /* ---- Risks page: list of cyber risks raised from items ---- */
 function crListPanel(){const rs=crAll().sort((x,y)=>(x.status==='Closed')-(y.status==='Closed')||((crCell(y)||{}).value||0)-((crCell(x)||{}).value||0));
- return `<div class="panel section"><div class="section-head"><h2>Cyber risks raised from items</h2><button class="secondary" data-act="crOpen" data-ref="">+ Add cyber risk</button></div><p class="sub">Risks tied to actions, exceptions and security debt, CMAP attestations and VPDSS attestation results. Open and accepted risks count in the OT and IT rows above; closed risks do not.</p>
+ return `<div class="panel section"><div class="section-head"><h2>Cyber risks raised from items</h2><button class="secondary" data-act="crOpen" data-ref="">+ Add cyber risk</button></div><p class="sub">Risks tied to actions, exceptions and security debt, CMAP attestations, VPDSS attestation results and incidents. Open and accepted risks count in the OT and IT rows above; closed risks do not.</p>
  <div class="table-scroll"><table class="mini"><thead><tr><th>Risk</th><th>Applies to</th><th>Threats and driver</th><th>Tied items</th><th>Residual</th><th>Status</th></tr></thead><tbody>${rs.length?rs.map(r=>{const c=crCell(r);return `<tr${r.status==='Closed'?' class="dim"':''}><td><button class="open" data-act="crOpen" data-ref="" data-id="${e(r.id)}">${e(r.id)} →</button><div>${e(r.stmt)}</div></td><td class="nowrap">${e(crEnvTxt(r))}<div class="small">${e((r.dims||[]).map(d=>d.toUpperCase()).join(', '))}${DB.assets[r.aid]?' · '+e(r.aid):''}</div></td><td class="small">${e((r.threats||[]).map(t=>THREAT_NAME[t]||t).join(', ')||'—')}<div>${e(r.driver||'')}</div></td><td class="small">${(r.links||[]).map(crSrcLink).join('<br>')||'—'}</td><td>${c?riskBox(c):'—'}<div class="small">I${e(r.I)} × L${e(r.L)}</div></td><td>${pill(r.status==='Closed'?'gray':r.status==='Accepted'?(r.expiry&&r.expiry<TODAY?'red':'blue'):'amber',r.status==='Accepted'&&r.expiry?(r.expiry<TODAY?'Acceptance expired':'Accepted until '+fd(r.expiry)):r.status)}</td></tr>`;}).join(''):'<tr><td colspan="6" class="small">No cyber risks raised from items yet. Use “+ Cyber risk” on an action, exception, security debt or attestation.</td></tr>'}</tbody></table></div></div>`;}
 
 /* ---- V10 migration: cyber risks collection, with fictional samples ---- */
@@ -5464,8 +5482,335 @@ function migrateV9(d){d.schema=10;d.crisks=d.crisks||{};
  S.forEach(([id,env,aid,dims,threats,driver,stmt,L,I,ownerId,status,links])=>{if(d.crisks[id]||(aid&&!a[aid]))return;d.crisks[id]={id,env,aid,dims,threats,driver,stmt,L,I,ownerId,status,expiry:'',links,origin:links[0],created:'2026-10-01',updated:'2026-10-01',audit:[{at:'2026-10-01',action:'Raised (sample)'}],sample:true};});
  return d;}
 
+/* ---- Incidents: cyber incident management (register + one record per incident) ----
+   Follows the MTM Information Security Incident Management Plan (ISIMP) and the Metro Integrated Risk Matrix.
+   Record DB.incidents {id: {id, created, updated, ov, exec, timeline [], impact, risk, reg, internal, resp, findings,
+   actions [], lessons, evidence [], approval}}. Fields are edited in place and saved as you type.
+   Settings in INC_CFG come from MTM documents supplied for this concept; deadlines are indicative. */
+const INC_CFG={
+ contexts:[
+  {id:'safety',name:'Safety',note:'1 fatality ≡ 10 serious injuries ≡ 200 minor injuries or illness',core:true,d:['Potential first aid injury or illness','1 to 19 minor injuries or illness. Medical treatment not requiring hospitalisation','20 to 199 minor injuries or 1 to 9 serious injuries or illness (hospitalisation overnight or time away from work > 5 days)','≥200 minor injuries. 10 to 19 serious injuries or illness. 1 fatality','21 to 39 serious injuries or illness. 2 to 3 fatalities','40 or more serious injuries or illness. 4 or more fatalities']},
+  {id:'financial',name:'Financial',note:'Includes commercial, business continuity',core:true,d:['< $100K income/expense','$100k ≤ income/expense < $500k','$500k ≤ income/expense < $2m','$2m ≤ income/expense < $10m','$10m ≤ income/expense < $50m','Income/expense ≥ $50m']},
+  {id:'reputation',name:'Reputational / political',core:true,d:[null,'Limited adverse local media','Negative state media coverage. Management appearance at Fair Work Australia','Regulator prosecution. Call-in event','Negative national media coverage. Breach and/or Cure Plan','Sustained negative (inter)national media coverage. Organised customer or NGO action. Step-in event or Termination event']},
+  {id:'legal',name:'Legal',core:true,d:[null,'Minor legal issues, non compliance and breaches of regulation','Minor legal issues, non compliance and breaches of regulation with investigation, minor litigation e.g. personal injury or Fair Work matters','Serious breach of regulation with prosecution/fines, moderate litigation (severe personal injury)','Significant prosecution and fines (company & executives); serious litigation including class actions, major breach of regulation','Potential prison terms for executives and/or high fines for the business, multiple litigation (class action)']},
+  {id:'engineering',name:'Engineering / technical',core:true,d:[null,'Minimal or no impact or consequences, unimportant. Can be managed/negotiated','Minor reduction in performance or technical compliance. Only minor requirements not met. Waivers will likely be granted to resolve all','Moderate reduction in performance or technical compliance. Some key requirements not met. Some waivers may be granted. May require re-scoping','Significant degradation in performance/technical compliance. Key but non-critical requirements not met. Waivers unlikely to be granted in all cases','Performance or technical goals will not be achieved. Critical project requirements will not be met']},
+  {id:'environment',name:'Environmental / heritage',core:false,d:[null,'Short term effects within area of limited environmental/heritage significance','Medium term effects in an area of some environmental/heritage significance as identified by external government authorities','Long term environmental impairment in an area of high environmental/heritage significance as identified by external government authorities','Permanent environmental impairment in an area of high environmental/heritage significance as identified by external government authorities',null]},
+  {id:'ir',name:'Industrial relations',core:false,d:[null,'Short term dispute','Localised dispute and limited operational impact','Protracted dispute with operational impact','Protracted industrial action or dispute with serious operation impact. Partial or limited passenger service disruption','Protracted dispute with long term serious operational impact. Protracted industrial action. Passenger service no longer able to operate']}],
+ likelihood:[[1,'Rare','< 3%','Has occurred somewhere in rail industry in the past (<1 in 20 yrs)'],[2,'Unlikely','3–10%','Occurs from time to time in rail industry (1 in 20 yrs)'],[3,'Possible','10–50%','Could occur once in next 5 years (1 in 5 yrs)'],[4,'Likely','50–90%','Could occur ≥ 2 times in next 5 years. Once every year to two years'],[5,'Almost certain','> 90%','Could occur > 10 times in next 5 years. Daily to monthly (>2 per year)']],
+ likelihoodQuestion:'How likely is it that the rated consequence eventuates from this incident (including recurrence or further compromise) over the five-year outlook?',
+ severity:[
+  {id:'P1',name:'Critical (P1)',ecmp:'ECMP level 3',fromS:[3,4,5],isimp:true,crit:'Confirmed PII breach; confidential or restricted data compromised; critical business system CIA compromised; major breach of regulation or contract; wide-scale malware with operational impact; confirmed unauthorised access to critical or safety systems; incident impacting train operations; DoS/DDoS with significant impact; financial impact > $300,000; S3–S5'},
+  {id:'P2',name:'Major (P2)',ecmp:'ECMP level 2',fromS:[1,2],isimp:true,crit:'Suspected (unprotected) PII breach; non-critical business system CIA compromised; minor breach of regulation or contract; malware outbreak with medium impact; unauthorised access to critical systems with low–medium impact; DoS/DDoS with minor impact; financial impact > $50,000; breach of franchise agreement; S1–S2'},
+  {id:'P3',name:'Minor / Low (P3/4)',ecmp:'ECMP level 1 (BAU)',fromS:[0],isimp:false,crit:'BAU security events; single computer malware infection; policy violation; scanning and probing; phishing/spam; financial impact ≤ $50,000; no safety risk; S0'},
+  {id:'AUD',name:'Audit',ecmp:'ECMP level 1 (BAU)',fromS:[],isimp:false,crit:'Audit, investigation or forensic requests; not usually a security breach; may move to Major or Critical with findings'}],
+ types:[['Acceptable Use Violation','L2-OCM-PRO-008'],['Close Access Breach','L2-OCM-PRO-001'],['Cyber-Intrusion','L2-OCM-PRO-009'],['Data Loss','L2-OCM-PRO-010'],['Denial of Service','L2-OCM-PRO-011'],['eDiscovery','L2-OCM-PRO-012'],['Email Blacklisting Removal','L2-OCM-PRO-013'],['Insider Threat','L2-OCM-PRO-014'],['Malware / Virus Event','L2-OCM-PRO-003'],['Ransomware','L2-OCM-PRO-015'],['Reconnaissance / Probing','L2-OCM-PRO-016'],['Social Engineering','L2-OCM-PRO-017'],['Website Compromise','L2-OCM-PRO-018'],['Zero-day Vulnerability','L2-OCM-PRO-019'],['Third-party / supply chain breach',''],['Other','']],
+ sources:['IP reputation monitor','Web application firewall / DDoS provider','Firewall / network intrusion detection','Host-based alert (anti-virus or anti-malware)','Log correlation (SIEM)','External notification (AFP or ASD/ACSC)','Dark web / internet keyword monitoring','User or administrator report','Third-party notification','Other'],
+ stages:['Identification','Triage','Declaration','Notification','Containment','Analysis','Eradication','Recovery','Follow-up','Other'],
+ statuses:['Suspected','Declared – active','Contained','Eradicated','Recovered – monitoring','Closed'],
+ dataClass:['Restricted','Confidential','Public Release','Unclassified (treated as Restricted)','Not applicable'],
+ regs:[
+  {id:'dot',name:'Department of Transport (DoT)',trigger:'Any actual, threatened or suspected data security breach or adverse effect on the Systems or Data',hours:1,deadline:'In writing, immediately and within 1 hour'},
+  {id:'mtrPhone',name:'MTR – HCS and CIO by phone',trigger:'Confirmed Critical or Major cybersecurity breach',hours:2,deadline:'By phone within 2 hours'},
+  {id:'mtrWritten',name:'MTR – written report to SSCD',trigger:'Any confirmed cybersecurity breach (Critical, Major or Minor)',hours:24,deadline:'Incident report by email within 24 hours'},
+  {id:'sociSig',name:'ASD (ACSC) – SOCI significant impact',trigger:'Incident has materially disrupted the availability of an essential service',hours:12,deadline:'Within 12 hours; written record within 84 hours if reported by phone'},
+  {id:'sociRel',name:'ASD (ACSC) – SOCI relevant impact',trigger:'Impact on the availability, integrity, reliability or confidentiality of the asset',hours:72,deadline:'Within 72 hours; written record within 48 hours if reported by phone'},
+  {id:'ovic',name:'OVIC (VPDSS E9.010)',trigger:'Adverse impact on the confidentiality, integrity or availability of information rated BIL 2 or higher',hours:720,deadline:'As soon as practical, no later than 30 days'},
+  {id:'oaic',name:'OAIC – Notifiable Data Breaches',trigger:'Personal information involved; eligible data breach likely to cause serious harm',hours:720,deadline:'Assess within 30 days; notify OAIC and individuals as soon as practicable once eligible'},
+  {id:'ransom',name:'Ransomware payment report (Cyber Security Act 2024)',trigger:'A ransomware or extortion payment was made',hours:72,from:'payment',deadline:'Within 72 hours of making the payment'},
+  {id:'police',name:'Law enforcement (AFP / Victoria Police)',trigger:'Suspected crime; voluntary notification through Legal',hours:null,deadline:'Voluntary'},
+  {id:'contract',name:'Contractual notification',trigger:'Notices required by customer, supplier or partner contracts',hours:null,custom:true,deadline:'As set by the contract'}],
+ internal:['Core CERT','Extended CERT','Continuity Support Group (CSG)','GM OCMS','Head of Infrastructure & Service Delivery','Incident Owner','Legal & Compliance','Privacy Officer','Media Relations','Asset / system owner'],
+ findings:[['vector','Initial infection / compromise vector'],['vuln','Vulnerability or security gap exploited'],['dates','Dates of compromise'],['targeted','Systems and information targeted'],['compromised','Systems and information compromised'],['malware','Malicious files or exploits and their capabilities'],['actor','Attacker type and demonstrated capabilities'],['more','Additional systems or information possibly compromised']],
+ lessons:[['detect','Detection and escalation'],['comms','Communication'],['resources','Personnel and resources'],['process','Was the documented process followed?'],['external','Responsiveness of external parties'],['controls','Effectiveness of security controls'],['other','Other improvements']],
+ cyber:[['c','Confidentiality','Was information disclosed or accessed without authorisation?'],['i','Integrity','Was information, software or configuration changed?'],['a','Availability','Were systems or services disrupted?'],['pi','Personal information','Whose and how much personal information; is serious harm likely?']]
+};
+const INC_TABS=['Overview','Timeline','Impact and risk','Notifications','Response and decision','Actions and lessons','Evidence and approval'];
+const incBlank=(id,ref)=>({id,created:TODAY,updated:TODAY,
+ ov:{title:'',ref,heat:'',type:'',origin:'',thirdParty:'',vendorId:'',source:'',discovered:'',status:'Suspected',owner:'',manager:'',assets:[],systems:'',env:'',dataClass:'',nature:'',method:'',info:'',sevJust:''},
+ exec:{edited:false,text:''},timeline:[],
+ impact:{cyber:{c:{aff:'',conf:'',desc:''},i:{aff:'',conf:'',desc:''},a:{aff:'',conf:'',desc:''},pi:{aff:'',conf:'',desc:''}},cons:{}},
+ risk:{initial:{date:'',S:'',F:'',why:''},current:{date:'',S:'',F:'',why:''},controls:'',residual:'',sev:'',sevPrev:'',sevHist:[]},
+ reg:{rows:{},payment:'',isimp:''},internal:{rows:{}},
+ resp:{containment:'',analysis:'',eradication:'',recovery:'',assurance:'',thirdParty:''},
+ findings:{items:{},facts:'',uncert:'',decision:'',why:'',by:'',date:'',review:''},
+ actions:[],lessons:{items:{},hours:'',productivity:'',cost:'',costNote:''},evidence:[],
+ approval:{reviewers:[],approver:'',role:'',date:'',comments:''}});
+
+(function(){
+const C=INC_CFG,ORG='Metro',MARK='Restricted';
+const pad2=n=>String(n).padStart(2,'0');
+const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fdt=d=>d?`${d.getDate()} ${MON3[d.getMonth()]} ${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`:'—';
+const parseL=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)):null;};
+const fdtS=s=>{const d=parseL(s);return d?(String(s).length>10?fdt(d):fd(s)):'—';};
+const nowHM=()=>{const d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const refHtml=s=>{if(!s)return '—';const u=safeUrl(s);return u?`<a href="${e(u)}" target="_blank" rel="noopener noreferrer">${e(s)}</a>`:e(s);};
+const TONE={bad:'red',warn:'amber',good:'green',gray:'gray'};
+let I=null;/* the incident on screen */
+const cur=()=>(V.view==='incident'&&DB.incidents&&DB.incidents[V.a])||null;
+/* ---- field builders: data-ip is the path inside the incident ---- */
+const fid=p=>'ip-'+String(p).replace(/[^\w]/g,'-');
+const getP=(o,p)=>p.split('.').reduce((x,k)=>x==null?x:x[k],o);
+function setP(o,p,v){const ks=p.split('.');for(let i=0;i<ks.length-1;i++){const k=ks[i];if(o[k]==null)o[k]=/^\d+$/.test(ks[i+1])?[]:{};o=o[k];}o[ks[ks.length-1]]=v;}
+const fld=(label,control,id,cls,hint)=>`<div class="field ${cls||''}"><label for="${e(id)}">${e(label)}</label>${control}${hint?`<div class="small" style="margin-top:4px">${hint}</div>`:''}</div>`;
+const fI=(label,p,v,attrs,cls,hint)=>fld(label,`<input id="${fid(p)}" data-ip="${e(p)}" value="${e(v)}" ${attrs||'type="text"'}>`,fid(p),cls,hint);
+const fT=(label,p,v,attrs,cls,hint)=>fld(label,`<textarea id="${fid(p)}" data-ip="${e(p)}" ${attrs||'rows="2"'}>${e(v)}</textarea>`,fid(p),cls,hint);
+const optsH=(opts,v)=>opts.map(o=>{const val=Array.isArray(o)?o[0]:o,lab=Array.isArray(o)?o[1]:o;return `<option value="${e(val)}"${String(val)===String(v==null?'':v)?' selected':''}>${e(lab)}</option>`;}).join('');
+const fS=(label,p,opts,v,attrs,cls,hint)=>fld(label,`<select id="${fid(p)}" data-ip="${e(p)}" ${attrs||''}>${optsH(opts,v)}</select>`,fid(p),cls,hint);
+/* ---- derived values ---- */
+const awareRow=x=>x.timeline.find(r=>r.aware&&isDate(r.date))||null;
+const awareAt=x=>{const r=awareRow(x);return r?parseL(r.date+(r.time?'T'+r.time:'')):null;};
+const sevById=id=>C.severity.find(s=>s.id===id)||null;
+const cellOf=(F,S)=>F&&S!==''&&S!=null?matrixCell(Number(F),Number(S)):null;
+function consMax(x){let b=null;C.contexts.forEach(c=>{const y=x.impact.cons[c.id];if(y&&y.s!==''&&y.s!=null&&y.s!=='na'){const s=Number(y.s);if(b==null||s>b.s)b={s,ctx:c.name};}});return b;}
+function sevSuggest(x){const r=x.risk.current.S!==''?Number(x.risk.current.S):x.risk.initial.S!==''?Number(x.risk.initial.S):(consMax(x)||{}).s;return r==null||isNaN(r)?null:C.severity.find(s=>s.fromS.includes(r))||null;}
+const curRating=x=>x.risk.current.S!==''&&x.risk.current.F?x.risk.current:x.risk.initial;
+function dur(ms){const m=Math.round(ms/60000);if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h '+(m%60)+' min';return Math.floor(h/24)+' days '+(h%24)+' h';}
+function regState(x,g){const row=x.reg.rows[g.id]||{},ap=row.applies||'',start=g.from==='payment'?parseL(x.reg.payment):awareAt(x),hours=g.custom?(Number(row.hours)||null):g.hours;
+ const due=start&&hours!=null?new Date(start.getTime()+hours*3600e3):null,notified=parseL(row.notified),now=new Date();
+ if(ap==='No')return {k:'na',tone:row.why?'gray':'warn',label:row.why?'Not required':'Not required – rationale needed',due};
+ if(notified)return {k:'done',tone:due&&notified>due?'warn':'good',label:due&&notified>due?'Notified late '+fdt(notified):'Notified '+fdt(notified),due};
+ if(ap==='')return {k:'open',tone:due&&due-now<3600e3*6?'bad':'warn',label:due&&now>due?'Not assessed – deadline passed':'Not assessed',due};
+ if(!due)return {k:'open',tone:'warn',label:ap==='Yes'?(hours==null?'To notify':'Mark when Metro became aware'):'Under assessment',due};
+ const ms=due-now;if(ms<0)return {k:'open',tone:'bad',label:'Overdue by '+dur(-ms),due};
+ return {k:'open',tone:ms<3600e3*6?'bad':'warn',label:(ap==='Yes'?'Due in ':'Decide within ')+dur(ms),due};}
+const openRegs=x=>C.regs.map(g=>({g,st:regState(x,g)})).filter(o=>o.st.k==='open').sort((a,b)=>(a.st.due?a.st.due.getTime():9e15)-(b.st.due?b.st.due.getTime():9e15));
+const isOpenInc=x=>x.ov.status!=='Closed';
+function uncertainties(x){const out=[];
+ C.findings.forEach(([k,n])=>{const y=x.findings.items[k]||{};if(y.conf==='Uncertain'||y.conf==='Unknown')out.push(n+': '+(y.conf==='Unknown'?'not yet known':'uncertain'+(y.text?' – '+y.text:'')));});
+ C.cyber.forEach(([k,n])=>{const y=x.impact.cyber[k];if(y.aff==='Unknown'||(y.aff==='Yes'&&y.conf==='Suspected'))out.push(n+' impact '+(y.aff==='Unknown'?'unknown':'suspected, not confirmed'));});
+ C.regs.forEach(g=>{const r=x.reg.rows[g.id]||{};if(r.applies==='Under assessment')out.push(g.name+': applicability under assessment');});
+ return out;}
+const tpName=x=>x.ov.thirdParty||(DB.vendors[x.ov.vendorId]||{}).name||'the third party';
+const sysNames=x=>(x.ov.assets||[]).filter(id=>DB.assets[id]).map(id=>DB.assets[id].id+' '+DB.assets[id].name);
+function execGenerated(x){const o=x.ov,at=awareAt(x),cr=curRating(x),c=cellOf(cr.F,cr.S),sv=sevById(x.risk.sev),cm=consMax(x),sys=sysNames(x).concat(o.systems?[o.systems]:[]);
+ const what=`${at?`On ${fdt(at)}, `:''}${ORG} became aware of ${o.type?(/^[AEIOU]/i.test(o.type)?'an ':'a ')+o.type.toLowerCase()+' incident':'a cyber incident'}${o.origin==='Third party'?` affecting ${tpName(x)}`:''}. ${o.nature||''}${sys.length?` Affected systems: ${sys.join('; ')}${o.env?' ('+o.env+')':''}.`:''}${o.info?` Information potentially compromised: ${o.info}.`:''}`.replace(/\s+/g,' ').trim();
+ const aff=C.cyber.filter(([k])=>x.impact.cyber[k].aff==='Yes').map(([k,n])=>n.toLowerCase()+(x.impact.cyber[k].conf==='Suspected'?' (suspected)':''));
+ const exp=`${aff.length?`The incident affects ${aff.join(', ')}. `:''}${cm?`The highest consequence is S${cm.s} (${cm.ctx}). `:''}${c?`The current risk score is ${c.value} (F${cr.F} × S${cr.S})${c.value>RISK_REG_THRESHOLD?', above the risk register threshold':''}. `:'The risk has not yet been rated. '}${sv?`Severity: ${sv.name}.`:''}`.trim();
+ const done=[],na=[],open=[];C.regs.forEach(g=>{const r=x.reg.rows[g.id]||{};if(r.notified)done.push(g.name);else if(r.applies==='No')na.push(g.name);else if(r.applies)open.push(g.name);});
+ const notn=`${done.length?`Notified: ${done.join('; ')}. `:'No external notification made yet. '}${open.length?`Pending or under assessment: ${open.join('; ')}. `:''}${na.length?`Assessed as not required: ${na.length} obligation${na.length===1?'':'s'}.`:''}`.trim();
+ const F=x.findings,concl=F.decision?`Decision: ${F.decision.toLowerCase()}${F.by?` (${F.by}${F.date?', '+fd(F.date):''})`:''}. ${F.why||''}`.trim():`The incident remains under ${o.status==='Closed'?'review':'investigation'}; no closure decision has been made.`;
+ return [['What happened',what],[ORG+"'s exposure",exp],['Notifications',notn],['Conclusion',concl]].map(([h,t])=>`**${h}.** ${t}`).join('\n\n');}
+const execText=x=>x.exec.edited?x.exec.text:execGenerated(x);
+const rich=s=>String(s||'').split(/\n{2,}/).map(p=>`<p>${e(p).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</p>`).join('');
+const sortedTl=x=>x.timeline.map((r,i)=>({r,i})).sort((a,b)=>(a.r.date||'9999').localeCompare(b.r.date||'9999')||(a.r.time||'').localeCompare(b.r.time||'')||a.i-b.i);
+
+/* ---- Register ---- */
+function incidentsPage(){const all=Object.values(DB.incidents||{}).sort((a,b)=>String(b.created).localeCompare(String(a.created))||b.id.localeCompare(a.id)),f=V.incF||'Open',rows=all.filter(x=>f==='All'||(f==='Open')===isOpenInc(x));
+ return crumb(['Incidents'])+titlebar('Incidents','Cyber incident management: one record per incident, from declaration to closure. Update the timeline as the incident develops; notification clocks run from when Metro became aware.','Sample data · concept only')+
+ `<div class="btnrow" style="margin:0 0 14px"><button class="primary" data-act="incNew">+ New incident</button></div>
+ <div class="panel"><div class="toolbar">${sel('incF',[['Open','Open incidents'],['Closed','Closed incidents'],['All','All incidents']],f,'aria-label="Show incidents" data-incf')}<span class="count">${rows.length} of ${all.length} incidents</span></div>
+ <div class="table-scroll"><table><thead><tr><th>Reference</th><th>Incident</th><th>Severity</th><th>Status</th><th>Metro aware</th><th>Next notification</th><th>Current risk</th><th>Owner</th></tr></thead><tbody>${rows.length?rows.map(x=>{const sv=sevById(x.risk.sev),at=awareAt(x),nx=openRegs(x)[0],cr=curRating(x),c=cellOf(cr.F,cr.S);
+  return `<tr><td class="nowrap">${e(x.ov.ref||x.id)}</td><td><button class="open" data-go="incident" data-a="${e(x.id)}">${e(x.ov.title||'Untitled incident')}</button><div class="small">${e(x.ov.type||'Type not set')}${sysNames(x).length?' · '+e(sysNames(x).join(', ')):''}</div></td><td>${sv?pill(sv.id==='P1'?'red':sv.id==='P2'?'amber':'gray',sv.name):pill('gray','Not assigned')}</td><td>${pill(x.ov.status==='Closed'?'green':'blue',x.ov.status)}</td><td class="nowrap">${at?e(fdt(at)):'—'}</td><td>${nx?`${pill(TONE[nx.st.tone],nx.st.label)}<div class="small">${e(nx.g.name)}</div>`:'<span class="small">None open</span>'}</td><td>${c?riskBox(c):'—'}</td><td>${e(x.ov.owner||'—')}</td></tr>`;}).join(''):`<tr><td colspan="8" class="empty">No ${f==='All'?'':f.toLowerCase()+' '}incidents.</td></tr>`}</tbody></table></div></div>
+ <p class="small attdisc">Ratings, deadlines and suggested severity are indicative. They support, and do not replace, the Information Security Incident Management Plan, legal advice or formal risk acceptance.</p>`;}
+
+/* ---- Incident record ---- */
+function incidentPage(){const x=DB.incidents&&DB.incidents[V.a];if(!x)throw new Error('Incident not found.');I=x;const tab=INC_TABS.includes(V.incTab)?V.incTab:'Overview',sv=sevById(x.risk.sev),at=awareAt(x),cr=curRating(x),c=cellOf(cr.F,cr.S),op=openRegs(x),bad=op.filter(o=>o.st.tone==='bad').length;
+ const fact=(l,v)=>`<div class="fact"><label>${e(l)}</label><strong>${v}</strong></div>`;
+ let h=crumb([['Incidents','incidents'],x.ov.ref||x.id])+back('Incidents',['incidents'])+titlebar(x.ov.title||'Untitled incident',`${x.ov.ref||x.id}${x.ov.type?' · '+x.ov.type:''} · Restricted`,x.ov.status)+
+ `<div class="panel section"><div class="facts">${fact('Severity',sv?e(sv.name):'Not assigned')}${fact('Metro became aware',at?e(fdt(at)):'Mark in Timeline')}${fact('Current risk',c?`${riskBox(c)} <span class="small">F${e(cr.F)} × S${e(cr.S)}</span>`:'Not rated')}${fact('Open notifications',op.length?`${op.length}${bad?` · <span style="color:var(--red)">${bad} urgent</span>`:''}`:'None')}${fact('Incident owner',e(x.ov.owner||'—'))}</div>
+ <div class="btnrow" style="margin-top:14px"><button class="secondary" data-act="incPdf">Download incident report (PDF)</button><button class="secondary" data-act="incDecl">Copy declaration email</button><button class="secondary danger" data-act="incDel">Delete incident</button></div></div>
+ <div class="tabs" role="tablist">${INC_TABS.map(t=>`<button role="tab" aria-selected="${t===tab}" class="${t===tab?'selected':''}" data-act="incTab" data-t="${e(t)}">${e(t)}</button>`).join('')}</div>`;
+ h+=({'Overview':tabOverview,'Timeline':tabTimeline,'Impact and risk':tabRisk,'Notifications':tabNotify,'Response and decision':tabResponse,'Actions and lessons':tabActions,'Evidence and approval':tabEvidence})[tab](x);
+ return h+`<p class="small attdisc">Ratings, deadlines and suggested severity are indicative and follow the settings in this concept. Confirm every notification obligation with Legal &amp; Compliance.</p>`;}
+function clocksPanel(x){const at=awareAt(x),op=openRegs(x),all=C.regs.map(g=>regState(x,g)),done=all.filter(s=>s.k==='done').length,na=all.filter(s=>s.k==='na').length;
+ return `<div class="panel section"><div class="section-head"><h2>Notification clocks</h2><button class="open" data-act="incTab" data-t="Notifications">Open Notifications →</button></div><p class="sub">${at?`Metro became aware <strong>${e(fdt(at))}</strong>${awareRow(x).time?'':' (no time recorded)'}.`:'Tick the event when Metro became aware in the Timeline to start the clocks.'}</p>
+ ${op.length?`<ul class="inc-clist">${op.map(({g,st})=>`<li><span>${e(g.name)}</span><span class="due">${st.due?e(fdt(st.due)):''}</span>${pill(TONE[st.tone],st.label)}</li>`).join('')}</ul>`:'<p class="small" style="margin-top:8px">No open notifications.</p>'}<p class="small" style="margin-top:8px">${done} notified · ${na} not required.</p></div>`;}
+function tabOverview(x){const o=x.ov,tp=o.origin==='Third party',ref=(C.types.find(t=>t[0]===o.type)||[])[1];
+ return clocksPanel(x)+`<div class="panel section"><h2>Incident overview</h2><div class="formgrid" style="margin-top:12px">
+ ${fI('Incident title',`ov.title`,o.title,'type="text" placeholder="Short name for the incident"','full')}
+ ${fI('Cyber incident number','ov.ref',o.ref)}${fI('HEAT incident number','ov.heat',o.heat,'type="text" placeholder="If applicable"')}
+ ${fS('Incident type','ov.type',[['','Select type'],...C.types.map(t=>t[0])],o.type,'data-irr','',ref?'Playbook: '+e(ref):'')}
+ ${fS('Incident origin','ov.origin',[['','Select origin'],'Third party','Internal','Unknown'],o.origin,'data-irr')}
+ ${tp?fS('Affected third party (register)','ov.vendorId',[['','Not in the third-party register'],...Object.values(DB.vendors).map(v=>[v.id,v.name])],o.vendorId,'data-irr')+(o.vendorId?'':fI('Third party name','ov.thirdParty',o.thirdParty)):''}
+ ${fS('Source of incident','ov.source',[['','Select source'],...C.sources],o.source)}
+ ${fI('Discovery date','ov.discovered',o.discovered,'type="date"')}
+ ${fS('Current status','ov.status',C.statuses,o.status,'data-irr')}
+ ${fI('Incident owner','ov.owner',o.owner,'type="text" placeholder="Name, role"')}${fI('Incident manager','ov.manager',o.manager,'type="text" placeholder="Name, role"')}
+ ${fS('Environment affected','ov.env',[['','Select'],'IT','OT','IT and OT','None confirmed'],o.env)}${fS('Data classification','ov.dataClass',[['','Select'],...C.dataClass],o.dataClass)}
+ <div class="field full"><span class="lab">Affected systems (system register)</span><div class="inc-chips">${Object.values(DB.assets).map(a=>`<label><input type="checkbox" data-incasset="${e(a.id)}" ${(o.assets||[]).includes(a.id)?'checked':''}> ${e(a.id)} · ${e(a.name)}</label>`).join('')}</div></div>
+ ${fT('Other affected systems or components','ov.systems',o.systems,'rows="2" placeholder="Hosts, applications or services not in the register"','full')}
+ ${fT('Nature of the incident','ov.nature',o.nature,'rows="3" placeholder="What happened and how it was detected"','full')}
+ ${fT('Attack method (if known)','ov.method',o.method,'rows="2"','full')}${fT('Information potentially compromised','ov.info',o.info,'rows="2"','full')}</div></div>
+ <div class="panel section"><div class="section-head"><h2>Executive summary</h2>${x.exec.edited?'<button class="secondary" data-act="incExecReset">Reset to generated</button>':''}</div><p class="sub">Drafted from the record as it develops. Edit it if needed. Write **text** for bold.</p>
+ <textarea id="incExec" class="plantext" style="min-height:220px;margin-top:10px" aria-label="Executive summary">${e(execText(x))}</textarea></div>`;}
+function tabTimeline(x){const tl=sortedTl(x);
+ return `<div class="panel section"><h2>Log an update</h2><p class="sub">Add an event as it happens: what happened, who was told, what was asked or answered.</p><div class="formgrid inc-g3" style="margin-top:12px">
+ ${fld('Date',`<input id="incU-date" type="date" value="${e(TODAY)}">`,'incU-date')}${fld('Time (optional)',`<input id="incU-time" type="time" value="${e(nowHM())}">`,'incU-time')}${fld('Incident stage',`<select id="incU-stage">${optsH([['','Select'],...C.stages],'')}</select>`,'incU-stage')}
+ ${fld('Party (optional)',`<input id="incU-party" type="text" placeholder="e.g. Vendor, DoT">`,'incU-party')}${fld('Sent / received',`<select id="incU-dir">${optsH([['','—'],'Sent','Received'],'')}</select>`,'incU-dir')}${fld('Acknowledged',`<select id="incU-ack">${optsH([['','—'],'Yes','No','Pending'],'')}</select>`,'incU-ack')}
+ ${fld('Event',`<textarea id="incU-event" rows="2"></textarea>`,'incU-event','full')}${fld('Attachment / evidence reference (optional)',`<input id="incU-ref" type="text" placeholder="SharePoint link or record number">`,'incU-ref','full')}</div>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="incU-aware"> Metro became aware at this event (starts the notification clocks)</label>
+ <p class="err" id="incUErr" role="alert"></p><div class="btnrow"><button class="primary" data-act="incLog">Add to timeline</button></div></div>
+ <div class="panel section"><h2>Timeline</h2><p class="sub">${tl.length} event${tl.length===1?'':'s'}, oldest first. Edit any event in place.</p>
+ ${tl.length?tl.map(({r,i},n)=>`<div class="inc-row${r.aware?' aw':''}"><div class="formgrid inc-g3">
+  ${fI('Date',`timeline.${i}.date`,r.date,'type="date" data-irr')}${fI('Time',`timeline.${i}.time`,r.time,'type="time" data-irr')}${fS('Incident stage',`timeline.${i}.stage`,[['','Select'],...C.stages],r.stage)}
+  ${fI('Party',`timeline.${i}.party`,r.party)}${fS('Sent / received',`timeline.${i}.dir`,[['','—'],'Sent','Received'],r.dir)}${fS('Acknowledged',`timeline.${i}.ack`,[['','—'],'Yes','No','Pending'],r.ack)}
+  ${fT('Event',`timeline.${i}.event`,r.event,'rows="2"','full')}${fI('Attachment / evidence reference',`timeline.${i}.ref`,r.ref,'type="text"','full')}</div>
+  <div class="inc-rowfoot"><label><input type="radio" name="incAware" data-incaware="${i}" ${r.aware?'checked':''}> Metro became aware at this event</label><button class="linkbtn" data-act="incDelRow" data-list="timeline" data-i="${i}">Remove event ${n+1}</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No events yet. Log the first update above.</p>'}</div>`;}
+function consRow(x,c){const y=x.impact.cons[c.id]||{},opts=[['','Select'],['na','N/A – not affected'],...c.d.map((d,s)=>d?[s,`S${s} · ${d}`]:null).filter(Boolean)];
+ return `<div class="inc-row"><div class="formgrid">${fS(c.name+(c.note?' ('+c.note+')':''),`impact.cons.${c.id}.s`,opts,y.s,'data-irr')}${fT('Rationale',`impact.cons.${c.id}.why`,y.why,'rows="2"')}</div></div>`;}
+function tabRisk(x){const cm=consMax(x),sg=sevSuggest(x),sv=sevById(x.risk.sev);
+ const mx=(()=>{const mk=(F,s)=>['initial','current'].filter(k=>String(x.risk[k].F)===String(F)&&String(x.risk[k].S)===String(s)).map(k=>k==='initial'?'I':'C');
+  return `<div class="table-scroll"><table class="inc-matrix"><thead><tr><th></th>${[0,1,2,3,4,5].map(s=>`<th>S${s}</th>`).join('')}</tr></thead><tbody>${[5,4,3,2,1].map(F=>`<tr><th>F${F}</th>${[0,1,2,3,4,5].map(s=>{const c=matrixCell(F,s),t=mk(F,s);return `<td class="r-${c.color}${t.length?' on':''}">${c.value}${t.length?`<span class="tag">${t.join('/')}</span>`:''}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div><p class="small">I = initial rating, C = current rating.</p>`;})();
+ return `<div class="panel section"><h2>Cyber impact</h2><p class="sub">What was affected. These facts support the consequence rating below.</p>
+ ${C.cyber.map(([k,n,q])=>{const y=x.impact.cyber[k];return `<div class="inc-row"><div class="formgrid inc-g3">${fS(n,`impact.cyber.${k}.aff`,[['','Select'],'Yes','No','Unknown'],y.aff,'','','<span>'+e(q)+'</span>')}${fS('Confidence',`impact.cyber.${k}.conf`,[['','—'],'Confirmed','Suspected'],y.conf)}${fT('Description',`impact.cyber.${k}.desc`,y.desc,'rows="2"')}</div></div>`;}).join('')}</div>
+ <div class="panel section"><h2>Consequence (S0–S5)</h2><p class="sub">Integrated risk matrix A1.1. Rate the most likely consequence of this incident, considering the five-year outlook.</p>
+ ${C.contexts.filter(c=>c.core).map(c=>consRow(x,c)).join('')}
+ <details style="margin-top:10px" ${C.contexts.some(c=>!c.core&&(x.impact.cons[c.id]||{}).s)?'open':''}><summary class="small" style="cursor:pointer;font-weight:700">Other contexts (environmental / heritage, industrial relations)</summary>${C.contexts.filter(c=>!c.core).map(c=>consRow(x,c)).join('')}</details>
+ <div class="notice" style="margin:12px 0 0">${cm?`Highest consequence: <strong>S${cm.s}</strong> (${e(cm.ctx)}).`:'No consequence rated yet.'}</div></div>
+ <div class="panel section"><h2>Risk assessment</h2><p class="sub">Consequence × likelihood on the composite score table (A1.3). Rate the incident when first assessed, and again as it stands now (residual).</p>
+ <div class="inc-rates">${['initial','current'].map(k=>{const r=x.risk[k],c=cellOf(r.F,r.S);return `<div class="inc-row"><h3 style="margin:0 0 8px">${k==='initial'?'Initial rating':'Current rating (residual)'}</h3><div class="formgrid">
+  ${fI('Assessed on',`risk.${k}.date`,r.date,'type="date"')}${fS('Consequence',`risk.${k}.S`,[['','Select'],...[0,1,2,3,4,5].map(s=>[s,'S'+s])],r.S,'data-irr','',cm?'Impact assessment highest: S'+cm.s:'')}
+  ${fS('Likelihood',`risk.${k}.F`,[['','Select'],...C.likelihood.map(l=>[l[0],`F${l[0]} · ${l[1]} (${l[2]})`])],r.F,'data-irr','full')}${fT('Rationale',`risk.${k}.why`,r.why,'rows="2"','full')}</div>
+  <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="small">Score</span>${c?riskBox(c):'<span class="small">Not rated</span>'}${c&&c.value>RISK_REG_THRESHOLD?'<span class="small" style="color:var(--red);font-weight:700">Higher than 9: raise in risk register</span>':''}</div></div>`;}).join('')}</div>
+ <p class="small" style="margin-top:8px">${e(C.likelihoodQuestion)}</p>
+ <details style="margin-top:8px"><summary class="small" style="cursor:pointer;font-weight:700">Likelihood scale and composite score table</summary><div class="table-scroll"><table class="mini"><thead><tr><th>Level</th><th>Label</th><th>Probability</th><th>Description</th></tr></thead><tbody>${C.likelihood.map(l=>`<tr><td>F${l[0]}</td><td>${e(l[1])}</td><td>${e(l[2])}</td><td>${e(l[3])}</td></tr>`).join('')}</tbody></table></div>${mx}</details>
+ <div class="formgrid" style="margin-top:12px">${fT('Controls and compensating measures in place','risk.controls',x.risk.controls,'rows="3" placeholder="Including temporary containment measures"','full')}${fT('Residual risk statement','risk.residual',x.risk.residual,'rows="2"','full')}</div></div>
+ <div class="panel section"><h2>Incident severity</h2><div class="formgrid" style="margin-top:12px">${fS('Assigned severity','risk.sev',[['','Select severity'],...C.severity.map(s=>[s.id,`${s.name} · ${s.ecmp}`])],x.risk.sev,'data-incsev','',sg?`Suggested from consequence: <strong>${e(sg.name)}</strong>`:'Rate consequence to see the suggested severity')}${fT('Severity justification','ov.sevJust',x.ov.sevJust,'rows="2"')}</div>
+ ${sv?`<p class="small" style="margin-top:8px">${e(sv.name)} criteria: ${e(sv.crit)}${sv.isimp?' · ISIMP must be engaged; notify the Extended CERT and CSG.':''}</p>`:''}
+ ${x.risk.sevHist.length?`<h3>Severity history</h3><div class="table-scroll"><table class="mini"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody>${x.risk.sevHist.map((h,i)=>`<tr><td class="nowrap">${e(fd(h.date))}</td><td>${e((sevById(h.from)||{}).name||'—')}</td><td>${e((sevById(h.to)||{}).name||'—')}</td><td><input type="text" data-ip="risk.sevHist.${i}.why" value="${e(h.why)}" placeholder="Reason for the change" aria-label="Reason for the change" style="width:100%"></td></tr>`).join('')}</tbody></table></div>`:''}</div>
+ ${typeof crPanel==='function'?crPanel('INC|'+x.id):''}`;}
+function tabNotify(x){const sv=sevById(x.risk.sev);
+ return clocksPanel(x)+`<div class="panel section"><h2>External notification</h2><p class="sub">For every obligation, record whether it applies and why. A blank is shown as "Not assessed", never as "Not required". Legal must approve all external communication.</p>
+ ${C.regs.map(g=>{const r=x.reg.rows[g.id]||{},p=`reg.rows.${g.id}`,st=regState(x,g);return `<div class="inc-row"><div class="inc-reghead"><div><strong>${e(g.name)}</strong><div class="small">${e(g.trigger)}</div><div class="small">Deadline: ${e(g.deadline)}</div></div><div class="st">${pill(TONE[st.tone],st.label)}<div class="small" style="margin-top:4px">${st.due?'Due '+e(fdt(st.due)):''}</div></div></div>
+  <div class="formgrid inc-g3">${fS('Applies?',p+'.applies',[['','Not assessed'],'Yes','No','Under assessment'],r.applies,'data-irr')}
+  ${g.custom?fI('Deadline (hours after aware)',p+'.hours',r.hours,'type="number" min="0" data-irr'):''}${g.from==='payment'&&r.applies==='Yes'?fI('Payment made','reg.payment',x.reg.payment,'type="datetime-local" data-irr'):''}
+  ${fI('Notified (date and time)',p+'.notified',r.notified,'type="datetime-local" data-irr')}${fI('Reference',p+'.refno',r.refno,'type="text" placeholder="Report or case number"')}
+  ${fS('Legal approved',p+'.legal',[['','—'],'Yes','No','Not needed'],r.legal)}${fI('Decided by',p+'.by',r.by,'type="text" placeholder="Name, role"')}
+  ${fT(r.applies==='No'?'Rationale (required when not required)':'Rationale',p+'.why',r.why,'rows="2"','full')}</div></div>`;}).join('')}</div>
+ <div class="panel section"><h2>Internal escalation</h2><div class="formgrid" style="margin-top:12px">${fS('ISIMP engaged','reg.isimp',[['','Select'],'Yes','No','Not required'],x.reg.isimp,'','',sv&&sv.isimp?'Required for '+e(sv.name):'')}</div>
+ <div class="table-scroll"><table class="mini" style="margin-top:12px"><thead><tr><th>Party</th><th>Notified (date and time)</th><th>Notified by</th><th>Receipt confirmed</th><th>Notes</th></tr></thead><tbody>${C.internal.map(n=>{const k=n.replace(/[^A-Za-z]/g,''),r=x.internal.rows[k]||{},p=`internal.rows.${k}`;return `<tr><td><strong>${e(n)}</strong></td><td><input type="datetime-local" data-ip="${p}.at" value="${e(r.at||'')}" aria-label="${e(n)} notified"></td><td><input type="text" data-ip="${p}.by" value="${e(r.by||'')}" aria-label="${e(n)} notified by"></td><td><select data-ip="${p}.ack" aria-label="${e(n)} receipt confirmed">${optsH([['','—'],'Yes','No','Not needed'],r.ack)}</select></td><td><input type="text" data-ip="${p}.note" value="${e(r.note||'')}" aria-label="${e(n)} notes"></td></tr>`;}).join('')}</tbody></table></div></div>`;}
+function tabResponse(x){const R=x.resp,F=x.findings,tp=x.ov.origin==='Third party',unc=uncertainties(x),sv=sevById(x.risk.sev);
+ const missing=[];if(x.ov.status==='Closed'||F.decision==='Close'){if(!F.decision)missing.push('a decision');if(!x.approval.approver||!x.approval.date)missing.push('approval (Evidence and approval tab)');if(sv&&sv.isimp&&!C.lessons.some(([k])=>(x.lessons.items[k]||'').trim()))missing.push('lessons learned, required for a Critical or Major incident');if(openRegs(x).length)missing.push('a decision on every open notification');}
+ return `<div class="panel section"><h2>Incident response</h2><p class="sub">Activities performed by ${e(ORG)}${tp?' and '+e(tpName(x)):''}.</p><div class="formgrid" style="margin-top:12px">
+ ${fT('Containment','resp.containment',R.containment,'rows="3"','full')}${fT('Analysis and investigation','resp.analysis',R.analysis,'rows="3"','full')}${fT('Eradication and remediation','resp.eradication',R.eradication,'rows="3"','full')}${fT('Recovery','resp.recovery',R.recovery,'rows="3"','full')}${fT('Assurance obtained','resp.assurance',R.assurance,'rows="3" placeholder="e.g. forensic report, scan results, attestations"','full')}
+ ${tp?fT('Activities performed by '+tpName(x),'resp.thirdParty',R.thirdParty,'rows="3"','full'):''}</div></div>
+ <div class="panel section"><h2>Findings</h2><p class="sub">Mark each finding Confirmed, Uncertain or Unknown. Uncertain and unknown items are listed as outstanding uncertainties.</p>
+ ${C.findings.map(([k,n])=>{const y=F.items[k]||{};return `<div class="inc-row"><div class="formgrid">${fT(n,`findings.items.${k}.text`,y.text,'rows="2"')}${fS('Confidence',`findings.items.${k}.conf`,[['','Select'],'Confirmed','Uncertain','Unknown'],y.conf,'data-irr')}</div></div>`;}).join('')}
+ <div class="formgrid" style="margin-top:12px">${fT('Other confirmed facts','findings.facts',F.facts,'rows="2"','full')}</div>
+ <h3>Outstanding uncertainties</h3>${unc.length?`<ul class="riskgaps">${unc.map(u=>`<li>${e(u)}</li>`).join('')}</ul>`:'<p class="small">None from the findings, impact and notification records.</p>'}
+ <div class="formgrid" style="margin-top:8px">${fT('Other uncertainties','findings.uncert',F.uncert,'rows="2"','full')}</div></div>
+ <div class="panel section"><h2>Decision</h2>${missing.length?`<div class="notice warn" style="margin:10px 0">Before closing, add ${e(missing.join(', '))}.</div>`:''}<div class="formgrid" style="margin-top:12px">
+ ${fS('Decision','findings.decision',[['','Not yet decided'],'Close','Continue monitoring','Escalate'],F.decision,'data-irr')}${fI('Decision-maker','findings.by',F.by,'type="text" placeholder="Name, role"')}${fI('Decision date','findings.date',F.date,'type="date"')}${F.decision==='Continue monitoring'?fI('Next review date','findings.review',F.review,'type="date"'):''}
+ ${fT('Justification for closure or continued monitoring','findings.why',F.why,'rows="3"','full')}</div></div>`;}
+function tabActions(x){const L=x.lessons,sv=sevById(x.risk.sev);
+ return `<div class="panel section"><div class="section-head"><h2>Actions and follow-up</h2><button class="secondary" data-act="incAddRow" data-list="actions">+ Add action</button></div>
+ ${x.actions.length?x.actions.map((a,i)=>`<div class="inc-row"><div class="formgrid inc-g3">${fT('Action',`actions.${i}.text`,a.text,'rows="2"','full',a.src?'From lessons learned: '+e(a.src):'')}${fI('Owner',`actions.${i}.owner`,a.owner)}${fI('Target date',`actions.${i}.due`,a.due,'type="date"')}${fS('Status',`actions.${i}.status`,['Open','In progress','Completed'],a.status||'Open')}
+  ${fT('Escalation trigger',`actions.${i}.trigger`,a.trigger,'rows="2"')}${fT('Closure criteria',`actions.${i}.closure`,a.closure,'rows="2"')}</div><div class="inc-rowfoot"><span></span><button class="linkbtn" data-act="incDelRow" data-list="actions" data-i="${i}">Remove action</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No actions yet.</p>'}</div>
+ <div class="panel section"><h2>Lessons learned</h2><p class="sub">Evaluate the organisational response.${sv&&sv.isimp?' Required before closing a Critical or Major incident.':''}</p><div class="formgrid" style="margin-top:12px">
+ ${C.lessons.map(([k,n])=>`<div class="field full"><label for="${fid('lessons.items.'+k)}">${e(n)}</label><textarea id="${fid('lessons.items.'+k)}" data-ip="lessons.items.${k}" rows="2">${e(L.items[k]||'')}</textarea><button class="linkbtn" style="margin-top:4px" data-act="incLesson" data-k="${e(k)}">+ Create action from this lesson</button></div>`).join('')}</div>
+ <h3>Cost of the incident</h3><div class="formgrid inc-g3">${fI('Response effort (hours)','lessons.hours',L.hours,'type="number" min="0"')}${fI('Lost productivity (hours)','lessons.productivity',L.productivity,'type="number" min="0"')}${fI('Direct cost ($)','lessons.cost',L.cost,'type="number" min="0"')}${fI('Cost notes','lessons.costNote',L.costNote,'type="text"','full')}</div></div>`;}
+function tabEvidence(x){const A=x.approval;
+ return `<div class="panel section"><div class="section-head"><h2>Evidence</h2><button class="secondary" data-act="incAddRow" data-list="evidence">+ Add evidence</button></div><p class="sub">Record evidence by reference (document name and SharePoint link or record number); keep the documents in the restricted incident folder.</p>
+ ${x.evidence.length?x.evidence.map((v,i)=>`<div class="inc-row"><div class="formgrid inc-g3">${fI('Document',`evidence.${i}.name`,v.name)}${fS('Type',`evidence.${i}.type`,[['','Select'],'Correspondence','Investigation report','Decision record','Logs / artefacts','Notification record','Other'],v.type)}${fI('Date',`evidence.${i}.date`,v.date,'type="date"')}${fI('Reference (link or record)',`evidence.${i}.ref`,v.ref,'type="text"','full')}</div><div class="inc-rowfoot"><span></span><button class="linkbtn" data-act="incDelRow" data-list="evidence" data-i="${i}">Remove</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No evidence recorded yet.</p>'}</div>
+ <div class="panel section"><div class="section-head"><h2>Reviewers</h2><button class="secondary" data-act="incAddRow" data-list="approval.reviewers">+ Add reviewer</button></div>
+ ${A.reviewers.length?A.reviewers.map((v,i)=>`<div class="inc-row"><div class="formgrid inc-g3">${fI('Name',`approval.reviewers.${i}.name`,v.name)}${fI('Role',`approval.reviewers.${i}.role`,v.role)}${fI('Reviewed on',`approval.reviewers.${i}.date`,v.date,'type="date"')}</div><div class="inc-rowfoot"><span></span><button class="linkbtn" data-act="incDelRow" data-list="approval.reviewers" data-i="${i}">Remove</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No reviewers yet.</p>'}</div>
+ <div class="panel section"><h2>Approval</h2><div class="formgrid" style="margin-top:12px">${fI('Approver','approval.approver',A.approver)}${fI('Role','approval.role',A.role)}${fI('Approved on','approval.date',A.date,'type="date"')}${fT('Comments','approval.comments',A.comments,'rows="2"','full')}</div></div>`;}
+
+/* ---- Report (PDF) ---- */
+function reportHtml(x){const o=x.ov,at=awareAt(x),cm=consMax(x),sv=sevById(x.risk.sev),unc=uncertainties(x),tl=sortedTl(x),val=v=>v?e(v):'—';
+ const sec=(n,t,b)=>`<section><h2>${n}. ${e(t)}</h2>${b}</section>`,kv=rows=>`<table class="kv">${rows.map(([k,v])=>`<tr><th>${e(k)}</th><td>${v}</td></tr>`).join('')}</table>`;
+ const rateRow=(k,lab)=>{const r=x.risk[k],c=cellOf(r.F,r.S);return `<tr><td>${lab}</td><td>${val(fd(r.date))}</td><td>${r.S!==''?'S'+e(r.S):'—'}</td><td>${r.F?'F'+e(r.F)+' '+e(C.likelihood[r.F-1][1]):'—'}</td><td>${c?`<span class="sc m-${c.color}">${c.value}</span>`:'Not rated'}</td><td>${val(r.why)}</td></tr>`;};
+ const body=`<header><div class="k">${ORG} · Cybersecurity · ${MARK}</div><h1>Cyber Incident Risk Assessment Report</h1><div class="t">${e(o.title||'Untitled incident')}</div>
+ <div class="meta"><span><b>Reference:</b> ${val(o.ref)}</span><span><b>Status:</b> ${val(o.status)}</span><span><b>Report date:</b> ${e(fd(TODAY))}</span><span><b>Severity:</b> ${sv?e(sv.name):'Not assigned'}</span></div></header>
+ ${sec(1,'Incident overview',kv([['Incident title',val(o.title)],['Cyber incident number',val(o.ref)],['HEAT incident number',val(o.heat)],['Incident type',val(o.type)],['Origin',val(o.origin)+(o.origin==='Third party'?' · '+e(tpName(x)):'')],['Source of incident',val(o.source)],['Discovery date',val(fd(o.discovered))],[ORG+' became aware',at?e(fdt(at)):'—'],['Current status',val(o.status)],['Incident owner',val(o.owner)],['Incident manager',val(o.manager)],['Environment affected',val(o.env)],['Data classification',val(o.dataClass)],['Affected systems',val(sysNames(x).concat(o.systems?[o.systems]:[]).join('; '))],['Nature of the incident',val(o.nature)],['Attack method',val(o.method)],['Information potentially compromised',val(o.info)]]))}
+ ${sec(2,'Executive summary',rich(execText(x)))}
+ ${sec(3,'Timeline',tl.length?`<table class="g"><thead><tr><th>Date and time</th><th>Stage</th><th>Event</th><th>Party</th><th>Ack.</th><th>Evidence</th></tr></thead><tbody>${tl.map(({r})=>`<tr${r.aware?' class="aw"':''}><td class="nw">${e(fd(r.date))}${r.time?' '+e(r.time):''}${r.aware?`<div class="aw-l">${ORG} became aware</div>`:''}</td><td>${val(r.stage)}</td><td>${val(r.event)}</td><td>${val(r.party)}${r.dir?' ('+e(r.dir.toLowerCase())+')':''}</td><td>${val(r.ack)}</td><td>${refHtml(r.ref)}</td></tr>`).join('')}</tbody></table>`:'<p>No events recorded.</p>')}
+ ${sec(4,'Impact assessment',`<h3>Cyber impact</h3><table class="g"><thead><tr><th>Area</th><th>Affected</th><th>Confidence</th><th>Description</th></tr></thead><tbody>${C.cyber.map(([k,n])=>{const y=x.impact.cyber[k];return `<tr><td>${e(n)}</td><td>${y.aff?e(y.aff):'Not assessed'}</td><td>${val(y.conf)}</td><td>${val(y.desc)}</td></tr>`;}).join('')}</tbody></table>
+  <h3>Consequence</h3><table class="g"><thead><tr><th>Risk context</th><th>Consequence</th><th>Rationale</th></tr></thead><tbody>${C.contexts.filter(c=>c.core||(x.impact.cons[c.id]||{}).s).map(c=>{const y=x.impact.cons[c.id]||{},s=y.s;return `<tr><td>${e(c.name)}</td><td>${s==='na'?'N/A':s!==undefined&&s!==''?'S'+e(s)+' · '+e(c.d[s]):'Not assessed'}</td><td>${val(y.why)}</td></tr>`;}).join('')}</tbody></table><p><b>Highest consequence:</b> ${cm?'S'+cm.s+' ('+e(cm.ctx)+')':'Not rated'}</p>`)}
+ ${sec(5,'Risk assessment',`<table class="g"><thead><tr><th>Rating</th><th>Assessed</th><th>Consequence</th><th>Likelihood</th><th>Score</th><th>Rationale</th></tr></thead><tbody>${rateRow('initial','Initial')}${rateRow('current','Current (residual)')}</tbody></table>
+  ${kv([['Controls and compensating measures',val(x.risk.controls)],['Residual risk',val(x.risk.residual)],['Severity',sv?e(sv.name+' · '+sv.ecmp):'Not assigned'],['Severity justification',val(o.sevJust)]])}
+  ${x.risk.sevHist.length?`<h3>Severity history</h3><table class="g"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody>${x.risk.sevHist.map(h=>`<tr><td>${e(fd(h.date))}</td><td>${e((sevById(h.from)||{}).name||'—')}</td><td>${e((sevById(h.to)||{}).name||'—')}</td><td>${val(h.why)}</td></tr>`).join('')}</tbody></table>`:''}`)}
+ ${sec(6,'Regulatory and internal escalation',`<table class="g"><thead><tr><th>Obligation</th><th>Applies</th><th>Rationale</th><th>Deadline</th><th>Notified</th><th>Reference</th><th>Legal</th><th>Decided by</th></tr></thead><tbody>${C.regs.map(g=>{const r=x.reg.rows[g.id]||{},st=regState(x,g);return `<tr><td>${e(g.name)}</td><td>${r.applies?e(r.applies):'<b>Not assessed</b>'}</td><td>${val(r.why)}</td><td>${st.due?e(fdt(st.due)):e(g.deadline)}</td><td>${r.notified?e(fdtS(r.notified)):'—'}</td><td>${val(r.refno)}</td><td>${val(r.legal)}</td><td>${val(r.by)}</td></tr>`;}).join('')}</tbody></table>
+  <h3>Internal escalation</h3><p><b>ISIMP engaged:</b> ${val(x.reg.isimp)}</p><table class="g"><thead><tr><th>Party</th><th>Notified</th><th>By</th><th>Receipt confirmed</th><th>Notes</th></tr></thead><tbody>${C.internal.map(n=>{const r=x.internal.rows[n.replace(/[^A-Za-z]/g,'')]||{};return r.at||r.by||r.ack||r.note?`<tr><td>${e(n)}</td><td>${r.at?e(fdtS(r.at)):'—'}</td><td>${val(r.by)}</td><td>${val(r.ack)}</td><td>${val(r.note)}</td></tr>`:'';}).join('')||'<tr><td colspan="5">No internal notification recorded.</td></tr>'}</tbody></table>`)}
+ ${sec(7,'Incident response',kv([['Containment',val(x.resp.containment)],['Analysis and investigation',val(x.resp.analysis)],['Eradication and remediation',val(x.resp.eradication)],['Recovery',val(x.resp.recovery)],['Assurance obtained',val(x.resp.assurance)],...(o.origin==='Third party'?[['Activities by '+tpName(x),val(x.resp.thirdParty)]]:[])]))}
+ ${sec(8,'Findings and decision',`<table class="g"><thead><tr><th>Finding</th><th>Detail</th><th>Confidence</th></tr></thead><tbody>${C.findings.map(([k,n])=>{const y=x.findings.items[k]||{};return `<tr><td>${e(n)}</td><td>${val(y.text)}</td><td>${y.conf?e(y.conf):'Not assessed'}</td></tr>`;}).join('')}</tbody></table>
+  ${x.findings.facts?`<p><b>Other confirmed facts:</b> ${e(x.findings.facts)}</p>`:''}<h3>Outstanding uncertainties</h3>${unc.length||x.findings.uncert?`<ul>${unc.map(u=>`<li>${e(u)}</li>`).join('')}${x.findings.uncert?`<li>${e(x.findings.uncert)}</li>`:''}</ul>`:'<p>None recorded.</p>'}
+  <h3>Decision</h3>${kv([['Decision',x.findings.decision?e(x.findings.decision):'Not yet decided'],['Decision-maker',val(x.findings.by)],['Date',val(fd(x.findings.date))],...(x.findings.decision==='Continue monitoring'?[['Next review',val(fd(x.findings.review))]]:[]),['Justification',val(x.findings.why)]])}`)}
+ ${sec(9,'Actions and follow-up',x.actions.length?`<table class="g"><thead><tr><th>Action</th><th>Owner</th><th>Target</th><th>Status</th><th>Escalation trigger</th><th>Closure criteria</th></tr></thead><tbody>${x.actions.map(a=>`<tr><td>${val(a.text)}</td><td>${val(a.owner)}</td><td class="nw">${val(fd(a.due))}</td><td>${val(a.status)}</td><td>${val(a.trigger)}</td><td>${val(a.closure)}</td></tr>`).join('')}</tbody></table>`:'<p>No actions recorded.</p>')}
+ ${sec(10,'Lessons learned',kv([...C.lessons.map(([k,n])=>[n,val(x.lessons.items[k])]),['Cost of the incident',[x.lessons.hours?e(x.lessons.hours)+' response hours':'',x.lessons.productivity?e(x.lessons.productivity)+' hours lost productivity':'',x.lessons.cost?'$'+e(Number(x.lessons.cost).toLocaleString('en-AU')):'',x.lessons.costNote?e(x.lessons.costNote):''].filter(Boolean).join(' · ')||'—']]))}
+ ${sec(11,'Evidence and approval',`${x.evidence.length?`<table class="g"><thead><tr><th>Document</th><th>Type</th><th>Reference</th><th>Date</th></tr></thead><tbody>${x.evidence.map(v=>`<tr><td>${val(v.name)}</td><td>${val(v.type)}</td><td>${refHtml(v.ref)}</td><td class="nw">${val(fd(v.date))}</td></tr>`).join('')}</tbody></table>`:'<p>No evidence recorded.</p>'}
+  ${x.approval.reviewers.length?`<h3>Reviewers</h3><table class="g"><thead><tr><th>Name</th><th>Role</th><th>Reviewed</th></tr></thead><tbody>${x.approval.reviewers.map(v=>`<tr><td>${val(v.name)}</td><td>${val(v.role)}</td><td>${val(fd(v.date))}</td></tr>`).join('')}</tbody></table>`:''}
+  <h3>Approval</h3>${kv([['Approver',val(x.approval.approver)],['Role',val(x.approval.role)],['Approved on',val(fd(x.approval.date))],['Comments',val(x.approval.comments)]])}`)}
+ <footer>Ratings, deadlines and severity are indicative, based on the ${ORG} integrated risk matrix and incident procedure settings in this concept. This report supports, and does not replace, legal advice or formal risk acceptance.</footer>`;
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${e((o.ref?o.ref+' ':'')+'Cyber Incident Risk Assessment Report')}</title><style>
+ @page{size:A4;margin:14mm 15mm}*{box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#223037;font-size:9.5pt;line-height:1.42;margin:0;padding:18px}@media print{body{padding:0}}
+ table.page{border:0;margin:0;width:100%}table.page>thead>tr>td,table.page>tfoot>tr>td,table.page>tbody>tr>td{border:0;padding:0}
+ .mark{font-size:8pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#B42318;text-align:center;margin:4px 0}
+ header{border-bottom:3px solid #0F3D3E;padding-bottom:8px;margin-bottom:12px}.k{font-size:8pt;letter-spacing:.06em;text-transform:uppercase;color:#118D8A;font-weight:700}h1{font-family:Georgia,serif;font-size:18pt;margin:4px 0 2px;color:#0F3D3E}.t{font-size:12pt;font-weight:600;margin-bottom:6px}
+ .meta{display:flex;flex-wrap:wrap;gap:3px 18px;font-size:9pt;color:#46566b}.meta b{color:#223037}
+ h2{font-family:Georgia,serif;font-size:12.5pt;margin:16px 0 6px;color:#0F3D3E;border-bottom:1px solid #d5dde6;padding-bottom:2px}h3{font-size:10pt;margin:10px 0 4px}p{margin:5px 0}ul{margin:4px 0 4px 18px}
+ table{width:100%;border-collapse:collapse;margin:4px 0 8px}td,th{border:1px solid #d5dde6;padding:4px 6px;vertical-align:top;text-align:left}thead th{background:#EEF3F5;font-size:8.5pt}
+ .kv th{width:30%;background:#F6F8F9;font-weight:600}.nw{white-space:nowrap}tr{break-inside:avoid}tr.aw td{background:#FFF7E6}.aw-l{font-size:7.5pt;font-weight:700;color:#B54708}
+ .sc{display:inline-block;min-width:26px;text-align:center;font-weight:700;border-radius:4px;padding:1px 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .m-green{background:#92D050}.m-blue{background:#8DB4E2}.m-yellow{background:#FFFF00}.m-orange{background:#F79646}.m-red{background:#FF0000;color:#fff}
+ a{color:#118D8A;word-break:break-all}footer{margin-top:18px;border-top:1px solid #d5dde6;padding-top:6px;font-size:8pt;color:#65748a}
+ </style></head><body><table class="page"><thead><tr><td><div class="mark">${MARK}</div></td></tr></thead><tfoot><tr><td><div class="mark">${MARK} · ${ORG} · Cyber Incident Risk Assessment Report · ${e(o.ref||'')} · ${e(fd(TODAY))}</div></td></tr></tfoot><tbody><tr><td>${body}</td></tr></tbody></table></body></html>`;}
+function printHtml(html){const old=document.getElementById('printFrame');if(old)old.remove();const f=document.createElement('iframe');f.id='printFrame';f.title='Report for printing';f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(f);
+ const d=f.contentWindow.document;d.open();d.write(html);d.close();toast('In the print dialog, choose "Save as PDF"');setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(_){toast('Printing is blocked in this browser');}},300);}
+window.incReportHtml=id=>reportHtml(DB.incidents[id]);
+
+/* ---- Saving: fields save as you type ---- */
+let incT;const incSave=()=>{const x=cur();if(x)x.updated=TODAY;clearTimeout(incT);incT=setTimeout(save,300);};
+const redraw=()=>{const y=window.scrollY;render();window.scrollTo(0,y);};
+function refreshExec(x){if(x.exec.edited)return;const t=document.getElementById('incExec');if(t&&document.activeElement!==t)t.value=execGenerated(x);}
+document.addEventListener('input',ev=>{const t=ev.target,x=cur();if(!x)return;
+ if(t.id==='incExec'){x.exec.edited=true;x.exec.text=t.value;incSave();return;}
+ if(t.dataset&&t.dataset.ip!=null){setP(x,t.dataset.ip,t.value);incSave();}});
+document.addEventListener('change',ev=>{const t=ev.target;
+ if(t.matches&&t.matches('[data-incf]')){V.incF=t.value;render();return;}
+ const x=cur();if(!x)return;
+ if(t.dataset.incasset){const s=new Set(x.ov.assets||[]);t.checked?s.add(t.dataset.incasset):s.delete(t.dataset.incasset);x.ov.assets=[...s];incSave();return;}
+ if(t.dataset.incaware!=null){x.timeline.forEach((r,i)=>r.aware=(i===Number(t.dataset.incaware)));save();redraw();return;}
+ if(t.dataset.ip==null)return;setP(x,t.dataset.ip,t.value);
+ if(t.hasAttribute('data-incsev')){if((x.risk.sevPrev||'')!==t.value){x.risk.sevHist.push({date:TODAY,from:x.risk.sevPrev||'',to:t.value,why:''});x.risk.sevPrev=t.value;}save();redraw();return;}
+ if(t.hasAttribute('data-irr')){save();redraw();return;}
+ incSave();});
+Object.assign(ACT,{
+ incNew(){DB.incidents=DB.incidents||{};const y=TODAY.slice(0,4),n=Object.values(DB.incidents).filter(x=>String(x.ov.ref).startsWith('CSI-'+y)).length+1,id=nid('INC');DB.incidents[id]=incBlank(id,`CSI-${y}-${String(n).padStart(3,'0')}`);save();V.incTab='Overview';go('incident',id);toast('Incident record created');},
+ incTab(b){V.incTab=b.dataset.t;const y=window.scrollY;render();window.scrollTo(0,Math.min(y,document.querySelector('.tabs')?document.querySelector('.tabs').offsetTop-80:y));},
+ incLog(){const x=cur();if(!x)return;const g=id=>document.getElementById(id),ev=g('incU-event').value.trim(),d=g('incU-date').value;
+  if(!isDate(d))return showErr('incUErr','Enter the date of the event.');if(!ev)return showErr('incUErr','Describe the event.');
+  const aware=g('incU-aware').checked;if(aware)x.timeline.forEach(r=>r.aware=false);
+  x.timeline.push({id:uid(),date:d,time:g('incU-time').value,stage:g('incU-stage').value,event:ev,party:g('incU-party').value.trim(),dir:g('incU-dir').value,ack:g('incU-ack').value,ref:g('incU-ref').value.trim(),aware});x.updated=TODAY;save();render();toast('Added to the timeline');},
+ incAddRow(b){const x=cur();if(!x)return;const k=b.dataset.list,list=getP(x,k);list.push(k==='actions'?{id:uid(),text:'',owner:'',due:'',status:'Open',trigger:'',closure:''}:k==='evidence'?{id:uid(),name:'',type:'',ref:'',date:''}:{id:uid(),name:'',role:'',date:''});save();redraw();},
+ incDelRow(b){const x=cur();if(!x)return;getP(x,b.dataset.list).splice(Number(b.dataset.i),1);save();redraw();},
+ incLesson(b){const x=cur();if(!x)return;const k=b.dataset.k,n=(C.lessons.find(l=>l[0]===k)||[])[1],t=(x.lessons.items[k]||'').trim();x.actions.push({id:uid(),text:t?`Improve ${n.toLowerCase()}: ${t}`:`Improve ${n.toLowerCase()}`,owner:'',due:'',status:'Open',trigger:'',closure:'',src:n});save();toast('Action added above');redraw();},
+ incExecReset(){const x=cur();if(!x)return;x.exec.edited=false;x.exec.text='';save();redraw();},
+ incPdf(){const x=cur();if(x)printHtml(reportHtml(x));},
+ incDecl(){const x=cur();if(!x)return;const o=x.ov,sv=sevById(x.risk.sev);const txt=`Subject: Cybersecurity incident declaration – ${o.title||'[incident name]'}\n\nIncident name: ${o.title||'—'}\nIncident type: ${o.type||'—'}\nCybersecurity incident number: ${o.ref||'—'}\nHEAT incident number: ${o.heat||'N/A'}\nIncident severity: ${sv?sv.name:'—'}\nSeverity justification: ${o.sevJust||'—'}\nData classification: ${o.dataClass||'N/A'}\nDescription and current analysis: ${o.nature||'—'}`;
+  (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Declaration email text copied'),()=>toast('Copy is blocked in this browser'));},
+ incDel(){const x=cur();if(!x)return;ConfirmDialog({title:'Delete this incident?',message:`${x.ov.ref||x.id} and its timeline, assessments and evidence references will be removed from this browser.`,buttons:[{label:'Cancel'},{label:'Delete incident',kind:'primary danger',fn:()=>{delete DB.incidents[x.id];save();go('incidents');toast('Incident deleted');}}],cancel:0});}
+});
+Object.assign(VIEWS,{incidents:incidentsPage,incident:incidentPage});
+setInterval(()=>{if(V.view==='incidents'||(V.view==='incident'&&(V.incTab||'Overview').match(/Overview|Notifications/)&&!document.activeElement.matches('input,textarea,select')))redraw();},60000);
+
+/* ---- System pages and Home: open incidents linked to a system appear as attention items ---- */
+{const base=attention;attention=function(aid){const out=base(aid);Object.values(DB.incidents||{}).filter(x=>isOpenInc(x)&&(x.ov.assets||[]).includes(aid)).forEach(x=>{const sv=sevById(x.risk.sev),late=openRegs(x).some(o=>o.st.tone==='bad');out.push({sev:late||(sv&&sv.isimp)?'bad':'warn',text:`Incident ${x.ov.ref||x.id} ${late?'– notification overdue or due soon':'open'}`,go:['incident',x.id]});});return out;};}
+})();
+
+/* ---- V11 migration: incidents collection with one fictional sample ---- */
+function migrateV10(d){d.schema=11;d.incidents=d.incidents||{};
+ if(!Object.keys(d.incidents).length&&d.assets&&d.assets['IT-018']){const s=incBlank('INC-9001','CSI-2026-001'),dd=n=>addDays(TODAY,-n);
+  Object.assign(s.ov,{title:'Vendor Y email compromise (sample)',type:'Third-party / supply chain breach',origin:'Third party',vendorId:(d.vendors&&d.vendors['V-Y'])?'V-Y':'',thirdParty:(d.vendors&&d.vendors['V-Y'])?'':'Vendor Y',source:'Third-party notification',discovered:dd(4),status:'Contained',owner:'Head of Infrastructure (sample)',manager:'Cyber Operations Manager (sample)',assets:['IT-018'],env:'IT',dataClass:'Confidential',nature:'Vendor Y advised that an attacker accessed one of its staff email accounts through a phishing attack. The account exchanged project correspondence with Metro.',method:'Credential phishing followed by mailbox access',info:'Project correspondence; contact details of 14 Metro staff',sevJust:'Suspected exposure of Metro confidential correspondence and staff contact details; no Metro system compromised.'});
+  s.created=dd(3);s.updated=dd(1);
+  s.timeline=[{id:'t1',date:dd(4),time:'16:20',stage:'Identification',event:'Vendor Y detects suspicious sign-ins to a staff mailbox.',party:'Vendor Y',dir:'',ack:'',ref:'',aware:false},{id:'t2',date:dd(3),time:'09:15',stage:'Notification',event:'Vendor Y notifies Metro by email of a possible compromise affecting Metro correspondence.',party:'Vendor Y',dir:'Received',ack:'Yes',ref:'',aware:true},{id:'t3',date:dd(3),time:'09:50',stage:'Triage',event:'Metro CERT reviews the notice and raises enquiries on scope and data affected.',party:'Vendor Y',dir:'Sent',ack:'Yes',ref:'',aware:false},{id:'t4',date:dd(3),time:'10:05',stage:'Notification',event:'DoT notified in writing of a suspected data security breach.',party:'DoT',dir:'Sent',ack:'Pending',ref:'',aware:false},{id:'t5',date:dd(2),time:'14:00',stage:'Containment',event:'Vendor Y confirms password reset, MFA enforced and mailbox rules removed.',party:'Vendor Y',dir:'Received',ack:'',ref:'',aware:false}];
+  s.impact.cyber.c={aff:'Yes',conf:'Suspected',desc:'Project correspondence may have been read.'};s.impact.cyber.i={aff:'No',conf:'',desc:''};s.impact.cyber.a={aff:'No',conf:'',desc:''};s.impact.cyber.pi={aff:'Yes',conf:'Suspected',desc:'Names, work emails and phone numbers of 14 staff.'};
+  s.impact.cons={safety:{s:'na',why:'No operational technology involved.'},financial:{s:'0',why:'Response effort only.'},reputation:{s:'1',why:'Possible limited local attention if phishing targets staff.'},legal:{s:'2',why:'Privacy assessment under way.'},engineering:{s:'na',why:''}};
+  s.risk.initial={date:dd(3),S:'2',F:'4',why:'Scope unknown at notification.'};s.risk.current={date:dd(1),S:'2',F:'2',why:'Containment confirmed; no evidence of further access.'};
+  s.risk.controls='Vendor Y password reset and MFA; Metro mail filtering for the vendor domain; staff phishing alert issued.';s.risk.residual='Low residual risk of targeted phishing using exposed contact details.';
+  s.risk.sev='P2';s.risk.sevPrev='P2';s.risk.sevHist=[{date:dd(3),from:'',to:'P2',why:'Suspected unprotected PII breach at a supplier'}];
+  s.reg.rows={dot:{applies:'Yes',why:'Suspected data security breach involving Metro data.',notified:dd(3)+'T10:05',legal:'Yes',by:'Head of Infrastructure'},mtrPhone:{applies:'No',why:'Not a confirmed Critical or Major breach of Metro systems.',by:'Head of Infrastructure'},mtrWritten:{applies:'Under assessment',why:'Depends on confirmation of the breach.'},sociSig:{applies:'No',why:'No impact on the availability of an essential service.',by:'Cyber Operations Manager'},sociRel:{applies:'No',why:'No Metro critical infrastructure asset affected.',by:'Cyber Operations Manager'},ovic:{applies:'Under assessment',why:'Correspondence BIL being confirmed with the business owner.'},oaic:{applies:'Under assessment',why:'Eligible data breach assessment under way (30 days).',by:'Privacy Officer'},ransom:{applies:'No',why:'Not a ransomware incident.',by:'Cyber Operations Manager'}};
+  s.reg.isimp='Yes';s.internal.rows={CoreCERT:{at:dd(3)+'T09:30',by:'Cyber Operations Manager',ack:'Yes'},GMOCMS:{at:dd(3)+'T09:45',by:'Cyber Operations Manager',ack:'Yes'},LegalCompliance:{at:dd(3)+'T09:55',by:'Head of Infrastructure',ack:'Yes'}};
+  s.resp.containment='Vendor Y reset credentials, enforced MFA and removed malicious inbox rules. Metro blocked lookalike domains.';s.resp.analysis='Vendor Y engaged a forensic provider; Metro reviewed mail logs for messages from the compromised account.';s.resp.assurance='Awaiting Vendor Y forensic summary.';s.resp.thirdParty='Incident response through its managed security provider.';
+  s.findings.items={vector:{text:'Credential phishing email',conf:'Confirmed'},compromised:{text:'One Vendor Y mailbox',conf:'Confirmed'},more:{text:'Whether attachments were downloaded',conf:'Uncertain'}};
+  s.actions=[{id:'a1',text:'Obtain Vendor Y forensic summary',owner:'Cyber Operations Manager',due:addDays(TODAY,5),status:'Open',trigger:'Not received by target date',closure:'Summary received and reviewed'}];
+  d.incidents[s.id]=s;}
+ return d;}
+
 function render(){let html;try{html=(VIEWS[V.view]||register)();}catch(err){console.error(err);html=`<div class="panel section"><h2>This record could not be shown</h2><p class="sub">${e(err.message)}</p><div class="btnrow"><button class="primary" data-go="register">Back to system register</button></div></div>`;}
- $('#app').innerHTML=html;const grp={home:'home',hcportal:'hcportal',phc:'hcportal',chk:'hcportal',hc:V.hcFrom==='portal'?'hcportal':undefined,bil:V.view==='bil'&&!V.a?'bilreg':undefined,bilreg:'bilreg',trareg:'trareg',traEdit:V.view==='traEdit'&&DB.tra[V.b]&&!DB.tra[V.b].assetId&&!PROTO?'trareg':undefined,thirdparty:'thirdparty',va:V.b?undefined:'thirdparty',assessments:'assessments',attestStd:'assessments',attestEl:'assessments',allrisks:'allrisks',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
+ $('#app').innerHTML=html;const grp={home:'home',hcportal:'hcportal',phc:'hcportal',chk:'hcportal',hc:V.hcFrom==='portal'?'hcportal':undefined,bil:V.view==='bil'&&!V.a?'bilreg':undefined,bilreg:'bilreg',trareg:'trareg',traEdit:V.view==='traEdit'&&DB.tra[V.b]&&!DB.tra[V.b].assetId&&!PROTO?'trareg':undefined,thirdparty:'thirdparty',va:V.b?undefined:'thirdparty',assessments:'assessments',attestStd:'assessments',attestEl:'assessments',allrisks:'allrisks',incidents:'incidents',incident:'incidents',reports:'reports'}[V.view]||'register';document.querySelectorAll('.topnav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===grp&&(grp!=='register'||b.dataset.main==='1')));
  if(V.view==='register')regRows();if($('#inhPrev'))updateRiskPreview();if($('#hcProgress'))updateHealthProgress();if($('#vScope'))updateVendorScope();if($('#ctlResults'))renderCtlResults();if($('#xL'))xferCounts();document.querySelectorAll('[data-mixed]').forEach(x=>x.indeterminate=true);}
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('td.lqc');if(!c)return;const r=c.querySelector('input[data-lqr]');if(r)r.dataset.was=r.checked?'1':'';},true);
 function lqClear(id){if(V.view!=='traEdit')return;document.querySelectorAll(`[name="lq_${id}"]`).forEach(x=>{x.checked=false;});const tr=DB.tra[V.b];readTra(tr);save();const y=window.scrollY;render();window.scrollTo(0,y);}
