@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Colaboree — Cyber Governance Toolkit — Cyber Incident Management (runs in the browser; nothing is sent to a server). Built by sa/build_incident.py. -->
+<!-- Colaboree — Cyber Governance Toolkit — Cyber Incident Management (records are stored in the D1 database via /api/incidents; sign-in required). Built by sa/build_incident.py. -->
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -189,7 +189,7 @@ table.inc-tl tr.inc-editrow>td{background:#f7fbff;padding:12px 14px}
 .inc-matrix td{width:44px;height:30px;text-align:center;font-weight:700;border-radius:4px;position:relative;border:0;padding:0}
 .inc-matrix td.on{outline:3px solid #172B33;outline-offset:-1px}
 .inc-matrix td .tag{position:absolute;top:-7px;right:-5px;background:#172B33;color:#fff;font-size:9px;border-radius:6px;padding:0 4px;line-height:14px}
-@media(max-width:760px){.formgrid.inc-g3,.formgrid.inc-g4,.inc-rates{grid-template-columns:1fr}}
+@media(max-width:760px){.formgrid.inc-g3,.formgrid.inc-g4,.inc-rates{grid-template-columns:1fr}.formgrid.inc-g4 .w2{grid-column:auto}}
 
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:'Source Serif 4',Georgia,serif;font-weight:600;letter-spacing:0}
@@ -215,7 +215,12 @@ label.filebtn{display:inline-block;cursor:pointer}
 .secondary:disabled{opacity:.5;cursor:not-allowed}
 .toast[hidden]{display:none}
 .sitefoot{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text2)}
-@media(max-width:650px){main{padding:18px 16px 48px}.sitenav{padding:0 16px}.nav-right{display:none}}
+.savestate{max-width:46vw;overflow:hidden;text-overflow:ellipsis}.savestate.busy{color:#FFE7A8}.savestate.bad{color:#FFB4AB;font-weight:500}
+.signin{max-width:560px}.signout{color:var(--text2)!important;margin-left:auto}
+.pp-row{background:var(--surface)}.formgrid.inc-g4 .w2{grid-column:span 2}.pp-row .mv{color:var(--text2);font-size:15px;padding:0 4px}button.linkbtn:disabled{opacity:.35;cursor:default}
+@media(max-width:650px){main{padding:18px 16px 48px}.sitenav{padding:0 16px}.nav-logo span{display:none}.savestate{max-width:52vw}.signout{margin-left:0}}
+
+@media(max-width:760px){.formgrid.inc-g3,.formgrid.inc-g4,.inc-rates{grid-template-columns:1fr}.formgrid.inc-g4 .w2{grid-column:auto}}
 
 </style>
 </head>
@@ -225,10 +230,10 @@ label.filebtn{display:inline-block;cursor:pointer}
     <a href="/" class="back-link">◂ toolkit</a>
     <div class="nav-logo">incident_mgmt <span>// cyber incident management</span></div>
   </div>
-  <div class="nav-right"><span class="dot"></span> runs in your browser</div>
+  <div class="nav-right"><span class="dot"></span> <span id="saveState" class="savestate" role="status" aria-live="polite">connecting…</span></div>
 </nav>
 <main id="app"></main>
-<footer class="sitefoot">Colaboree · Cyber Governance Toolkit · runs in your browser, nothing is uploaded</footer>
+<footer class="sitefoot">Colaboree · Cyber Governance Toolkit · incident records are restricted · outputs are indicative</footer>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script>
 /* ---- Page core: helpers, storage and routing (records stay in this browser) ---- */
@@ -265,24 +270,64 @@ function ConfirmDialog(opt){closeDialog();const d=document.createElement('div');
  (btns[opt.focus||0]||btns[0]).focus();}
 function closeDialog(){document.querySelectorAll('.dlg-back').forEach(x=>x.remove());}
 
-/* Storage: one versioned key; bump the version and migrate if the record shape changes */
-const LS_KEY='cyberIncidentsV1';
-function load(){try{const r=localStorage.getItem(LS_KEY);if(r){const d=JSON.parse(r);if(d&&d.schema===1&&d.incidents&&typeof d.incidents==='object')return d;}}catch(_){}return {schema:1,seq:9000,incidents:{}};}
-let DB=load();
-let saveWarned=false;
-function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(DB));}catch(_){if(!saveWarned){saveWarned=true;toast('This browser is not saving records. Use Export to keep a copy.');}}}
-function nid(p){DB.seq=(DB.seq||9000)+1;while(DB.incidents[p+'-'+DB.seq])DB.seq++;return p+'-'+DB.seq;}
+/* Storage: incident records live in the D1 database behind /api/incidents (sign-in required).
+   The editor ID and password are kept in memory only, never in browser storage. */
+const API='/api/incidents';
+let DB={incidents:{}},META={},EDITOR=null,USER='';
+const AUTH={state:'checking',msg:''};
+const b64=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+async function api(method,body){const h={'content-type':'application/json'};if(EDITOR)h.authorization='Basic '+b64(EDITOR.user+':'+EDITOR.pass);
+ let r;try{r=await fetch(API,{method,headers:h,body:body?JSON.stringify(body):undefined,credentials:'same-origin',cache:'no-store'});}catch(_){return {status:0,j:{error:'The incident database could not be reached. Check your connection.'}};}
+ let j={};try{j=await r.json();}catch(_){j={error:r.status===404?'The incident database is not set up on this site yet.':'Unexpected response from the incident database.'};}return {status:r.status,j};}
+/* Load everything after sign-in */
+async function loadAll(){const {status,j}=await api('GET');
+ if(status===200){USER=j.user||'';DB.incidents={};META={};(j.incidents||[]).forEach(r=>{if(r&&r.data&&typeof r.data==='object'){r.data.id=r.id;DB.incidents[r.id]=r.data;META[r.id]={version:r.version,updated_at:r.updated_at,updated_by:r.updated_by};}});
+  setParties(Array.isArray(j.parties)&&j.parties.length?j.parties:null,j.parties_updated_by,j.parties_updated_at);AUTH.state='ready';AUTH.msg='';return true;}
+ if(status===401||status===403){AUTH.state='signin';AUTH.msg=EDITOR?(j.error||'Sign-in failed.'):'';EDITOR=null;return false;}
+ AUTH.state='error';AUTH.msg=j.error||'The incident database could not be reached.';return false;}
+/* Saving: changes are queued per incident and sent a moment after typing stops */
+const DIRTY=new Set(),INFLIGHT=new Set(),CONFLICT={};let saveTimer=null,lastErr='';
+function save(){if(V.view==='incident'&&V.a&&DB.incidents[V.a])queueSave(V.a);}
+function queueSave(id){if(CONFLICT[id])return;DIRTY.add(id);saveState();clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);}
+async function flush(){for(const id of [...DIRTY]){if(INFLIGHT.has(id)||CONFLICT[id])continue;const x=DB.incidents[id];DIRTY.delete(id);if(!x)continue;INFLIGHT.add(id);saveState();
+  const {status,j}=await api('POST',{action:'save',incident:x,version:(META[id]||{}).version||0,stage:typeof incStageOf==='function'?incStageOf(x):''});INFLIGHT.delete(id);
+  if(status===200){META[id]={version:j.version,updated_at:j.updated_at,updated_by:j.updated_by};lastErr='';}
+  else if(status===409){CONFLICT[id]=j;lastErr='';if(V.a===id)render();}
+  else if(status===401||status===403){DIRTY.add(id);lastErr=j.error||'Your sign-in has expired.';AUTH.state='signin';EDITOR=null;render();}
+  else{DIRTY.add(id);lastErr=j.error||'Not saved.';clearTimeout(saveTimer);saveTimer=setTimeout(flush,8000);}
+  saveState();}
+ if([...DIRTY].some(id=>!INFLIGHT.has(id)&&!CONFLICT[id])&&!lastErr){clearTimeout(saveTimer);saveTimer=setTimeout(flush,300);}}
+const unsaved=()=>DIRTY.size+INFLIGHT.size>0;
+function saveState(){const el=$('#saveState');if(!el)return;const c=Object.keys(CONFLICT).length;
+ el.textContent=AUTH.state!=='ready'?'not signed in':c?'not saved – changed by someone else':lastErr?'not saved – '+lastErr:INFLIGHT.size||DIRTY.size?'saving…':USER?'saved · signed in as '+USER:'saved';
+ el.className='savestate'+(c||lastErr?' bad':INFLIGHT.size||DIRTY.size?' busy':'');}
+window.addEventListener('beforeunload',ev=>{if(unsaved()){ev.preventDefault();ev.returnValue='';}});
+function newId(){let id;do{id='INC-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();}while(DB.incidents[id]);return id;}
 
 /* Routing: #/ for the register, #/incident/<id> for one record */
 const V={view:'incidents',a:null};
 const ACT={},VIEWS={};
 function go(view,a){if(view==='incident'&&V.a!==a){V.incTab='Overview';V.incEditId=null;V.incAdd=false;V.incOblOpen=null;}V.view=view;V.a=a||null;
- const h=view==='incident'&&a?'#/incident/'+encodeURIComponent(a):'#/';if(location.hash!==h)history.pushState(null,'',h);render();window.scrollTo(0,0);}
-function route(){const m=/^#\/incident\/([^/]+)$/.exec(location.hash);if(m){const id=decodeURIComponent(m[1]);if(V.a!==id){V.incTab='Overview';V.incEditId=null;V.incAdd=false;}V.view='incident';V.a=id;}else{V.view='incidents';V.a=null;}render();}
-function render(){const app=$('#app');try{app.innerHTML=(VIEWS[V.view]||VIEWS.incidents)();}catch(err){app.innerHTML=`<div class="panel section"><h2>Something went wrong</h2><p class="err">${e(err.message)}</p><div class="btnrow"><button class="secondary" data-go="incidents">Back to incidents</button></div></div>`;}}
+ const h=view==='incident'&&a?'#/incident/'+encodeURIComponent(a):view==='settings'?'#/settings':'#/';if(location.hash!==h)history.pushState(null,'',h);render();window.scrollTo(0,0);
+ if(view==='incidents'&&AUTH.state==='ready'&&!unsaved()&&!Object.keys(CONFLICT).length)refresh();}
+async function refresh(){const ok=await loadAll();if(ok&&V.view==='incidents'&&!(document.activeElement&&document.activeElement.matches('input,textarea,select')))render();saveState();}
+function route(){const m=/^#\/incident\/([^/]+)$/.exec(location.hash);if(m){const id=decodeURIComponent(m[1]);if(V.a!==id){V.incTab='Overview';V.incEditId=null;V.incAdd=false;}V.view='incident';V.a=id;}else if(location.hash==='#/settings'){V.view='settings';V.a=null;}else{V.view='incidents';V.a=null;}render();}
+function render(){const app=$('#app');saveState();try{app.innerHTML=AUTH.state!=='ready'?authPage():(VIEWS[V.view]||VIEWS.incidents)();}catch(err){app.innerHTML=`<div class="panel section"><h2>Something went wrong</h2><p class="err">${e(err.message)}</p><div class="btnrow"><button class="secondary" data-go="incidents">Back to incidents</button></div></div>`;}}
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act],[data-go]');if(!b||b.disabled)return;if(b.dataset.act){const f=ACT[b.dataset.act];if(f){ev.preventDefault();f(b);}}else if(b.dataset.go){ev.preventDefault();go(b.dataset.go,b.dataset.a);}});
 window.addEventListener('popstate',route);
-window.addEventListener('storage',ev=>{if(ev.key===LS_KEY){DB=load();if(!document.activeElement||!document.activeElement.matches('input,textarea,select'))render();}});
+/* Sign-in page: shown until the database accepts the sign-in (Cloudflare Access users go straight through) */
+function authPage(){if(AUTH.state==='checking')return `<div class="panel section"><p class="small">Connecting to the incident database…</p></div>`;
+ const intro=`<section class="intro"><div class="eyebrow">Cyber incident · management</div><h1>Cyber Incident Management</h1><p>One record per incident, from identification to closure, kept in the toolkit's incident database. Sign in to open, update or delete incident records.</p></section>`;
+ if(AUTH.state==='error')return intro+`<div class="panel section"><h2>The incident database is not available</h2><p class="err">${e(AUTH.msg)}</p><div class="btnrow"><button class="secondary" data-act="authRetry">Try again</button></div></div>`;
+ return intro+`<form class="panel section signin" id="signinForm" autocomplete="off"><h2>Sign in</h2><p class="sub">Use the toolkit editor ID and password. They are kept in this page's memory only and cleared when you close or reload it.</p>
+ <div class="formgrid" style="margin-top:12px"><div class="field"><label for="siUser">Editor ID</label><input id="siUser" type="text" autocomplete="username" required></div><div class="field"><label for="siPass">Password</label><input id="siPass" type="password" autocomplete="current-password" required></div></div>
+ <p class="err" id="siErr" role="alert">${e(AUTH.msg)}</p><div class="btnrow"><button class="primary" type="submit">Sign in</button></div></form>`;}
+document.addEventListener('submit',async ev=>{if(ev.target.id!=='signinForm')return;ev.preventDefault();const u=$('#siUser').value.trim(),p=$('#siPass').value;if(!u||!p)return showErr('siErr','Enter the editor ID and password.');
+ const btn=ev.target.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Signing in…';EDITOR={user:u,pass:p};AUTH.msg='';
+ const ok=await loadAll();if(ok&&DIRTY.size){lastErr='';flush();}render();if(!ok){const f=$('#siPass');if(f)f.focus();}});
+ACT.authRetry=async()=>{AUTH.state='checking';render();await loadAll();render();};
+ACT.signOut=()=>{if(unsaved())return toast('Wait until your changes are saved');EDITOR=null;USER='';DB={incidents:{}};META={};AUTH.state='signin';AUTH.msg='';go('incidents');};
+async function start(){route();await loadAll();route();}
 
 /* ---- Cyber Incident Management (Colaboree toolkit): register + one record per incident ----
    Follows the MTM Information Security Incident Management Plan (ISIMP) and the Metro Integrated Risk Matrix.
@@ -308,17 +353,27 @@ const INC_CFG={
  types:[['Acceptable Use Violation','L2-OCM-PRO-008'],['Close Access Breach','L2-OCM-PRO-001'],['Cyber-Intrusion','L2-OCM-PRO-009'],['Data Loss','L2-OCM-PRO-010'],['Denial of Service','L2-OCM-PRO-011'],['eDiscovery','L2-OCM-PRO-012'],['Email Blacklisting Removal','L2-OCM-PRO-013'],['Insider Threat','L2-OCM-PRO-014'],['Malware / Virus Event','L2-OCM-PRO-003'],['Ransomware','L2-OCM-PRO-015'],['Reconnaissance / Probing','L2-OCM-PRO-016'],['Social Engineering','L2-OCM-PRO-017'],['Website Compromise','L2-OCM-PRO-018'],['Zero-day Vulnerability','L2-OCM-PRO-019'],['Third-party / supply chain breach',''],['Other','']],
  sources:['IP reputation monitor','Web application firewall / DDoS provider','Firewall / network intrusion detection','Host-based alert (anti-virus or anti-malware)','Log correlation (SIEM)','External notification (AFP or ASD/ACSC)','Dark web / internet keyword monitoring','User or administrator report','Third-party notification','Other'],
  stages:['Identification','Triage','Declaration','Notification','Containment','Analysis','Eradication','Recovery','Follow-up','Closed'],
- regs:[
-  {id:'dot',name:'Department of Transport (DoT)',trigger:'Any actual, threatened or suspected data security breach or adverse effect on the Systems or Data',hours:1,deadline:'In writing, immediately and within 1 hour'},
-  {id:'mtrPhone',name:'MTR – HCS and CIO by phone',trigger:'Confirmed Critical or Major cybersecurity breach',hours:2,deadline:'By phone within 2 hours'},
-  {id:'mtrWritten',name:'MTR – written report to SSCD',trigger:'Any confirmed cybersecurity breach (Critical, Major or Minor)',hours:24,deadline:'Incident report by email within 24 hours'},
-  {id:'sociSig',soci:'significant',name:'ASD (ACSC) – SOCI significant impact',trigger:'Incident has materially disrupted the availability of an essential service',hours:12,deadline:'Within 12 hours; written record within 84 hours if reported by phone'},
-  {id:'sociRel',soci:'relevant',name:'ASD (ACSC) – SOCI relevant impact',trigger:'Impact on the availability, integrity, reliability or confidentiality of the asset',hours:72,deadline:'Within 72 hours; written record within 48 hours if reported by phone'}],
- internal:['Core CERT','Extended CERT','Continuity Support Group (CSG)','GM OCMS','Head of Infrastructure & Service Delivery','Incident Owner','Legal & Compliance','Privacy Officer','Media Relations','Asset / system owner'],
  findings:[['vector','Initial infection / compromise vector'],['vuln','Vulnerability or security gap exploited'],['dates','Dates of compromise'],['targeted','Systems and information targeted'],['compromised','Systems and information compromised'],['malware','Malicious files or exploits and their capabilities'],['actor','Attacker type and demonstrated capabilities'],['more','Additional systems or information possibly compromised']],
  lessons:[['detect','Detection and escalation'],['comms','Communication'],['resources','Personnel and resources'],['process','Was the documented process followed?'],['external','Responsiveness of external parties'],['controls','Effectiveness of security controls'],['other','Other improvements']],
  cyber:[['c','Confidentiality','Was information disclosed or accessed without authorisation?'],['i','Integrity','Was information, software or configuration changed?'],['a','Availability','Were systems or services disrupted?'],['pi','Personal information','Whose and how much personal information; is serious harm likely?']]
 };
+/* Escalation parties: who may need to be told, and how quickly. Edited on the Escalation parties page and stored in the
+   database; these defaults apply until the list is first saved. A party with a timeframe gets a notification clock. */
+const DEFAULT_PARTIES=[
+ {id:'dot',name:'Department of Transport (DoT)',kind:'External',hours:1,clock:'aware',how:'In writing, immediately',trigger:'Any actual, threatened or suspected data security breach or adverse effect on the Systems or Data'},
+ {id:'mtrPhone',name:'MTR – HCS and CIO by phone',kind:'External',hours:2,clock:'aware',how:'By phone',trigger:'Confirmed Critical or Major cybersecurity breach'},
+ {id:'mtrWritten',name:'MTR – written report to SSCD',kind:'External',hours:24,clock:'aware',how:'Incident report by email',trigger:'Any confirmed cybersecurity breach (Critical, Major or Minor)'},
+ {id:'sociSig',name:'ASD (ACSC) – SOCI significant impact',kind:'External',hours:12,clock:'sociSig',how:'Written record within 84 hours if reported by phone',trigger:'Incident has materially disrupted the availability of an essential service'},
+ {id:'sociRel',name:'ASD (ACSC) – SOCI relevant impact',kind:'External',hours:72,clock:'sociRel',how:'Written record within 48 hours if reported by phone',trigger:'Impact on the availability, integrity, reliability or confidentiality of the asset'},
+ ...['Core CERT','Extended CERT','Continuity Support Group (CSG)','GM OCMS','Head of Infrastructure & Service Delivery','Incident Owner','Legal & Compliance','Privacy Officer','Media Relations','Asset / system owner'].map(n=>({id:'int:'+n.replace(/[^A-Za-z]/g,''),name:n,kind:'Internal',hours:'',clock:'aware',how:'',trigger:''}))];
+let PARTIES=DEFAULT_PARTIES.map(p=>Object.assign({},p)),PARTIES_FROM={by:'',at:'',saved:false};
+function setParties(list,by,at){PARTIES=(list||DEFAULT_PARTIES).map(p=>Object.assign({},p));PARTIES_FROM={by:by||'',at:at||'',saved:!!list};}
+const hasTime=p=>p.hours!==''&&p.hours!=null&&!isNaN(Number(p.hours));
+const hrsText=h=>{h=Number(h);if(h<1){const m=Math.round(h*60);return m===0?'immediately':m+' minute'+(m===1?'':'s');}return (Number.isInteger(h)?h:h.toFixed(1))+' hour'+(h===1?'':'s');};
+const CLOCK_OPTS=[['aware','When notification becomes required'],['sociRel','When a SOCI relevant (or significant) impact is identified'],['sociSig','When a SOCI significant impact is identified']];
+const deadlineText=p=>hasTime(p)?(Number(p.hours)===0?'Immediately':'Within '+hrsText(p.hours))+(p.how?' · '+p.how:''):(p.how||'No set timeframe');
+/* Parties with a timeframe are the notification obligations that carry a clock */
+Object.defineProperty(INC_CFG,'regs',{get(){return PARTIES.filter(hasTime).map(p=>({id:p.id,name:p.name,hours:Number(p.hours),trigger:p.trigger||'',deadline:deadlineText(p),soci:p.clock==='sociSig'?'significant':p.clock==='sociRel'?'relevant':undefined,internal:p.kind==='Internal'}));}});
 const INC_TABS=['Overview','Details','Timeline','Impact and risk','Closure and approval'];
 const incBlank=(id,ref)=>({id,created:TODAY,updated:TODAY,
  ov:{title:'',ref,heat:'',type:'',origin:'',thirdParty:'',source:'',discovered:'',owner:'',manager:'',sys:[],systems:'',env:'',nature:'',sevJust:''},
@@ -397,6 +452,7 @@ function b5(im){const d=im.drv,y=d&&d.ctx&&(im.cons||{})[d.ctx];return y&&y.s!==
 const openRegs=x=>C.regs.map(g=>({g,st:regState(x,g)})).filter(o=>o.st.k==='open').sort((a,b)=>(a.st.due?a.st.due.getTime():9e15)-(b.st.due?b.st.due.getTime():9e15));
 /* The incident's current stage is the furthest lifecycle stage reached on the timeline (ISIMP order); Closed is the last stage */
 function incStage(x){let best=-1;(x.timeline||[]).forEach(t=>{const i=C.stages.indexOf(t.stage);if(i>best)best=i;});return best<0?'Identification':C.stages.at(best);}
+window.incStageOf=x=>incStage(x);
 const isOpenInc=x=>incStage(x)!=='Closed';
 const stagePill=x=>{const s=incStage(x);return pill(s==='Closed'?'green':'blue',s);};
 function uncertainties(x){const out=[];
@@ -420,8 +476,8 @@ const sortedTl=x=>x.timeline.map((r,i)=>({r,i})).sort((a,b)=>(a.r.date||'9999').
 /* ---- Register ---- */
 function incidentsPage(){const all=Object.values(DB.incidents||{}).map(incNorm).sort((a,b)=>String(b.created).localeCompare(String(a.created))||b.id.localeCompare(a.id)),f=V.incF||'Open',rows=all.filter(x=>f==='All'||(f==='Open')===isOpenInc(x));
  return `<section class="intro"><div class="eyebrow">Cyber incident · management</div><h1>Cyber Incident Management</h1><p>One record per incident, from identification to closure. Log events, notifications, responses, decisions and actions on the timeline as the incident develops. Notification clocks start when notification becomes required.</p>
- <p class="hint">Incident records stay in this browser only and are never sent to a server. Use Export to keep a copy in your restricted incident folder, and Clear all when you have finished on a shared computer.</p></section>
- <div class="btnrow" style="margin:0 0 14px"><button class="primary" data-act="incNew">+ New incident</button>${DB.incidents['INC-9001']?'':'<button class="secondary" data-act="incSample">Load sample incident</button>'}<button class="secondary" data-act="incExport"${all.length?'':' disabled'}>Export</button><label class="secondary filebtn" for="incImport">Import<input type="file" id="incImport" accept="application/json,.json" hidden></label>${all.length?'<button class="secondary danger" data-act="incClear">Clear all</button>':''}</div>
+ <p class="hint">Records are kept in the toolkit's incident database and shared with everyone who can sign in. Changes save automatically. Export keeps a backup copy for your restricted incident folder.</p></section>
+ <div class="btnrow" style="margin:0 0 14px"><button class="primary" data-act="incNew">+ New incident</button>${DB.incidents['INC-9001']?'':'<button class="secondary" data-act="incSample">Load sample incident</button>'}<button class="secondary" data-act="incExport"${all.length?'':' disabled'}>Export</button><label class="secondary filebtn" for="incImport">Import<input type="file" id="incImport" accept="application/json,.json" hidden></label><button class="secondary" data-go="settings">Escalation parties</button><button class="linkbtn signout" data-act="signOut">Sign out</button></div>
  <div class="panel"><div class="toolbar">${sel('incF',[['Open','Open incidents'],['Closed','Closed incidents'],['All','All incidents']],f,'aria-label="Show incidents" data-incf')}<span class="count">${rows.length} of ${all.length} incidents</span></div>
  <div class="table-scroll"><table><thead><tr><th>Reference</th><th>Incident</th><th>Severity</th><th>Stage</th><th>Notification required</th><th>Next notification</th><th>Current risk</th><th>Owner</th></tr></thead><tbody>${rows.length?rows.map(x=>{const sv=sevById(x.risk.sev),at=awareAt(x),nx=openRegs(x)[0],cr=curRating(x),c=cellOf(cr.F,cr.S);
   return `<tr><td class="nowrap">${e(x.ov.ref||x.id)}</td><td><button class="open" data-go="incident" data-a="${e(x.id)}">${e(x.ov.title||'Untitled incident')}</button><div class="small">${e(x.ov.type||'Type not set')}${sysNames(x).length?' · '+e(sysNames(x).join(', ')):''}</div></td><td>${sv?pill(sv.id==='P1'?'red':sv.id==='P2'?'amber':'gray',sv.name):pill('gray','Not assigned')}</td><td>${stagePill(x)}</td><td class="nowrap">${at?e(fdt(at)):'—'}</td><td>${nx?`${cdHtml(nx.st)||pill(TONE[nx.st.tone],nx.st.label)}<div class="small">${e(nx.g.name)}</div>`:'<span class="small">None open</span>'}</td><td>${c?riskBox(c):'—'}</td><td>${e(x.ov.owner||'—')}</td></tr>`;}).join(''):`<tr><td colspan="8" class="empty">No ${f==='All'?'':f.toLowerCase()+' '}incidents.</td></tr>`}</tbody></table></div></div>
@@ -435,21 +491,24 @@ const PHASES=['Containment','Analysis and investigation','Eradication and remedi
 const PHASE_STAGE={'Containment':'Containment','Analysis and investigation':'Analysis','Eradication and remediation':'Eradication','Recovery':'Recovery','Assurance':'Follow-up'};
 const DTYPES=['Severity change','Notification decision','Escalation','Containment approach','Close','Continue monitoring','Other'];
 const intKey=n=>n.replace(/[^A-Za-z]/g,'');
-const oblOpts=()=>[['','Select who was notified'],...C.regs.map(g=>[g.id,g.name]),...C.internal.map(n=>['int:'+intKey(n),'Internal – '+n]),['other','Other party']];
+const oblOpts=()=>[['','Select who was notified'],...PARTIES.map(p=>[p.id,p.name]),['other','Other party']];
 /* A notification's party links it to an obligation when it matches an obligation or internal party name */
-const partyNames=()=>[...C.regs.map(g=>g.name),...C.internal.map(n=>'Internal – '+n)];
-function matchObl(t){const s=String(t||'').trim().toLowerCase();if(!s)return '';const g=C.regs.find(r=>r.name.toLowerCase()===s);if(g)return g.id;const n=C.internal.find(m=>m.toLowerCase()===s||('internal – '+m).toLowerCase()===s);return n?'int:'+intKey(n):'';}
+const partyNames=()=>PARTIES.map(p=>p.name);
+function matchObl(t){const s=String(t||'').trim().toLowerCase().replace(/^internal – /,'');if(!s)return '';const p=PARTIES.find(r=>r.name.toLowerCase()===s);return p?p.id:'';}
 const entryObl=r=>r.obl||matchObl(r.party);
 const partyOf=r=>r.party||r.by||r.decider||(r.kind==='notify'&&r.obl?oblName(r.obl):'');
 const STAGE_PHASE={Containment:'Containment',Analysis:'Analysis and investigation',Eradication:'Eradication and remediation',Recovery:'Recovery','Follow-up':'Assurance'};
-const oblName=id=>{const g=C.regs.find(r=>r.id===id);if(g)return g.name;const n=C.internal.find(m=>'int:'+intKey(m)===id);return n?'Internal – '+n:'Other party';};
+const oblName=id=>{const p=PARTIES.find(r=>r.id===id);return p?p.name:'Other party';};
+const isInternal=id=>(PARTIES.find(r=>r.id===id)||{}).kind==='Internal'||/^int:/.test(id||'')&&!PARTIES.some(r=>r.id===id);
 const entryAt=r=>r.date+'T'+(r.time||'00:00');
 const tlDisplay=r=>`${fd(r.date)}${r.time?' '+r.time:''}`;
 const actById=(x,id)=>x.actions.find(a=>a.id===id)||null;
 function incidentPage(){const x=DB.incidents&&DB.incidents[V.a];if(!x)throw new Error('Incident not found. It may have been deleted, or it is stored in a different browser.');incNorm(x);I=x;const tab=INC_TABS.includes(V.incTab)?V.incTab:'Overview',sv=sevById(x.risk.sev),at=awareAt(x),cr=curRating(x),c=cellOf(cr.F,cr.S),op=openRegs(x),bad=op.filter(o=>o.st.tone==='bad').length;
- const fact=(l,v)=>`<div class="fact"><label>${e(l)}</label><strong>${v}</strong></div>`;
+ const fact=(l,v)=>`<div class="fact"><label>${e(l)}</label><strong>${v}</strong></div>`,cf=CONFLICT[x.id];
  let h=crumb([['Incidents','incidents'],x.ov.ref||x.id])+back('Incidents',['incidents'])+titlebar(x.ov.title||'Untitled incident',`${x.ov.ref||x.id}${x.ov.type?' · '+x.ov.type:''} · Restricted`,incStage(x))+
+ (cf?`<div class="notice warn" role="alert"><strong>Your latest changes to this incident are not saved.</strong> ${e(cf.error||'Someone else changed it.')}<div class="btnrow"><button class="primary" data-act="incReload">${cf.deleted?'Leave this incident':'Load their version'}</button>${cf.deleted?'':'<button class="secondary" data-act="incKeepMine">Keep my version</button>'}</div><p class="small" style="margin-top:8px">"Load their version" discards your unsaved changes. "Keep my version" replaces their changes with yours.</p></div>`:'')+
  `<div class="panel section"><div class="facts">${fact('Severity',sv?e(sv.name):'Not assigned')}${fact('Notification required',at?e(fdt(at)):'Mark in Timeline')}${fact('Current risk',c?`${riskBox(c)} <span class="small">F${e(cr.F)} × S${e(cr.S)}</span>`:'Not rated')}${fact('Open notifications',op.length?`${op.length}${bad?` · <span style="color:var(--red)">${bad} urgent</span>`:''}`:'None')}${fact('Incident owner',e(x.ov.owner||'—'))}</div>
+ ${(m=>m&&m.updated_at?`<p class="small" style="margin-top:10px">Last saved ${e(m.updated_at)} UTC${m.updated_by?' by '+e(m.updated_by):''}.</p>`:'')(META[x.id])}
  <div class="btnrow" style="margin-top:14px"><button class="secondary" data-act="incPdf">Download incident report (PDF)</button><button class="secondary" data-act="incDecl">Copy declaration email</button><button class="secondary danger" data-act="incDel">Delete incident</button></div></div>
  <div class="tabs" role="tablist">${INC_TABS.map(t=>`<button role="tab" aria-selected="${t===tab}" class="${t===tab?'selected':''}" data-act="incTab" data-t="${e(t)}">${e(t)}</button>`).join('')}</div>`;
  h+=({'Overview':tabOverview,'Details':tabDetails,'Timeline':tabTimeline,'Impact and risk':tabRisk,'Closure and approval':tabClosure})[tab](x);
@@ -530,7 +589,7 @@ function tabTimeline(x){const tl=sortedTl(x),f='all',shown=tl,k=V.incKind||'even
  ${sociStart(x,'significant')?'':`<div class="inc-soci" id="incSociBox" role="radiogroup" aria-label="SOCI impact assessment (optional)" ${awareAt(x)?'':'hidden'}><span class="lab">SOCI impact assessment (optional)</span>${SOCI_OPTS.filter(([v])=>!(v==='none'&&sociStart(x,'relevant'))&&!(v==='relevant'&&sociStart(x,'relevant'))).map(([v,n])=>`<label><input type="radio" name="incU-soci" value="${v}"> ${e(n)}</label>`).join('')}<button type="button" class="linkbtn" data-act="incSociClear">Clear</button></div>`}
  <p class="err" id="incUErr" role="alert"></p><div class="btnrow"><button class="primary" data-act="incLog">Add to timeline</button><button class="secondary" data-act="incAddToggle">Cancel</button></div></div>`;
  /* notification obligations: decide whether each applies; the notification itself is logged on the timeline */
- const obl=`<div class="panel section"><div class="section-head"><h2>Notification clocks and obligations</h2></div>
+ const obl=`<div class="panel section"><div class="section-head"><h2>Notification clocks and obligations</h2><button class="open" data-go="settings">Edit escalation parties →</button></div>
  ${awareAt(x)?`<div class="inc-clockon">Clocks running from <strong>${e(fdt(awareAt(x)))}</strong>, when notification became required. SOCI clocks run from the SOCI impact assessment. Countdowns update every minute.</div>`:`<div class="notice warn" style="margin:10px 0 0">The clocks have not started. Add or edit a timeline entry and switch on "Notification required" to start the countdown for every obligation.</div>`}
  <p class="sub" style="margin-top:10px">Decide whether each obligation applies. Log the notification itself as a timeline entry; the status updates from it. A blank is shown as "Not assessed", never as "Not required".</p>
  ${C.regs.slice().sort((a,b)=>{const da=regState(x,a).due,db=regState(x,b).due;return (da?da.getTime():9e15)-(db?db.getTime():9e15);}).map(g=>{const r=x.reg.rows[g.id]||{},p=`reg.rows.${g.id}`,st=regState(x,g),nf=notifiedOf(x,g);return `<details class="inc-obl" ${V.incOblOpen===g.id?'open':''} data-oblid="${e(g.id)}"><summary><span class="nm"><strong>${e(g.name)}</strong><span class="small">${e(g.deadline)}</span></span><span class="inc-oblright" data-oblr="${e(g.id)}">${oblRight(x,g)}</span>${st.k==='open'&&!st.wait?`<button class="secondary inc-oblbtn" data-act="incLogObl" data-obl="${e(g.id)}">+ Log notification</button>`:''}</summary>
@@ -603,8 +662,8 @@ function reportHtml(x){const o=x.ov,at=awareAt(x),cm=consMax(x),sv=sevById(x.ris
  ${sec(5,'Risk assessment',`<table class="g"><thead><tr><th>Rating</th><th>Assessed</th><th>Consequence</th><th>Likelihood</th><th>Score</th><th>Rationale</th></tr></thead><tbody>${rateRow('current','Current')}</tbody></table>
   ${kv([['Controls and compensating measures',val(x.risk.controls)],['Residual risk',val(x.risk.residual)],['Severity',sv?e(sv.name+' · '+sv.ecmp):'Not assigned'],['Severity justification',val(o.sevJust)]])}
   ${x.risk.sevHist.length?`<h3>Severity history</h3><table class="g"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody>${x.risk.sevHist.map(h=>`<tr><td>${e(fd(h.date))}</td><td>${e((sevById(h.from)||{}).name||'—')}</td><td>${e((sevById(h.to)||{}).name||'—')}</td><td>${val(h.why)}</td></tr>`).join('')}</tbody></table>`:''}`)}
- ${sec(6,'Regulatory and internal escalation',`<table class="g"><thead><tr><th>Obligation</th><th>Applies</th><th>Rationale</th><th>Deadline</th><th>Notified</th><th>Reference</th><th>Legal</th><th>Decided by</th></tr></thead><tbody>${C.regs.map(g=>{const r=x.reg.rows[g.id]||{},st=regState(x,g);return `<tr><td>${e(g.name)}</td><td>${r.applies?e(r.applies):'<b>Not assessed</b>'}</td><td>${val(r.why)}</td><td>${st.due?e(fdt(st.due)):e(g.deadline)}</td><td>${(nf=>nf?e(fdtS(nf.at)):'—')(notifiedOf(x,g))}</td><td>${val((notifiedOf(x,g)||{}).refno)}</td><td>${val((notifiedOf(x,g)||{}).legal)}</td><td>${val(r.by)}</td></tr>`;}).join('')}</tbody></table>
-  <h3>Internal escalation</h3>${(l=>l.length?`<table class="g"><thead><tr><th>Party</th><th>Notified</th><th>What was communicated</th></tr></thead><tbody>${l.map(({r})=>`<tr><td>${e(oblName(entryObl(r)).replace('Internal – ',''))}</td><td class="nw">${e(tlDisplay(r))}</td><td>${val(r.event)}</td></tr>`).join('')}</tbody></table>`:'<p>No internal notification recorded.</p>')(tl.filter(({r})=>r.kind==='notify'&&String(entryObl(r)).startsWith('int:')))}`)}
+ ${sec(6,'Escalation and notification obligations',`<table class="g"><thead><tr><th>Obligation</th><th>Applies</th><th>Rationale</th><th>Deadline</th><th>Notified</th><th>Reference</th><th>Legal</th><th>Decided by</th></tr></thead><tbody>${C.regs.map(g=>{const r=x.reg.rows[g.id]||{},st=regState(x,g);return `<tr><td>${e(g.name)}</td><td>${r.applies?e(r.applies):'<b>Not assessed</b>'}</td><td>${val(r.why)}</td><td>${st.due?e(fdt(st.due)):e(g.deadline)}</td><td>${(nf=>nf?e(fdtS(nf.at)):'—')(notifiedOf(x,g))}</td><td>${val((notifiedOf(x,g)||{}).refno)}</td><td>${val((notifiedOf(x,g)||{}).legal)}</td><td>${val(r.by)}</td></tr>`;}).join('')}</tbody></table>
+  <h3>Internal escalation</h3>${(l=>l.length?`<table class="g"><thead><tr><th>Party</th><th>Notified</th><th>What was communicated</th></tr></thead><tbody>${l.map(({r})=>`<tr><td>${e(oblName(entryObl(r)))}</td><td class="nw">${e(tlDisplay(r))}</td><td>${val(r.event)}</td></tr>`).join('')}</tbody></table>`:'<p>No internal notification recorded.</p>')(tl.filter(({r})=>r.kind==='notify'&&isInternal(entryObl(r))))}`)}
  ${sec(7,'Incident response',kv([...PHASES,'Other activities'].map(ph=>{const l=tl.filter(({r})=>r.kind==='response'&&(r.phase||STAGE_PHASE[r.stage]||'Other activities')===ph);return [ph,l.length?`<ul>${l.map(({r})=>`<li>${e(tlDisplay(r))}: ${e(r.event||'')}${partyOf(r)?' <i>('+e(partyOf(r))+')</i>':''}</li>`).join('')}</ul>`:'—'];})))}
  ${sec(8,'Closure summary and decision',`<h3>Incident closure summary</h3>${x.findings.summary?rich(x.findings.summary):'<p>—</p>'}
   <h3>Decision</h3>${kv([['Decision',x.findings.decision?e(x.findings.decision):'Not yet decided'],['Decision-maker',val(x.findings.by)],['Date',val(fd(x.findings.date))],...(x.findings.decision==='Continue monitoring'?[['Next review',val(fd(x.findings.review))]]:[]),['Justification',val(x.findings.why)]])}`)}
@@ -656,7 +715,7 @@ document.addEventListener('change',ev=>{const t=ev.target;
  if(t.hasAttribute('data-irr')){save();redraw();return;}
  incSave();});
 Object.assign(ACT,{
- incNew(){DB.incidents=DB.incidents||{};const y=TODAY.slice(0,4),n=Object.values(DB.incidents).filter(x=>String(x.ov.ref).startsWith('CSI-'+y)).length+1,id=nid('INC');DB.incidents[id]=incBlank(id,`CSI-${y}-${String(n).padStart(3,'0')}`);save();V.incTab='Overview';go('incident',id);toast('Incident record created');},
+ incNew(){const y=TODAY.slice(0,4),n=Object.values(DB.incidents).filter(x=>String(x.ov.ref).startsWith('CSI-'+y)).length+1,id=newId();DB.incidents[id]=incBlank(id,`CSI-${y}-${String(n).padStart(3,'0')}`);go('incident',id);queueSave(id);toast('Incident record created');},
  incTab(b){V.incTab=b.dataset.t;const y=window.scrollY;render();window.scrollTo(0,Math.min(y,document.querySelector('.tabs')?document.querySelector('.tabs').offsetTop-80:y));},
  incLog(){const x=cur();if(!x)return;const g=id=>document.getElementById(id),v=id=>{const el=g(id);return el?String(el.value).trim():'';},k=v('incU-kind')||'event',ev=v('incU-event'),d=v('incU-date');
   if(!isDate(d))return showErr('incUErr','Enter the date.');if(!ev)return showErr('incUErr','Describe the event.');
@@ -680,25 +739,56 @@ Object.assign(ACT,{
  incPdf(){const x=cur();if(x)printHtml(reportHtml(x));},
  incDecl(){const x=cur();if(!x)return;const o=x.ov,sv=sevById(x.risk.sev);const txt=`Subject: Cybersecurity incident declaration – ${o.title||'[incident name]'}\n\nIncident name: ${o.title||'—'}\nIncident type: ${o.type||'—'}\nCybersecurity incident number: ${o.ref||'—'}\nHEAT incident number: ${o.heat||'N/A'}\nIncident severity: ${sv?sv.name:'—'}\nSeverity justification: ${o.sevJust||'—'}\nIncident details and current analysis: ${o.nature||'—'}`;
   (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Declaration email text copied'),()=>toast('Copy is blocked in this browser'));},
- incDel(){const x=cur();if(!x)return;ConfirmDialog({title:'Delete this incident?',message:`${x.ov.ref||x.id} and its timeline, assessments and evidence references will be removed from this browser.`,buttons:[{label:'Cancel'},{label:'Delete incident',kind:'primary danger',fn:()=>{delete DB.incidents[x.id];save();go('incidents');toast('Incident deleted');}}],cancel:0});}
+ incDel(){const x=cur();if(!x)return;ConfirmDialog({title:'Delete this incident?',message:`${x.ov.ref||x.id} and its timeline, assessments and evidence references will be permanently deleted from the incident database for everyone. Export it first if you need a copy.`,buttons:[{label:'Cancel'},{label:'Delete permanently',kind:'primary danger',fn:async()=>{DIRTY.delete(x.id);const {status,j}=await api('POST',{action:'delete',id:x.id});if(status!==200)return toast(j.error||'The incident could not be deleted');delete DB.incidents[x.id];delete META[x.id];delete CONFLICT[x.id];go('incidents');toast('Incident deleted');}}],cancel:0});},
+ incReload(){const x=cur();if(!x)return;const c=CONFLICT[x.id];delete CONFLICT[x.id];DIRTY.delete(x.id);if(c&&c.data){c.data.id=x.id;incNorm(c.data);DB.incidents[x.id]=c.data;META[x.id]={version:c.version,updated_at:c.updated_at,updated_by:c.updated_by};render();toast('Reloaded the latest saved version');}else{delete DB.incidents[x.id];go('incidents');toast('That incident no longer exists');}},
+ incKeepMine(){const x=cur();if(!x)return;const c=CONFLICT[x.id];delete CONFLICT[x.id];if(c&&c.version)META[x.id]=Object.assign({},META[x.id],{version:c.version});else delete META[x.id];queueSave(x.id);render();toast('Saving your version over theirs');},
 });
 /* ---- Keeping records: sample, export, import and clear (records live in this browser only) ---- */
 const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
 /* Fill any missing fields from a blank record, keeping only keys that are safe to copy */
 function fillBlank(b,x){if(!isObj(x))return b;Object.keys(x).forEach(k=>{if(k==='__proto__'||k==='constructor'||k==='prototype')return;const v=x[k];b[k]=isObj(b[k])&&isObj(v)?fillBlank(b[k],v):v;});return b;}
 Object.assign(ACT,{
- incSample(){if(DB.incidents['INC-9001'])return toast('The sample incident is already loaded');DB.incidents['INC-9001']=incSample();save();render();toast('Sample incident loaded');},
- incExport(){const n=Object.keys(DB.incidents).length;if(!n)return toast('No incidents to export');const blob=new Blob([JSON.stringify({tool:'colaboree-cyber-incident',schema:DB.schema,exported:new Date().toISOString(),incidents:DB.incidents},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`cyber-incidents-${TODAY}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);toast(`Exported ${n} incident${n===1?'':'s'}. Store the file in a restricted location.`);},
- incClear(){ConfirmDialog({title:'Clear all incidents?',message:'Every incident record will be removed from this browser. Export first if you need to keep a copy.',buttons:[{label:'Cancel'},{label:'Clear all',kind:'primary danger',fn:()=>{DB.incidents={};save();go('incidents');toast('All incidents cleared from this browser');}}],cancel:0});}
+ incSample(){if(DB.incidents['INC-9001'])return toast('The sample incident is already loaded');DB.incidents['INC-9001']=incSample();queueSave('INC-9001');render();toast('Sample incident added to the database');},
+ incExport(){const n=Object.keys(DB.incidents).length;if(!n)return toast('No incidents to export');const blob=new Blob([JSON.stringify({tool:'colaboree-cyber-incident',schema:1,exported:new Date().toISOString(),incidents:DB.incidents},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`cyber-incidents-${TODAY}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);toast(`Exported ${n} incident${n===1?'':'s'}. Store the file in a restricted location.`);},
 });
 document.addEventListener('change',ev=>{const t=ev.target;if(t.id!=='incImport'||!t.files||!t.files[0])return;const f=t.files[0];t.value='';
  if(f.size>5e6)return toast('That file is too large to be an incident export');
  f.text().then(txt=>{let d;try{d=JSON.parse(txt);}catch(_){return toast('That file is not valid JSON');}
   const src=isObj(d)&&isObj(d.incidents)?d.incidents:null;if(!src)return toast('No incidents found in that file');
-  let added=0,replaced=0;Object.values(src).forEach(r=>{if(!isObj(r)||typeof r.id!=='string'||!/^[\w-]{1,40}$/.test(r.id))return;const ov=isObj(r.ov)?r.ov:{};const x=fillBlank(incBlank(r.id,String(ov.ref||r.id)),r);x.id=r.id;try{incNorm(x);}catch(_){return;}if(DB.incidents[r.id])replaced++;else added++;DB.incidents[r.id]=x;});
+  let added=0,replaced=0;Object.values(src).forEach(r=>{if(!isObj(r)||typeof r.id!=='string'||!/^INC-[A-Za-z0-9-]{1,40}$/.test(r.id))return;const ov=isObj(r.ov)?r.ov:{};const x=fillBlank(incBlank(r.id,String(ov.ref||r.id)),r);x.id=r.id;try{incNorm(x);}catch(_){return;}if(DB.incidents[r.id])replaced++;else added++;DB.incidents[r.id]=x;queueSave(r.id);});
   if(!added&&!replaced)return toast('No valid incidents found in that file');
-  const seq=Object.keys(DB.incidents).map(k=>Number((k.match(/(\d+)$/)||[])[1])||0);DB.seq=Math.max(DB.seq||9000,...seq);save();render();toast(`Imported ${added} new${replaced?`, replaced ${replaced}`:''} incident${added+replaced===1?'':'s'}`);});});
-Object.assign(VIEWS,{incidents:incidentsPage,incident:incidentPage});
+  render();toast(`Imported ${added} new${replaced?`, replaced ${replaced}`:''} incident${added+replaced===1?'':'s'}`);});});
+/* ---- Escalation parties: who is notified, and the timeframe that starts their clock ---- */
+function partiesPage(){if(!V.pDraft)V.pDraft=PARTIES.map(p=>Object.assign({},p));const d=V.pDraft,changed=JSON.stringify(d)!==JSON.stringify(PARTIES);
+ const row=(p,i)=>`<div class="inc-row pp-row"><div class="formgrid inc-g4">
+  ${fld('Party name',`<input id="pp-${i}-name" data-pp="${i}.name" value="${e(p.name)}" maxlength="120" type="text">`,`pp-${i}-name`,'w2')}
+  ${fld('Type',`<select id="pp-${i}-kind" data-pp="${i}.kind">${optsH(['External','Internal'],p.kind)}</select>`,`pp-${i}-kind`)}
+  ${fld('Timeframe (hours)',`<input id="pp-${i}-hours" data-pp="${i}.hours" value="${e(p.hours)}" type="number" min="0" max="8760" step="0.25" placeholder="No set timeframe">`,`pp-${i}-hours`,'','Blank = no clock · 0.5 = 30 min')}
+  ${fld('Clock starts',`<select id="pp-${i}-clock" data-pp="${i}.clock">${optsH(CLOCK_OPTS,p.clock)}</select>`,`pp-${i}-clock`,'w2')}
+  ${fld('How to notify',`<input id="pp-${i}-how" data-pp="${i}.how" value="${e(p.how)}" maxlength="200" type="text" placeholder="e.g. In writing; by phone then email">`,`pp-${i}-how`,'w2')}
+  ${fld('When it applies',`<textarea id="pp-${i}-trigger" data-pp="${i}.trigger" rows="2" maxlength="500" placeholder="The kind of incident that must be escalated to this party">${e(p.trigger)}</textarea>`,`pp-${i}-trigger`,'full')}</div>
+  <div class="inc-rowfoot"><span class="small">${hasTime(p)?e(deadlineText(p)):'No clock: listed as a party you can log notifications to'}</span><span><button class="linkbtn mv" data-act="ppMove" data-i="${i}" data-d="-1" ${i?'':'disabled'} aria-label="Move ${e(p.name||'party')} up">↑</button> <button class="linkbtn mv" data-act="ppMove" data-i="${i}" data-d="1" ${i<d.length-1?'':'disabled'} aria-label="Move ${e(p.name||'party')} down">↓</button> <button class="linkbtn" data-act="ppDel" data-i="${i}">Remove</button></span></div></div>`;
+ return crumb([['Incidents','incidents'],'Escalation parties'])+back('Incidents',['incidents'])+titlebar('Escalation parties','Who may need to be told about an incident, and how quickly. A party with a timeframe gets a notification clock on every incident.')+
+ `<div class="panel section"><div class="section-head"><h2>Parties and timeframes</h2><button class="secondary" data-act="ppAdd">+ Add party</button></div>
+ <p class="sub">${PARTIES_FROM.saved?`Saved list${PARTIES_FROM.by?' · last changed by '+e(PARTIES_FROM.by):''}${PARTIES_FROM.at?' '+e(PARTIES_FROM.at)+' UTC':''}.`:'These are the starting defaults. Save to keep your own list.'} Changes apply to every incident: clocks are recalculated, notifications already logged stay on each timeline, and a removed party's clock no longer shows.</p>
+ <div id="ppRows">${d.map(row).join('')||'<p class="small" style="margin-top:10px">No parties. Add one.</p>'}</div>
+ <p class="err" id="ppErr" role="alert"></p>
+ <div class="btnrow"><button class="primary" data-act="ppSave">Save escalation parties</button><button class="secondary" data-act="ppReset" ${changed?'':'disabled'}>Discard changes</button><button class="linkbtn" data-act="ppDefaults">Start again from the defaults</button></div></div>
+ <p class="small attdisc">Timeframes are indicative settings for this toolkit. Confirm every notification obligation, and how it is measured, with Legal &amp; Compliance.</p>`;}
+document.addEventListener('input',ev=>{const t=ev.target;if(!t.dataset||t.dataset.pp==null||!V.pDraft)return;const [i,k]=t.dataset.pp.split('.'),p=V.pDraft[Number(i)];if(!p||!['name','kind','hours','clock','how','trigger'].includes(k))return;p[k]=k==='hours'?(t.value===''?'':Number(t.value)):t.value;});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.dataset&&t.dataset.pp&&/\.(hours|kind|clock)$/.test(t.dataset.pp))redraw();});
+Object.assign(ACT,{
+ ppAdd(){V.pDraft.push({id:'p-'+Math.random().toString(36).slice(2,9),name:'',kind:'External',hours:'',clock:'aware',how:'',trigger:''});redraw();const el=document.getElementById(`pp-${V.pDraft.length-1}-name`);if(el){el.scrollIntoView({block:'center'});el.focus();}},
+ ppDel(b){const i=Number(b.dataset.i),p=V.pDraft[i];if(!p)return;V.pDraft.splice(i,1);redraw();toast(`Removed ${p.name||'the party'} – save to apply`);},
+ ppMove(b){const i=Number(b.dataset.i),j=i+Number(b.dataset.d),d=V.pDraft;if(j<0||j>=d.length)return;[d[i],d[j]]=[d[j],d[i]];redraw();},
+ ppReset(){V.pDraft=null;redraw();},
+ ppDefaults(){V.pDraft=DEFAULT_PARTIES.map(p=>Object.assign({},p));redraw();toast('Defaults loaded – save to apply');},
+ async ppSave(b){const d=V.pDraft,names=new Set();for(const [i,p] of d.entries()){p.name=String(p.name||'').trim();if(!p.name)return showErr('ppErr',`Party ${i+1} needs a name.`);if(names.has(p.name.toLowerCase()))return showErr('ppErr',`"${p.name}" is listed twice.`);names.add(p.name.toLowerCase());if(p.hours!==''&&!(Number(p.hours)>=0&&Number(p.hours)<=8760))return showErr('ppErr',`The timeframe for "${p.name}" must be between 0 and 8760 hours, or blank.`);}
+  b.disabled=true;const {status,j}=await api('POST',{action:'saveParties',parties:d});b.disabled=false;
+  if(status!==200)return showErr('ppErr',j.error||'The escalation parties could not be saved.');
+  setParties(j.parties,j.updated_by,'');V.pDraft=null;redraw();toast('Escalation parties saved');}
+});
+Object.assign(VIEWS,{incidents:incidentsPage,incident:incidentPage,settings:partiesPage});
 /* Live countdowns: refresh the clock texts every 30 seconds without redrawing the page (so typing is never interrupted) */
 setInterval(()=>{const x=cur();if(V.view==='incidents'&&!document.activeElement.matches('input,textarea,select')){redraw();return;}if(!x)return;
  document.querySelectorAll('[data-oblr]').forEach(el=>{const g=C.regs.find(r=>r.id===el.dataset.oblr);if(g)el.innerHTML=oblRight(x,g);});
@@ -734,7 +824,7 @@ function incSample(){{const s=incBlank('INC-9001','CSI-2026-001'),dd=n=>addDays(
   s.actions=[{id:'a1',text:'Obtain Vendor Y forensic summary.',owner:'Cyber Operations Manager',due:addDays(TODAY,5),status:'Open',trigger:'Not received by target date',closure:'Summary received and reviewed',tlId:'t8'}];
   return s;}}
 
-route();
+start();
 </script>
 </body>
 </html>
