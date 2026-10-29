@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!-- Colaboree — Cyber Governance Toolkit — Cyber Incident Management (runs in the browser; nothing is sent to a server). Built by sa/build_incident.py. -->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Cyber Incident Management — Colaboree</title>
+<meta name="robots" content="noindex"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+ --nav:#0F3D3E;--action:#118D8A;--accent:#4CC9C0;--bg:#F2F5F7;--surface:#FFFFFF;--text:#223037;--text2:#6B7C85;--line:#E1E7EA;
+ --accent-tint:rgba(76,201,192,0.12);--action-tint:rgba(17,141,138,0.08);
+ --ink:var(--text);--muted:var(--text2);--pale:var(--bg);--blue:var(--action);--blue-dk:#0C6E6B;--white:#fff;--tint:#F7F9FA;--hover:#F3FAF9;
+ --note-bg:#EEF8F7;--note-line:#CDE9E6;--note-ink:#0F4F4E;--field:#CBD5DA;--red:#B42318;--amber:#B54708;--green:#2E7D45;
+ --f:'IBM Plex Sans',system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--pale);color:var(--ink);font:14px/1.45 var(--f)}
+button,input,select,textarea{font:inherit;color:var(--ink)}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #86b9e3;outline-offset:2px}
+a{color:var(--blue)}
+.crumb{font-size:12px;color:var(--muted);margin-bottom:12px}
+.crumb button{border:0;background:none;color:var(--blue);padding:0;font-size:12px}
+.titlebar{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:20px}
+h1{font-size:27px;margin:0 0 4px;letter-spacing:-.4px;text-wrap:balance}
+h2{font-size:17px;margin:0 0 12px;text-wrap:balance}
+h3{font-size:15px;margin:0 0 6px}
+p{margin:0}
+.sub{color:var(--muted)}
+.sample{background:#e8f2fb;color:#245c83;border:1px solid #cde3f4;border-radius:4px;padding:6px 10px;font-size:12px;font-weight:700;white-space:nowrap;text-transform:uppercase}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:7px;box-shadow:0 1px 3px #1b314910}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;padding:16px;border-bottom:1px solid var(--line)}
+.toolbar input,.toolbar select{border:1px solid var(--field);border-radius:5px;background:var(--white);padding:9px 11px}
+.toolbar input{min-width:240px;flex:1}
+.toolbar select{min-width:160px}
+.count{margin-left:auto;align-self:center;color:var(--muted)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:left}
+th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:var(--tint);font-weight:700}
+th,td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--hover)}
+.num,td.nowrap{font-variant-numeric:tabular-nums}
+.open{border:0;background:none;color:var(--blue);font-weight:700;text-align:left;padding:0}
+.open:hover{text-decoration:underline}
+.pill{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill.red{background:#fce9e8;color:var(--red)}
+.pill.amber{background:#fff1dd;color:var(--amber)}
+.pill.green{background:#e8f6ec;color:var(--green)}
+.pill.gray{background:#eef2f6;color:#5b6a7b}
+.pill.blue{background:#e8f2fb;color:#245c83}
+.pill.solidred{background:var(--red);color:var(--white)}
+.empty{padding:34px;color:var(--muted);text-align:center}
+.back{border:0;background:none;color:var(--blue);font-weight:700;padding:0;margin-bottom:17px}
+.facts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:8px 0 0}
+.fact{border:1px solid var(--line);border-radius:5px;background:var(--white);padding:11px 13px;min-width:0}
+.fact label,.fact .lab{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.fact strong{font-size:13px;overflow-wrap:anywhere}
+.fact .small{display:block}
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin:0 0 18px;overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:11px 2px;color:var(--muted);font-weight:700;white-space:nowrap}
+.tabs button.selected{border-bottom-color:var(--blue);color:var(--blue)}
+.grid{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(330px,1fr);gap:18px}
+.section{padding:17px 18px;margin-bottom:18px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.small{font-size:12px;color:var(--muted)}
+.mini td,.mini th{padding:9px 7px}
+.mini td:first-child,.mini th:first-child{padding-left:0}
+.mini td:last-child,.mini th:last-child{padding-right:0}
+.notice{background:var(--note-bg);border:1px solid var(--note-line);padding:12px 14px;border-radius:5px;margin:0 0 18px;color:var(--note-ink)}
+.notice.warn{background:#fff8ec;border-color:#f1dfc0;color:#6f4e1d}
+.nowrap{white-space:nowrap}
+.primary{border:0;border-radius:5px;background:var(--blue);color:var(--white);padding:9px 13px;font-weight:700}
+.primary:hover{background:var(--blue-dk)}
+.secondary{border:1px solid var(--blue);border-radius:5px;background:var(--white);color:var(--blue);padding:8px 12px;font-weight:700}
+.secondary:hover{background:var(--hover)}
+.danger{border:1px solid var(--red);border-radius:5px;background:var(--white);color:var(--red);padding:8px 12px;font-weight:700}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.field .lab{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--field);border-radius:4px;padding:9px 10px;background:var(--white)}
+.field textarea{min-height:75px;resize:vertical}
+input:disabled,select:disabled,textarea:disabled{background:#f3f6f9;color:#5b6a7b}
+.err{color:var(--red);margin:12px 0 0;font-weight:700}
+.err:empty{display:none}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:10px}
+.kv div strong{display:block}
+.kv div span{color:var(--muted)}
+.badt{color:var(--red);font-weight:700}
+.toast{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--nav);color:var(--white);padding:10px 14px;border-radius:5px;max-width:calc(100vw - 32px);z-index:9}
+@media(max-width:1050px){.facts,.facts.three{grid-template-columns:repeat(3,minmax(0,1fr))}.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:650px){.facts,.facts.three{grid-template-columns:repeat(2,minmax(0,1fr))}.vendor-q .response-row,.formgrid,.checkgrid,.kv{grid-template-columns:minmax(0,1fr)}.table-scroll table{min-width:680px}.titlebar{align-items:flex-start;flex-direction:column}.toolbar input{min-width:0}.count{margin-left:0}}
+.rbox{display:inline-grid;place-items:center;min-width:42px;height:30px;border-radius:6px;font-weight:700;border:1px solid rgba(0,0,0,.12)}
+.r-green{background:#92D050;color:#172B33}
+.r-blue{background:#9DDFE6;color:#172B33}
+.r-yellow{background:#FFF200;color:#172B33}
+.r-orange{background:#F79646;color:#172B33}
+.r-red{background:#FF1F1F;color:#fff}
+button.linkbtn{background:none;border:0;color:var(--red);cursor:pointer;font:inherit;font-size:12px;font-weight:600;padding:0;text-decoration:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.linkbtn{background:none;border:0;color:var(--action);cursor:pointer;padding:0;font:inherit;text-decoration:underline}
+.field textarea.plantext,.plantext{width:100%;min-height:250px;border:1px solid var(--field);border-radius:4px;padding:10px 12px;font-size:13.5px;line-height:1.5;resize:vertical}
+.linkbtn.small{font-size:12px;color:var(--muted);text-decoration:underline}
+@media print{.viewtog,.stepper,.trajump,.btnrow,[data-act=residEdit],[data-act=thrEdit],.traroute{display:none!important}}
+.attdisc{margin:14px 0}
+details.panel>summary{cursor:pointer}
+.riskgaps{margin:10px 0 0;padding-left:20px}
+.riskgaps li{margin:6px 0}
+button.danger{color:var(--red);border-color:var(--red)}
+button.primary.danger{background:var(--red);color:#fff}
+.dlg-back{position:fixed;inset:0;background:rgba(16,32,48,.45);display:grid;place-items:center;z-index:100;padding:16px}
+.dlg{background:var(--white);border-radius:10px;max-width:480px;width:100%;padding:18px 20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.dlg h2{margin:0 0 8px;font-size:18px}
+.regdl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;margin:0}
+.regdl dt{font-size:12px;color:var(--muted);font-weight:700}
+.regdl dd{margin:2px 0 0;font-weight:600}
+.dlg{max-height:calc(100vh - 32px);overflow:auto}
+.inc-row{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-top:10px;background:var(--white)}
+.inc-row.aw{border-color:#f1c27d;background:#fffaf0}
+.inc-rowfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.inc-rowfoot label{display:flex;gap:6px;align-items:center;font-weight:700}
+.formgrid.inc-g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.inc-clist{list-style:none;margin:10px 0 0;padding:0;border:1px solid var(--line);border-radius:6px}
+.inc-clist li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.inc-clist li:first-child{border-top:0}
+.inc-clist .due{margin-left:auto;font-size:12px;color:var(--muted);font-family:Consolas,monospace}
+.inc-cia{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 18px}
+.inc-cia legend{font-size:13px;font-weight:700;margin-bottom:6px;padding:0}
+.inc-cia label{display:flex;gap:6px;align-items:center;font-weight:400;font-size:14px;margin:0;cursor:pointer}
+.formgrid.inc-g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.inc-obl{border:1px solid var(--line);border-radius:6px;margin-top:8px;background:var(--white)}
+.inc-obl>summary{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;flex-wrap:wrap;list-style:none}
+.inc-obl>summary::-webkit-details-marker{display:none}
+.inc-obl .nm{display:flex;flex-direction:column}
+.inc-obl .due{margin-left:auto;font-size:12px;color:var(--muted);font-family:Consolas,monospace}
+.inc-oblbody{padding:0 12px 12px}
+.inc-entryhead .when,.inc-feed .when{font-family:Consolas,monospace;font-size:12px;color:var(--muted)}
+.inc-edit{margin-top:6px}
+.inc-edit>summary{cursor:pointer;font-size:12px;color:var(--blue);font-weight:700}
+.inc-feed{list-style:none;margin:8px 0 0;padding:0}
+.inc-feed li{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.inc-feed li:first-child{border-top:0}
+.inc-sum{margin-top:10px;font-size:14px;line-height:1.55}
+.inc-sum p{margin:0 0 8px}
+.inc-syslist{list-style:none;margin:4px 0 10px;padding:0;border:1px solid var(--line);border-radius:6px}
+.inc-syslist li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.inc-syslist li:first-child{border-top:0}
+.inc-sysadd{display:flex;gap:8px;flex-wrap:wrap}
+.inc-sysadd select{flex:1;min-width:200px;border:1px solid var(--field);border-radius:4px;padding:9px 10px;background:var(--white)}
+.inc-status{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.inc-status .field{min-width:240px}
+.inc-addbox{border:1px solid var(--blue);border-radius:6px;padding:14px;margin:12px 0;background:#f7fbff}
+table.inc-tl{margin-top:10px}
+table.inc-tl th:nth-child(1){width:120px}
+table.inc-tl th:nth-child(2){width:110px}
+table.inc-tl th:nth-child(3){width:70px}
+table.inc-tl th:nth-child(5){width:120px}
+table.inc-tl th:nth-child(6){width:56px}
+table.inc-tl tr.aw>td{background:#fffaf0}
+table.inc-tl tr.inc-editrow>td{background:#f7fbff;padding:12px 14px}
+.inc-clockon{margin-top:10px;padding:10px 12px;border-radius:5px;background:#e8f6ec;color:#1e5b33;border:1px solid #bfe3c9}
+.inc-trigger{margin-top:12px;border:1px solid #f1c27d;background:#fffaf0;border-radius:6px;padding:10px 12px}
+.inc-trigger label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;cursor:pointer}
+.inc-trigger input{margin-top:3px}
+.inc-trigger .small{margin:6px 0 0 24px}
+.inc-switch input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.inc-switch .sw{flex:0 0 auto;position:relative;width:38px;height:22px;border-radius:11px;background:#b8c2c8;transition:background .15s;margin-top:0}
+.inc-switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.inc-switch input:checked+.sw{background:var(--action,#118D8A)}
+.inc-switch input:checked+.sw::after{transform:translateX(16px)}
+.inc-switch input:focus-visible+.sw{outline:2px solid var(--action,#118D8A);outline-offset:2px}
+.inc-cd{display:inline-block;font-family:Consolas,monospace;font-size:12px;font-weight:700;padding:3px 8px;border-radius:12px;background:#fff1dd;color:#8a5300;white-space:nowrap}
+.inc-cd.hot{background:#fce9e8;color:#b42318}
+.inc-cd.ok{background:#e8f6ec;color:#1e5b33}
+.inc-oblright{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.inc-oblright .due{margin-left:0}
+.inc-oblbtn{padding:5px 10px;font-size:12px}
+.inc-soci[hidden]{display:none!important}
+.inc-soci{margin-top:10px;border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.inc-soci label{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer;margin:0}
+.inc-soci .lab{font-size:12px;font-weight:700;color:var(--muted)}
+.inc-soci .linkbtn{align-self:flex-start;color:var(--blue)}
+.inc-matrix{border-collapse:separate;border-spacing:3px;margin-top:10px;width:auto}
+.inc-matrix th{font-size:11px;color:var(--muted);padding:2px 6px;border:0;background:none}
+.inc-matrix td{width:44px;height:30px;text-align:center;font-weight:700;border-radius:4px;position:relative;border:0;padding:0}
+.inc-matrix td.on{outline:3px solid #172B33;outline-offset:-1px}
+.inc-matrix td .tag{position:absolute;top:-7px;right:-5px;background:#172B33;color:#fff;font-size:9px;border-radius:6px;padding:0 4px;line-height:14px}
+@media(max-width:760px){.formgrid.inc-g3,.formgrid.inc-g4,.inc-rates{grid-template-columns:1fr}}
+
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Source Serif 4',Georgia,serif;font-weight:600;letter-spacing:0}
+h1{font-size:clamp(1.6rem,3.6vw,2.1rem);line-height:1.2}h2{font-size:1.15rem}h3{font-size:1rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible,label.filebtn:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.sitenav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;height:56px;background:var(--nav)}
+.nav-left{display:flex;align-items:center;gap:14px;min-width:0}
+.back-link{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.7);text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:3px;padding:2px 8px;white-space:nowrap}
+.back-link:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.nav-logo{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.05rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-logo span{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:.68rem;color:rgba(255,255,255,.55);margin-left:4px}
+.nav-right{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.nav-right .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+main{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
+.intro{margin-bottom:18px}.intro .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--action);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.intro h1{margin:0 0 8px}.intro p{color:var(--text2);max-width:760px;font-size:.95rem}.intro .hint{font-size:.85rem;margin-top:8px}
+.panel{border-radius:10px;box-shadow:none}
+.sample{background:var(--accent-tint);color:var(--nav);border-color:#BFE7E3;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.04em}
+th{font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.04em}
+.fact label,.fact .lab,.regdl dt{font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.03em}
+label.filebtn{display:inline-block;cursor:pointer}
+.primary.danger{background:var(--red);border-color:var(--red);color:#fff}
+.secondary:disabled{opacity:.5;cursor:not-allowed}
+.toast[hidden]{display:none}
+.sitefoot{border-top:1px solid var(--line);padding:22px 24px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--text2)}
+@media(max-width:650px){main{padding:18px 16px 48px}.sitenav{padding:0 16px}.nav-right{display:none}}
+
+</style>
+</head>
+<body>
+<nav class="sitenav">
+  <div class="nav-left">
+    <a href="/" class="back-link">◂ toolkit</a>
+    <div class="nav-logo">incident_mgmt <span>// cyber incident management</span></div>
+  </div>
+  <div class="nav-right"><span class="dot"></span> runs in your browser</div>
+</nav>
+<main id="app"></main>
+<footer class="sitefoot">Colaboree · Cyber Governance Toolkit · runs in your browser, nothing is uploaded</footer>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+/* ---- Page core: helpers, storage and routing (records stay in this browser) ---- */
+const $=s=>document.querySelector(s);
+function e(v){return String(v==null?'':v).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));}
+function safeUrl(u){try{const x=new URL(String(u).trim());return x.protocol==='http:'||x.protocol==='https:'?x.href:'';}catch(_){return '';}}
+const pad=n=>String(n).padStart(2,'0');
+const isoOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const TODAY=isoOf(new Date());
+const isDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
+function addDays(s,n){const d=parse(s);d.setDate(d.getDate()+n);return isoOf(d);}
+const daysTo=s=>Math.round((parse(s)-parse(TODAY))/864e5);
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fd=s=>{if(!isDate(s))return '—';const d=parse(s);return d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear();};
+function dueText(s,soon){if(!isDate(s))return '—';const n=daysTo(s);soon=soon||30;if(n<0)return `<span class="badt">${fd(s)}</span>`;if(n<=soon)return `<span style="color:var(--amber);font-weight:700">${fd(s)}</span>`;return fd(s);}
+const pill=(c,t)=>`<span class="pill ${c}">${e(t)}</span>`;
+function sel(id,opts,val,attrs){return `<select id="${e(id)}" name="${e(id)}" ${attrs||''}>`+opts.map(o=>{const v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return `<option value="${e(v)}"${String(v)===String(val==null?'':val)?' selected':''}>${e(l)}</option>`;}).join('')+'</select>';}
+function showErr(id,msg){const x=document.getElementById(id);if(x){x.textContent=msg;x.scrollIntoView({block:'center'});}}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2800);}
+/* Composite score table (likelihood F1–F5 × consequence S0–S5) */
+const RISK_MATRIX={1:[[1,'green'],[1,'green'],[2,'green'],[3,'green'],[4,'blue'],[5,'yellow']],2:[[1,'green'],[2,'green'],[4,'blue'],[6,'yellow'],[8,'yellow'],[10,'orange']],3:[[2,'green'],[3,'green'],[6,'yellow'],[9,'yellow'],[12,'orange'],[15,'red']],4:[[3,'green'],[4,'blue'],[8,'yellow'],[12,'orange'],[16,'red'],[20,'red']],5:[[4,'blue'],[5,'yellow'],[10,'orange'],[15,'red'],[20,'red'],[25,'red']]};
+const matrixCell=(l,i)=>{const r=RISK_MATRIX[Math.max(1,Math.min(5,l))][Math.max(0,Math.min(5,i))];return {value:r[0],color:r[1]};};
+const RISK_REG_THRESHOLD=9;
+const riskBox=cell=>`<span class="rbox r-${cell.color}">${cell.value}</span>`;
+const crumb=parts=>`<div class="crumb">${parts.map(p=>Array.isArray(p)?`<button data-go="${e(p[1])}"${p[2]?` data-a="${e(p[2])}"`:''}>${e(p[0])}</button>`:e(p)).join(' / ')}</div>`;
+const back=(label,g)=>`<button class="back" data-go="${e(g[0])}"${g[1]?` data-a="${e(g[1])}"`:''}>← ${e(label)}</button>`;
+const titlebar=(t,sub,tag)=>`<div class="titlebar"><div><h1>${e(t)}</h1>${sub?`<p class="sub">${e(sub)}</p>`:''}</div>${tag?`<span class="sample">${e(tag)}</span>`:''}</div>`;
+function ConfirmDialog(opt){closeDialog();const d=document.createElement('div');d.className='dlg-back';d.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgT" aria-describedby="dlgM"><h2 id="dlgT">${e(opt.title)}</h2><p id="dlgM">${e(opt.message)}</p><div class="btnrow">${opt.buttons.map((b,i)=>`<button type="button" class="${e(b.kind||'secondary')}" data-dlg="${i}">${e(b.label)}</button>`).join('')}</div></div>`;
+ document.body.appendChild(d);const prev=document.activeElement;const btns=[...d.querySelectorAll('button')];
+ const done=i=>{closeDialog();if(prev&&prev.focus&&document.body.contains(prev))prev.focus();const b=opt.buttons[i];if(b&&b.fn)b.fn();};
+ d.addEventListener('click',ev=>{const b=ev.target.closest('[data-dlg]');if(b)done(Number(b.dataset.dlg));else if(ev.target===d)done(opt.cancel);});
+ d.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.preventDefault();done(opt.cancel);}if(ev.key==='Tab'){const f=btns[0],l=btns[btns.length-1];if(ev.shiftKey&&document.activeElement===f){ev.preventDefault();l.focus();}else if(!ev.shiftKey&&document.activeElement===l){ev.preventDefault();f.focus();}}});
+ (btns[opt.focus||0]||btns[0]).focus();}
+function closeDialog(){document.querySelectorAll('.dlg-back').forEach(x=>x.remove());}
+
+/* Storage: one versioned key; bump the version and migrate if the record shape changes */
+const LS_KEY='cyberIncidentsV1';
+function load(){try{const r=localStorage.getItem(LS_KEY);if(r){const d=JSON.parse(r);if(d&&d.schema===1&&d.incidents&&typeof d.incidents==='object')return d;}}catch(_){}return {schema:1,seq:9000,incidents:{}};}
+let DB=load();
+let saveWarned=false;
+function save(){try{localStorage.setItem(LS_KEY,JSON.stringify(DB));}catch(_){if(!saveWarned){saveWarned=true;toast('This browser is not saving records. Use Export to keep a copy.');}}}
+function nid(p){DB.seq=(DB.seq||9000)+1;while(DB.incidents[p+'-'+DB.seq])DB.seq++;return p+'-'+DB.seq;}
+
+/* Routing: #/ for the register, #/incident/<id> for one record */
+const V={view:'incidents',a:null};
+const ACT={},VIEWS={};
+function go(view,a){if(view==='incident'&&V.a!==a){V.incTab='Overview';V.incEditId=null;V.incAdd=false;V.incOblOpen=null;}V.view=view;V.a=a||null;
+ const h=view==='incident'&&a?'#/incident/'+encodeURIComponent(a):'#/';if(location.hash!==h)history.pushState(null,'',h);render();window.scrollTo(0,0);}
+function route(){const m=/^#\/incident\/([^/]+)$/.exec(location.hash);if(m){const id=decodeURIComponent(m[1]);if(V.a!==id){V.incTab='Overview';V.incEditId=null;V.incAdd=false;}V.view='incident';V.a=id;}else{V.view='incidents';V.a=null;}render();}
+function render(){const app=$('#app');try{app.innerHTML=(VIEWS[V.view]||VIEWS.incidents)();}catch(err){app.innerHTML=`<div class="panel section"><h2>Something went wrong</h2><p class="err">${e(err.message)}</p><div class="btnrow"><button class="secondary" data-go="incidents">Back to incidents</button></div></div>`;}}
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act],[data-go]');if(!b||b.disabled)return;if(b.dataset.act){const f=ACT[b.dataset.act];if(f){ev.preventDefault();f(b);}}else if(b.dataset.go){ev.preventDefault();go(b.dataset.go,b.dataset.a);}});
+window.addEventListener('popstate',route);
+window.addEventListener('storage',ev=>{if(ev.key===LS_KEY){DB=load();if(!document.activeElement||!document.activeElement.matches('input,textarea,select'))render();}});
+
+/* ---- Cyber Incident Management (Colaboree toolkit): register + one record per incident ----
+   Follows the MTM Information Security Incident Management Plan (ISIMP) and the Metro Integrated Risk Matrix.
+   Record DB.incidents {id: {id, created, updated, ov, exec, timeline [], impact, risk, reg, internal, resp, findings,
+   actions [], lessons, evidence [], approval}}. Fields are edited in place and saved as you type.
+   Settings in INC_CFG come from MTM documents supplied for this concept; deadlines are indicative. */
+const INC_CFG={
+ contexts:[
+  {id:'safety',name:'Safety',note:'1 fatality ≡ 10 serious injuries ≡ 200 minor injuries or illness',core:true,d:['Potential first aid injury or illness','1 to 19 minor injuries or illness. Medical treatment not requiring hospitalisation','20 to 199 minor injuries or 1 to 9 serious injuries or illness (hospitalisation overnight or time away from work > 5 days)','≥200 minor injuries. 10 to 19 serious injuries or illness. 1 fatality','21 to 39 serious injuries or illness. 2 to 3 fatalities','40 or more serious injuries or illness. 4 or more fatalities']},
+  {id:'financial',name:'Financial',note:'Includes commercial, business continuity',core:true,d:['< $100K income/expense','$100k ≤ income/expense < $500k','$500k ≤ income/expense < $2m','$2m ≤ income/expense < $10m','$10m ≤ income/expense < $50m','Income/expense ≥ $50m']},
+  {id:'reputation',name:'Reputational / political',core:true,d:[null,'Limited adverse local media','Negative state media coverage. Management appearance at Fair Work Australia','Regulator prosecution. Call-in event','Negative national media coverage. Breach and/or Cure Plan','Sustained negative (inter)national media coverage. Organised customer or NGO action. Step-in event or Termination event']},
+  {id:'legal',name:'Legal',core:true,d:[null,'Minor legal issues, non compliance and breaches of regulation','Minor legal issues, non compliance and breaches of regulation with investigation, minor litigation e.g. personal injury or Fair Work matters','Serious breach of regulation with prosecution/fines, moderate litigation (severe personal injury)','Significant prosecution and fines (company & executives); serious litigation including class actions, major breach of regulation','Potential prison terms for executives and/or high fines for the business, multiple litigation (class action)']},
+  {id:'engineering',name:'Engineering / technical',core:true,d:[null,'Minimal or no impact or consequences, unimportant. Can be managed/negotiated','Minor reduction in performance or technical compliance. Only minor requirements not met. Waivers will likely be granted to resolve all','Moderate reduction in performance or technical compliance. Some key requirements not met. Some waivers may be granted. May require re-scoping','Significant degradation in performance/technical compliance. Key but non-critical requirements not met. Waivers unlikely to be granted in all cases','Performance or technical goals will not be achieved. Critical project requirements will not be met']},
+  {id:'environment',name:'Environmental / heritage',core:false,d:[null,'Short term effects within area of limited environmental/heritage significance','Medium term effects in an area of some environmental/heritage significance as identified by external government authorities','Long term environmental impairment in an area of high environmental/heritage significance as identified by external government authorities','Permanent environmental impairment in an area of high environmental/heritage significance as identified by external government authorities',null]},
+  {id:'ir',name:'Industrial relations',core:false,d:[null,'Short term dispute','Localised dispute and limited operational impact','Protracted dispute with operational impact','Protracted industrial action or dispute with serious operation impact. Partial or limited passenger service disruption','Protracted dispute with long term serious operational impact. Protracted industrial action. Passenger service no longer able to operate']}],
+ likelihood:[[1,'Rare','< 3%','Has occurred somewhere in rail industry in the past (<1 in 20 yrs)'],[2,'Unlikely','3–10%','Occurs from time to time in rail industry (1 in 20 yrs)'],[3,'Possible','10–50%','Could occur once in next 5 years (1 in 5 yrs)'],[4,'Likely','50–90%','Could occur ≥ 2 times in next 5 years. Once every year to two years'],[5,'Almost certain','> 90%','Could occur > 10 times in next 5 years. Daily to monthly (>2 per year)']],
+ likelihoodQuestion:'How likely is it that the rated consequence eventuates from this incident (including recurrence or further compromise) over the five-year outlook?',
+ severity:[
+  {id:'P1',name:'Critical (P1)',ecmp:'ECMP level 3',fromS:[3,4,5],isimp:true,crit:'Confirmed PII breach; confidential or restricted data compromised; critical business system CIA compromised; major breach of regulation or contract; wide-scale malware with operational impact; confirmed unauthorised access to critical or safety systems; incident impacting train operations; DoS/DDoS with significant impact; financial impact > $300,000; S3–S5'},
+  {id:'P2',name:'Major (P2)',ecmp:'ECMP level 2',fromS:[1,2],isimp:true,crit:'Suspected (unprotected) PII breach; non-critical business system CIA compromised; minor breach of regulation or contract; malware outbreak with medium impact; unauthorised access to critical systems with low–medium impact; DoS/DDoS with minor impact; financial impact > $50,000; breach of franchise agreement; S1–S2'},
+  {id:'P3',name:'Minor / Low (P3/4)',ecmp:'ECMP level 1 (BAU)',fromS:[0],isimp:false,crit:'BAU security events; single computer malware infection; policy violation; scanning and probing; phishing/spam; financial impact ≤ $50,000; no safety risk; S0'},
+  {id:'AUD',name:'Audit',ecmp:'ECMP level 1 (BAU)',fromS:[],isimp:false,crit:'Audit, investigation or forensic requests; not usually a security breach; may move to Major or Critical with findings'}],
+ types:[['Acceptable Use Violation','L2-OCM-PRO-008'],['Close Access Breach','L2-OCM-PRO-001'],['Cyber-Intrusion','L2-OCM-PRO-009'],['Data Loss','L2-OCM-PRO-010'],['Denial of Service','L2-OCM-PRO-011'],['eDiscovery','L2-OCM-PRO-012'],['Email Blacklisting Removal','L2-OCM-PRO-013'],['Insider Threat','L2-OCM-PRO-014'],['Malware / Virus Event','L2-OCM-PRO-003'],['Ransomware','L2-OCM-PRO-015'],['Reconnaissance / Probing','L2-OCM-PRO-016'],['Social Engineering','L2-OCM-PRO-017'],['Website Compromise','L2-OCM-PRO-018'],['Zero-day Vulnerability','L2-OCM-PRO-019'],['Third-party / supply chain breach',''],['Other','']],
+ sources:['IP reputation monitor','Web application firewall / DDoS provider','Firewall / network intrusion detection','Host-based alert (anti-virus or anti-malware)','Log correlation (SIEM)','External notification (AFP or ASD/ACSC)','Dark web / internet keyword monitoring','User or administrator report','Third-party notification','Other'],
+ stages:['Identification','Triage','Declaration','Notification','Containment','Analysis','Eradication','Recovery','Follow-up','Closed'],
+ regs:[
+  {id:'dot',name:'Department of Transport (DoT)',trigger:'Any actual, threatened or suspected data security breach or adverse effect on the Systems or Data',hours:1,deadline:'In writing, immediately and within 1 hour'},
+  {id:'mtrPhone',name:'MTR – HCS and CIO by phone',trigger:'Confirmed Critical or Major cybersecurity breach',hours:2,deadline:'By phone within 2 hours'},
+  {id:'mtrWritten',name:'MTR – written report to SSCD',trigger:'Any confirmed cybersecurity breach (Critical, Major or Minor)',hours:24,deadline:'Incident report by email within 24 hours'},
+  {id:'sociSig',soci:'significant',name:'ASD (ACSC) – SOCI significant impact',trigger:'Incident has materially disrupted the availability of an essential service',hours:12,deadline:'Within 12 hours; written record within 84 hours if reported by phone'},
+  {id:'sociRel',soci:'relevant',name:'ASD (ACSC) – SOCI relevant impact',trigger:'Impact on the availability, integrity, reliability or confidentiality of the asset',hours:72,deadline:'Within 72 hours; written record within 48 hours if reported by phone'}],
+ internal:['Core CERT','Extended CERT','Continuity Support Group (CSG)','GM OCMS','Head of Infrastructure & Service Delivery','Incident Owner','Legal & Compliance','Privacy Officer','Media Relations','Asset / system owner'],
+ findings:[['vector','Initial infection / compromise vector'],['vuln','Vulnerability or security gap exploited'],['dates','Dates of compromise'],['targeted','Systems and information targeted'],['compromised','Systems and information compromised'],['malware','Malicious files or exploits and their capabilities'],['actor','Attacker type and demonstrated capabilities'],['more','Additional systems or information possibly compromised']],
+ lessons:[['detect','Detection and escalation'],['comms','Communication'],['resources','Personnel and resources'],['process','Was the documented process followed?'],['external','Responsiveness of external parties'],['controls','Effectiveness of security controls'],['other','Other improvements']],
+ cyber:[['c','Confidentiality','Was information disclosed or accessed without authorisation?'],['i','Integrity','Was information, software or configuration changed?'],['a','Availability','Were systems or services disrupted?'],['pi','Personal information','Whose and how much personal information; is serious harm likely?']]
+};
+const INC_TABS=['Overview','Details','Timeline','Impact and risk','Closure and approval'];
+const incBlank=(id,ref)=>({id,created:TODAY,updated:TODAY,
+ ov:{title:'',ref,heat:'',type:'',origin:'',thirdParty:'',source:'',discovered:'',owner:'',manager:'',sys:[],systems:'',env:'',nature:'',sevJust:''},
+ exec:{edited:false,text:''},timeline:[],
+ impact:{drv:{ctx:'',cia:[],why:''},cyber:{c:{aff:'',conf:'',desc:''},i:{aff:'',conf:'',desc:''},a:{aff:'',conf:'',desc:''},pi:{aff:'',conf:'',desc:''}},cons:{}},
+ risk:{initial:{date:'',S:'',F:'',why:''},current:{date:'',S:'',F:'',why:''},controls:'',residual:'',sev:'',sevPrev:'',sevHist:[]},
+ reg:{rows:{},payment:'',isimp:''},internal:{rows:{}},
+ resp:{containment:'',analysis:'',eradication:'',recovery:'',assurance:'',thirdParty:''},
+ findings:{summary:'',decision:'',why:'',by:'',date:'',review:''},
+ actions:[],lessons:{text:''},evidence:[],
+ approval:{reviewers:[],approver:'',role:'',date:'',comments:''}});
+
+(function(){
+const C=INC_CFG,ORG='Metro',MARK='Restricted';
+const pad2=n=>String(n).padStart(2,'0');
+const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fdt=d=>d?`${d.getDate()} ${MON3[d.getMonth()]} ${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`:'—';
+const parseL=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)):null;};
+const fdtS=s=>{const d=parseL(s);return d?(String(s).length>10?fdt(d):fd(s)):'—';};
+const nowHM=()=>{const d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes());};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const refHtml=s=>{if(!s)return '—';const u=safeUrl(s);return u?`<a href="${e(u)}" target="_blank" rel="noopener noreferrer">${e(s)}</a>`:e(s);};
+const TONE={bad:'red',warn:'amber',good:'green',gray:'gray'};
+let I=null;/* the incident on screen */
+const cur=()=>(V.view==='incident'&&DB.incidents&&DB.incidents[V.a])||null;
+/* ---- field builders: data-ip is the path inside the incident ---- */
+const fid=p=>'ip-'+String(p).replace(/[^\w]/g,'-');
+const getP=(o,p)=>p.split('.').reduce((x,k)=>x==null?x:x[k],o);
+function setP(o,p,v){const ks=p.split('.');if(ks.some(k=>k==='__proto__'||k==='constructor'||k==='prototype'))return;for(let i=0;i<ks.length-1;i++){const k=ks[i];if(o[k]==null)o[k]=/^\d+$/.test(ks[i+1])?[]:{};o=o[k];}o[ks[ks.length-1]]=v;}
+const fld=(label,control,id,cls,hint)=>`<div class="field ${cls||''}"><label for="${e(id)}">${e(label)}</label>${control}${hint?`<div class="small" style="margin-top:4px">${hint}</div>`:''}</div>`;
+const fI=(label,p,v,attrs,cls,hint)=>fld(label,`<input id="${fid(p)}" data-ip="${e(p)}" value="${e(v)}" ${attrs||'type="text"'}>`,fid(p),cls,hint);
+const fT=(label,p,v,attrs,cls,hint)=>fld(label,`<textarea id="${fid(p)}" data-ip="${e(p)}" ${attrs||'rows="2"'}>${e(v)}</textarea>`,fid(p),cls,hint);
+const optsH=(opts,v)=>opts.map(o=>{const val=Array.isArray(o)?o[0]:o,lab=Array.isArray(o)?o[1]:o;return `<option value="${e(val)}"${String(val)===String(v==null?'':v)?' selected':''}>${e(lab)}</option>`;}).join('');
+const fS=(label,p,opts,v,attrs,cls,hint)=>fld(label,`<select id="${fid(p)}" data-ip="${e(p)}" ${attrs||''}>${optsH(opts,v)}</select>`,fid(p),cls,hint);
+/* ---- derived values ---- */
+const awareRow=x=>x.timeline.find(r=>r.aware&&isDate(r.date))||null;
+const awareAt=x=>{const r=awareRow(x);return r?parseL(r.date+(r.time?'T'+r.time:'')):null;};
+const sevById=id=>C.severity.find(s=>s.id===id)||null;
+const cellOf=(F,S)=>F&&S!==''&&S!=null?matrixCell(Number(F),Number(S)):null;
+function consMax(x){const d=x.impact.drv,S=x.risk.current.S;if(d&&d.ctx&&S!==''&&S!=null){const c=C.contexts.find(z=>z.id===d.ctx);return {s:Number(S),ctx:c?c.name:d.ctx};}let b=null;C.contexts.forEach(c=>{const y=x.impact.cons[c.id];if(y&&y.s!==''&&y.s!=null&&y.s!=='na'){const s=Number(y.s);if(b==null||s>b.s)b={s,ctx:c.name};}});return b;}
+function sevSuggest(x){const r=x.risk.current.S!==''?Number(x.risk.current.S):x.risk.initial.S!==''?Number(x.risk.initial.S):(consMax(x)||{}).s;return r==null||isNaN(r)?null:C.severity.find(s=>s.fromS.includes(r))||null;}
+const CIA=[['c','Confidentiality'],['i','Integrity'],['a','Availability']];
+const ciaNames=x=>CIA.filter(([k])=>((x.impact.drv||{}).cia||[]).includes(k)).map(([,n])=>n);
+const curRating=x=>x.risk.current.S!==''&&x.risk.current.F?x.risk.current:x.risk.initial;
+function dur(ms){const m=Math.round(ms/60000);if(m<60)return m+' min';const h=Math.floor(m/60);if(h<48)return h+' h '+(m%60)+' min';return Math.floor(h/24)+' days '+(h%24)+' h';}
+/* SOCI impact assessment recorded on timeline entries: none | relevant | significant (significant is also a relevant impact) */
+const SOCI_OPTS=[['none','SOCI – no impact identified to critical infrastructure asset'],['relevant','SOCI – relevant impact identified to critical infrastructure asset'],['significant','SOCI – significant impact identified to critical infrastructure asset']];
+function sociStart(x,level){const l=x.timeline.filter(t=>isDate(t.date)&&(level==='significant'?t.soci==='significant':(t.soci==='relevant'||t.soci==='significant'))).sort((a,b)=>entryAt(a).localeCompare(entryAt(b)))[0];return l?parseL(entryAt(l)):null;}
+const sociAssessed=x=>x.timeline.some(t=>t.soci);
+function regStart(x,g){return g.soci?sociStart(x,g.soci):g.from==='payment'?parseL(x.reg.payment):awareAt(x);}
+function regState(x,g){const row=x.reg.rows[g.id]||{},ap=row.applies||'',start=regStart(x,g),hours=g.custom?(Number(row.hours)||null):g.hours;
+ if(g.soci&&!ap&&!start&&!notifiedOf(x,g)){if(sociAssessed(x))return {k:'na',tone:'gray',label:g.soci==='significant'?'Not required – no significant impact identified':'Not required – no SOCI impact identified',due:null,auto:true};return {k:'open',tone:'warn',label:'SOCI impact not yet assessed',due:null,wait:true};}
+ const due=start&&hours!=null?new Date(start.getTime()+hours*3600e3):null,nf=notifiedOf(x,g),notified=nf?parseL(nf.at):null,now=new Date();
+ if(ap==='No')return {k:'na',tone:row.why?'gray':'warn',label:row.why?'Not required':'Not required – rationale needed',due};
+ if(notified)return {k:'done',tone:due&&notified>due?'warn':'good',label:due&&notified>due?'Notified late '+fdt(notified):'Notified '+fdt(notified),due};
+ if(ap==='')return {k:'open',tone:due&&due-now<3600e3*6?'bad':'warn',label:'Not assessed',due};
+ if(!due)return {k:'open',tone:'warn',label:ap==='Yes'?(hours==null?'To notify':'Mark when Metro became aware'):'Under assessment',due};
+ const ms=due-now;return {k:'open',tone:ms<3600e3*6?'bad':'warn',label:ap==='Yes'?'To notify':'Under assessment',due};}
+/* The first notification entry on the timeline for an obligation */
+function notifiedOf(x,g){const r=x.timeline.filter(t=>t.kind==='notify'&&entryObl(t)===g.id&&isDate(t.date)).sort((a,b)=>entryAt(a).localeCompare(entryAt(b)))[0];return r?{at:entryAt(r),refno:r.refno||'',legal:r.legal||'',id:r.id}:null;}
+/* Older records kept notification times, internal notifications and response text in separate fields; move them onto the timeline once */
+function incNorm(x){if(!x.v7){x.v7=true;const F=x.findings||{};if(!(F.summary||'').trim()&&(F.items||F.facts||F.uncert)){const parts=C.findings.map(([k,n])=>{const y=(F.items||{})[k]||{};return (y.text||'').trim()?n+': '+y.text.trim()+(y.conf?' ('+y.conf.toLowerCase()+')':''):'';}).filter(Boolean);if((F.facts||'').trim())parts.push('Other confirmed facts: '+F.facts.trim());if((F.uncert||'').trim())parts.push('Other uncertainties: '+F.uncert.trim());F.summary=parts.join('\n\n');delete F.items;delete F.facts;delete F.uncert;}}
+ if(!x.v6){x.v6=true;const L=x.lessons||{};if(L.text==null){const parts=C.lessons.map(([k,n])=>(L.items||{})[k]&&L.items[k].trim()?n+': '+L.items[k].trim():'').filter(Boolean);const cost=[L.hours?L.hours+' response hours':'',L.productivity?L.productivity+' hours lost productivity':'',L.cost?'$'+L.cost+' direct cost':'',L.costNote||''].filter(Boolean).join(' · ');if(cost)parts.push('Cost: '+cost);x.lessons={text:parts.join('\n\n')};}}
+ if(!x.v5){x.v5=true;const im=x.impact,rk=x.risk;if(!im.drv||(!im.drv.ctx&&!(im.drv.cia||[]).length&&!im.drv.why)){let b=null;C.contexts.forEach(c=>{const y=(im.cons||{})[c.id];if(y&&y.s!==''&&y.s!=null&&y.s!=='na'&&(b==null||Number(y.s)>Number(b.y.s)))b={c,y};});im.drv={ctx:b?b.c.id:'',cia:['c','i','a'].filter(k=>(im.cyber||{})[k]&&im.cyber[k].aff==='Yes'),why:b?(b.y.why||''):''};}
+  if(rk.current.S===''&&rk.current.F===''&&(rk.initial.S!==''||rk.initial.F!==''))rk.current=Object.assign({},rk.initial);if(rk.current.S===''&&b5(im))rk.current.S=String(b5(im));}
+ if(!x.v4){x.v4=true;if(x.ov.status==='Closed'&&!x.timeline.some(t=>t.stage==='Closed'))x.timeline.push({id:uid(),date:x.updated||TODAY,time:'',kind:'event',stage:'Closed',event:'Incident closed.',party:'',ref:'',aware:false});x.timeline.forEach(t=>{if(t.stage==='Other')t.stage='';});delete x.ov.status;}
+ if(!x.v3){x.v3=true;const o=x.ov,parts=[o.nature,o.method?'Attack method: '+o.method:'',o.info?'Information potentially compromised: '+o.info:'',o.systems?'Other affected systems: '+o.systems:''].filter(z=>(z||'').trim());o.nature=parts.join('\n\n');['method','info','systems','dataClass'].forEach(k=>delete o[k]);}
+ if(x.v2)return x;x.v2=true;const add=o=>x.timeline.push(Object.assign({id:uid(),date:x.created||TODAY,time:'',kind:'event',stage:'',event:'',party:'',dir:'',ack:'',ref:'',aware:false},o));
+ Object.entries(x.reg.rows||{}).forEach(([id,r])=>{if(r&&r.notified){const g=C.regs.find(z=>z.id===id);add({date:r.notified.slice(0,10),time:r.notified.slice(11,16),kind:'notify',stage:'Notification',obl:id,refno:r.refno||'',legal:r.legal||'',event:'Notified '+(g?g.name:id)+'.'});delete r.notified;delete r.refno;delete r.legal;}});
+ Object.entries(x.internal.rows||{}).forEach(([k,r])=>{if(r&&r.at){add({date:r.at.slice(0,10),time:r.at.slice(11,16),kind:'notify',stage:'Notification',obl:'int:'+k,event:(r.note||'Notified')+(r.by?' (by '+r.by+')':''),ack:r.ack||''});}});x.internal.rows={};
+ const PH={containment:'Containment',analysis:'Analysis and investigation',eradication:'Eradication and remediation',recovery:'Recovery',assurance:'Assurance'};
+ Object.entries(PH).forEach(([k,ph])=>{if((x.resp[k]||'').trim()){add({kind:'response',phase:ph,stage:PHASE_STAGE[ph],by:'Metro',event:x.resp[k]});x.resp[k]='';}});
+ if((x.resp.thirdParty||'').trim()){add({kind:'response',phase:'Containment',stage:'Containment',by:tpName(x),event:x.resp.thirdParty});x.resp.thirdParty='';}
+ x.timeline.forEach(t=>{if(!t.kind)t.kind='event';});return x;}
+function b5(im){const d=im.drv,y=d&&d.ctx&&(im.cons||{})[d.ctx];return y&&y.s!=='na'?y.s:'';}
+const openRegs=x=>C.regs.map(g=>({g,st:regState(x,g)})).filter(o=>o.st.k==='open').sort((a,b)=>(a.st.due?a.st.due.getTime():9e15)-(b.st.due?b.st.due.getTime():9e15));
+/* The incident's current stage is the furthest lifecycle stage reached on the timeline (ISIMP order); Closed is the last stage */
+function incStage(x){let best=-1;(x.timeline||[]).forEach(t=>{const i=C.stages.indexOf(t.stage);if(i>best)best=i;});return best<0?'Identification':C.stages.at(best);}
+const isOpenInc=x=>incStage(x)!=='Closed';
+const stagePill=x=>{const s=incStage(x);return pill(s==='Closed'?'green':'blue',s);};
+function uncertainties(x){const out=[];
+ C.cyber.forEach(([k,n])=>{const y=x.impact.cyber[k];if(y.aff==='Unknown'||(y.aff==='Yes'&&y.conf==='Suspected'))out.push(n+' impact '+(y.aff==='Unknown'?'unknown':'suspected, not confirmed'));});
+ C.regs.forEach(g=>{const r=x.reg.rows[g.id]||{};if(r.applies==='Under assessment')out.push(g.name+': applicability under assessment');});
+ return out;}
+const tpName=x=>x.ov.thirdParty||'the third party';
+const sysNames=x=>(x.ov.sys||[]).filter(Boolean);
+function execGenerated(x){const o=x.ov,at=awareAt(x),cr=curRating(x),c=cellOf(cr.F,cr.S),sv=sevById(x.risk.sev),cm=consMax(x),sys=sysNames(x);
+ const what=`${at?`On ${fdt(at)}, `:''}${ORG} became aware of ${o.type?(/^[AEIOU]/i.test(o.type)?'an ':'a ')+o.type.toLowerCase()+' incident':'a cyber incident'}${o.origin==='Third party'?` affecting ${tpName(x)}`:''}. ${o.nature||''}${sys.length?` Systems impacted: ${sys.join('; ')}${o.env?' ('+o.env+')':''}.`:o.env?` Environment affected: ${o.env}.`:''}`.replace(/\s+/g,' ').trim();
+ const aff=ciaNames(x).map(n=>n.toLowerCase());
+ const exp=`${aff.length?`The incident affects ${aff.join(', ')}. `:''}${cm?`The consequence is rated S${cm.s} (${cm.ctx}). `:''}${c?`The current risk score is ${c.value} (F${cr.F} × S${cr.S})${c.value>RISK_REG_THRESHOLD?', above the risk register threshold':''}. `:'The risk has not yet been rated. '}${sv?`Severity: ${sv.name}.`:''}`.trim();
+ const done=[],na=[],open=[];if(at)C.regs.forEach(g=>{const st=regState(x,g);if(notifiedOf(x,g))done.push(g.name);else if(st.k==='na')na.push(g.name);else if(st.due||st.wait)open.push(g.name+(st.due?' (due '+fdt(st.due)+')':' (SOCI impact not yet assessed)'));});
+ const notn=!at?'Notification has not been marked as required.':`${done.length?`Notified: ${done.join('; ')}. `:'No external notification made yet. '}${open.length?`Pending or under assessment: ${open.join('; ')}. `:''}${na.length?`Not required: ${na.join('; ')}.`:''}`.trim();
+ const F=x.findings,concl=F.decision?`Decision: ${F.decision.toLowerCase()}${F.by?` (${F.by}${F.date?', '+fd(F.date):''})`:''}. ${(F.summary||'').split(/\n{2,}/)[0]||F.why||''}`.trim():`The incident is at the ${incStage(x)} stage; no closure decision has been made.`;
+ return [['What happened',what],[ORG+"'s exposure",exp],['Notifications',notn],['Conclusion',concl]].map(([h,t])=>`**${h}.** ${t}`).join('\n\n');}
+const execText=x=>x.exec.edited?x.exec.text:execGenerated(x);
+const rich=s=>String(s||'').split(/\n{2,}/).map(p=>`<p>${e(p).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</p>`).join('');
+const sortedTl=x=>x.timeline.map((r,i)=>({r,i})).sort((a,b)=>(a.r.date||'9999').localeCompare(b.r.date||'9999')||(a.r.time||'').localeCompare(b.r.time||'')||a.i-b.i);
+
+/* ---- Register ---- */
+function incidentsPage(){const all=Object.values(DB.incidents||{}).map(incNorm).sort((a,b)=>String(b.created).localeCompare(String(a.created))||b.id.localeCompare(a.id)),f=V.incF||'Open',rows=all.filter(x=>f==='All'||(f==='Open')===isOpenInc(x));
+ return `<section class="intro"><div class="eyebrow">Cyber incident · management</div><h1>Cyber Incident Management</h1><p>One record per incident, from identification to closure. Log events, notifications, responses, decisions and actions on the timeline as the incident develops. Notification clocks start when notification becomes required.</p>
+ <p class="hint">Incident records stay in this browser only and are never sent to a server. Use Export to keep a copy in your restricted incident folder, and Clear all when you have finished on a shared computer.</p></section>
+ <div class="btnrow" style="margin:0 0 14px"><button class="primary" data-act="incNew">+ New incident</button>${DB.incidents['INC-9001']?'':'<button class="secondary" data-act="incSample">Load sample incident</button>'}<button class="secondary" data-act="incExport"${all.length?'':' disabled'}>Export</button><label class="secondary filebtn" for="incImport">Import<input type="file" id="incImport" accept="application/json,.json" hidden></label>${all.length?'<button class="secondary danger" data-act="incClear">Clear all</button>':''}</div>
+ <div class="panel"><div class="toolbar">${sel('incF',[['Open','Open incidents'],['Closed','Closed incidents'],['All','All incidents']],f,'aria-label="Show incidents" data-incf')}<span class="count">${rows.length} of ${all.length} incidents</span></div>
+ <div class="table-scroll"><table><thead><tr><th>Reference</th><th>Incident</th><th>Severity</th><th>Stage</th><th>Notification required</th><th>Next notification</th><th>Current risk</th><th>Owner</th></tr></thead><tbody>${rows.length?rows.map(x=>{const sv=sevById(x.risk.sev),at=awareAt(x),nx=openRegs(x)[0],cr=curRating(x),c=cellOf(cr.F,cr.S);
+  return `<tr><td class="nowrap">${e(x.ov.ref||x.id)}</td><td><button class="open" data-go="incident" data-a="${e(x.id)}">${e(x.ov.title||'Untitled incident')}</button><div class="small">${e(x.ov.type||'Type not set')}${sysNames(x).length?' · '+e(sysNames(x).join(', ')):''}</div></td><td>${sv?pill(sv.id==='P1'?'red':sv.id==='P2'?'amber':'gray',sv.name):pill('gray','Not assigned')}</td><td>${stagePill(x)}</td><td class="nowrap">${at?e(fdt(at)):'—'}</td><td>${nx?`${cdHtml(nx.st)||pill(TONE[nx.st.tone],nx.st.label)}<div class="small">${e(nx.g.name)}</div>`:'<span class="small">None open</span>'}</td><td>${c?riskBox(c):'—'}</td><td>${e(x.ov.owner||'—')}</td></tr>`;}).join(''):`<tr><td colspan="8" class="empty">No ${f==='All'?'':f.toLowerCase()+' '}incidents.</td></tr>`}</tbody></table></div></div>
+ <p class="small attdisc">Ratings, deadlines and suggested severity are indicative. They support, and do not replace, the Information Security Incident Management Plan, legal advice or formal risk acceptance.</p>`;}
+
+/* ---- Incident record ---- */
+const KINDS=[['event','Event'],['notify','Notification'],['response','Response'],['decision','Decision'],['action','Action']];
+const KIND_TONE={event:'gray',notify:'blue',response:'green',decision:'amber',action:'solidred'};
+const kindName=k=>(KINDS.find(z=>z[0]===k)||KINDS[0])[1];
+const PHASES=['Containment','Analysis and investigation','Eradication and remediation','Recovery','Assurance'];
+const PHASE_STAGE={'Containment':'Containment','Analysis and investigation':'Analysis','Eradication and remediation':'Eradication','Recovery':'Recovery','Assurance':'Follow-up'};
+const DTYPES=['Severity change','Notification decision','Escalation','Containment approach','Close','Continue monitoring','Other'];
+const intKey=n=>n.replace(/[^A-Za-z]/g,'');
+const oblOpts=()=>[['','Select who was notified'],...C.regs.map(g=>[g.id,g.name]),...C.internal.map(n=>['int:'+intKey(n),'Internal – '+n]),['other','Other party']];
+/* A notification's party links it to an obligation when it matches an obligation or internal party name */
+const partyNames=()=>[...C.regs.map(g=>g.name),...C.internal.map(n=>'Internal – '+n)];
+function matchObl(t){const s=String(t||'').trim().toLowerCase();if(!s)return '';const g=C.regs.find(r=>r.name.toLowerCase()===s);if(g)return g.id;const n=C.internal.find(m=>m.toLowerCase()===s||('internal – '+m).toLowerCase()===s);return n?'int:'+intKey(n):'';}
+const entryObl=r=>r.obl||matchObl(r.party);
+const partyOf=r=>r.party||r.by||r.decider||(r.kind==='notify'&&r.obl?oblName(r.obl):'');
+const STAGE_PHASE={Containment:'Containment',Analysis:'Analysis and investigation',Eradication:'Eradication and remediation',Recovery:'Recovery','Follow-up':'Assurance'};
+const oblName=id=>{const g=C.regs.find(r=>r.id===id);if(g)return g.name;const n=C.internal.find(m=>'int:'+intKey(m)===id);return n?'Internal – '+n:'Other party';};
+const entryAt=r=>r.date+'T'+(r.time||'00:00');
+const tlDisplay=r=>`${fd(r.date)}${r.time?' '+r.time:''}`;
+const actById=(x,id)=>x.actions.find(a=>a.id===id)||null;
+function incidentPage(){const x=DB.incidents&&DB.incidents[V.a];if(!x)throw new Error('Incident not found. It may have been deleted, or it is stored in a different browser.');incNorm(x);I=x;const tab=INC_TABS.includes(V.incTab)?V.incTab:'Overview',sv=sevById(x.risk.sev),at=awareAt(x),cr=curRating(x),c=cellOf(cr.F,cr.S),op=openRegs(x),bad=op.filter(o=>o.st.tone==='bad').length;
+ const fact=(l,v)=>`<div class="fact"><label>${e(l)}</label><strong>${v}</strong></div>`;
+ let h=crumb([['Incidents','incidents'],x.ov.ref||x.id])+back('Incidents',['incidents'])+titlebar(x.ov.title||'Untitled incident',`${x.ov.ref||x.id}${x.ov.type?' · '+x.ov.type:''} · Restricted`,incStage(x))+
+ `<div class="panel section"><div class="facts">${fact('Severity',sv?e(sv.name):'Not assigned')}${fact('Notification required',at?e(fdt(at)):'Mark in Timeline')}${fact('Current risk',c?`${riskBox(c)} <span class="small">F${e(cr.F)} × S${e(cr.S)}</span>`:'Not rated')}${fact('Open notifications',op.length?`${op.length}${bad?` · <span style="color:var(--red)">${bad} urgent</span>`:''}`:'None')}${fact('Incident owner',e(x.ov.owner||'—'))}</div>
+ <div class="btnrow" style="margin-top:14px"><button class="secondary" data-act="incPdf">Download incident report (PDF)</button><button class="secondary" data-act="incDecl">Copy declaration email</button><button class="secondary danger" data-act="incDel">Delete incident</button></div></div>
+ <div class="tabs" role="tablist">${INC_TABS.map(t=>`<button role="tab" aria-selected="${t===tab}" class="${t===tab?'selected':''}" data-act="incTab" data-t="${e(t)}">${e(t)}</button>`).join('')}</div>`;
+ h+=({'Overview':tabOverview,'Details':tabDetails,'Timeline':tabTimeline,'Impact and risk':tabRisk,'Closure and approval':tabClosure})[tab](x);
+ return h+`<p class="small attdisc">Ratings, deadlines and suggested severity are indicative and follow the settings in this concept. Confirm every notification obligation with Legal &amp; Compliance.</p>`;}
+/* Countdown to an obligation's deadline: time left, or how long overdue */
+function cdHtml(st){if(st.k!=='open'||!st.due)return '';const ms=st.due-new Date();return `<span class="inc-cd ${ms<0||ms<6*3600e3?'hot':''}">${ms<0?'Overdue '+dur(-ms):dur(ms)+' left'}</span>`;}
+/* Right-hand side of an obligation row: deadline and countdown while open; notification time and time taken once notified */
+function oblRight(x,g){const st=regState(x,g),nf=notifiedOf(x,g);
+ if(st.k==='done'&&nf){const start=regStart(x,g),at=parseL(nf.at),late=st.due&&at>st.due;
+  return `<span class="due">Notified ${e(fdt(at))}</span>${start?`<span class="inc-cd ${late?'hot':'ok'}">Took ${e(dur(Math.max(0,at-start)))}${late?' · late by '+e(dur(at-st.due)):' · on time'}</span>`:''}`;}
+ if(st.k==='na')return pill(TONE[st.tone],st.label);
+ return `<span class="due">${st.due?'Due '+e(fdt(st.due)):st.wait?'Waiting for SOCI impact assessment':g.from==='payment'?'Clock starts at payment':g.custom?'Set the contract deadline':g.hours==null?'No set deadline':'Clock not started'}</span>${cdHtml(st)}${(x.reg.rows[g.id]||{}).applies||st.wait?pill(TONE[st.tone],st.label):''}`;}
+function clockList(x,max){const op=openRegs(x).slice(0,max||99),all=C.regs.map(g=>regState(x,g)),done=all.filter(s=>s.k==='done').length,na=all.filter(s=>s.k==='na').length;
+ return `${op.length?`<ul class="inc-clist">${op.map(({g,st})=>`<li><span>${e(g.name)}</span><span class="due">${st.due?'Due '+e(fdt(st.due)):''}</span>${cdHtml(st)}${(x.reg.rows[g.id]||{}).applies||st.wait?pill(TONE[st.tone],st.label):''}</li>`).join('')}</ul>`:'<p class="small" style="margin-top:8px">No open notifications.</p>'}<p class="small" style="margin-top:8px">${done} notified · ${na} not required.</p>`;}
+/* Closure readiness: what is still needed before the incident can be closed */
+function closureGaps(x){const F=x.findings,sv=sevById(x.risk.sev),out=[];
+ if(!F.decision)out.push('Record the closure decision (Closure and approval)');
+ if(!x.approval.approver||!x.approval.date)out.push('Record the approval (Closure and approval)');
+ if(sv&&sv.isimp&&!(x.lessons.text||'').trim())out.push('Record lessons learned (required for a Critical or Major incident)');
+ const op=openRegs(x).length;if(op)out.push(`Decide ${op} open notification obligation${op===1?'':'s'} (Timeline)`);
+ const oa=x.actions.filter(a=>a.status!=='Completed').length;if(oa)out.push(`${oa} action${oa===1?'':'s'} still open (update under Edit on the timeline)`);
+ return out;}
+
+/* ---- Overview: a read-only summary of what has been recorded so far ---- */
+function tabOverview(x){const o=x.ov,tl=sortedTl(x),recent=tl.slice(-5).reverse(),oa=x.actions.filter(a=>a.status!=='Completed'),gaps=closureGaps(x),sys=sysNames(x),d=x.impact.drv,r=x.risk.current,ctx=C.contexts.find(z=>z.id===d.ctx),c=cellOf(r.F,r.S),sv=sevById(x.risk.sev),lk=r.F?C.likelihood[r.F-1]:null,soci=[...x.timeline].filter(t=>t.soci).pop();
+ const dl=(k,v)=>`<div><dt>${e(k)}</dt><dd>${v}</dd></div>`;
+ const cia=ciaNames(x);
+ return `<div class="panel section"><div class="section-head"><h2>Incident summary</h2>${x.exec.edited?'<button class="secondary" data-act="incExecReset">Reset to generated</button>':''}</div><p class="sub">Written from what has been recorded so far and updated as the record grows.${x.exec.edited?' Edited by hand.':''}</p>
+ <div class="inc-sum" id="incExecView">${rich(execText(x))}</div>
+ <details class="inc-edit" style="margin-top:8px"><summary>Edit summary</summary><textarea id="incExec" class="plantext" style="min-height:200px;margin-top:8px" aria-label="Incident summary">${e(execText(x))}</textarea><p class="small">Write **text** for bold. A blank line starts a new paragraph.</p></details></div>
+ <div class="grid"><div>
+  <div class="panel section"><div class="section-head"><h2>Details</h2><button class="open" data-act="incTab" data-t="Details">Edit details →</button></div><dl class="regdl" style="margin-top:10px">
+   ${dl('Incident type',e(o.type||'—'))}${dl('Origin',e(o.origin||'—')+(o.origin==='Third party'?' · '+e(tpName(x)):''))}${dl('Environment affected',e(o.env||'—'))}${dl('Systems impacted',sys.length?e(sys.join('; ')):'—')}${dl('Incident owner',e(o.owner||'—'))}${dl('Incident coordinator',e(o.manager||'—'))}${dl('Current stage',stagePill(x))}</dl></div>
+  <div class="panel section"><div class="section-head"><h2>Impact and risk</h2><button class="open" data-act="incTab" data-t="Impact and risk">Edit impact and risk →</button></div><dl class="regdl" style="margin-top:10px">
+   ${dl('Risk driver',ctx?e(ctx.name):'Not selected')}${dl('Consequence',r.S!==''&&ctx?'S'+e(r.S)+`<div class="small" style="font-weight:400">${e(ctx.d[Number(r.S)]||'')}</div>`:'Not rated')}${dl('C, I or A affected',cia.length?cia.map(n=>pill('red',n)).join(' '):'None selected')}${dl('Likelihood of a breach',lk?'F'+e(lk[0])+' · '+e(lk[1])+' ('+e(lk[2])+')':'Not rated')}${dl('Risk score',c?riskBox(c)+(c.value>RISK_REG_THRESHOLD?' <span class="small" style="color:var(--red);font-weight:700">Raise in risk register</span>':''):'Not rated')}${dl('Severity',sv?e(sv.name+' · '+sv.ecmp):'Not assigned')}</dl></div>
+  <div class="panel section"><div class="section-head"><h2>Recent timeline</h2><button class="open" data-act="incTab" data-t="Timeline">Open Timeline →</button></div>
+   ${recent.length?`<ul class="inc-feed">${recent.map(({r})=>`<li><span class="when">${e(tlDisplay(r))}</span>${pill(KIND_TONE[r.kind||'event'],kindName(r.kind))}<span>${e(r.event||'—')}</span></li>`).join('')}</ul><p class="small" style="margin-top:6px">${tl.length} event${tl.length===1?'':'s'} in total.</p>`:'<p class="small">No timeline entries yet.</p>'}</div>
+ </div><div>
+  <div class="panel section"><div class="section-head"><h2>Notifications</h2><button class="open" data-act="incTab" data-t="Timeline">Open Timeline →</button></div>
+   <dl class="regdl" style="margin-top:10px">${dl('Notification required',awareAt(x)?e(fdt(awareAt(x))):'Not yet – switch on in the Timeline')}${awareAt(x)?dl('SOCI impact assessment',soci?pill(soci.soci==='none'?'gray':soci.soci==='significant'?'red':'amber',(SOCI_OPTS.find(z=>z[0]===soci.soci)||[,''])[1].replace('SOCI – ','').replace(' to critical infrastructure asset',''))+' <span class="small">'+e(tlDisplay(soci))+'</span>':'Not yet assessed'):''}</dl>
+   ${awareAt(x)?`<div data-incclocks style="margin-top:10px">${clockList(x)}</div>`:''}</div>
+  <div class="panel section"><div class="section-head"><h2>Open actions</h2><button class="open" data-act="incTab" data-t="Timeline">Open Timeline →</button></div>${oa.length?`<ul class="inc-feed">${oa.map(a=>`<li><span>${e(a.text||'Action')}</span><span class="when">${e(a.owner||'No owner')} · ${a.due?dueText(a.due):'No date'}</span></li>`).join('')}</ul>`:'<p class="small">No open actions.</p>'}</div>
+  <div class="panel section"><div class="section-head"><h2>Closure</h2><button class="open" data-act="incTab" data-t="Closure and approval">Open Closure →</button></div>
+   <dl class="regdl" style="margin-top:10px">${dl('Closure summary',(x.findings.summary||'').trim()?'Recorded':'Not yet written')}${dl('Decision',x.findings.decision?e(x.findings.decision):'Not yet decided')}${dl('Lessons learned',(x.lessons.text||'').trim()?'Recorded':'Not yet recorded')}${dl('Approval',x.approval.approver&&x.approval.date?e(x.approval.approver)+' · '+e(fd(x.approval.date)):'Not yet approved')}</dl>
+   ${isOpenInc(x)?(gaps.length?`<h3 style="margin-top:12px">Still needed to close</h3><ul class="riskgaps">${gaps.map(g=>`<li>${e(g)}</li>`).join('')}</ul>`:'<p class="small" style="margin-top:10px">Everything needed for closure is recorded. Log a timeline entry at the Closed stage to close the incident.</p>'):'<p class="small" style="margin-top:10px">Incident closed.</p>'}</div>
+ </div></div>`;}
+
+/* ---- Details: most important first ---- */
+function tabDetails(x){const o=x.ov,tp=o.origin==='Third party',ref=(C.types.find(t=>t[0]===o.type)||[])[1],sys=sysNames(x);
+ return `<div class="panel section"><h2>Incident details</h2><div class="formgrid" style="margin-top:12px">
+ ${fI('Incident title','ov.title',o.title,'type="text" placeholder="Short name for the incident"','full')}
+ ${fS('Incident type','ov.type',[['','Select type'],...C.types.map(t=>t[0])],o.type,'data-irr','',ref?'Playbook: '+e(ref):'')}
+ ${fS('Incident origin','ov.origin',[['','Select origin'],'Third party','Internal','Unknown'],o.origin,'data-irr')}
+ ${tp?fI('Affected third party','ov.thirdParty',o.thirdParty,'type="text" placeholder="Supplier or vendor name"'):''}
+ ${fT('Incident details','ov.nature',o.nature,'rows="5" placeholder="What happened, how it was detected, the attack method if known and the information potentially compromised"','full')}
+ ${fS('Environment affected','ov.env',[['','Select'],'IT','OT','IT and OT','None confirmed'],o.env)}
+ <div class="field full"><span class="lab">Systems impacted</span>
+  ${sys.length?`<ul class="inc-syslist">${sys.map((n,i)=>`<li><span>${e(n)}</span><button class="linkbtn" data-act="incSysDel" data-i="${i}">Remove</button></li>`).join('')}</ul>`:'<p class="small" style="margin:4px 0 8px">No systems added yet.</p>'}
+  <div class="inc-sysadd"><input id="incSysName" type="text" aria-label="System to add" placeholder="System or application name" maxlength="200"><button class="secondary" data-act="incSysAdd">+ Add system</button></div></div>
+ ${fI('Incident owner','ov.owner',o.owner,'type="text" placeholder="Name, role"')}${fI('Incident coordinator','ov.manager',o.manager,'type="text" placeholder="Name, role"')}</div></div>
+ <div class="panel section"><h2>Reference details</h2><div class="formgrid" style="margin-top:12px">
+ ${fI('Cyber incident number','ov.ref',o.ref)}${fI('HEAT incident number','ov.heat',o.heat,'type="text" placeholder="If applicable"')}
+ ${fS('Source of incident','ov.source',[['','Select source'],...C.sources],o.source)}${fI('Discovery date','ov.discovered',o.discovered,'type="date"')}</div>
+ <p class="small" style="margin-top:10px">The incident status is updated in the Timeline.</p></div>`;}
+
+/* ---- Timeline: events, notifications, response activities, decisions and actions in one log ---- */
+function tabTimeline(x){const tl=sortedTl(x),f='all',shown=tl,k=V.incKind||'event',tp=x.ov.origin==='Third party';
+ const kf=(kind,html)=>k===kind?html:'';
+ const statusBox=`<div class="panel section"><div class="inc-status"><div><h2 style="margin:0">Notification clocks</h2></div><div class="small">Current stage: ${stagePill(x)}</div></div>${awareAt(x)?`<p class="small" style="margin:2px 0 0">Running from when notification became required, ${e(fdt(awareAt(x)))}. Next deadlines first; all obligations are below the timeline.</p><div data-incclocks="3">${clockList(x,3)}</div>`:'<p class="small" style="margin:2px 0 0">Not started. Switch on "Notification required" on a timeline entry to start the countdown for every notification obligation.</p>'}</div>`;
+ const logForm=!V.incAdd?'':`<div class="inc-addbox" id="incLogPanel"><div class="section-head"><h3 style="margin:0">New timeline entry</h3><button class="linkbtn" data-act="incAddToggle">Cancel</button></div>
+ <div class="formgrid inc-g3" style="margin-top:10px">
+ ${fld('Incident stage',`<select id="incU-stage">${optsH([['','Select'],...C.stages],V.incStage||'')}</select>`,'incU-stage')}${fld('Date',`<input id="incU-date" type="date" value="${e(TODAY)}">`,'incU-date')}${fld('Time (optional)',`<input id="incU-time" type="time" value="${e(nowHM())}">`,'incU-time')}</div>
+ <div class="formgrid" style="margin-top:12px">${fld('Event',`<textarea id="incU-event" rows="2" placeholder="What happened, who was notified, what was done or decided, or the action required"></textarea>`,'incU-event','full')}</div>
+ <div class="formgrid inc-g3" style="margin-top:12px">${fld('Type',`<select id="incU-kind">${optsH(KINDS,V.incKind||'event')}</select>`,'incU-kind')}${fld('Party',`<input id="incU-party" type="text" list="incPartyList" value="${e(V.incParty||'')}" placeholder="e.g. Vendor, Department of Transport (DoT)">`,'incU-party','','For a notification, choose the obligation or internal party from the list so its clock updates')}
+ ${fld('Attachment / evidence reference (optional)',`<input id="incU-ref" type="text" placeholder="SharePoint link or record number">`,'incU-ref')}</div>
+ <datalist id="incPartyList">${partyNames().map(n=>`<option value="${e(n)}">`).join('')}</datalist>
+ ${awareAt(x)?'':`<div class="inc-trigger"><label class="inc-switch"><input type="checkbox" role="switch" id="incU-aware"><span class="sw" aria-hidden="true"></span><span><strong>Notification required</strong> – at this event Metro became aware of an actual, threatened or suspected data security or privacy breach, or received a complaint alleging one.</span></label></div>`}
+ ${sociStart(x,'significant')?'':`<div class="inc-soci" id="incSociBox" role="radiogroup" aria-label="SOCI impact assessment (optional)" ${awareAt(x)?'':'hidden'}><span class="lab">SOCI impact assessment (optional)</span>${SOCI_OPTS.filter(([v])=>!(v==='none'&&sociStart(x,'relevant'))&&!(v==='relevant'&&sociStart(x,'relevant'))).map(([v,n])=>`<label><input type="radio" name="incU-soci" value="${v}"> ${e(n)}</label>`).join('')}<button type="button" class="linkbtn" data-act="incSociClear">Clear</button></div>`}
+ <p class="err" id="incUErr" role="alert"></p><div class="btnrow"><button class="primary" data-act="incLog">Add to timeline</button><button class="secondary" data-act="incAddToggle">Cancel</button></div></div>`;
+ /* notification obligations: decide whether each applies; the notification itself is logged on the timeline */
+ const obl=`<div class="panel section"><div class="section-head"><h2>Notification clocks and obligations</h2></div>
+ ${awareAt(x)?`<div class="inc-clockon">Clocks running from <strong>${e(fdt(awareAt(x)))}</strong>, when notification became required. SOCI clocks run from the SOCI impact assessment. Countdowns update every minute.</div>`:`<div class="notice warn" style="margin:10px 0 0">The clocks have not started. Add or edit a timeline entry and switch on "Notification required" to start the countdown for every obligation.</div>`}
+ <p class="sub" style="margin-top:10px">Decide whether each obligation applies. Log the notification itself as a timeline entry; the status updates from it. A blank is shown as "Not assessed", never as "Not required".</p>
+ ${C.regs.slice().sort((a,b)=>{const da=regState(x,a).due,db=regState(x,b).due;return (da?da.getTime():9e15)-(db?db.getTime():9e15);}).map(g=>{const r=x.reg.rows[g.id]||{},p=`reg.rows.${g.id}`,st=regState(x,g),nf=notifiedOf(x,g);return `<details class="inc-obl" ${V.incOblOpen===g.id?'open':''} data-oblid="${e(g.id)}"><summary><span class="nm"><strong>${e(g.name)}</strong><span class="small">${e(g.deadline)}</span></span><span class="inc-oblright" data-oblr="${e(g.id)}">${oblRight(x,g)}</span>${st.k==='open'&&!st.wait?`<button class="secondary inc-oblbtn" data-act="incLogObl" data-obl="${e(g.id)}">+ Log notification</button>`:''}</summary>
+  <div class="inc-oblbody"><p class="small" style="margin:0 0 8px">${e(g.trigger)}</p><div class="formgrid inc-g3">${fS('Applies?',p+'.applies',[['','Not assessed'],'Yes','No','Under assessment'],r.applies,'data-irr')}${fI('Decided by',p+'.by',r.by,'type="text" placeholder="Name, role"')}
+  ${g.custom?fI('Deadline (hours after aware)',p+'.hours',r.hours,'type="number" min="0" data-irr'):''}${g.from==='payment'&&r.applies==='Yes'?fI('Payment made','reg.payment',x.reg.payment,'type="datetime-local" data-irr'):''}
+  ${fT(r.applies==='No'?'Rationale (required when not required)':'Rationale',p+'.why',r.why,'rows="2"','full')}</div>
+  ${nf?`<p class="small" style="margin:8px 0 0">Notified ${e(fdtS(nf.at))} (timeline entry)${nf.refno?' · ref '+e(nf.refno):''}${nf.legal?' · Legal approved: '+e(nf.legal):''}</p>`:''}</div></details>`;}).join('')}</div>`;
+ /* actions raised on the timeline */
+ const acts=`<div class="panel section"><h2>Actions</h2><p class="sub">Actions are logged on the timeline. Update their status here; completing an action adds a timeline entry.</p>
+ ${x.actions.length?x.actions.map((a,i)=>`<div class="inc-row"><div class="formgrid inc-g4">${fT('Action',`actions.${i}.text`,a.text,'rows="2"','w2',a.src?'From lessons learned: '+e(a.src):'')}${fI('Owner',`actions.${i}.owner`,a.owner)}${fI('Target date',`actions.${i}.due`,a.due,'type="date"')}${fS('Status',`actions.${i}.status`,['Open','In progress','Completed'],a.status||'Open','data-incact="'+i+'"')}
+  ${fT('Escalation trigger',`actions.${i}.trigger`,a.trigger,'rows="2"','w2')}${fT('Closure criteria',`actions.${i}.closure`,a.closure,'rows="2"')}</div><div class="inc-rowfoot"><span class="small">${a.status==='Completed'?'Completed':a.due?'Due '+dueText(a.due):'No target date'}</span><button class="linkbtn" data-act="incDelRow" data-list="actions" data-i="${i}">Remove action</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No actions yet. Log one above as an "Action".</p>'}</div>`;
+ /* the log */
+ const detail=(r,kd,a)=>[partyOf(r)?(kd==='notify'?'To: ':'')+e(partyOf(r)):'',kd==='action'&&a?`${a.status}${a.due?' · due '+e(fd(a.due)):''}`:'',r.ref?'Evidence: '+refHtml(r.ref):''].filter(Boolean).join(' · ');
+ const editRow=(r,i,kd)=>`<tr class="inc-editrow"><td colspan="6"><div class="formgrid inc-g3">
+   ${fS('Incident stage',`timeline.${i}.stage`,[['','Select'],...C.stages],r.stage)}${fI('Date',`timeline.${i}.date`,r.date,'type="date" data-irr')}${fI('Time',`timeline.${i}.time`,r.time,'type="time" data-irr')}
+   ${fT('Event',`timeline.${i}.event`,r.event,'rows="2"','full')}
+   ${fS('Type',`timeline.${i}.kind`,KINDS,kd,'data-irr data-inctype="'+i+'"')}${fI('Party',`timeline.${i}.party`,partyOf(r),'type="text" list="incPartyList" data-irr')}${fI('Attachment / evidence reference',`timeline.${i}.ref`,r.ref)}${!awareAt(x)&&!r.soci?'':fS('SOCI impact assessment',`timeline.${i}.soci`,[['','Not assessed at this entry'],...SOCI_OPTS.map(([v,n])=>[v,n.replace('SOCI – ','')])],r.soci||'','data-irr','full')}${(ai=>kd==='action'&&ai>=0?fS('Action status',`actions.${ai}.status`,['Open','In progress','Completed'],x.actions[ai].status||'Open','data-incact="'+ai+'"'):'')(x.actions.findIndex(z=>z.id===r.actionId))}</div>
+   <div class="inc-rowfoot"><label><input type="radio" name="incAware" data-incaware="${i}" ${r.aware?'checked':''}> Notification required (starts the clocks)</label><span><button class="linkbtn" data-act="incDelRow" data-list="timeline" data-i="${i}">Remove entry</button> <button class="secondary" data-act="incEdit" data-id="">Done</button></span></div></td></tr>`;
+ const feed=`<div class="panel section"><div class="section-head"><h2>Timeline</h2>${V.incAdd?'':'<button class="primary" data-act="incAddToggle">+ Add timeline entry</button>'}</div>
+ <p class="sub">${tl.length} entr${tl.length===1?'y':'ies'}, oldest first. Select Edit to change an entry.</p>
+ ${logForm}
+ <datalist id="incPartyList">${partyNames().map(n=>`<option value="${e(n)}">`).join('')}</datalist>
+ <div class="table-scroll"><table class="inc-tl"><thead><tr><th>Stage</th><th>Date</th><th>Time</th><th>Event</th><th>Type</th><th aria-label="Edit"></th></tr></thead><tbody>
+ ${shown.length?shown.map(({r,i})=>{const kd=r.kind||'event',a=r.actionId?actById(x,r.actionId):null,d=detail(r,kd,a),ed=V.incEditId===r.id;
+  return `<tr class="${r.aware?'aw':''}${ed?' editing':''}"><td>${e(r.stage||'—')}</td><td class="nowrap">${e(fd(r.date))}</td><td class="nowrap">${e(r.time||'—')}</td><td>${e(r.event||'—')}${r.aware?' <span class="pill amber">Notification required</span>':''}${r.soci?` <span class="pill ${r.soci==='none'?'gray':r.soci==='significant'?'red':'amber'}">SOCI: ${r.soci==='none'?'no impact':r.soci+' impact'}</span>`:''}${d?`<div class="small">${d}</div>`:''}</td><td>${pill(KIND_TONE[kd],kindName(kd))}</td><td class="nowrap"><button class="open" data-act="incEdit" data-id="${e(ed?'':r.id)}">${ed?'Close':'Edit'}</button></td></tr>${ed?editRow(r,i,kd):''}`;}).join(''):`<tr><td colspan="6" class="empty">No entries${f==='all'?' yet. Select "+ Add timeline entry".':' of this type.'}</td></tr>`}
+ </tbody></table></div></div>`;
+ return feed+obl;}
+
+/* ---- Impact and risk: one risk driver (consequence context), C/I/A affected, likelihood, score ---- */
+function tabRisk(x){const d=x.impact.drv,r=x.risk.current,ctx=C.contexts.find(c=>c.id===d.ctx),sg=sevSuggest(x),sv=sevById(x.risk.sev),c=cellOf(r.F,r.S);
+ const vOpts=ctx?[['','Select value'],...ctx.d.map((t,s)=>t?[s,`S${s} · ${t}`]:null).filter(Boolean)]:[['','Select a driver first']];
+ const lOpts=[['','Select likelihood'],...C.likelihood.map(l=>[l[0],`F${l[0]} · ${l[1]} (${l[2]}) – ${l[3]}`])];
+ const mx=`<div class="table-scroll"><table class="inc-matrix"><thead><tr><th></th>${[0,1,2,3,4,5].map(s=>`<th>S${s}</th>`).join('')}</tr></thead><tbody>${[5,4,3,2,1].map(F=>`<tr><th>F${F}</th>${[0,1,2,3,4,5].map(s=>{const m=matrixCell(F,s),on=String(r.F)===String(F)&&String(r.S)===String(s);return `<td class="r-${m.color}${on?' on':''}">${m.value}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`;
+ return `<div class="panel section"><h2>Impact</h2><p class="sub">Integrated risk matrix A1.1. Choose the risk driver most affected by this incident and rate its consequence.</p><div class="formgrid" style="margin-top:12px">
+ ${fS('Risk driver','impact.drv.ctx',[['','Select driver'],...C.contexts.map(c=>[c.id,c.name])],d.ctx,'data-irr')}
+ ${fS('Consequence','risk.current.S',vOpts,r.S,'data-irr'+(ctx?'':' disabled'),'',ctx&&ctx.note?e(ctx.note):'')}
+ <fieldset class="field full inc-cia"><legend>Confidentiality, integrity or availability affected</legend>${CIA.map(([k,n])=>`<label><input type="checkbox" data-inccia="${k}" ${(d.cia||[]).includes(k)?'checked':''}> ${n}</label>`).join('')}</fieldset>
+ ${fT('Rationale','impact.drv.why',d.why,'rows="3" placeholder="Why this driver and consequence value"','full')}</div></div>
+ <div class="panel section"><h2>Likelihood of a breach</h2><p class="sub">${e(C.likelihoodQuestion)}</p><div class="formgrid" style="margin-top:12px">
+ ${fS('Likelihood','risk.current.F',lOpts,r.F,'data-irr','full')}${fT('Rationale','risk.current.why',r.why,'rows="3" placeholder="Why this likelihood"','full')}</div></div>
+ <div class="panel section"><h2>Risk assessment</h2><p class="sub">Consequence × likelihood on the composite score table (A1.3).</p>
+ <div style="margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">${c?`${riskBox(c)}<span class="small">${e(ctx?ctx.name:'')} S${e(r.S)} × F${e(r.F)} ${e(C.likelihood[r.F-1][1])}</span>`:`<span class="small">Not rated – select ${r.S===''?'a consequence':''}${r.S===''&&!r.F?' and ':''}${!r.F?'a likelihood':''}.</span>`}${c&&c.value>RISK_REG_THRESHOLD?'<span class="small" style="color:var(--red);font-weight:700">Higher than 9: raise in risk register</span>':''}</div>
+ <details style="margin-top:10px"><summary class="small" style="cursor:pointer;font-weight:700">Composite score table</summary>${mx}</details></div>
+ <div class="panel section"><h2>Incident severity</h2><div class="formgrid" style="margin-top:12px">${fS('Assigned severity','risk.sev',[['','Select severity'],...C.severity.map(s=>[s.id,`${s.name} · ${s.ecmp}`])],x.risk.sev,'data-incsev','',sg?`Suggested from consequence: <strong>${e(sg.name)}</strong>`:'Rate consequence to see the suggested severity')}${fT('Severity justification','ov.sevJust',x.ov.sevJust,'rows="2"')}</div>
+ ${sv?`<p class="small" style="margin-top:8px">${e(sv.name)} criteria: ${e(sv.crit)}${sv.isimp?' · ISIMP must be engaged; notify the Extended CERT and CSG.':''}</p>`:''}
+ ${x.risk.sevHist.length?`<h3>Severity history</h3><div class="table-scroll"><table class="mini"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody>${x.risk.sevHist.map((h,i)=>`<tr><td class="nowrap">${e(fd(h.date))}</td><td>${e((sevById(h.from)||{}).name||'—')}</td><td>${e((sevById(h.to)||{}).name||'—')}</td><td><input type="text" data-ip="risk.sevHist.${i}.why" value="${e(h.why)}" placeholder="Reason for the change" aria-label="Reason for the change" style="width:100%"></td></tr>`).join('')}</tbody></table></div>`:''}</div>`;}
+/* ---- Closure and approval ---- */
+function tabClosure(x){const F=x.findings,A=x.approval,gaps=closureGaps(x);
+ return `<div class="panel section"><h2>Ready to close?</h2>${gaps.length?`<ul class="riskgaps">${gaps.map(g=>`<li>${e(g)}</li>`).join('')}</ul>`:'<p class="small">Everything needed for closure is recorded. Log a timeline entry at the Closed stage to close the incident.</p>'}</div>
+ <div class="panel section"><h2>Incident closure summary</h2><div class="formgrid" style="margin-top:12px">${fT('Incident closure summary','findings.summary',F.summary,'rows="5" placeholder="What happened, what was confirmed, what remains uncertain, and the outcome"','full')}</div></div>
+ <div class="panel section"><h2>Closure decision</h2><p class="sub">Recording the decision also adds it to the timeline.</p><div class="formgrid" style="margin-top:12px">
+ ${fS('Decision','findings.decision',[['','Not yet decided'],'Close','Continue monitoring','Escalate'],F.decision,'data-irr data-incdecision')}${fI('Decision-maker','findings.by',F.by,'type="text" placeholder="Name, role"')}${fI('Decision date','findings.date',F.date,'type="date"')}${F.decision==='Continue monitoring'?fI('Next review date','findings.review',F.review,'type="date"'):''}
+ ${fT('Justification for closure or continued monitoring','findings.why',F.why,'rows="3"','full')}</div></div>
+ <div class="panel section"><h2>Lessons learned</h2><div class="formgrid" style="margin-top:12px">${fT('Lessons learned','lessons.text',x.lessons.text,'rows="4" placeholder="What went well, what to improve, and any follow-up actions"','full',(sevById(x.risk.sev)||{}).isimp?'Required before closing a Critical or Major incident.':'')}</div></div>
+ <div class="panel section"><div class="section-head"><h2>Evidence</h2><button class="secondary" data-act="incAddRow" data-list="evidence">+ Add evidence</button></div><p class="sub">Supporting correspondence, investigation reports and decision records, by reference (document name and SharePoint link or record number). Evidence references on timeline entries are listed in the report too.</p>
+ ${x.evidence.length?x.evidence.map((v,i)=>`<div class="inc-row"><div class="formgrid inc-g3">${fI('Document',`evidence.${i}.name`,v.name)}${fS('Type',`evidence.${i}.type`,[['','Select'],'Correspondence','Investigation report','Decision record','Logs / artefacts','Notification record','Other'],v.type)}${fI('Date',`evidence.${i}.date`,v.date,'type="date"')}${fI('Reference (link or record)',`evidence.${i}.ref`,v.ref,'type="text"','full')}</div><div class="inc-rowfoot"><span></span><button class="linkbtn" data-act="incDelRow" data-list="evidence" data-i="${i}">Remove</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No evidence recorded yet.</p>'}</div>
+ <div class="panel section"><div class="section-head"><h2>Reviewers</h2><button class="secondary" data-act="incAddRow" data-list="approval.reviewers">+ Add reviewer</button></div>
+ ${A.reviewers.length?A.reviewers.map((v,i)=>`<div class="inc-row"><div class="formgrid inc-g3">${fI('Name',`approval.reviewers.${i}.name`,v.name)}${fI('Role',`approval.reviewers.${i}.role`,v.role)}${fI('Reviewed on',`approval.reviewers.${i}.date`,v.date,'type="date"')}</div><div class="inc-rowfoot"><span></span><button class="linkbtn" data-act="incDelRow" data-list="approval.reviewers" data-i="${i}">Remove</button></div></div>`).join(''):'<p class="small" style="margin-top:10px">No reviewers yet.</p>'}</div>
+ <div class="panel section"><h2>Approval</h2><div class="formgrid" style="margin-top:12px">${fI('Approver','approval.approver',A.approver)}${fI('Role','approval.role',A.role)}${fI('Approved on','approval.date',A.date,'type="date"')}${fT('Comments','approval.comments',A.comments,'rows="2"','full')}</div></div>`;}
+/* ---- Report (PDF) ---- */
+function reportHtml(x){const o=x.ov,at=awareAt(x),cm=consMax(x),sv=sevById(x.risk.sev),unc=uncertainties(x),tl=sortedTl(x),val=v=>v?e(v):'—';
+ const sec=(n,t,b)=>`<section><h2>${n}. ${e(t)}</h2>${b}</section>`,kv=rows=>`<table class="kv">${rows.map(([k,v])=>`<tr><th>${e(k)}</th><td>${v}</td></tr>`).join('')}</table>`;
+ const rateRow=(k,lab)=>{const r=x.risk[k],c=cellOf(r.F,r.S);return `<tr><td>${lab}</td><td>${val(fd(r.date))}</td><td>${r.S!==''?'S'+e(r.S):'—'}</td><td>${r.F?'F'+e(r.F)+' '+e(C.likelihood[r.F-1][1]):'—'}</td><td>${c?`<span class="sc m-${c.color}">${c.value}</span>`:'Not rated'}</td><td>${val(r.why)}</td></tr>`;};
+ const body=`<header><div class="k">${ORG} · Cybersecurity · ${MARK}</div><h1>Cyber Incident Risk Assessment Report</h1><div class="t">${e(o.title||'Untitled incident')}</div>
+ <div class="meta"><span><b>Reference:</b> ${val(o.ref)}</span><span><b>Stage:</b> ${e(incStage(x))}</span><span><b>Report date:</b> ${e(fd(TODAY))}</span><span><b>Severity:</b> ${sv?e(sv.name):'Not assigned'}</span></div></header>
+ ${sec(1,'Incident overview',kv([['Incident title',val(o.title)],['Cyber incident number',val(o.ref)],['HEAT incident number',val(o.heat)],['Incident type',val(o.type)],['Origin',val(o.origin)+(o.origin==='Third party'?' · '+e(tpName(x)):'')],['Source of incident',val(o.source)],['Discovery date',val(fd(o.discovered))],['Notification required',at?e(fdt(at)):'—'],['Current stage',e(incStage(x))],['Incident details',val(o.nature)],['Environment affected',val(o.env)],['Systems impacted',val(sysNames(x).join('; '))],['Incident owner',val(o.owner)],['Incident coordinator',val(o.manager)]]))}
+ ${sec(2,'Executive summary',rich(execText(x)))}
+ ${sec(3,'Timeline',tl.length?`<table class="g"><thead><tr><th>Date and time</th><th>Stage</th><th>Event</th><th>Type</th><th>Party</th><th>Evidence</th></tr></thead><tbody>${tl.map(({r})=>{const a=r.actionId?actById(x,r.actionId):null;return `<tr${r.aware?' class="aw"':''}><td class="nw">${e(fd(r.date))}${r.time?' '+e(r.time):''}${r.aware?`<div class="aw-l">Notification required</div>`:''}</td><td>${val(r.stage)}</td><td>${val(r.event)}</td><td>${e(kindName(r.kind))}</td><td>${partyOf(r)?e(partyOf(r)):'—'}${r.kind==='action'&&a?'; '+e(a.status):''}</td><td>${refHtml(r.ref)}</td></tr>`;}).join('')}</tbody></table>`:'<p>No events recorded.</p>')}
+ ${sec(4,'Impact assessment',kv([['Risk driver',x.impact.drv.ctx?e((C.contexts.find(c=>c.id===x.impact.drv.ctx)||{}).name||x.impact.drv.ctx):'—'],['Consequence',cm?'S'+e(cm.s)+' · '+e(((C.contexts.find(c=>c.id===x.impact.drv.ctx)||{}).d||[])[cm.s]||''):'Not rated'],['C, I or A affected',ciaNames(x).length?e(ciaNames(x).join(', ')):'—'],['Rationale',val(x.impact.drv.why)]]))}
+ ${sec(5,'Risk assessment',`<table class="g"><thead><tr><th>Rating</th><th>Assessed</th><th>Consequence</th><th>Likelihood</th><th>Score</th><th>Rationale</th></tr></thead><tbody>${rateRow('current','Current')}</tbody></table>
+  ${kv([['Controls and compensating measures',val(x.risk.controls)],['Residual risk',val(x.risk.residual)],['Severity',sv?e(sv.name+' · '+sv.ecmp):'Not assigned'],['Severity justification',val(o.sevJust)]])}
+  ${x.risk.sevHist.length?`<h3>Severity history</h3><table class="g"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Reason</th></tr></thead><tbody>${x.risk.sevHist.map(h=>`<tr><td>${e(fd(h.date))}</td><td>${e((sevById(h.from)||{}).name||'—')}</td><td>${e((sevById(h.to)||{}).name||'—')}</td><td>${val(h.why)}</td></tr>`).join('')}</tbody></table>`:''}`)}
+ ${sec(6,'Regulatory and internal escalation',`<table class="g"><thead><tr><th>Obligation</th><th>Applies</th><th>Rationale</th><th>Deadline</th><th>Notified</th><th>Reference</th><th>Legal</th><th>Decided by</th></tr></thead><tbody>${C.regs.map(g=>{const r=x.reg.rows[g.id]||{},st=regState(x,g);return `<tr><td>${e(g.name)}</td><td>${r.applies?e(r.applies):'<b>Not assessed</b>'}</td><td>${val(r.why)}</td><td>${st.due?e(fdt(st.due)):e(g.deadline)}</td><td>${(nf=>nf?e(fdtS(nf.at)):'—')(notifiedOf(x,g))}</td><td>${val((notifiedOf(x,g)||{}).refno)}</td><td>${val((notifiedOf(x,g)||{}).legal)}</td><td>${val(r.by)}</td></tr>`;}).join('')}</tbody></table>
+  <h3>Internal escalation</h3>${(l=>l.length?`<table class="g"><thead><tr><th>Party</th><th>Notified</th><th>What was communicated</th></tr></thead><tbody>${l.map(({r})=>`<tr><td>${e(oblName(entryObl(r)).replace('Internal – ',''))}</td><td class="nw">${e(tlDisplay(r))}</td><td>${val(r.event)}</td></tr>`).join('')}</tbody></table>`:'<p>No internal notification recorded.</p>')(tl.filter(({r})=>r.kind==='notify'&&String(entryObl(r)).startsWith('int:')))}`)}
+ ${sec(7,'Incident response',kv([...PHASES,'Other activities'].map(ph=>{const l=tl.filter(({r})=>r.kind==='response'&&(r.phase||STAGE_PHASE[r.stage]||'Other activities')===ph);return [ph,l.length?`<ul>${l.map(({r})=>`<li>${e(tlDisplay(r))}: ${e(r.event||'')}${partyOf(r)?' <i>('+e(partyOf(r))+')</i>':''}</li>`).join('')}</ul>`:'—'];})))}
+ ${sec(8,'Closure summary and decision',`<h3>Incident closure summary</h3>${x.findings.summary?rich(x.findings.summary):'<p>—</p>'}
+  <h3>Decision</h3>${kv([['Decision',x.findings.decision?e(x.findings.decision):'Not yet decided'],['Decision-maker',val(x.findings.by)],['Date',val(fd(x.findings.date))],...(x.findings.decision==='Continue monitoring'?[['Next review',val(fd(x.findings.review))]]:[]),['Justification',val(x.findings.why)]])}`)}
+ ${sec(9,'Actions and follow-up',x.actions.length?`<table class="g"><thead><tr><th>Action</th><th>Owner</th><th>Target</th><th>Status</th><th>Escalation trigger</th><th>Closure criteria</th></tr></thead><tbody>${x.actions.map(a=>`<tr><td>${val(a.text)}</td><td>${val(a.owner)}</td><td class="nw">${val(fd(a.due))}</td><td>${val(a.status)}</td><td>${val(a.trigger)}</td><td>${val(a.closure)}</td></tr>`).join('')}</tbody></table>`:'<p>No actions recorded.</p>')}
+ ${sec(10,'Lessons learned',x.lessons.text?rich(x.lessons.text):'<p>—</p>')}
+ ${sec(11,'Evidence and approval',`${x.evidence.length?`<table class="g"><thead><tr><th>Document</th><th>Type</th><th>Reference</th><th>Date</th></tr></thead><tbody>${x.evidence.map(v=>`<tr><td>${val(v.name)}</td><td>${val(v.type)}</td><td>${refHtml(v.ref)}</td><td class="nw">${val(fd(v.date))}</td></tr>`).join('')}</tbody></table>`:'<p>No evidence recorded.</p>'}
+  ${x.approval.reviewers.length?`<h3>Reviewers</h3><table class="g"><thead><tr><th>Name</th><th>Role</th><th>Reviewed</th></tr></thead><tbody>${x.approval.reviewers.map(v=>`<tr><td>${val(v.name)}</td><td>${val(v.role)}</td><td>${val(fd(v.date))}</td></tr>`).join('')}</tbody></table>`:''}
+  <h3>Approval</h3>${kv([['Approver',val(x.approval.approver)],['Role',val(x.approval.role)],['Approved on',val(fd(x.approval.date))],['Comments',val(x.approval.comments)]])}`)}
+ <footer>Ratings, deadlines and severity are indicative, based on the ${ORG} integrated risk matrix and incident procedure settings in this concept. This report supports, and does not replace, legal advice or formal risk acceptance.</footer>`;
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${e((o.ref?o.ref+' ':'')+'Cyber Incident Risk Assessment Report')}</title><style>
+ @page{size:A4;margin:14mm 15mm}*{box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#223037;font-size:9.5pt;line-height:1.42;margin:0;padding:18px}@media print{body{padding:0}}
+ table.page{border:0;margin:0;width:100%}table.page>thead>tr>td,table.page>tfoot>tr>td,table.page>tbody>tr>td{border:0;padding:0}
+ .mark{font-size:8pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#B42318;text-align:center;margin:4px 0}
+ header{border-bottom:3px solid #0F3D3E;padding-bottom:8px;margin-bottom:12px}.k{font-size:8pt;letter-spacing:.06em;text-transform:uppercase;color:#118D8A;font-weight:700}h1{font-family:Georgia,serif;font-size:18pt;margin:4px 0 2px;color:#0F3D3E}.t{font-size:12pt;font-weight:600;margin-bottom:6px}
+ .meta{display:flex;flex-wrap:wrap;gap:3px 18px;font-size:9pt;color:#46566b}.meta b{color:#223037}
+ h2{font-family:Georgia,serif;font-size:12.5pt;margin:16px 0 6px;color:#0F3D3E;border-bottom:1px solid #d5dde6;padding-bottom:2px}h3{font-size:10pt;margin:10px 0 4px}p{margin:5px 0}ul{margin:4px 0 4px 18px}
+ table{width:100%;border-collapse:collapse;margin:4px 0 8px}td,th{border:1px solid #d5dde6;padding:4px 6px;vertical-align:top;text-align:left}thead th{background:#EEF3F5;font-size:8.5pt}
+ .kv th{width:30%;background:#F6F8F9;font-weight:600}.nw{white-space:nowrap}tr{break-inside:avoid}tr.aw td{background:#FFF7E6}.aw-l{font-size:7.5pt;font-weight:700;color:#B54708}
+ .sc{display:inline-block;min-width:26px;text-align:center;font-weight:700;border-radius:4px;padding:1px 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .m-green{background:#92D050}.m-blue{background:#8DB4E2}.m-yellow{background:#FFFF00}.m-orange{background:#F79646}.m-red{background:#FF0000;color:#fff}
+ a{color:#118D8A;word-break:break-all}footer{margin-top:18px;border-top:1px solid #d5dde6;padding-top:6px;font-size:8pt;color:#65748a}
+ </style></head><body><table class="page"><thead><tr><td><div class="mark">${MARK}</div></td></tr></thead><tfoot><tr><td><div class="mark">${MARK} · ${ORG} · Cyber Incident Risk Assessment Report · ${e(o.ref||'')} · ${e(fd(TODAY))}</div></td></tr></tfoot><tbody><tr><td>${body}</td></tr></tbody></table></body></html>`;}
+function printHtml(html){const old=document.getElementById('printFrame');if(old)old.remove();const f=document.createElement('iframe');f.id='printFrame';f.title='Report for printing';f.setAttribute('aria-hidden','true');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';document.body.appendChild(f);
+ const d=f.contentWindow.document;d.open();d.write(html);d.close();toast('In the print dialog, choose "Save as PDF"');setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(_){toast('Printing is blocked in this browser');}},300);}
+window.incReportHtml=id=>reportHtml(DB.incidents[id]);
+window.incApi={openRegs,regState,notifiedOf,closureGaps};
+
+/* ---- Saving: fields save as you type ---- */
+let incT;const incSave=()=>{const x=cur();if(x)x.updated=TODAY;clearTimeout(incT);incT=setTimeout(save,300);};
+const redraw=()=>{const y=window.scrollY;render();window.scrollTo(0,y);};
+function refreshExec(x){if(x.exec.edited)return;const t=document.getElementById('incExec');if(t&&document.activeElement!==t)t.value=execGenerated(x);}
+document.addEventListener('input',ev=>{const t=ev.target,x=cur();if(!x)return;
+ if(t.id==='incExec'){x.exec.edited=true;x.exec.text=t.value;const v=document.getElementById('incExecView');if(v)v.innerHTML=rich(t.value);incSave();return;}
+ if(t.dataset&&t.dataset.ip!=null&&t.tagName!=='SELECT'){setP(x,t.dataset.ip,t.value);incSave();}});
+document.addEventListener('change',ev=>{const t=ev.target;
+ if(t.matches&&t.matches('[data-incf]')){V.incF=t.value;render();return;}
+ if(t.id==='incU-aware'){const sb=document.getElementById('incSociBox');if(sb){sb.hidden=!t.checked;if(!t.checked)sb.querySelectorAll('input').forEach(r=>r.checked=false);}return;}
+ const x=cur();if(!x)return;
+ if(t.dataset.inccia){const d=x.impact.drv,st=new Set(d.cia||[]);t.checked?st.add(t.dataset.inccia):st.delete(t.dataset.inccia);d.cia=CIA.map(([k])=>k).filter(k=>st.has(k));incSave();return;}
+ if(t.dataset.incaware!=null){x.timeline.forEach((r,i)=>r.aware=(i===Number(t.dataset.incaware)));save();redraw();toast('Notification clocks now run from '+fdt(awareAt(x)));return;}
+ if(t.dataset.ip==null)return;const prevVal=getP(x,t.dataset.ip);setP(x,t.dataset.ip,t.value);
+ if(t.hasAttribute('data-inctype')){const r=x.timeline[Number(t.dataset.inctype)];if(r){if(r.kind==='action'&&!r.actionId){const a={id:uid(),text:r.event,owner:r.party||'',due:'',status:'Open',trigger:'',closure:'',tlId:r.id};x.actions.push(a);r.actionId=a.id;}if(r.kind==='notify')r.obl=matchObl(r.party);}save();redraw();return;}
+ if(/^timeline\.\d+\.party$/.test(t.dataset.ip)){const r=x.timeline[Number(t.dataset.ip.split('.')[1])];if(r&&r.kind==='notify')r.obl=matchObl(r.party)||(r.party?'':r.obl);save();redraw();return;}
+ if(t.hasAttribute('data-incact')&&t.value==='Completed'&&prevVal!=='Completed'){const a=x.actions[Number(t.dataset.incact)];x.timeline.push({id:uid(),date:TODAY,time:nowHM(),kind:'action',stage:incStage(x),event:'Action completed: '+(a.text||''),party:'',dir:'',ack:'',ref:'',aware:false,actionId:a.id,done:true});save();redraw();toast('Completion added to the timeline');return;}
+ if(t.hasAttribute('data-incdecision')&&t.value&&t.value!==prevVal){x.timeline.push({id:uid(),date:TODAY,time:nowHM(),kind:'decision',stage:t.value==='Close'?'Follow-up':'',event:'Closure decision: '+t.value.toLowerCase()+'.',dtype:t.value==='Escalate'?'Escalation':t.value,decider:x.findings.by||'',party:'',dir:'',ack:'',ref:'',aware:false});save();redraw();toast('Decision added to the timeline');return;}
+ if(t.hasAttribute('data-incsev')){if((x.risk.sevPrev||'')!==t.value){x.risk.sevHist.push({date:TODAY,from:x.risk.sevPrev||'',to:t.value,why:''});x.timeline.push({id:uid(),date:TODAY,time:nowHM(),kind:'decision',stage:'',event:`Severity set to ${(sevById(t.value)||{}).name||'not assigned'}${x.risk.sevPrev?' (was '+((sevById(x.risk.sevPrev)||{}).name||'—')+')':''}.`,dtype:'Severity change',decider:'',party:'',dir:'',ack:'',ref:'',aware:false});x.risk.sevPrev=t.value;}save();redraw();return;}
+ if(t.dataset.ip==='risk.current.S'||t.dataset.ip==='risk.current.F')x.risk.current.date=TODAY;
+ if(t.dataset.ip==='impact.drv.ctx'){const c=C.contexts.find(z=>z.id===t.value),S=x.risk.current.S;if(!c||(S!==''&&!c.d[Number(S)]))x.risk.current.S='';}
+ if(t.hasAttribute('data-irr')){save();redraw();return;}
+ incSave();});
+Object.assign(ACT,{
+ incNew(){DB.incidents=DB.incidents||{};const y=TODAY.slice(0,4),n=Object.values(DB.incidents).filter(x=>String(x.ov.ref).startsWith('CSI-'+y)).length+1,id=nid('INC');DB.incidents[id]=incBlank(id,`CSI-${y}-${String(n).padStart(3,'0')}`);save();V.incTab='Overview';go('incident',id);toast('Incident record created');},
+ incTab(b){V.incTab=b.dataset.t;const y=window.scrollY;render();window.scrollTo(0,Math.min(y,document.querySelector('.tabs')?document.querySelector('.tabs').offsetTop-80:y));},
+ incLog(){const x=cur();if(!x)return;const g=id=>document.getElementById(id),v=id=>{const el=g(id);return el?String(el.value).trim():'';},k=v('incU-kind')||'event',ev=v('incU-event'),d=v('incU-date');
+  if(!isDate(d))return showErr('incUErr','Enter the date.');if(!ev)return showErr('incUErr','Describe the event.');
+  const aware=!!(g('incU-aware')&&g('incU-aware').checked);if(aware)x.timeline.forEach(r=>r.aware=false);const sociEl=document.querySelector('input[name="incU-soci"]:checked'),soci=sociEl?sociEl.value:'';
+  const party=v('incU-party'),r={id:uid(),date:d,time:v('incU-time'),kind:k,stage:v('incU-stage'),event:ev,party,ref:v('incU-ref'),aware};if(soci)r.soci=soci;
+  if(k==='notify')r.obl=matchObl(party);if(k==='response')r.by=party;if(k==='decision')r.decider=party;
+  if(k==='action'){const a={id:uid(),text:ev,owner:party,due:'',status:'Open',trigger:'',closure:'',tlId:r.id};x.actions.push(a);r.actionId=a.id;}
+  if(k==='notify'&&C.regs.some(z=>z.id===r.obl)){const row=x.reg.rows[r.obl]=x.reg.rows[r.obl]||{};if(!row.applies||row.applies==='Under assessment')row.applies='Yes';}
+  x.timeline.push(r);x.updated=TODAY;V.incParty='';V.incKind='';V.incStage='';V.incAdd=false;save();redraw();toast(aware?'Added. Notification clocks now run from '+fdt(awareAt(x)):'Added to the timeline');},
+ incLogObl(b){V.incKind='notify';V.incStage='Notification';V.incParty=oblName(b.dataset.obl);V.incAdd=true;V.incOblOpen=null;render();const p=document.getElementById('incLogPanel');if(p){p.scrollIntoView({block:'start'});const t=document.getElementById('incU-event');if(t)t.focus();}},
+ incKf(b){V.incKf=b.dataset.k;redraw();},
+ incSociClear(){document.querySelectorAll('input[name="incU-soci"]').forEach(r=>r.checked=false);},
+ incAddToggle(){V.incAdd=!V.incAdd;if(!V.incAdd){V.incParty='';V.incKind='';V.incStage='';}redraw();if(V.incAdd){const t=document.getElementById('incU-event');if(t)t.focus();}},
+ incEdit(b){V.incEditId=b.dataset.id||null;redraw();},
+ incSysAdd(){const x=cur(),el=document.getElementById('incSysName'),v=el?el.value.trim():'';if(!x||!v)return toast('Type the system name first');x.ov.sys=[...new Set([...(x.ov.sys||[]),v])];save();redraw();const n=document.getElementById('incSysName');if(n)n.focus();},
+ incSysDel(b){const x=cur();if(!x)return;(x.ov.sys||[]).splice(Number(b.dataset.i),1);save();redraw();},
+ incAddRow(b){const x=cur();if(!x)return;const k=b.dataset.list,list=getP(x,k);list.push(k==='evidence'?{id:uid(),name:'',type:'',ref:'',date:''}:{id:uid(),name:'',role:'',date:''});save();redraw();},
+ incDelRow(b){const x=cur();if(!x)return;const l=b.dataset.list,list=getP(x,l),it=list[Number(b.dataset.i)];list.splice(Number(b.dataset.i),1);
+  if(l==='timeline'&&it&&it.actionId)x.actions=x.actions.filter(a=>a.id!==it.actionId);if(l==='actions'&&it)x.timeline=x.timeline.filter(t=>t.actionId!==it.id||t.done);save();redraw();},
+ incExecReset(){const x=cur();if(!x)return;x.exec.edited=false;x.exec.text='';save();redraw();},
+ incPdf(){const x=cur();if(x)printHtml(reportHtml(x));},
+ incDecl(){const x=cur();if(!x)return;const o=x.ov,sv=sevById(x.risk.sev);const txt=`Subject: Cybersecurity incident declaration – ${o.title||'[incident name]'}\n\nIncident name: ${o.title||'—'}\nIncident type: ${o.type||'—'}\nCybersecurity incident number: ${o.ref||'—'}\nHEAT incident number: ${o.heat||'N/A'}\nIncident severity: ${sv?sv.name:'—'}\nSeverity justification: ${o.sevJust||'—'}\nIncident details and current analysis: ${o.nature||'—'}`;
+  (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Declaration email text copied'),()=>toast('Copy is blocked in this browser'));},
+ incDel(){const x=cur();if(!x)return;ConfirmDialog({title:'Delete this incident?',message:`${x.ov.ref||x.id} and its timeline, assessments and evidence references will be removed from this browser.`,buttons:[{label:'Cancel'},{label:'Delete incident',kind:'primary danger',fn:()=>{delete DB.incidents[x.id];save();go('incidents');toast('Incident deleted');}}],cancel:0});}
+});
+/* ---- Keeping records: sample, export, import and clear (records live in this browser only) ---- */
+const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+/* Fill any missing fields from a blank record, keeping only keys that are safe to copy */
+function fillBlank(b,x){if(!isObj(x))return b;Object.keys(x).forEach(k=>{if(k==='__proto__'||k==='constructor'||k==='prototype')return;const v=x[k];b[k]=isObj(b[k])&&isObj(v)?fillBlank(b[k],v):v;});return b;}
+Object.assign(ACT,{
+ incSample(){if(DB.incidents['INC-9001'])return toast('The sample incident is already loaded');DB.incidents['INC-9001']=incSample();save();render();toast('Sample incident loaded');},
+ incExport(){const n=Object.keys(DB.incidents).length;if(!n)return toast('No incidents to export');const blob=new Blob([JSON.stringify({tool:'colaboree-cyber-incident',schema:DB.schema,exported:new Date().toISOString(),incidents:DB.incidents},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`cyber-incidents-${TODAY}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);toast(`Exported ${n} incident${n===1?'':'s'}. Store the file in a restricted location.`);},
+ incClear(){ConfirmDialog({title:'Clear all incidents?',message:'Every incident record will be removed from this browser. Export first if you need to keep a copy.',buttons:[{label:'Cancel'},{label:'Clear all',kind:'primary danger',fn:()=>{DB.incidents={};save();go('incidents');toast('All incidents cleared from this browser');}}],cancel:0});}
+});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.id!=='incImport'||!t.files||!t.files[0])return;const f=t.files[0];t.value='';
+ if(f.size>5e6)return toast('That file is too large to be an incident export');
+ f.text().then(txt=>{let d;try{d=JSON.parse(txt);}catch(_){return toast('That file is not valid JSON');}
+  const src=isObj(d)&&isObj(d.incidents)?d.incidents:null;if(!src)return toast('No incidents found in that file');
+  let added=0,replaced=0;Object.values(src).forEach(r=>{if(!isObj(r)||typeof r.id!=='string'||!/^[\w-]{1,40}$/.test(r.id))return;const ov=isObj(r.ov)?r.ov:{};const x=fillBlank(incBlank(r.id,String(ov.ref||r.id)),r);x.id=r.id;try{incNorm(x);}catch(_){return;}if(DB.incidents[r.id])replaced++;else added++;DB.incidents[r.id]=x;});
+  if(!added&&!replaced)return toast('No valid incidents found in that file');
+  const seq=Object.keys(DB.incidents).map(k=>Number((k.match(/(\d+)$/)||[])[1])||0);DB.seq=Math.max(DB.seq||9000,...seq);save();render();toast(`Imported ${added} new${replaced?`, replaced ${replaced}`:''} incident${added+replaced===1?'':'s'}`);});});
+Object.assign(VIEWS,{incidents:incidentsPage,incident:incidentPage});
+/* Live countdowns: refresh the clock texts every 30 seconds without redrawing the page (so typing is never interrupted) */
+setInterval(()=>{const x=cur();if(V.view==='incidents'&&!document.activeElement.matches('input,textarea,select')){redraw();return;}if(!x)return;
+ document.querySelectorAll('[data-oblr]').forEach(el=>{const g=C.regs.find(r=>r.id===el.dataset.oblr);if(g)el.innerHTML=oblRight(x,g);});
+ document.querySelectorAll('[data-incclocks]').forEach(el=>{el.innerHTML=clockList(x,Number(el.dataset.incclocks)||0);});},30000);
+
+})();
+
+/* ---- V11 migration: incidents collection with one fictional sample ---- */
+/* ---- Sample incident (fictional), loaded on request ---- */
+function incSample(){{const s=incBlank('INC-9001','CSI-2026-001'),dd=n=>addDays(TODAY,-n);
+  Object.assign(s.ov,{title:'Vendor Y email compromise (sample)',type:'Third-party / supply chain breach',origin:'Third party',thirdParty:'Vendor Y',source:'Third-party notification',discovered:dd(4),status:'Contained',owner:'Head of Infrastructure (sample)',manager:'Cyber Operations Manager (sample)',sys:['Passenger information platform (sample)'],env:'IT',nature:'Vendor Y advised that an attacker accessed one of its staff email accounts through a phishing attack (credential phishing followed by mailbox access). The account exchanged project correspondence with Metro. Information potentially compromised: project correspondence and contact details of 14 Metro staff.',sevJust:'Suspected exposure of Metro confidential correspondence and staff contact details; no Metro system compromised.'});
+  s.created=dd(3);s.updated=dd(1);
+  const T=(id,n,time,kind,stage,event,o)=>Object.assign({id,date:dd(n),time,kind,stage,event,party:'',dir:'',ack:'',ref:'',aware:false},o||{});
+  s.v2=true;s.v3=true;s.v4=true;s.timeline=[T('t1',4,'16:20','event','Identification','Vendor Y detects suspicious sign-ins to a staff mailbox.',{party:'Vendor Y'}),
+   T('t2',3,'09:15','event','Notification','Vendor Y notifies Metro by email of a possible compromise affecting Metro correspondence.',{party:'Vendor Y',dir:'Received',ack:'Yes',aware:true,soci:'none'}),
+   T('t3',3,'09:30','notify','Notification','Core CERT alerted and incident chat opened.',{obl:'int:CoreCERT',dir:'Sent'}),
+   T('t3b',3,'09:45','notify','Declaration','Incident declaration email sent to the GM OCMS.',{obl:'int:GMOCMS',dir:'Sent'}),
+   T('t3c',3,'09:50','event','Triage','Metro CERT reviews the notice and raises enquiries on scope and data affected.',{party:'Vendor Y',dir:'Sent',ack:'Yes'}),
+   T('t3d',3,'09:55','decision','Triage','Severity set to Major (P2): suspected unprotected PII breach at a supplier.',{dtype:'Severity change',decider:'Head of Infrastructure'}),
+   T('t4',3,'10:05','notify','Notification','DoT notified in writing of a suspected data security breach.',{obl:'dot',legal:'Yes',dir:'Sent'}),
+   T('t5',3,'11:00','response','Containment','Metro blocked lookalike domains and alerted staff to expect phishing.',{phase:'Containment',by:'Metro'}),
+   T('t6',2,'14:00','response','Containment','Vendor Y reset credentials, enforced MFA and removed malicious inbox rules.',{phase:'Containment',by:'Vendor Y'}),
+   T('t7',2,'15:30','response','Analysis','Metro reviewed mail logs for messages from the compromised account; no further suspicious mail found.',{phase:'Analysis and investigation',by:'Metro'}),
+   T('t8',1,'10:00','action','Analysis','Obtain Vendor Y forensic summary.',{actionId:'a1'})];
+  s.impact.cyber.c={aff:'Yes',conf:'Suspected',desc:'Project correspondence may have been read.'};s.impact.cyber.i={aff:'No',conf:'',desc:''};s.impact.cyber.a={aff:'No',conf:'',desc:''};s.impact.cyber.pi={aff:'Yes',conf:'Suspected',desc:'Names, work emails and phone numbers of 14 staff.'};
+  s.impact.cons={safety:{s:'na',why:'No operational technology involved.'},financial:{s:'0',why:'Response effort only.'},reputation:{s:'1',why:'Possible limited local attention if phishing targets staff.'},legal:{s:'2',why:'Privacy assessment under way.'},engineering:{s:'na',why:''}};
+  s.risk.initial={date:dd(3),S:'2',F:'4',why:'Scope unknown at notification.'};s.risk.current={date:dd(1),S:'2',F:'2',why:'Containment confirmed; no evidence of further access.'};
+  s.risk.controls='Vendor Y password reset and MFA; Metro mail filtering for the vendor domain; staff phishing alert issued.';s.risk.residual='Low residual risk of targeted phishing using exposed contact details.';
+  s.risk.sev='P2';s.risk.sevPrev='P2';s.risk.sevHist=[{date:dd(3),from:'',to:'P2',why:'Suspected unprotected PII breach at a supplier'}];
+  s.reg.rows={dot:{applies:'Yes',why:'Suspected data security breach involving Metro data.',by:'Head of Infrastructure'},mtrPhone:{applies:'No',why:'Not a confirmed Critical or Major breach of Metro systems.',by:'Head of Infrastructure'},mtrWritten:{applies:'Under assessment',why:'Depends on confirmation of the breach.'},ovic:{applies:'Under assessment',why:'Correspondence BIL being confirmed with the business owner.'},oaic:{applies:'Under assessment',why:'Eligible data breach assessment under way (30 days).',by:'Privacy Officer'},ransom:{applies:'No',why:'Not a ransomware incident.',by:'Cyber Operations Manager'}};
+
+  s.findings.summary='Initial compromise vector: credential phishing email to a Vendor Y staff member (confirmed).\n\nSystems compromised: one Vendor Y mailbox (confirmed). No Metro system was accessed.\n\nStill uncertain: whether attachments were downloaded.';
+  s.actions=[{id:'a1',text:'Obtain Vendor Y forensic summary.',owner:'Cyber Operations Manager',due:addDays(TODAY,5),status:'Open',trigger:'Not received by target date',closure:'Summary received and reviewed',tlId:'t8'}];
+  return s;}}
+
+route();
+</script>
+</body>
+</html>
