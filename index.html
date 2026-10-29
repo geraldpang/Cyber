@@ -113,7 +113,12 @@ footer{
   .tiles{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:420px){
-  .tiles{grid-template-columns:1fr 1fr;gap:14px;}
+  nav{padding:0 16px;}
+  .nav-sub{display:none;}
+  .hero{padding:48px 16px 32px;}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 16px 64px;}
+  .tile{padding:14px;gap:10px;min-width:0;}
+  .tile-title{font-size:.92rem;overflow-wrap:anywhere;}
 }
 </style>
 </head>
@@ -125,7 +130,7 @@ footer{
     <span class="nav-sub">Cyber Governance Toolkit</span>
   </div>
   <div class="nav-right">
-    <span class="dot"></span> 3 tools live
+    <span class="dot"></span> 4 tools live
   </div>
 </nav>
 
@@ -170,6 +175,18 @@ footer{
       </svg>
     </div>
     <div class="tile-title">Third-Party Assessment Report</div>
+    <div class="tile-status"><span class="dot"></span>Live</div>
+  </a>
+
+  <a class="tile" href="/incident">
+    <div class="tile-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3.5l9 15.5H3z"/>
+        <path d="M12 10v4"/>
+        <circle cx="12" cy="16.6" r=".9" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="tile-title">Cyber Incident Management</div>
     <div class="tile-status"><span class="dot"></span>Live</div>
   </a>
 
